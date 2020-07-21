@@ -1,0 +1,54 @@
+@import '~@common/layout/frame/config.less';
+.host-list-page{
+	background-color:#fff;
+	padding:10px 15px;
+	.search-bar{
+		display:flex;
+	}
+	.table-wrap{
+		margin-top:10px;
+	}
+}
+
+.tree-table-layout{
+	display:flex;
+	.left-tree{
+		width:260px;
+		background-color:#fff;
+		padding:10px 15px;
+		height:calc(@containerHeight - 20px);
+		overflow:auto;
+		.left-tree-style{
+			overflow:auto;
+			padding:15px 0;
+			white-space:nowrap;
+		}
+	}
+	.right-table{
+		width:calc(100% - 270px);
+		margin-left:10px;
+		background-color:#fff;
+		padding:10px 15px;
+		height:calc(@containerHeight - 20px);
+		overflow:auto;
+		.search-bar{
+			display:flex;
+		}
+		.table-wrap{
+			margin-top:10px;
+		}
+	}
+}
+
+.img-container{
+	padding:10px;
+	border:1px solid #eee;
+	border-radius:2px;
+	height:300px;
+	img{
+		width:100%;
+		height:100%;
+	}
+}
+
+

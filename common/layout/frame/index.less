@@ -1,0 +1,147 @@
+@import "./global.less";
+@import "./config.less";
+
+@borderShadow:0 0 6px 1px rgba(0,0,0,0.06);
+
+@topHeight:calc(@topbarHeight + @headerHeight);
+
+.frame{
+  background-color:@appBgColor;
+  a{
+    color:@linkColor;
+    &:active,&.active{
+      color:@linkActiveColor;
+    }
+    &:hover{
+      color:@linkHoverColor;
+    }
+  }
+  .frame-header{
+    // height:@headerHeight;
+    // line-height:@headerHeight;
+    // box-shadow:0 0 3px 2px #ddd;
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    z-index:10;
+    color:@appColor;
+  }
+  .frame-footer{
+    height:@footerHeight;
+    line-height:@footerHeight;
+    position:fixed;
+    bottom:0;
+    left:0;//@menuWidth;
+    right:0;
+    z-index:2;
+    .footer{
+      background-color:@footerBgColor;
+      max-width:@maxWidth;
+      padding-left:@menuWidth;
+      transition:left .3s;
+    }
+    &.showMenu{
+      .footer{
+        padding-left:@collapseWidth;
+        transition:left .3s;
+      }
+    }
+  }
+  .frame-main{
+    max-width:@maxWidth;
+    margin:0 auto;
+    padding-top:@topHeight;
+    padding-bottom:@footerHeight;
+    box-shadow:@borderShadow;
+    z-index:5;
+    .frame-container{
+      position:relative;
+      .frame-aside{
+        position:fixed;
+        width:@menuWidth;
+        // left:calc(50% - @maxWidth/2);
+        top:@topHeight;
+        bottom:0;
+        z-index:5;
+        color:@appColor;
+        transition:width .3s;
+        &.showMenu{
+          // left:calc(@collapseWidth - @menuWidth);
+          width:@collapseWidth;
+          transition:width .3s;
+        }
+      }
+      .frame-view{
+        padding-left:@menuWidth;
+        min-height:calc(100vh - @footerHeight - @topHeight);
+        transition:padding-left .3s;
+        &.showMenu{
+          padding-left:@collapseWidth;
+          transition:padding-left .3s;
+        }
+      }
+    }
+  }
+}
+
+
+/*
+@media screen and (max-width:@maxWidth){
+  .frame{
+    .frame-main{
+      .frame-container{
+        .frame-aside{
+          left:0;
+        }
+      }
+    }
+  }
+}*/
+
+@media screen and (max-width:env(--viewport-1)){
+  .frame{
+    .frame-main{
+      .frame-container{
+        .frame-aside{
+          // left:0;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width:1024px){
+  .frame{
+    .frame-main{
+      .frame-container{
+        .frame-aside{
+          // left:calc(0px - @menuWidth);
+          width:0;
+          &.showMenu{
+            // left:0;
+            width:@menuWidth;
+          }
+        }
+        .frame-view{
+          padding-left:0;
+          &.showMenu{
+            padding-left:0;
+          }
+        }
+      }
+    }
+    .frame-footer{
+      .footer{
+        padding-left:0;
+      }
+      &.showMenu{
+        .footer{
+          padding-left:0;
+        }
+      }
+    }
+  }
+}
+
+

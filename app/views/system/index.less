@@ -1,0 +1,76 @@
+@import '~@common/layout/frame/config.less';
+
+.ellipsis{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+@width:120px;
+.board-card{
+	border:1px solid rgba(0,0,0,.03);
+	border-radius:2px;
+	&:hover{
+		box-shadow:0 0 2px 4px rgba(0,0,0,.03);
+	}
+	.card-title{
+		padding:10px 15px;
+		overflow:hidden;
+		border-bottom:1px solid rgba(0,0,0,.03);
+		.title-left{
+			float:left;
+			width:calc(100% - @width);
+			.ellipsis;
+		}
+		.title-right{
+			float:right;
+			width:@width;
+			.ellipsis;
+			text-align: right;
+		}
+	}
+	.card-body{
+		padding:6px 15px;
+	}
+}
+
+.board-list{
+	.board-item{
+		padding:6px 10px;
+		overflow:hidden;
+		.item-left{
+			float:left;
+			width:@width;
+			text-align: right;
+			.ellipsis;
+		}
+		.item-right{
+			float:right;
+			width:calc(100% - @width - 20px);
+			.ellipsis;
+		}
+	}
+}
+
+.sys-license{
+	background-color:#fff;
+	padding:10px 15px;
+	min-height:calc(@containerHeight - 20px);
+	a{
+		color:#40a9ff;
+		&:hover{
+			color:#3498db;
+		}
+	}
+}
+
+.sys-chpwd{
+	background-color:#fff;
+	padding:10px 15px;
+	min-height:calc(@containerHeight - 20px);
+	.chpwd-card{
+		width:50%;
+		padding:20px 0;
+	}
+}
+
+

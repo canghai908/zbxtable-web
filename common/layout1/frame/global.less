@@ -1,0 +1,120 @@
+/* global style*/
+@import '~@huxy/styles/lib/reset.css';
+@import '~@huxy/styles/lib/common.less';
+
+a{
+  text-decoration:none;
+  background-color:transparent;
+  color:#777;
+  font-weight:500;
+  transition:.2s color;
+}
+
+/*li{
+  >a{
+    .ellipsis;
+    >span{
+      .ellipsis;
+    }
+  }
+}*/
+
+.huxy-angle{
+  .angle(6px);
+}
+
+
+.search-form{
+  padding:6px 0 !important;
+  overflow:hidden;
+  .search-form-btn{
+    margin-left: auto;
+  }
+}
+
+.table-wrap{
+  .table-actions{
+    a{
+      margin:0 6px;
+      color:#1890ff;
+    }
+    .delete{
+      color:#ff4d4f;
+    }
+  }
+}
+
+.filterArea{
+  position:relative;
+  border-radius:5px;
+  // border:1px solid #ccc;
+  // margin-bottom: 15px;
+  min-height: 40px;
+  overflow:hidden;
+  display:flex;
+  .label-area{
+    // position:absolute;
+    // width:60px;
+    // float:left;
+    // border-right:1px solid #ccc;
+    padding:5px;
+    height: 100%;
+    display: flex;
+    // align-items: center;
+    // justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    width: 130px;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .selected-area{
+    // float:left;
+    // padding-left:70px;
+    padding-right:10px;
+    word-wrap: break-word;
+    word-break: break-all;
+    >span{
+      font-size:13px;
+      display:inline-block;
+      padding:2px 6px;
+      border:1px dashed #2e8ad7;
+      margin: 5px;
+      border-radius:3px;
+      background-color:#f8f8f8;
+      color:#2e8ad7;
+      >i,>.anticon{
+        font-size:13px;
+        display:inline-block;
+        cursor:pointer;
+        margin-left: 5px;
+        padding-left:3px;
+        color:#2e8ad7;
+        background-color:#f3f3f3;
+        border-left:1px solid #eee;
+        &:hover{
+          color:#1890ff;
+        }
+      }
+    }
+  }
+  &.fill{
+    .selected-area{
+      >span{
+        color:#2e8ad7;
+        border:1px solid #2e8ad7;
+        background-color:#e7f0f8;
+        >i,>.anticon{
+          background-color:rgba(0,0,0,.02);
+          border-left:1px solid rgba(0,0,0,.04);
+          color:#2e8ad7;
+          &:hover{
+            color:#1890ff;
+          }
+        }
+      }
+    }
+  }
+}
+
+
