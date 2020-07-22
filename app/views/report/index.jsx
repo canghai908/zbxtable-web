@@ -235,7 +235,7 @@ const Index=props=>{
       </Select>
       <Select value={selecteds?.item} allowClear placeholder="请选择指标" style={{ width: 180,marginRight: 10 }} onChange={handleTarget}>
         {
-          (targets||[]).map(v=><Option key={v.itemid} value={v.itemid}>{v.name}</Option>)
+          (targets||[]).map(v=><Option key={v.itemid} value={v.itemid}><Tooltip title={v.name}>{v.name}</Tooltip></Option>)
         }
       </Select>
       <RangePicker showTime placeholder={['请选择开始时间','请选择结束时间']} value={rt} onChange={(moment,str)=>setSearchValue({begin:str[0],end:str[1]})} style={{marginRight:'15px'}} />
