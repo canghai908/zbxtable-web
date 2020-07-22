@@ -64,14 +64,14 @@ const plugins=[
     clientsClaim: true,
     skipWaiting: true,
   }),
-  new CompressionPlugin({
+  /* new CompressionPlugin({
     test: /\.(js|css)(\?.*)?$/i,
     filename: '[path].gz[query]',
     algorithm: 'gzip',
     threshold: 10240,
     minRatio: 0.8,
     deleteOriginalAssets: false,
-  }),
+  }), */
 ];
 
 const {ANALYZE}=process.env;
@@ -83,7 +83,6 @@ if(ANALYZE){
 module.exports = merge(webpackConfig, {
   mode:'production',
   devtool:'cheap-module-source-map',
-  cache:false,
   output:{
     path:build,
     publicPath:rootDir,

@@ -128,6 +128,9 @@ const rules=[
 
 module.exports={
   context:app,
+  cache: {
+    type: 'filesystem',
+  },
   experiments: {
     asset: true,
   },
@@ -154,6 +157,10 @@ module.exports={
       minSize:{
         javascript:8000,
         style:8000,
+      },
+      maxSize:{
+        javascript:1000000,
+        style:1000000,
       },
       minChunks:2,
       maxInitialRequests:10,
