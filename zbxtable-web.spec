@@ -1,10 +1,10 @@
 Name:		zbxtable-web
-Version:	1.0.0
+Version:	%{version}
 Release: 	1%{?alphatag:.%{alphatag}}%{?dist}
 Summary:	Zbxtable Web
 Group:		Applications/Internet
 License:	Apache-2.0
-URL:		https://blog.cactifans.com/
+URL:		https://zbxtable.cactifans.com
 Source0:	zbxtable-web-%{version}%{?alphatag:%{alphatag}}.tar.gz
 
 Buildroot:	%{_tmppath}/zbxtable-web-%{version}-%{release}-root-%(%{__id_u} -n)
