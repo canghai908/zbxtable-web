@@ -26,13 +26,13 @@ const cardList=[
     color:'#40a9ff',
   },
   {
-    key:'problems',
+    key:'triggers',
     label:'触发器',
     icon:<BugOutlined style={{color:'#ffc53d'}} />,
     color:'#ffc53d',
   },
   {
-    key:'triggers',
+    key:'problems',
     label:'问题',
     icon:<AlertOutlined style={{color:'#fa541c'}} />,
     color:'#fa541c',
