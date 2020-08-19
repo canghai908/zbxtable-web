@@ -1,34 +1,34 @@
-import React,{useEffect} from 'react';
+import React, { useEffect } from 'react';
 import { Form, Input, Button, Checkbox, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import {loginFn} from '@app/api/api';
-import {utils} from '@common';
+import { loginFn } from '@app/api/api';
+import { utils } from '@common';
 
-const {storage,session}=utils;
+const { storage, session } = utils;
 
 import styles from './index.less';
 
 import './index.less';
 
-import {title} from '@app/configs';
+import { title } from '@app/configs';
 
-const {Search}=Input;
+const { Search } = Input;
 
-const Index=props=>{
-  useEffect(()=>{
-    if(storage.get('token')){
+const Index = props => {
+  useEffect(() => {
+    if (storage.get('token')) {
       props.router.push('/');
     }
-  },[]);
+  }, []);
   const onFinish = async values => {
-    const {code,data,message:msg}=await loginFn(values);
-    if(code===200){
+    const { code, data, message: msg } = await loginFn(values);
+    if (code === 200) {
       message.success(msg);
-      storage.set('token',data.token);
+      storage.set('token', data.token);
       props.router.push('/');
     }
   };
-  
+
   return <div className={styles.page}>
     <div className={styles['login-panel']}>
       <div className={styles.title}>
@@ -40,7 +40,9 @@ const Index=props=>{
             name="login"
             className="login-form"
             initialValues={{
-              remember: true,
+              //remember: true,
+              username: 'admin',
+              password: 'Zbxtable',
             }}
             onFinish={onFinish}
           >
@@ -53,7 +55,7 @@ const Index=props=>{
                 },
               ]}
             >
-              <Input prefix={<UserOutlined className="site-form-item-icon" style={{marginRight:'7px',color:'#999'}} />} placeholder="用户名" />
+              <Input prefix={<UserOutlined className="site-form-item-icon" style={{ marginRight: '7px', color: '#999' }} />} placeholder="用户名" />
             </Form.Item>
             <Form.Item
               name="password"
@@ -65,7 +67,7 @@ const Index=props=>{
               ]}
             >
               <Input
-                prefix={<LockOutlined className="site-form-item-icon" style={{marginRight:'7px',color:'#999'}} />}
+                prefix={<LockOutlined className="site-form-item-icon" style={{ marginRight: '7px', color: '#999' }} />}
                 type="password"
                 placeholder="密码"
               />
