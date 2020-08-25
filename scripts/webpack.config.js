@@ -128,9 +128,12 @@ const rules=[
 
 module.exports={
   context:app,
-  cache: {
+  /* cache: {
     type: 'filesystem',
-  },
+    buildDependencies: {
+      config: [ __filename ],
+    },
+  }, */
   experiments: {
     asset: true,
   },
@@ -158,10 +161,10 @@ module.exports={
         javascript:8000,
         style:8000,
       },
-      maxSize:{
+      /* maxSize:{
         javascript:1000000,
         style:1000000,
-      },
+      }, */
       minChunks:2,
       maxInitialRequests:10,
       maxAsyncRequests:10,

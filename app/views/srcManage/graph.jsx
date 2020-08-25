@@ -215,7 +215,7 @@ const Index=props=>{
       <div className="search-bar">
         <RangePicker showTime value={[moment(searchValue.begin),moment(searchValue.end)].filter(Boolean)} onChange={(moment,str)=>setSearchValue({begin:str[0],end:str[1]})} style={{marginRight:'15px'}} />
         <Button type="primary" onClick={()=>update({period:[searchValue.begin,searchValue.end],hostid:selected.hostid})} icon={<SearchOutlined />}>查询</Button>
-        <Button style={{marginLeft:12}} loading={loading} onClick={()=>expGraph()} icon={<DownloadOutlined />}>导出</Button>
+        <Button style={{marginLeft:12}} disabled={!checkedKeys.length} loading={loading} onClick={()=>expGraph()} icon={<DownloadOutlined />}>导出</Button>
       </div>
       <div className="table-wrap">
         <Row gutter={[12,12]}>

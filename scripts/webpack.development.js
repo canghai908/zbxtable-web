@@ -24,7 +24,6 @@ const postcssOptions={
 module.exports=merge(webpackConfig,{
   mode:'development',
   devtool:'eval-cheap-module-source-map',
-  cache:true,
   // target:'web',
   entry:{
     app:['webpack-hot-middleware/client?reload=true'],
