@@ -22,7 +22,6 @@ const sidebarMenu=menu=>menu.find(v=>v.active)?.children??menu[0].children;
 const Frame=props=>{
 
   const {menu}=props;
-  console.log(1,props);
 
   const [showMenu,setShowMenu]=useState(false);
 

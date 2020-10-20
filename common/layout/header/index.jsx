@@ -32,15 +32,15 @@ const navDrop=nameList=>[
 const langList=nameList=>[
   {
     key:'zh',
-    name:nameList['chinese'],
+    name:nameList['zh'],
   },
   {
     key:'en',
-    name:nameList['english'],
+    name:nameList['en'],
   },
   {
     key:'jp',
-    name:nameList['japanese'],
+    name:nameList['jp'],
   },
 ];
 
@@ -49,7 +49,7 @@ const Header=props=>{
   const userInfo=user?.data??{};
 
   const langCfg=store?.getState('langCfg')??{};
-  const {title,nav}=langCfg;
+  const {title,nav,language}=langCfg;
 
   const [showNav,setShowNav]=useState(false);
   const [showTheme,setShowTheme]=useState(false);
@@ -141,11 +141,11 @@ const Header=props=>{
             </ul>
           </li> */}
           <li>
-            <a onClick={e=>switchTheme(e)}>{nav.language}</a>
+            <a onClick={e=>switchTheme(e)}>{nav[language]}</a>
             <ul className={`huxy-arrow-lt${showTheme?' show':''}`}>
               {
                 langList(nav).map(v=><li key={v.key}>
-                  <a className={selected===v.key?'active':''} onClick={()=>changeLang(v)}>
+                  <a className={language===v.key?'active':''} onClick={()=>changeLang(v)}>
                     <span>{v.name}</span>
                   </a>
                 </li>)

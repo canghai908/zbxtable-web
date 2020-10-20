@@ -3,9 +3,9 @@ const nav={
   profile:'个人中心',
   logout:'退出',
   language:'语言',
-  chinese:'汉语',
-  english:'英语',
-  japanese:'日语',
+  zh:'汉语',
+  en:'英语',
+  jp:'日语',
   clean_cookie:'清缓',
 };
 

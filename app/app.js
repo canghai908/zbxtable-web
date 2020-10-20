@@ -1,6 +1,8 @@
 import React,{useState,useEffect} from 'react';
 import { ConfigProvider } from 'antd';
 import zhCN from 'antd/es/locale/zh_CN';
+import enUS from 'antd/es/locale/en_US';
+import jaJP from 'antd/es/locale/ja_JP';
 import {useRouter,components as comp,utils} from '@common';
 import routers from './router';
 
@@ -14,6 +16,8 @@ const {Spinner}=comp;
 
 const antLang={
   zh:zhCN,
+  en:enUS,
+  jp:jaJP,
 };
 
 let count=0;

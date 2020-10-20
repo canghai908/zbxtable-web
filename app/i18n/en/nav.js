@@ -3,9 +3,9 @@ const nav={
   profile:'profile',
   logout:'logout',
   language:'language',
-  chinese:'chinese',
-  english:'english',
-  japanese:'japanese',
+  zh:'chinese',
+  en:'english',
+  jp:'japanese',
   clean_cookie:'clean_cookie',
 };
 
