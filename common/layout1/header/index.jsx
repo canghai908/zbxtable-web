@@ -114,7 +114,7 @@ const Header=props=>{
             </ul>
           </li>
           {
-            menu.map(v=><li key={v.path}><Link path={v.path} className={v.active?'active':''}>
+            menu.map(v=><li key={v.path}><Link to={v.path} className={v.active?'active':''}>
               {v.icon}
               <span className="menu-title">{v.name}</span>
             </Link></li>)

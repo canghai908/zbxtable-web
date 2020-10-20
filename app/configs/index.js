@@ -17,7 +17,7 @@ const beforeRender=input=>{
 
 export const routerCfg={
   browserRouter:true,
-  title,
+  // title,
   // errorBoundary:false,
   beforeRender,
 };

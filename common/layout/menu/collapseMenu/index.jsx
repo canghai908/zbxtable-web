@@ -13,7 +13,7 @@ const render=data=>{
     const active=v.active?'active':'';
     if(hasChildren){
       return <li key={v.name} has-children="true">
-        <Link path={v.path} className={active} preventDefault>
+        <Link to={v.path} className={active} preventDefault>
           {typeof v.icon==='string'?<i className={v.icon} />:(v.icon||null)}
           <span className="has-right-icon">{v.name}</span>
           <i />
@@ -22,7 +22,7 @@ const render=data=>{
       </li>;
     }
     return <li key={v.name}>
-      <Link path={v.path} stopPropagation className={active}>
+      <Link to={v.path} stopPropagation className={active}>
         {typeof v.icon==='string'?<i className={v.icon} />:(v.icon||null)}
         <span>{v.name}</span>
       </Link>

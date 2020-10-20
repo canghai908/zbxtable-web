@@ -91,6 +91,7 @@
   "dependencies": {
     "@huxy/components": "0.0.5",
     "@huxy/router": "^0.2.0",
+    "@huxy/router4zbx": "0.0.1",
     "@huxy/styles": "0.0.6",
     "@huxy/use": "0.1.0",
     "@huxy/utils": "0.1.0",

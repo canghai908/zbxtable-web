@@ -23,7 +23,7 @@ const render=(menu,toggle)=>{
     if(hasChildren){
       const open=v.open?'open':'';
       return <li key={v.name} onClick={e=>toggle(e,v)} has-children="true">
-        <Link path={v.path} className={active} preventDefault>
+        <Link to={v.path} className={active} preventDefault>
           {typeof v.icon==='string'?<i className={v.icon} />:(v.icon||null)}
           <span className="has-right-icon">{v.name}</span>
           <i className={`huxy-angle ${open?'top':'bottom'}`} />
@@ -32,7 +32,7 @@ const render=(menu,toggle)=>{
       </li>;
     }
     return <li key={v.name}>
-      <Link path={v.path} stopPropagation className={active}>
+      <Link to={v.path} stopPropagation className={active}>
         {typeof v.icon==='string'?<i className={v.icon} />:(v.icon||null)}
         <span>{v.name}</span>
       </Link>

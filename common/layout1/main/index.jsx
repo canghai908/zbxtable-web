@@ -11,7 +11,7 @@ import './index.less';
 export const breadcrumb=current=><div className="breadcrumb">
   <span style={{float:'left'}}>当前位置： </span>
   <ul>
-    {current.filter(v=>v.name).map(v=>v.path!=='/'&&<li key={v.path}><Link path={v.path}>{v.name}</Link></li>)}
+    {current.filter(v=>v.name).map(v=>v.path!=='/'&&<li key={v.path}><Link to={v.path}>{v.name}</Link></li>)}
   </ul>
 </div>;
 

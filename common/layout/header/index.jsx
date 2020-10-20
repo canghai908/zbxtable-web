@@ -4,9 +4,11 @@ import {message} from 'antd';
 import {utils} from '@common';
 const {storage}=utils;
 
+import {emit} from '@app/utils';
+
 import { UserOutlined, PoweroffOutlined } from '@ant-design/icons';
 
-import {title,themeList} from '@app/configs';
+// import {title,themeList} from '@app/configs';
 
 import {logoutFn} from '@app/api/api';
 
@@ -14,22 +16,40 @@ import HoriMenu from './horiMenu';
 
 import './index.less';
 
-const navDrop=[
+const navDrop=nameList=>[
   {
-    name:'个人中心',
+    name:nameList['profile'],
     icon:<UserOutlined />,
     path:'',
   },
   {
-    name:'退出',
+    name:nameList['logout'],
     icon:<PoweroffOutlined />,
     path:'/user/login',
   },
 ];
 
+const langList=nameList=>[
+  {
+    key:'zh',
+    name:nameList['chinese'],
+  },
+  {
+    key:'en',
+    name:nameList['english'],
+  },
+  {
+    key:'jp',
+    name:nameList['japanese'],
+  },
+];
+
 const Header=props=>{
-  const {collapseMenu,menu,user,theme}=props;
+  const {collapseMenu,menu,user,theme,store}=props;
   const userInfo=user?.data??{};
+
+  const langCfg=store?.getState('langCfg')??{};
+  const {title,nav}=langCfg;
 
   const [showNav,setShowNav]=useState(false);
   const [showTheme,setShowTheme]=useState(false);
@@ -87,6 +107,11 @@ const Header=props=>{
     }
   };
 
+  const changeLang=item=>{
+    storage.set('language',item.key);
+    emit.emit('change-language',item.key);
+  };
+
   return <div className="header">
     <div className="header-wrap">
       <div className="banner">
@@ -103,7 +128,7 @@ const Header=props=>{
               </span>
             </a>
           </li>
-          <li>
+          {/* <li>
             <a onClick={e=>switchTheme(e)}>主题</a>
             <ul className={`huxy-arrow-lt${showTheme?' show':''}`}>
               {
@@ -114,9 +139,21 @@ const Header=props=>{
                 </li>)
               }
             </ul>
+          </li> */}
+          <li>
+            <a onClick={e=>switchTheme(e)}>{nav.language}</a>
+            <ul className={`huxy-arrow-lt${showTheme?' show':''}`}>
+              {
+                langList(nav).map(v=><li key={v.key}>
+                  <a className={selected===v.key?'active':''} onClick={()=>changeLang(v)}>
+                    <span>{v.name}</span>
+                  </a>
+                </li>)
+              }
+            </ul>
           </li>
           {
-            /* menu.map(v=><li key={v.path}><Link path={v.path} className={v.active?'active':''}>
+            /* menu.map(v=><li key={v.path}><Link to={v.path} className={v.active?'active':''}>
               {v.icon}
               <span className="menu-title">{v.name}</span>
             </Link></li>) */
@@ -134,7 +171,7 @@ const Header=props=>{
             </a>
             <ul className={`huxy-arrow-rt${showNav?' show':''}`}>
               {
-                navDrop.map(v=><li key={v.name}>
+                navDrop(nav).map(v=><li key={v.name}>
                   <a onClick={()=>handleNavClick(v)} className={v.active?'active':''}>
                     {v.icon}
                     <span className="drop-label">{v.name}</span>
