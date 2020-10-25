@@ -1,10 +1,10 @@
 const nav={
-  user:'user',
-  profile:'profile',
-  logout:'logout',
-  language:'language',
-  zh:'chinese',
-  en:'english',
+  user:'User',
+  profile:'Profile',
+  logout:'Logout',
+  language:'Language',
+  zh:'中文',
+  en:'English',
   jp:'japanese',
   clean_cookie:'clean_cookie',
 };
