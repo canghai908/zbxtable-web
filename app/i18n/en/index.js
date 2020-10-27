@@ -3,7 +3,7 @@ import nav from './nav';
 // import theme from './theme';
 import main from './main';
 
-const title='devOps';
+const title='DevOps';
 
 export default {
   title,
