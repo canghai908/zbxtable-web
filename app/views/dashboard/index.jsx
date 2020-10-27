@@ -12,63 +12,63 @@ import './index.less';
 
 const fm=num=>typeof num==='number'?num.toLocaleString('en-US'):'';
 
-const cardList=[
+const cardList=nameList=>[
   {
     key:'hosts',
-    label:'主机',
+    label:nameList['host'],
     icon:<CloudServerOutlined style={{color:'#73d13d'}} />,
     color:'#73d13d',
   },
   {
     key:'items',
-    label:'指标',
+    label:nameList['item'],
     icon:<BarChartOutlined style={{color:'#40a9ff'}} />,
     color:'#40a9ff',
   },
   {
     key:'triggers',
-    label:'触发器',
+    label:nameList['trigger'],
     icon:<BugOutlined style={{color:'#ffc53d'}} />,
     color:'#ffc53d',
   },
   {
     key:'problems',
-    label:'问题',
+    label:nameList['problem'],
     icon:<AlertOutlined style={{color:'#fa541c'}} />,
     color:'#fa541c',
   },
 ];
 
-const level=[
+const level=nameList=>[
   {
     value:'0',
-    label:'全部',
+    label:nameList['all'],
   },
   {
     value:'1',
-    label:'信息',
+    label:nameList['info'],
   },
   {
     value:'2',
-    label:'警告',
+    label:nameList['warning'],
   },
   {
     value:'3',
-    label:'一般',
+    label:nameList['normal'],
   },
   {
     value:'4',
-    label:'严重',
+    label:nameList['danger'],
   },
   {
     value:'5',
-    label:'灾难',
+    label:nameList['zainan'],
   },
 ];
 
-const columns=(page,handleItemEdit,handleItemDel)=>[
+const columns=(page,nameList,levelList)=>[
   {
-    title: '序号',
+    title: nameList['id'],
     dataIndex: 'dataIndex',
     width: 10,
     ellipsis: true,
@@ -79,7 +79,7 @@ const columns=(page,handleItemEdit,handleItemDel)=>[
     },
   },
   {
-    title: '发生时间',
+    title: nameList['time'],
     dataIndex: 'lastchange',
     width: 40,
     ellipsis: true,
@@ -89,36 +89,36 @@ const columns=(page,handleItemEdit,handleItemDel)=>[
     },
   },
   {
-    title: '告警主机',
+    title: nameList['name'],
     dataIndex: 'name',
     width: 40,
     ellipsis: true,
     render:(text,row,index)=><Tooltip title={text}>{text}</Tooltip>,
   },
   {
-    title: '告警信息',
+    title: nameList['info'],
     dataIndex: 'lasteventname',
     width: 70,
     ellipsis: true,
     render:(text,row,index)=><Tooltip title={text}>{text}</Tooltip>,
   },
   {
-    title: '告警等级',
+    title: nameList['severity'],
     dataIndex: 'severity',
     width: 20,
     ellipsis: true,
     render:(text,row,index)=>{
-      const t=level.find(v=>v.value==text)?.label??'';
+      const t=level(levelList).find(v=>v.value==text)?.label??'';
       return <Tooltip title={t}>{t}</Tooltip>;
     },
   },
   {
-    title: '是否知晓',
+    title: nameList['acknowledged'],
     dataIndex: 'acknowledged',
     width: 20,
     ellipsis: true,
     render:(text,row,index)=>{
-      const t=text=='0'?'未知':'已知';
+      const t=text=='0'?nameList['notKnow']:nameList['know'];
       return <Tooltip title={t}>{t}</Tooltip>;
     },
   },
@@ -142,41 +142,41 @@ const columns=(page,handleItemEdit,handleItemDel)=>[
   }, */
 ];
 
-const refreshTimes=[
+const refreshTimes=nameList=>[
   {
-    label:'off',
+    label:nameList['off'],
     value:0,
   },
   {
-    label:'2分钟',
+    label:nameList['2m'],
     value:120000,
   },
   {
-    label:'5分钟',
+    label:nameList['5m'],
     value:300000,
   },
   {
-    label:'10分钟',
+    label:nameList['10m'],
     value:600000,
   },
   {
-    label:'30分钟',
+    label:nameList['30m'],
     value:1800000,
   },
   {
-    label:'2小时',
+    label:nameList['2h'],
     value:7200000,
   },
   {
-    label:'1天',
+    label:nameList['1d'],
     value:86400000,
   },
 ];
 
-const menu=handler=>(
+const menu=(handler,time)=>(
   <Menu>
     {
-      refreshTimes.map(v=><Menu.Item key={v.value}><a onClick={()=>handler(v)}>{v.label}</a></Menu.Item>)
+      refreshTimes(time).map(v=><Menu.Item key={v.value}><a onClick={()=>handler(v)}>{v.label}</a></Menu.Item>)
     }
   </Menu>
 );
@@ -186,6 +186,11 @@ const Index=props=>{
   const [active,setActive]=useState('0');
 
   const [refreshText,setRefreshText]=useState('off');
+
+  const langCfg=props.store?.getState('langCfg')??{};
+  const {dashboard}=langCfg;
+
+  const {card,level:levelList,table,time}=dashboard||{};
 
   const [delay,setDelay]=useState(50000);
   const [list,updateList]=useAsync({});
@@ -236,7 +241,7 @@ const Index=props=>{
     {/* <Button onClick={()=>handleEdit()}>新增</Button> */}
     <Row gutter={12}>
       {
-        cardList.map(v=><Col md={6} sm={12}>
+        cardList(card).map(v=><Col md={6} sm={12}>
           <div className="dashboard-card">
             <div className="dashboard-card-left">
               <a>{v.icon}</a>
@@ -251,9 +256,9 @@ const Index=props=>{
     </Row>
     <div className="section-wrap">
       <div className="tab-header-wrap">
-        <TabHeader tabs={level.map(v=>({key:v.value,value:v.label,renderTabs}))} switchTab={switchTab} />
+        <TabHeader tabs={level(levelList).map(v=>({key:v.value,value:v.label,renderTabs}))} switchTab={switchTab} />
         <div className="refresh-bar">
-          <Dropdown overlay={menu(refresh)} trigger={['click']} placement="bottomCenter">
+          <Dropdown overlay={menu(refresh,time)} trigger={['click']} placement="bottomCenter">
             <a className="ant-dropdown-link" onClick={e => e.preventDefault()} style={{color:'#40a9ff'}}>{refreshText} <RedoOutlined /></a>
           </Dropdown>
         </div>
@@ -262,7 +267,7 @@ const Index=props=>{
         <Table
           size="small"
           bordered
-          columns={columns(page.current)}
+          columns={columns(page.current,table,levelList)}
           dataSource={dataSource}
           loading={trigger?.pending}
           rowKey="id"
