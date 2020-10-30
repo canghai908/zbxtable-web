@@ -3,8 +3,8 @@ import nav from './nav';
 import theme from './theme';
 import main from './main';
 import dashboard from './dashboard';
-
-const title='运维管理平台';
+import host from './host';
+const title = '运维管理平台';
 
 export default {
   title,
@@ -13,6 +13,5 @@ export default {
   theme,
   main,
   dashboard,
+  host,
 };
-
-
