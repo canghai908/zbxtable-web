@@ -4,6 +4,8 @@ import theme from './theme';
 import main from './main';
 import dashboard from './dashboard';
 import host from './host';
+import template from './template';
+import group from './group';
 const title = '运维管理平台';
 
 export default {
@@ -14,4 +16,6 @@ export default {
   main,
   dashboard,
   host,
+  template,
+  group,
 };

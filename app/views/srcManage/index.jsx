@@ -146,7 +146,6 @@ const Index = (props) => {
   const langCfg = props.store?.getState('langCfg') ?? {};
   const {host} = langCfg;
   const {hostable} = host || {};
-  console.log(hostable);
 
   return (
     <div className="host-list-page">

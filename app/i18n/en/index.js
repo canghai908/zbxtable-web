@@ -4,7 +4,10 @@ import nav from './nav';
 import main from './main';
 import dashboard from './dashboard';
 import host from './host';
-const title='ZbxTable';
+import template from './template';
+import group from './group';
+import analysislang from './analysislang';
+const title = 'ZbxTable';
 
 export default {
   title,
@@ -12,8 +15,9 @@ export default {
   nav,
   // theme,
   main,
-  dashboard, 
+  dashboard,
   host,
+  template,
+  group,
+  analysislang,
 };
-
-

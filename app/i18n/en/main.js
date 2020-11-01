@@ -1,7 +1,5 @@
-const main={
-  bread:'current',
+const main = {
+  bread: 'current',
 };
 
 export default main;
-
-
