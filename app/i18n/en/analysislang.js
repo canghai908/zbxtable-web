@@ -1,7 +1,11 @@
 const analysislang = {
-  analysistpl: {
-    group: 'Group',
-    hosts: 'Hosts',
+  analysistable: {
+    id: 'ID',
+    hostname: 'Hostname',
+    severity: 'Severity',
+    message: 'Message',
+    status: 'Status',
+    occurtime: 'Occurtime',
   },
 };
 

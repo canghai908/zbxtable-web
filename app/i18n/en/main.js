@@ -1,5 +1,5 @@
 const main = {
-  bread: 'current',
+  bread: 'Current',
 };
 
 export default main;

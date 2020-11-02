@@ -1,6 +1,6 @@
 const router = {
   '/dashboard': 'Dashboard',
-  '/srcManage': 'Resource Management',
+  '/srcManage': 'Management',
   '/host': 'Host',
   '/groups': 'Group',
   '/templates': 'Template',
