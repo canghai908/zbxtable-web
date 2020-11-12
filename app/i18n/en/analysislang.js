@@ -7,6 +7,10 @@ const analysislang = {
     status: 'Status',
     occurtime: 'Occurtime',
   },
+  buttonlang:{
+    query:'查询',
+    export: '导出',
+  }
 };
 
 export default analysislang;

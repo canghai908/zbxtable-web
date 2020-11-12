@@ -6,7 +6,8 @@ import dashboard from './dashboard';
 import host from './host';
 import template from './template';
 import group from './group';
-const title = '运维管理平台';
+import analysislang from './analysislang';
+const title = 'ZbxTable';
 
 export default {
   title,
@@ -18,4 +19,5 @@ export default {
   host,
   template,
   group,
+  analysislang,
 };

@@ -49,7 +49,7 @@ const Index=props=>{
               rules={[
                 {
                   required: true,
-                  message: '请输入用户名!',
+                  message: 'Username can not be blank',
                 },
               ]}
             >
@@ -60,14 +60,14 @@ const Index=props=>{
               rules={[
                 {
                   required: true,
-                  message: '请输入密码!',
+                  message: 'Password can not be blank',
                 },
               ]}
             >
               <Input
                 prefix={<LockOutlined className="site-form-item-icon" style={{marginRight:'7px',color:'#999'}} />}
                 type="password"
-                placeholder="密码"
+                placeholder="password"
               />
             </Form.Item>
             <Form.Item>

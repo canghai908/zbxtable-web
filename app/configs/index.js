@@ -3,7 +3,7 @@ import {utils} from '@common';
 const {storage}=utils;
 
 // const browserRouter=!process.env.isDev;
-export const title='运维管理平台';
+export const title='ZbxTable';
 // const theme='dark';
 
 export const baseUrl='';//'riskWarning';
