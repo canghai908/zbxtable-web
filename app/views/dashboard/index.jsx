@@ -3,7 +3,7 @@ import { Button, Table, Tooltip, message,Row,Col,Tabs,Badge,Menu,Dropdown } from
 import { CloudServerOutlined,BarChartOutlined,BugOutlined,AlertOutlined,RedoOutlined } from '@ant-design/icons';
 import {use,utils,components} from '@common';
 const {useAsync}=use;
-const {formatTime,formatNum}=utils;
+const {formatTime,formatNum,storage}=utils;
 const {TabHeader}=components;
 
 import {getIndex,getTrigger} from '@app/api/api';
@@ -185,12 +185,15 @@ const Index=props=>{
   // console.log(props);
   const [active,setActive]=useState('0');
 
-  const [refreshText,setRefreshText]=useState('off');
-
   const langCfg=props.store?.getState('langCfg')??{};
   const {dashboard}=langCfg;
 
   const {card,level:levelList,table,time}=dashboard||{};
+
+  const refreshValue=storage.get('refreshValue')||0;
+  const refreshInfo=refreshTimes(time).find(v=>v.value===refreshValue)||{};
+
+  const [refreshText,setRefreshText]=useState(refreshInfo);
 
   const [delay,setDelay]=useState(50000);
   const [list,updateList]=useAsync({});
@@ -201,13 +204,17 @@ const Index=props=>{
   useEffect(()=>{
     updateNumList(page.current);
     updateWarningList(page.current);
+    refresh(refreshInfo,true);
   },[]);
   useEffect(()=>{
     return ()=>clearInterval(timer);
   },[]);
-  const refresh=delay=>{
-    clearInterval(timer);
-    setRefreshText(delay.label);
+  const refresh=(delay,isInit=false)=>{
+    if(!isInit){
+      clearInterval(timer);
+      setRefreshText(delay);
+      storage.set('refreshValue',delay.value);
+    }
     if(delay.value){
       timer=setInterval(()=>{
         updateWarningList();
@@ -259,7 +266,7 @@ const Index=props=>{
         <TabHeader tabs={level(levelList).map(v=>({key:v.value,value:v.label,renderTabs}))} switchTab={switchTab} />
         <div className="refresh-bar">
           <Dropdown overlay={menu(refresh,time)} trigger={['click']} placement="bottomCenter">
-            <a className="ant-dropdown-link" onClick={e => e.preventDefault()} style={{color:'#40a9ff'}}>{refreshText} <RedoOutlined /></a>
+            <a className="ant-dropdown-link" onClick={e => e.preventDefault()} style={{color:'#40a9ff'}}>{refreshText?.label} <RedoOutlined /></a>
           </Dropdown>
         </div>
       </div>
