@@ -6,7 +6,7 @@ const conf={
     problem:'Problem',
   },
   level:{
-    all:'All',
+    all:'Not classified',
     info:'Information',
     warning:'Warning',
     normal:'Average',

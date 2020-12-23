@@ -6,7 +6,7 @@ const conf={
     problem:'问题',
   },
   level:{
-    all:'全部',
+    all:'未分类',
     info:'信息',
     warning:'警告',
     normal:'一般',
