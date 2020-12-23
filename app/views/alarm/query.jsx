@@ -14,7 +14,7 @@ const {Search} = Input;
 
 const {RangePicker} = DatePicker;
 
-const columns = (page, nameList) => [
+const columns = (page, nameList,levelList,statusList) => [
   {
     title: nameList['id'],
     dataIndex: 'dataIndex',
@@ -38,7 +38,11 @@ const columns = (page, nameList) => [
     dataIndex: 'level',
     width: 50,
     ellipsis: true,
-    render: (text, row, index) => <Tooltip title={text}>{text}</Tooltip>,
+    // render: (text, row, index) => <Tooltip title={text}>{text}</Tooltip>,
+    render:(text,row,index)=>{
+      const t=level(levelList).find(v=>v.value==text)?.label??'';
+      return <Tooltip title={t}>{t}</Tooltip>;
+    },
   },
   {
     title: nameList['message'],
@@ -52,7 +56,11 @@ const columns = (page, nameList) => [
     dataIndex: 'status',
     width: 50,
     ellipsis: true,
-    render: (text, row, index) => <Tooltip title={text}>{text}</Tooltip>,
+    render:(text,row,index)=>{
+      // render: (text, row, index) => <Tooltip title={text}>{text}</Tooltip>,
+      const t=triggerstatus(statusList).find(v=>v.value==text)?.label??'';
+      return <Tooltip title={t}>{t}</Tooltip>;
+    },
   },
   {
     title: nameList['occurtime'],
@@ -106,6 +114,44 @@ const columns = (page, nameList) => [
     },
   }, */
 ];
+
+const level=nameList=>[
+  {
+    value:'0',
+    label:nameList['all'],
+  },
+  {
+    value:'1',
+    label:nameList['info'],
+  },
+  {
+    value:'2',
+    label:nameList['warning'],
+  },
+  {
+    value:'3',
+    label:nameList['normal'],
+  },
+  {
+    value:'4',
+    label:nameList['danger'],
+  },
+  {
+    value:'5',
+    label:nameList['zainan'],
+  },
+];
+const triggerstatus=nameList=>[
+  {
+    value:'0',
+    label:nameList['resolved'],
+  },
+  {
+    value:'1',
+    label:nameList['problem'],
+  },
+];
+
 
 const Index = (props) => {
   const [alarmLoading, setAlarmLoading] = useState(false);
@@ -162,7 +208,7 @@ const Index = (props) => {
   //i18n
   const langCfg = props.store?.getState('langCfg') ?? {};
   const {analysislang} = langCfg;
-  const {analysistable,buttonlang} = analysislang || {};
+  const {analysistable,buttonlang,level:levelList,triggerstatus:statusList} = analysislang || {};
   return (
     <div className="alarm-analysis-page">
       <div className="search-bar">
@@ -194,7 +240,7 @@ const Index = (props) => {
           }}
           size="small"
           bordered
-          columns={columns(page.current, analysistable)}
+          columns={columns(page.current, analysistable,levelList,statusList)}
           dataSource={items}
           loading={table?.pending}
           rowKey="id"

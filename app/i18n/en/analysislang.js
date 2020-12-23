@@ -7,9 +7,21 @@ const analysislang = {
     status: 'Status',
     occurtime: 'Occurtime',
   },
+  level:{
+    all:'Not classified',
+    info:'Information',
+    warning:'Warning',
+    normal:'Average',
+    danger:'High',
+    zainan:'Disaster',
+  },
+  triggerstatus:{
+    problem:'PROBLEM',
+    resolved:'RESOLVED',
+  },
   buttonlang:{
-    query:'查询',
-    export: '导出',
+    query:'Query',
+    export: 'Export',
   }
 };
 
