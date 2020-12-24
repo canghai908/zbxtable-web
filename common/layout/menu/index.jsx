@@ -53,7 +53,7 @@ const render=(data,toggle)=>{
     const active=v.active?'active':'';
     if(hasChildren){
       return <li key={v.name} onClick={e=>toggle(e,v)} has-children="true" className={v.open?'open':''}>
-        <Link path={v.path} className={active} preventDefault>
+        <Link to={v.path} className={active} preventDefault>
           {typeof v.icon==='string'?<i className={v.icon} />:(v.icon||null)}
           <span className="txt has-right-icon">{v.name}</span>
           <i className="coll-ico" />
@@ -62,7 +62,7 @@ const render=(data,toggle)=>{
       </li>;
     }
     return <li key={v.name}>
-      <Link path={v.path} stopPropagation className={active}>
+      <Link to={v.path} stopPropagation className={active}>
         {typeof v.icon==='string'?<i className={v.icon} />:(v.icon||null)}
         <span className="txt">{v.name}</span>
       </Link>
@@ -76,7 +76,7 @@ const renderCollapsed=data=>{
     const active=v.active?'active':'';
     if(hasChildren){
       return <li key={v.name} has-children="true">
-        <Link path={v.path} className={active} preventDefault>
+        <Link to={v.path} className={active} preventDefault>
           {typeof v.icon==='string'?<i className={v.icon} />:(v.icon||null)}
           <span className="txt has-right-icon">{v.name}</span>
           <i className="coll-ico" />
@@ -85,7 +85,7 @@ const renderCollapsed=data=>{
       </li>;
     }
     return <li key={v.name}>
-      <Link path={v.path} stopPropagation className={active}>
+      <Link to={v.path} stopPropagation className={active}>
         {typeof v.icon==='string'?<i className={v.icon} />:(v.icon||null)}
         <span className="txt">{v.name}</span>
       </Link>

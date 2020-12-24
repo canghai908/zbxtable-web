@@ -1,75 +1,82 @@
-import React,{useEffect,useCallback,useRef,useState} from 'react';
-import { Button, Table, Tooltip, message,Input,Tag } from 'antd';
-import { EditOutlined,DeleteOutlined,PlusOutlined } from '@ant-design/icons';
+import React, {useEffect, useCallback, useRef, useState} from 'react';
+import {Button, Table, Tooltip, message, Input, Tag} from 'antd';
+import {EditOutlined, DeleteOutlined, PlusOutlined} from '@ant-design/icons';
 import {use} from '@common';
-const {useAsync}=use;
+const {useAsync} = use;
 import {getTemplate} from '@app/api/api';
 
 import './index.less';
 
-const {Search}=Input;
+const {Search} = Input;
 
-const columns=(page,handler={})=>[
+const columns = (page, nameList) => [
   {
-    title: '序号',
+    title: nameList['id'],
     dataIndex: 'dataIndex',
     width: 20,
     ellipsis: true,
-    render: (text,row,index)=>{
-      const {page:current,limit:size}=page;
-      const i=size*(current-1)+index+1;
+    render: (text, row, index) => {
+      const {page: current, limit: size} = page;
+      const i = size * (current - 1) + index + 1;
       return i;
     },
   },
   {
-    title: '可见名称',
+    title: nameList['templates'],
     dataIndex: 'name',
     width: 70,
     ellipsis: true,
-    render:(text,row,index)=><Tooltip title={text}>{text}</Tooltip>,
+    render: (text, row, index) => <Tooltip title={text}>{text}</Tooltip>,
   },
   {
-    title: '应用集',
+    title: nameList['applications'],
     dataIndex: 'applications',
     width: 50,
     ellipsis: true,
-    render:(text,row,index)=><Tooltip title={text}>{text}</Tooltip>,
+    render: (text, row, index) => <Tooltip title={text}>{text}</Tooltip>,
   },
   {
-    title: '指标总',
+    title: nameList['items'],
     dataIndex: 'items',
     width: 50,
     ellipsis: true,
-    render:(text,row,index)=><Tooltip title={text}>{text}</Tooltip>,
+    render: (text, row, index) => <Tooltip title={text}>{text}</Tooltip>,
   },
   {
-    title: '触发器',
+    title: nameList['triggers'],
     dataIndex: 'triggers',
     width: 50,
     ellipsis: true,
-    render:(text,row,index)=><Tooltip title={text}>{text}</Tooltip>,
+    render: (text, row, index) => <Tooltip title={text}>{text}</Tooltip>,
   },
   {
-    title: '图形',
+    title: nameList['graphs'],
     dataIndex: 'graphs',
     width: 50,
     ellipsis: true,
-    render:(text,row,index)=><Tooltip title={text}>{text}</Tooltip>,
+    render: (text, row, index) => <Tooltip title={text}>{text}</Tooltip>,
   },
   {
-    title: '自动发现规则',
+    title: nameList['screens'],
+    dataIndex: 'screens',
+    width: 50,
+    ellipsis: true,
+    render: (text, row, index) => <Tooltip title={text}>{text}</Tooltip>,
+  },
+  {
+    title: nameList['discoveries'],
     dataIndex: 'discoveries',
     width: 50,
     ellipsis: true,
-    render:(text,row,index)=><Tooltip title={text}>{text}</Tooltip>,
+    render: (text, row, index) => <Tooltip title={text}>{text}</Tooltip>,
   },
   {
-    title: '关联主机数',
+    title: nameList['hosts'],
     dataIndex: 'groups',
     width: 50,
     ellipsis: true,
-    render:(text,row,index)=>{
-      const t=row.hosts?.length??0;
+    render: (text, row, index) => {
+      const t = row.hosts?.length ?? 0;
       return <Tooltip title={t}>{t}</Tooltip>;
     },
   },
@@ -119,26 +126,26 @@ const columns=(page,handler={})=>[
   }, */
 ];
 
-const Index=props=>{
-  const [list,updateList]=useAsync({});
-  const [searchValue,setSearchValue]=useState({});
+const Index = (props) => {
+  const [list, updateList] = useAsync({});
+  const [searchValue, setSearchValue] = useState({});
   // const page=useRef({current:1,size:10});
-  const page=useRef({page:1,limit:10});
-  const update=useCallback(params=>updateList({table:getTemplate(params)}),[]);
-  useEffect(()=>{
+  const page = useRef({page: 1, limit: 10});
+  const update = useCallback((params) => updateList({table: getTemplate(params)}), []);
+  useEffect(() => {
     update(page.current);
-  },[]);
-  const pageChange=(current,size)=>{
-    page.current={page:current,limit:size};
+  }, []);
+  const pageChange = (current, size) => {
+    page.current = {page: current, limit: size};
     update({
       ...searchValue,
       ...page.current,
     });
   };
-  const searchList=value=>{
-    const values={hosts:value};
+  const searchList = (value) => {
+    const values = {hosts: value};
     setSearchValue(values);
-    update({...page.current,...values});
+    update({...page.current, ...values});
   };
   /* const handleEdit=async item=>{
     const {data,msg}=await editItem(item);
@@ -150,52 +157,43 @@ const Index=props=>{
     message.success(msg);
     update(page.current);
   }; */
-  const {table}=list;
-  const tableList=table?.data??{};
-  const {items,total}=tableList;
-  return <div className="host-list-page">
-    <div className="search-bar">
-      <Search placeholder="请输入主机名" onSearch={searchList} enterButton style={{width:'200px',marginRight:'15px'}} />
-      {/* <Button type="primary" icon={<PlusOutlined />}>添加主机</Button> */}
+  const {table} = list;
+  const tableList = table?.data ?? {};
+  const {items, total} = tableList;
+
+  //i18n
+  const langCfg = props.store?.getState('langCfg') ?? {};
+  const {template} = langCfg;
+  const {tpl} = template || {};
+
+  return (
+    <div className="host-list-page">
+      <div className="search-bar">
+        <Search placeholder="请输入主机名" onSearch={searchList} enterButton style={{width: '200px', marginRight: '15px'}} />
+        {/* <Button type="primary" icon={<PlusOutlined />}>添加主机</Button> */}
+      </div>
+      <div className="table-wrap">
+        <Table
+          pagination={{
+            onShowSizeChange: (current, size) => pageChange(current, size),
+            onChange: (current, size) => pageChange(current, size),
+            showSizeChanger: true,
+            showQuickJumper: true,
+            total: total || 0,
+            current: page.current.page,
+            pageSize: page.current.limit,
+            pageSizeOptions: ['10', '20', '30', '40'],
+          }}
+          size="small"
+          bordered
+          columns={columns(page.current, tpl)}
+          dataSource={items}
+          loading={table?.pending}
+          rowKey="id"
+        />
+      </div>
     </div>
-    <div className="table-wrap">
-      <Table
-        pagination={{
-          onShowSizeChange:(current,size)=>pageChange(current,size),
-          onChange:(current,size)=>pageChange(current,size),
-          showSizeChanger: true,
-          showQuickJumper: true,
-          total:total||0,
-          current:page.current.page,
-          pageSize:page.current.limit,
-          pageSizeOptions:['10','20','30','40'],
-        }}
-        size="small"
-        bordered
-        columns={columns(page.current/* ,{handleEdit,handleDelete} */)}
-        dataSource={items}
-        loading={table?.pending}
-        rowKey="id"
-      />
-    </div>
-  </div>;
+  );
 };
 
 export default Index;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

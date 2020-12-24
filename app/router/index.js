@@ -9,7 +9,7 @@ const subMenu=()=>{
 
 };
 
-const routers=[
+const routers=nameList=>[
   {
     path:'/',
     redirect:'/dashboard',
@@ -31,7 +31,7 @@ const routers=[
     children:[
       {
         path:'/dashboard',
-        name:'首页',
+        name:nameList['/dashboard'],
         icon:<HomeOutlined />,
         component:()=>import('../views/dashboard'),
         /* resolve:{
@@ -42,30 +42,30 @@ const routers=[
       {
         path:'/srcManage',
         redirect:'/srcManage/host',
-        name:'资源管理',
+        name:nameList['/srcManage'],
         icon:<CloudServerOutlined />,
         children:[
           {
             path:'/host',
-            name:'主机',
+            name:nameList['/host'],
             icon:<DesktopOutlined />,
             component:()=>import('../views/srcManage'),
           },
           {
             path:'/groups',
-            name:'主机组',
+            name:nameList['/groups'],
             icon:<DatabaseOutlined />,
             component:()=>import('../views/srcManage/groups'),
           },
           {
             path:'/templates',
-            name:'模版',
+            name:nameList['/templates'],
             icon:<ContainerOutlined />,
             component:()=>import('../views/srcManage/templates'),
           },
           {
             path:'/graph',
-            name:'图形管理',
+            name:nameList['/graph'],
             icon:<AreaChartOutlined />,
             component:()=>import('../views/srcManage/graph'),
           },
@@ -74,24 +74,24 @@ const routers=[
       {
         path:'/report',
         redirect:'/report/export',
-        name:'指标报表',
+        name:nameList['/report'],
         icon:<LineChartOutlined />,
         children:[
           {
             path:'/export',
-            name:'指标导出',
+            name:nameList['/export'],
             icon:<CloudDownloadOutlined />,
             component:()=>import('../views/report'),
           },
           {
             path:'/inspect',
-            name:'巡检报告',
+            name:nameList['/inspect'],
             icon:<FileExcelOutlined />,
             component:()=>import('../views/report/inspect'),
           },
           {
             path:'/batch',
-            name:'批量导出',
+            name:nameList['/batch'],
             hideMenu:true,
             icon:<FundProjectionScreenOutlined />,
             component:()=>import('../views/report/batch'),
@@ -101,18 +101,18 @@ const routers=[
       {
         path:'/alarm',
         redirect:'/alarm/analysis',
-        name:'告警报表',
+        name:nameList['/alarm'],
         icon:<AlertOutlined />,
         children:[
           {
             path:'/analysis',
-            name:'告警分析',
+            name:nameList['/analysis'],
             icon:<FundOutlined />,
             component:()=>import('../views/alarm'),
           },
           {
             path:'/query',
-            name:'告警查询',
+            name:nameList['/query'],
             icon:<BellOutlined />,
             component:()=>import('../views/alarm/query'),
           },
@@ -121,18 +121,18 @@ const routers=[
       {
         path:'/system',
         redirect:'/system/license',
-        name:'系统管理',
+        name:nameList['/system'],
         icon:<SettingOutlined />,
         children:[
           /* {
             path:'/license',
-            name:'授权信息',
+            name:nameList['/license'],
             icon:<AlertOutlined />,
             component:()=>import('../views/system'),
           }, */
           {
             path:'/chpwd',
-            name:'修改密码',
+            name:nameList['/chpwd'],
             icon:<ToolOutlined />,
             component:()=>import('../views/system/chpwd'),
           },
@@ -145,19 +145,19 @@ const routers=[
     children:[
       {
         path:'/login',
-        title:'登录',
+        name:nameList['/login'],
         component:()=>import('../views/user'),
       },
       /* {
         path:'/signup',
-        title:'注册',
+        name:nameList['/signup'],
         component:()=><h1>注册</h1>,
       }, */
     ],
   },
   {
     path:'/404',
-    name:'404',
+    name:nameList['/404'],
     component:()=><div>404</div>,
     hideMenu:true,
   },

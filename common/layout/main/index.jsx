@@ -8,15 +8,17 @@ import './index.less';
 
 // const getSecoudMenu=menu=>menu.find(v=>v.open)?.children??[];
 
-export const breadcrumb=current=><div className="breadcrumb">
-  <span style={{float:'left'}}>当前位置： </span>
+export const breadcrumb=(current,bread)=><div className="breadcrumb">
+  <span style={{float:'left'}}>{bread}： </span>
   <ul>
-    {current.filter(v=>v.name).map(v=>v.path!=='/'&&<li key={v.path}><Link path={v.path}>{v.name}</Link></li>)}
+    {current.filter(v=>v.name).map(v=>v.path!=='/'&&<li key={v.path}><Link to={v.path}>{v.name}</Link></li>)}
   </ul>
 </div>;
 
 const Main=props=>{
-  const {menu,current,children,inputPath,showMenu}=props;
+  const {menu,current,children,inputPath,showMenu,store}=props;
+  const langCfg=store?.getState('langCfg')??{};
+  const {main:{bread}}=langCfg;
   const hasMenu=menu&&menu.length;
   const style=hasMenu?null:{paddingLeft:0};
   return <div className="frame-container">
@@ -27,7 +29,7 @@ const Main=props=>{
     }
     <div className={`frame-view${showMenu}`} style={style}>
       <div className="page-container">
-        {hasMenu?breadcrumb(current):null}
+        {hasMenu?breadcrumb(current,bread):null}
         <div className="content">
           {children}
         </div>

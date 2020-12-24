@@ -9,7 +9,7 @@ const pro2 = {
   PRD_ROOT_DIR: '/',
   DEFAULT_TOKEN: 'Basic 123456',
   // PROXY_URI:'http://192.168.100.150:8010',
-  // PROXY_URI: 'http://localhost:8080',
+  // PROXY_URI: 'http://localhost:8084',
   // PROXY_URI:'http://172.24.9.62:8093',
   PROXY_URI:'https://zbx.cactifans.com',
   SALT: '123',
