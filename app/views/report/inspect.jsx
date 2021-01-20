@@ -159,7 +159,7 @@ const Index=props=>{
     <div className="search-bar">
       <Select value={selecteds?.group} allowClear placeholder="请选择主机组" style={{ width: 150,marginRight: 10 }} onChange={handleGroup}>
         {
-          (items||[]).map(v=><Option key={v.groupid} value={v.groupid}>{v.name}</Option>)
+          (items||[]).map(v=><Option key={v.groupid} value={v.groupid}><Tooltip title={v.name}>{v.name}</Tooltip></Option>)
         }
       </Select>
       <Button type="primary" loading={reportLoading} onClick={()=>dlReport()} icon={<SearchOutlined />}>导出巡检报告</Button>
