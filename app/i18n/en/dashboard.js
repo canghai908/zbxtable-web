@@ -6,12 +6,13 @@ const conf={
     problem:'Problem',
   },
   level:{
-    all:'Not classified',
+    noclass:'Not classified',
     info:'Information',
     warning:'Warning',
     normal:'Average',
     danger:'High',
     zainan:'Disaster',
+    all:'All',
   },
   table:{
     id:'ID',
