@@ -6,12 +6,13 @@ const conf={
     problem:'问题',
   },
   level:{
-    all:'未分类',
+    noclass:'未分类',
     info:'信息',
     warning:'警告',
     normal:'一般',
     danger:'严重',
     zainan:'灾难',
+    all:'所有'
   },
   table:{
     id:'序号',

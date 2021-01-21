@@ -160,7 +160,7 @@ const Index = (props) => {
   //i18n
   const langCfg = props.store?.getState('langCfg') ?? {};
   const {analysislang} = langCfg;
-  const {analysistpl} = analysislang || {};
+  const {level:levelList} = analysislang || {};
 
   return (
     <div className="alarm-analysis-page">

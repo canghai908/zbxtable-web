@@ -225,12 +225,12 @@ const Index=props=>{
     <div className="search-bar">
       <Select value={selecteds?.group} allowClear placeholder="请选择主机组" style={{ width: 150,marginRight: 10 }} onChange={handleGroup}>
         {
-          (items||[]).map(v=><Option key={v.groupid} value={v.groupid}>{v.name}</Option>)
+          (items||[]).map(v=><Option key={v.groupid} value={v.groupid}><Tooltip title={v.name}>{v.name}</Tooltip></Option>)
         }
       </Select>
       <Select value={selecteds?.host} allowClear placeholder="请选择主机" style={{ width: 120,marginRight: 10 }} onChange={handleHost}>
         {
-          (hosts||[]).map(v=><Option key={v.hostid} value={v.hostid}>{v.name}</Option>)
+          (hosts||[]).map(v=><Option key={v.hostid} value={v.hostid}><Tooltip title={v.name}>{v.name}</Tooltip></Option>)
         }
       </Select>
       <Select value={selecteds?.item} allowClear placeholder="请选择指标" style={{ width: 180,marginRight: 10 }} onChange={handleTarget}>

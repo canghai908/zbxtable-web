@@ -41,28 +41,32 @@ const cardList=nameList=>[
 
 const level=nameList=>[
   {
-    value:'0',
+    value:'6',
     label:nameList['all'],
   },
   {
-    value:'1',
-    label:nameList['info'],
-  },
-  {
-    value:'2',
-    label:nameList['warning'],
-  },
-  {
-    value:'3',
-    label:nameList['normal'],
+    value:'5',
+    label:nameList['zainan'],
   },
   {
     value:'4',
     label:nameList['danger'],
   },
   {
-    value:'5',
-    label:nameList['zainan'],
+    value:'3',
+    label:nameList['normal'],
+  },
+  {
+    value:'2',
+    label:nameList['warning'],
+  },
+  {
+    value:'1',
+    label:nameList['info'],
+  },
+  {
+    value:'0',
+    label:nameList['noclass'],
   },
 ];
 
@@ -239,8 +243,8 @@ const Index=props=>{
   const {index,trigger}=list;//props;
   const numList=index?.data?.items??{};
   const warningList=trigger?.data?.items??[];
-  const dataSource=active==0?warningList:warningList.filter(v=>v.severity==active);
-  const renderTabs=(v,active)=><Badge count={(v.key==0?warningList:warningList.filter(sv=>sv.severity==v.key)).length}>
+  const dataSource=active==6?warningList:warningList.filter(v=>v.severity==active);
+  const renderTabs=(v,active)=><Badge count={(v.key==6?warningList:warningList.filter(sv=>sv.severity==v.key)).length}>
     <div style={{padding:'6px 15px'}}>{v.value}</div>
   </Badge>;
 
