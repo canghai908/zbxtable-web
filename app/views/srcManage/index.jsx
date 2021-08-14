@@ -75,18 +75,18 @@ const columns = (page, nameList) => [
     align: 'center',
     render: (text, row, index) => (text == '0' ? <Tag color="green">启用</Tag> : <Tag color="red">未启用</Tag>),
   },
-  {
-    title: nameList['available'],
-    dataIndex: 'available',
-    width: 40,
-    ellipsis: true,
-    align: 'center',
-    render: (text, row, index) => (
-      <Tooltip title={row.error}>
-        <Tag color={available[text - 0].color}>{available[text - 0].value}</Tag>
-      </Tooltip>
-    ),
-  },
+  // {
+  //   title: nameList['available'],
+  //   dataIndex: 'available',
+  //   width: 40,
+  //   ellipsis: true,
+  //   align: 'center',
+  //   render: (text, row, index) => (
+  //     <Tooltip title={row.error}>
+  //       <Tag color={available[text - 0].color}>{available[text - 0].value}</Tag>
+  //     </Tooltip>
+  //   ),
+  // },
   /* {
     title: '操作',
     dataIndex: 'action',
