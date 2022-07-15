@@ -7,22 +7,22 @@ ZbxTable front end
 ## Getting Started
 
 ``` 
-npm i
-npm run start
+yarn install
+yarn serve
 ```
 
-Visit  http://127.0.0.1:9600
+Visit  http://127.0.0.1:8080
 
 ## Build
 
 nodejs>10
 
 ``` 
-npm i
-npm run build
+yarn install
+yarn build
 ```
 
-The built code will be stored in the /app/build folder 
+The built code will be stored in the web folder 
 
 ## Deploy
 
@@ -48,17 +48,7 @@ server {
 Copy the generated front-end files to the /usr/local/zbxtable/web directory
 
 ``` 
-cp -a /app/build/* /usr/local/zbxtable/web
+cp -a web/* /usr/local/zbxtable/web
 ```
 
 8084 is the zbxtable back-end program port, restart nginx to access the system using http://ip:8088, the default account: admin, password: Zbxtable
-
-## Team
-
-Back-end development
-
-[canghai908](https://github.com/canghai908)
-
-Front-end development
-
-[ahyiru](https://github.com/ahyiru)

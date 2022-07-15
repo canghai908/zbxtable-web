@@ -7,10 +7,11 @@ ZbxTable 前端页面
 ## 开发
 
 ``` 
-npm run start
+yarn install
+yarn serve
 ```
 
-访问 http://127.0.0.1:9600
+访问 http://127.0.0.1:8080
 
 ## 构建
 
@@ -19,11 +20,11 @@ npm run start
 构建
 
 ``` 
-npm i
-npm run build
+yarn install
+yarn build
 ```
 
-构建后的代码默认会存放到 /app/build 文件夹
+构建后的代码默认会存放到 web 文件夹
 
 ## 部署
 
@@ -49,17 +50,7 @@ server {
 拷贝生成的前端文件到/usr/local/zbxtable/web 目录
 
 ``` 
-cp -a /app/build/* /usr/local/zbxtable/web
+cp -a web/* /usr/local/zbxtable/web
 ```
 
 8084 为 zbxtable 后端程序端口, 重启 nginx 即可使用http://ip:8088 访问系统, 默认账号:admin，密码: Zbxtable
-
-## Team
-
-后端
-
-[canghai908](https://github.com/canghai908)
-
-前端
-
-[ahyiru](https://github.com/ahyiru)
