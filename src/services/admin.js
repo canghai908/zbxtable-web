@@ -21,7 +21,11 @@ import {
   ITEM_TRAFFIC,
   TOPO_TRAFFIC,
   TASK_LOG,
+  EVENT_LOG,
   MANAGER,
+  RULE,
+  USER,
+  GROUP,
 } from "@/services/api";
 import { request, METHOD } from "@/utils/request";
 import { INDEX_VERSION, REPORT } from "./api";
@@ -175,6 +179,57 @@ export async function taskLogDelete(id) {
 export async function managerChpwd(params) {
   return request(MANAGER + "/chpwd", METHOD.POST, params);
 }
+export async function ruleList(params) {
+  return request(RULE, METHOD.GET, { ...params });
+}
+export async function ruleAdd(params) {
+  return request(RULE, METHOD.POST, params);
+}
+export async function rulePut(id, params) {
+  return request(RULE + "/" + id, METHOD.PUT, params);
+}
+export async function ruleStatusPut(id, params) {
+  return request(RULE + "/status/" + id, METHOD.PUT, params);
+}
+export async function ruleDelete(id) {
+  return request(RULE + "/" + id, METHOD.DELETE);
+}
+export async function ruleGet(id) {
+  return request(RULE + "/" + id, METHOD.GET);
+}
+export async function userList(params) {
+  return request(USER, METHOD.GET, { ...params });
+}
+export async function userCreate(params) {
+  return request(USER, METHOD.POST, params);
+}
+export async function userDelete(id) {
+  return request(USER + "/" + id, METHOD.DELETE);
+}
+export async function userPut(id, params) {
+  return request(USER + "/" + id, METHOD.PUT, params);
+}
+export async function userStatusPut(id, params) {
+  return request(USER + "/status/" + id, METHOD.PUT, params);
+}
+export async function groupList(params) {
+  return request(GROUP, METHOD.GET, { ...params });
+}
+export async function groupCreate(params) {
+  return request(GROUP, METHOD.POST, params);
+}
+export async function groupPut(id, params) {
+  return request(GROUP + "/" + id, METHOD.PUT, params);
+}
+export async function groupMemberPut(id, params) {
+  return request(GROUP + "/member/" + id, METHOD.PUT, params);
+}
+export async function groupDelete(id) {
+  return request(GROUP + "/" + id, METHOD.DELETE);
+}
+export async function eventLogGet(id) {
+  return request(EVENT_LOG + "/" + id, METHOD.GET);
+}
 export default {
   hostList,
   hostDetail,
@@ -186,6 +241,7 @@ export default {
   indexEgress,
   alarm,
   alarmAnalysis,
+  alarmTenantGet,
   topologyList,
   topologyDetail,
   createTopology,
@@ -221,4 +277,20 @@ export default {
   reportStatusUpdate,
   taskLogList,
   taskLogDelete,
+  eventLogGet,
+  ruleList,
+  ruleAdd,
+  rulePut,
+  ruleStatusPut,
+  userList,
+  ruleGet,
+  userCreate,
+  userDelete,
+  userPut,
+  userStatusPut,
+  groupList,
+  groupCreate,
+  groupPut,
+  groupMemberPut,
+  groupDelete,
 };

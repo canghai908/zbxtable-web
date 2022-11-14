@@ -155,6 +155,8 @@ export default {
         let res = resp.data
         if (res.code == 200) {
           this.form = res.data.items || []
+          this.form.items = res.data.items.items.split(',')
+          console.log(this.form.items)
           console.log(this.form)
         }
       }).finally(() => { this.loading = false })

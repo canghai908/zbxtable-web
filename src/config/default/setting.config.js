@@ -19,7 +19,7 @@ module.exports = {
   cachePage: true, //是否缓存页面数据，仅多页签模式下生效，true 缓存, false 不缓存
   hideSetting: false, //隐藏设置抽屉，true:隐藏，false:不隐藏
   systemName: "ZbxTable", //系统名称
-  copyright: "ZbxTable", //copyright
+  copyright: "ZbxTable 2.1.0", //copyright
   asyncRoutes: false, //异步加载路由，true:开启，false:不开启
   showPageTitle: true, //是否显示页面标题（PageLayout 布局中的页面标题），true:显示，false:不显示
   filterMenu: true, //根据权限过滤菜单，true:过滤，false:不过滤
@@ -31,8 +31,11 @@ module.exports = {
   },
   footerLinks: [
     //页面底部链接，{link: '链接地址', name: '名称/显示文字', icon: '图标，支持 ant design vue 图标库'}
-    // { link: "https://pro.ant.design", name: "ZbxTable文档" },
-    // { link: "https://github.com/canghai908/zbxtable", icon: "github" },
-    // { link: "https://blog.cactifans.com", name: "技术Blog" },
+    { link: "https://www.zbxtable.com", name: "ZbxTable文档" },
+    {
+      link: "https://github.com/canghai908/zbxtable",
+      name: "Github",
+    },
+    { link: "https://blog.cactifans.com", name: "技术Blog" },
   ],
 };

@@ -136,6 +136,21 @@ const options = {
               name: "告警查询",
               component: () => import("@/pages/alarm/query"),
             },
+            {
+              path: "rule",
+              name: "分发规则",
+              component: () => import("@/pages/alarm/rule"),
+            },
+            {
+              path: "rule-edit",
+              name: "分发规则",
+              component: () => import("@/pages/alarm/ruleEdit"),
+            },
+            {
+              path: "mutes",
+              name: "屏蔽规则",
+              component: () => import("@/pages/alarm/mutes"),
+            },
           ],
         },
         {
@@ -153,7 +168,7 @@ const options = {
               path: "detail",
               name: "编辑",
               meta: { highlight: "/topology", invisible: true },
-              component: () => import("@/pages/topology/topologyDetail"),
+              component: () => import("@/pages/topology/detail"),
             },
             {
               path: "show",
@@ -189,7 +204,13 @@ const options = {
             {
               path: "add",
               name: "添加",
-              meta: { highlight: "/report", invisible: true },
+              meta: {
+                highlight: "/report",
+                invisible: true,
+                authority: {
+                  role: "admin1",
+                },
+              },
               component: () => import("@/pages/report/add"),
             },
           ],
@@ -205,9 +226,19 @@ const options = {
           component: BlankView,
           children: [
             {
+              path: "users",
+              name: "用户管理",
+              meta: { icon: "user", page: { cacheAble: false } },
+              component: () => import("@/pages/system/users"),
+            },
+            {
+              path: "groups",
+              name: "组织管理",
+              component: () => import("@/pages/system/init"),
+            },
+            {
               path: "init",
               name: "指标映射",
-              // meta: { highlight: "/system", invisible: true },
               component: () => import("@/pages/system/init"),
             },
             {

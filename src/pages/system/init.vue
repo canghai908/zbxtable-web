@@ -61,7 +61,7 @@ export default {
       }).finally(() => { this.loading = false })
     },
     seeEdit(record) {
-      this.$router.push("/system/edit?id=" + record.id)
+      this.$router.push("/system/init-edit?id=" + record.id)
     },
     deployInit(record) {
       console.log(record)

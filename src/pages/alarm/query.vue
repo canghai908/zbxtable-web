@@ -36,7 +36,16 @@
     </a-form-model>
 
     <div class="linux-list">
-      <a-table :loading="loading" :columns="columns" :data-source="list" @change="changePage" :pagination="pagination" :rowKey="(record) => { return record.id;}">
+      <a-table :loading="loading" :columns="columns" :data-source="list" @expand="getEvent" @change="changePage" :pagination="pagination" :rowKey="(record) => { return record.id;}">
+        <a-table slot="expandedRowRender" :columns="innerColumns" :data-source="innerData" :pagination="false">
+          <span slot="notify_time" slot-scope="record">{{record.notify_time | parsetime }}</span>
+          <span slot="status" slot-scope="record">
+            <a-badge v-if="record.status==0" status="success"></a-badge>
+            <a-badge v-else-if="record.status==1" status="error"></a-badge>
+            <a-badge v-else-if="record.status==2" status="processing"></a-badge>
+            {{record.status | notifyResult }}
+          </span>
+        </a-table>
         <div slot="level" slot-scope="record">
           <a-tag v-if="record.level==0" color="#97AAB3">{{record.level | levelFilter}}</a-tag>
           <a-tag v-else-if="record.level==1" color=" #7499FF">{{record.level | levelFilter}}</a-tag>
@@ -49,7 +58,17 @@
           <a-tag v-if="record.status==0" color="#87d068">{{record.status | statusFilter}}</a-tag>
           <a-tag v-else-if="record.status==1" color="#f50">{{record.status | statusFilter}}</a-tag>
         </div>
-        <span slot="occurtime" slot-scope="record">{{record.occurtime | parsetime }}</span>
+        <span slot="occur_time" slot-scope="record">{{record.occur_time | parsetime }}</span>
+        <span slot="notify_status" slot-scope="record">
+
+          <a-badge v-if="record.notify_status==0" status="success"></a-badge>
+          <a-badge v-else-if="record.notify_status==1" status="default"></a-badge>
+          <a-badge v-else-if="record.notify_status==2" status="processing"></a-badge>
+          {{record.notify_status | notifyStatusFilter }}
+        </span>
+        <span slot="operation" slot-scope="record">
+          <a-button v-if="record.notify_status!=1" class="pd20 paddingleft0" type="link" size="small" @click="addMutes(record)">屏蔽</a-button>
+        </span>
       </a-table>
     </div>
   </page-layout>
@@ -57,8 +76,9 @@
 
 <script>
 import PageLayout from "@/layouts/PageLayout";
-import { alarm, alarmTenantGet, alarmExport } from "@/services/admin";
+import { alarm, alarmTenantGet, alarmExport, eventLogGet } from "@/services/admin";
 import { parseTimeFun } from "@/utils/formatter";
+import { reduce } from "lodash";
 import moment from "moment";
 import "moment/locale/zh-cn";
 export default {
@@ -85,20 +105,32 @@ export default {
         { id: 4, value: "严重", },
         { id: 5, value: "灾难", },
       ],
-
       columns: [
-        { title: "ID", dataIndex: "id", align: "center" },
+        { title: "ID", dataIndex: "id", align: "left" },
         { title: "告警租户", dataIndex: "tenant_id", align: "left" },
-        { title: "告警类型", key: "status", align: "center", scopedSlots: { customRender: "status" }, },
+        { title: "告警类型", key: "status", align: "left", scopedSlots: { customRender: "status" }, },
         { title: "设备名称", dataIndex: "hostname", align: "left" },
-        { title: "IP", dataIndex: "host_ip", align: "center", scopedSlots: { customRender: "host_ip" }, },
-        { title: "告警级别", key: "level", align: "center", scopedSlots: { customRender: "level" }, },
+        { title: "IP", dataIndex: "host_ip", align: "left", scopedSlots: { customRender: "host_ip" }, },
+        { title: "告警级别", key: "level", align: "left", scopedSlots: { customRender: "level" }, },
         { title: "告警描述", dataIndex: "message", align: "left" },
         { title: "告警详情", dataIndex: "detail", align: "left" },
-        { title: "发生时间", key: "occurtime", align: "center", scopedSlots: { customRender: "occurtime" }, },
+        { title: "发生时间", key: "occur_time", align: "left", scopedSlots: { customRender: "occur_time" }, },
+        { title: "通知状态", key: "notify_status", align: "left", scopedSlots: { customRender: "notify_status" }, },
+        { title: "操作", key: "operation", align: "center", scopedSlots: { customRender: "operation" } },
+      ],
+      innerColumns: [
+        { title: "规则名称", dataIndex: "rule", align: "left" },
+        { title: "接收渠道", dataIndex: "channel", align: "left" },
+        { title: "接收用户", dataIndex: "user", align: "left" },
+        { title: "接收账号", dataIndex: "account", align: "left" },
+        { title: "通知时间", key: "notify_time", align: "left", scopedSlots: { customRender: "notify_time" }, },
+        { title: "通知内容", dataIndex: "notify_content", align: "left", width: "300px", ellipsis: true, },
+        { title: "通知结果", key: "status", align: "left", scopedSlots: { customRender: "status" }, },
+        { title: "错误信息", dataIndex: "notify_error", align: "left", width: "300px", ellipsis: true, },
       ],
       tenantlist: [],
       list: [],
+      innerData: [],
       pagination: {
         total: 0,
         current: 1,
@@ -167,6 +199,11 @@ export default {
     handleLevelChange(value) {
       this.level = value
     },
+    addMutes(record) {
+      console.log(record)
+      this.$router.push("/alarm/mutes?hostid=" + record.host_id + '&tenantid=' + record.tenant_id +
+        '&host=' + record.host + '&message=' + record.message)
+    },
     //导出excel
     anayexport() {
       alarmExport(
@@ -210,10 +247,19 @@ export default {
     resetData() {
       this.hosts = "";
       this.tenantid = "";
-      this.tenantid = "";
       this.status = "";
       this.level = "";
       this.init();
+    },
+    getEvent(exp, record) {
+      console.log(exp, record)
+      this.innerData = []
+      eventLogGet(record.id).then((resp) => {
+        let res = resp.data;
+        if (res.code == 200) {
+          this.innerData = res.data.items || [];
+        }
+      })
     },
   },
   filters: {
@@ -252,6 +298,33 @@ export default {
           break;
         case "1":
           res = "告警";
+          break;
+      }
+      return res;
+    },
+    notifyStatusFilter(v) {
+      let res = "已通知";
+      switch (v) {
+        case "0":
+          res = "已通知";
+          break;
+        case "1":
+          res = "已屏蔽";
+          break;
+        case "2":
+          res = "默认规则";
+          break;
+      }
+      return res;
+    },
+    notifyResult(v) {
+      let res = "已通知";
+      switch (v) {
+        case "0":
+          res = "已送达";
+          break;
+        case "1":
+          res = "失败";
           break;
       }
       return res;

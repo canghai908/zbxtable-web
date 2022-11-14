@@ -18,4 +18,3 @@ selenium-debug.log
 *.njsproj
 *.sln
 .env.production.local
-.drone.yml

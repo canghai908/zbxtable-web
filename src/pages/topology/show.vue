@@ -111,7 +111,9 @@ export default {
         grid: _that.grid,
         resizing: { // 调整节点宽高
           enabled: true,
-          orthogonal: false
+          orthogonal: true,
+          restricted: false,
+          autoScroll: true,
         },
         clipboard: {
           enabled: true,
@@ -124,15 +126,16 @@ export default {
           enabled: true,
           pageVisible: false,
           pageBreak: true,
-          pannable: true
+          pannable: true,
+          autoResize: true,
         },
-        minimap: {//小地图
-          enabled: true,
-          width: 200,
-          height: 160,
-          padding: 10,
-          container: minimapContainer
-        },
+        // minimap: {//小地图
+        //   enabled: true,
+        //   width: 200,
+        //   height: 160,
+        //   padding: 10,
+        //   container: minimapContainer
+        // },
         selecting: {//允许选定
           enabled: true,
           showNodeSelectionBox: true,

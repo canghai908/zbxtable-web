@@ -6,6 +6,7 @@ const BASE_URL =
     : API_PROXY_PREFIX;
 module.exports = {
   LOGIN: "/v1/login",
+  ROUTES: "/v1/index/routers",
   INDEX_INFO: "/v1/index/baseinfo",
   HOST_LIST: "/v1/host",
   HOST_EXPORT: "/v1/export/hosts",
@@ -30,6 +31,10 @@ module.exports = {
   ITEM_TRAFFIC: "/v1/item/traffic",
   TOPO_TRAFFIC: "/v1/item/topotraffic",
   TASK_LOG: "/v1/task_log",
+  EVENT_LOG: "/v1/event_log",
   MANAGER: "/v1/manager",
+  RULE: "/v1/rule",
+  USER: "/v1/user",
+  GROUP: "/v1/group",
   API_WS: "/ws",
 };

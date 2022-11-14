@@ -1,32 +1,34 @@
-English | [简体中文](./README.zh-CN.md)
+[English](./README.md) | 简体中文
 
 # zbxtable-web
 
-ZbxTable front end
+ZbxTable 前端页面
 
-## Getting Started
+## 开发
 
 ``` 
 yarn install
 yarn serve
 ```
 
-Visit  http://127.0.0.1:8080
+访问 http://127.0.0.1:8080
 
-## Build
+## 构建
 
-nodejs>10
+环境：nodejs>10
+
+构建
 
 ``` 
 yarn install
 yarn build
 ```
 
-The built code will be stored in the web folder 
+构建后的代码默认会存放到 web 文件夹
 
-## Deploy
+## 部署
 
-It is recommended to use nginx, the configuration file is as follows:
+建议使用 nginx， 配置文件如下
 
 ``` 
 server {
@@ -45,10 +47,10 @@ server {
 }
 ```
 
-Copy the generated front-end files to the /usr/local/zbxtable/web directory
+拷贝生成的前端文件到/usr/local/zbxtable/web 目录
 
 ``` 
 cp -a web/* /usr/local/zbxtable/web
 ```
 
-8084 is the zbxtable back-end program port, restart nginx to access the system using http://ip:8088, the default account: admin, password: Zbxtable
+8084 为 zbxtable 后端程序端口, 重启 nginx 即可使用http://ip:8088 访问系统, 默认账号:admin，密码: Zbxtable

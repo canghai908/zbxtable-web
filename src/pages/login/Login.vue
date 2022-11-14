@@ -36,8 +36,9 @@
 
 <script>
 import CommonLayout from "@/layouts/CommonLayout";
-import { login } from "@/services/user";
+import { login, getRoutesConfig } from "@/services/user";
 import { setAuthorization } from "@/utils/request";
+import { loadRoutes } from '@/utils/routerUtil'
 import { mapMutations } from "vuex";
 export default {
   name: "Login",
@@ -71,28 +72,27 @@ export default {
     afterLogin(res) {
       this.logging = false;
       const loginRes = res.data;
-      if (loginRes.code >= 0) {
-        // const {user, permissions, roles} = loginRes.data
-        let premissions = [{ id: "queryForm", operation: ["add", "edit"] }],
-          roles = [{ id: "admin", operation: ["add", "edit", "delete"] }],
-          user = {
-            name: "admin",
-            avatar:
-              "https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png",
-            address: "武汉",
-          };
+      if (loginRes.code == 200) {
+        const { user, permissions, roles } = loginRes.data
+        // let premissions = [{ id: "queryForm", operation: ["add", "edit", 'delete'] }]
+        // roles = [{ id: "admin", operation: ["add", "edit", "delete"] }],
+        // user = {
+        //   name: "admin",
+        //   avatar:
+        //     "https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png",
+        //   address: "武汉",
+        // };
         this.setUser(user);
-        this.setPermissions(premissions);
+        // this.setPermissions(premissions);
         this.setRoles(roles);
         setAuthorization({ token: loginRes.data.token });
         // 获取路由配置
-        // getRoutesConfig().then(result => {
-        //   const routesConfig = result.data.data
-        //   loadRoutes(routesConfig)
-        this.$router.push("/dashboard/workplace");
-        //   this.$message.success(loginRes.message, 3)
-        // })
-
+        getRoutesConfig().then(result => {
+          const routesConfig = result.data.data.items;
+          loadRoutes(routesConfig)
+          this.$router.push("/dashboard/workplace");
+          this.$message.success(loginRes.message, 1)
+        })
       } else {
         this.error = loginRes.message;
       }

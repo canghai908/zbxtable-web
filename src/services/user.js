@@ -1,5 +1,5 @@
-import {LOGIN} from '@/services/api'
-import {request, METHOD, removeAuthorization} from '@/utils/request'
+import { LOGIN, ROUTES } from "@/services/api";
+import { request, METHOD, removeAuthorization } from "@/utils/request";
 
 /**
  * 登录服务
@@ -10,19 +10,23 @@ import {request, METHOD, removeAuthorization} from '@/utils/request'
 export async function login(name, password) {
   return request(LOGIN, METHOD.POST, {
     username: name,
-    password: password
-  })
+    password: password,
+  });
+}
+
+export async function getRoutesConfig() {
+  return request(ROUTES, METHOD.GET);
 }
 
 /**
  * 退出登录
  */
 export function logout() {
-  removeAuthorization()
+  removeAuthorization();
 }
-
 
 export default {
   login,
-  logout
-}
+  logout,
+  getRoutesConfig,
+};

@@ -157,7 +157,7 @@
 
 <script>
 import PageLayout from "@/layouts/PageLayout";
-import { indexTrigger, indexInfo, hostMockd, indexRestop, indexEgress } from "@/services/admin";
+import { indexTrigger, indexInfo, indexRestop, indexEgress } from "@/services/admin";
 import { parseTimeFun } from "@/utils/formatter";
 import pie from "@/components/gcharts/pie";
 import legent from "@/components/gcharts/legent";
