@@ -28,6 +28,7 @@ steps:
     when:
       branch:
         - dev
+        
   - name: scp stable
     image: drone-scp:latest
     settings:
