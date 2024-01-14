@@ -140,7 +140,7 @@ export async function templateList() {
 export async function templateGetItemList(id) {
   return request(TEMPLATE_lIST + "/item/" + id, METHOD.GET);
 }
-export async function zbxVersion() {
+export async function baseVersion() {
   return request(INDEX_VERSION, METHOD.GET);
 }
 export async function reportAdd(params) {
@@ -265,7 +265,7 @@ export default {
   hostgroupList,
   templateList,
   templateGetItemList,
-  zbxVersion,
+  baseVersion,
   reportAdd,
   reportList,
   reportGet,

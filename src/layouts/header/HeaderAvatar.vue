@@ -13,10 +13,6 @@
         <a-icon type="setting" />
         <span></span>
       </a-menu-item> -->
-      <a-menu-item>
-        <a-icon type="build" />
-        <span>版本:{{version}}</span>
-      </a-menu-item>
       <a-menu-divider />
       <a-menu-item @click="logout">
         <a-icon style="margin-right: 8px;" type="poweroff" />
@@ -29,16 +25,12 @@
 <script>
 import { mapGetters } from 'vuex'
 import { logout } from '@/services/user'
-import config from "../../../package.json";
 
 export default {
   name: 'HeaderAvatar',
   version: '',
   computed: {
     ...mapGetters('account', ['user']),
-  },
-  created() {
-    this.version = config.version
   },
   methods: {
     logout() {
