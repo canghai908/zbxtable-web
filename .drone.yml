@@ -11,7 +11,7 @@ steps:
       - name: cache
         path: /drone/src/zbxtable-web/node_modules
   - name: scp dev
-    image: drone-scp:latest
+    image: appleboy/drone-scp
     settings:
       host:
         from_secret: 222_host
@@ -30,7 +30,7 @@ steps:
         - dev
 
   - name: scp stable
-    image: drone-scp:latest
+    image: appleboy/drone-scp
     settings:
       host:
         from_secret: 222_host
