@@ -6,7 +6,7 @@ steps:
     commands:
       - npm install --legacy-peer-deps
       - npm run build
-      - tar zcvf dist.tar.gz ./dist/
+      - tar zcvf web.tar.gz ./web/
     volumes:
       - name: cache
         path: /drone/src/zbxtable-web/node_modules
@@ -24,11 +24,11 @@ steps:
       command_timeout: 10m
       strip_components: 1
       target: /home/wwwroot/downloads/dev
-      source: ./dist.tar.gz
+      source: ./web.tar.gz
     when:
       branch:
         - dev
-        
+
   - name: scp stable
     image: drone-scp:latest
     settings:
@@ -43,7 +43,7 @@ steps:
       command_timeout: 10m
       strip_components: 1
       target: /home/wwwroot/downloads/stable
-      source: ./dist.tar.gz
+      source: ./web.tar.gz
     when:
       branch:
         - 2.1 
