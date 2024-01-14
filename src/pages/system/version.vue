@@ -5,11 +5,11 @@
         <a-descriptions-item label="Zabbix版本" :span="3">{{ ZabbixVersion }}</a-descriptions-item>
         <a-descriptions-item label=" 前端版本" :span="3">{{ UIVersion }}</a-descriptions-item>
         <a-descriptions-item label="后端版本信息">
-          版本:{{ BackVersion }}
+          Version:{{ BackVersion }}
           <br />
           GitHash:{{ GitHash }}
           <br />
-          构建时间:{{ BuildTime }}
+          BuildTime:{{ BuildTime }}
         </a-descriptions-item>
       </a-descriptions>
     </a-card>
