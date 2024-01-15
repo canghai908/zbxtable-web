@@ -4,6 +4,8 @@
 
 ZbxTable 前端页面
 
+[![Build Status](https://drone.cactifans.org/api/badges/canghai908/zbxtable-web/status.svg?ref=refs/heads/2.1)](https://drone.cactifans.org/canghai908/zbxtable-web)
+
 ## 开发
 
 ``` 
