@@ -145,6 +145,9 @@ const routerMap = {
     name: "分析页",
     component: () => import("@/pages/dashboard/analysis"),
   },
+  version: {
+    component: () => import("@/pages/system/version"),
+  },
 
   form: {
     name: "表单页",

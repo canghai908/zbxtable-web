@@ -268,8 +268,9 @@ export default {
     },
     websocketonopen() { //连接建立之后执行send方法发送数据
       this.isWebSocket = true;
+      this.websock.send("success")
       this.$message.success("Websocket链接成功")
-      // this.websocketsend(JSON.stringify(actions));
+
     },
     websocketonclose() {//断开
       // setTimeout(this.$message.info("重新建立Websocket连接中11"), 5000);
@@ -295,6 +296,7 @@ export default {
         '.x6-port-body'
       )
       this.showPorts(ports, false)
+      this.websock.send("success");
     },
     tuopuDetail() {
       if (this.id) {

@@ -26,7 +26,7 @@ module.exports = {
   SYSTEM_LIST: "/v1/system",
   HOST_GROUP: "/v1/host_group",
   TEMPLATE_lIST: "/v1/template",
-  INDEX_VERSION: "/v1/index/zbx",
+  INDEX_VERSION: "/v1/index/version",
   REPORT: "/v1/report",
   ITEM_TRAFFIC: "/v1/item/traffic",
   TOPO_TRAFFIC: "/v1/item/topotraffic",

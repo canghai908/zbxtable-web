@@ -1,0 +1,53 @@
+kind: pipeline
+name: zbxtable-web
+steps:
+  - name: build
+    image: node:16.20.2-bullseye
+    commands:
+      - npm install --legacy-peer-deps
+      - npm run build
+      - tar zcvf web.tar.gz ./web/
+    volumes:
+      - name: cache
+        path: /drone/src/zbxtable-web/node_modules
+  - name: scp dev
+    image: appleboy/drone-scp
+    settings:
+      host:
+        from_secret: 222_host
+      port:
+        from_secret: port
+      username:
+        from_secret: username
+      password:
+        from_secret: 222_password
+      command_timeout: 10m
+      strip_components: 1
+      target: /home/wwwroot/downloads/dev
+      source: ./web.tar.gz
+    when:
+      branch:
+        - dev
+
+  - name: scp stable
+    image: appleboy/drone-scp
+    settings:
+      host:
+        from_secret: 222_host
+      port:
+        from_secret: port
+      username:
+        from_secret: username
+      password:
+        from_secret: 222_password
+      command_timeout: 10m
+      strip_components: 1
+      target: /home/wwwroot/downloads/stable
+      source: ./web.tar.gz
+    when:
+      branch:
+        - 2.1 
+volumes:
+- name: cache
+  host:
+    path: /tmp/drone/cache/zbxtable-web/node_modules
