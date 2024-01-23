@@ -260,7 +260,6 @@ export default {
       rule.status = rule.status ? '0' : '1';
       rule.s_time = this.rule.s_time.format('HH:mm')
       rule.e_time = this.rule.e_time.format('HH:mm')
-      console.log("规则编辑：", rule);
       rulePut(this.id, rule).then((resp) => {
         let res = resp.data
         if (res.code == 200) {

@@ -37,10 +37,10 @@
     <a-modal title="新增规则" :visible="visible" :confirm-loading="confirmLoading" @ok="createRule" @cancel="handleCancel" width="1000px">
       <template>
         <a-form-model :model="rule">
-          <a-form-model-item :label="$t('title')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="name">
+          <a-form-model-item :label="$t('title')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="name" :required="true">
             <a-input v-model.trim="rule.name" :placeholder="$t('titleInput')" />
           </a-form-model-item>
-          <a-form-model-item :label="$t('tenant_id')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="tenant_id">
+          <a-form-model-item :label="$t('tenant_id')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="tenant_id" :required="true">
             <a-select v-model="rule.tenant_id" mode="multiple" style="width: 100%" placeholder="选择告警租户" @change="handleTenantChange">
               <a-select-option v-for="(item, index) in tenantlist" :key="index" :value="item.tenant_id" :label="item.tenant_id" :title="item.tenant_id">
                 {{ item.tenant_id }}
@@ -124,11 +124,11 @@
     <a-modal title="编辑规则" :visible="visibleEdit" :confirm-loading="confirmLoading" @ok="updateRule" @cancel="handleEditCancel" width="1000px">
       <template>
         <a-form-model :model="rule">
-          <a-form-model-item :label="$t('title')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="name">
+          <a-form-model-item :label="$t('title')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="name" :required="true">
             <a-input v-model.trim="rule.name" :placeholder="$t('titleInput')" />
           </a-form-model-item>
           <a-form-model-item :label="$t('tenant_id')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="tenant_id">
-            <a-select v-model="rule.tenant_id" mode="multiple" style="width: 100%" placeholder="选择告警租户" @change="handleTenantChange">
+            <a-select v-model="rule.tenant_id" mode="multiple" style="width: 100%" placeholder="选择告警租户" @change="handleTenantChange" :required="true">
               <a-select-option v-for="(item, index) in tenantlist" :key="index" :value="item.tenant_id" :label="item.tenant_id" :title="item.tenant_id">
                 {{ item.tenant_id }}
               </a-select-option>
@@ -259,9 +259,9 @@ export default {
         // { value: "sms", label: "短信" },
       ],
       rFuncOptions: [
-        { value: "==", label: "==" },
-        { value: "=~", label: "=~" },
-        { value: "!=", label: "!=" },],
+        { value: "==", label: "等于" },
+        { value: "=~", label: "包含" },
+        { value: "!=", label: "不等于" },],
       rTypeOptions: [
         { value: "host", label: "主机名" },
         { value: "group", label: "主机组" },

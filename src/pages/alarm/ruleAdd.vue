@@ -56,7 +56,7 @@
           </a-form-item>
           <a-form-item :label="$t('date2')" :labelCol="{span: 7}" :wrapperCol="{span: 8}" :required="true">
             <a-col>
-              <a-time-picker v-model="rule.s_time" format="HH:mm"></a-time-picker>-->
+              <a-time-picker v-model="rule.s_time" format="HH:mm"></a-time-picker>
               <a-time-picker v-model="rule.e_time" format="HH:mm"></a-time-picker>
             </a-col>
           </a-form-item>
@@ -117,9 +117,9 @@ export default {
         { value: "trigger", label: "触发器" },
         { value: "severity", label: "告警级别" }],
       rFuncOptions: [
-        { value: "==", label: "==" },
-        { value: "=~", label: "=~" },
-        { value: "!=", label: "!=" },],
+        { value: "==", label: "等于" },
+        { value: "=~", label: "包含" },
+        { value: "!=", label: "不等于" },],
       rWeekOptions: [
         { value: "0", label: "星期日" },
         { value: "1", label: "星期一" },
@@ -165,7 +165,6 @@ export default {
     init() {
       this.rule.s_time = moment('00:00', 'HH:mm')
       this.rule.e_time = moment('23:59', 'HH:mm')
-      console.log(this.rule.s_time)
       //tenant get
       alarmTenantGet().then((resp) => {
         let res = resp.data
@@ -181,7 +180,6 @@ export default {
         let res = resp.data;
         if (res.code == 200) {
           this.userlist = res.data.items || [];
-          console.log(this.userlist)
         }
       })
       //group get
@@ -222,7 +220,6 @@ export default {
       rule.status = rule.status ? '0' : '1';
       rule.s_time = this.rule.s_time.format('HH:mm')
       rule.e_time = this.rule.e_time.format('HH:mm')
-      console.log("规则添加：", rule);
       ruleAdd(rule).then((resp) => {
         let res = resp.data
         if (res.code == 200) {

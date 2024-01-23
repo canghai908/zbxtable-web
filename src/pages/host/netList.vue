@@ -71,6 +71,7 @@ export default {
       available: "",
       hosttype: "HW_NET",
       loading: false,
+      interfaces: "",
       availableOption: [
         { label: "正常", value: "1" },
         { label: "异常", value: "2" },

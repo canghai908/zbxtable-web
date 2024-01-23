@@ -220,7 +220,6 @@ export default {
         let res = resp.data;
         if (res.code == 200) {
           this.userlist = res.data.items || [];
-          console.log(this.userlist)
         }
       })
       //group get

@@ -73,6 +73,7 @@ export default {
       ip: "",
       available: "",
       hosttype: "HW_SRV",
+      interfaces: "",
       loading: false,
       availableOption: [
         { label: "正常", value: "1" },
@@ -121,14 +122,6 @@ export default {
           align: "center",
           scopedSlots: { customRender: "location" },
         },
-        // {
-        //   title: "运行时长",
-        //   key: "uptime",
-        //   align: "center",
-        //   scopedSlots: { customRender: "uptime" },
-        // },
-        // { title: "CPU使用率", key: "cpu_utilization", align: 'center', width: '150px', scopedSlots: { customRender: "cpu_utilization" }},
-        // { title: "内存使用率", key: "memory_utilization", align: 'center', width: '150px', scopedSlots: { customRender: "memory_utilization" }},
         {
           title: "监控状态",
           key: "available",
@@ -173,7 +166,6 @@ export default {
           let res = resp.data;
           if (res.code == 200) {
             this.pagination.total = res.data.total;
-            console.log(res.data.items);
             this.pagination.current = this.page;
             this.pagination.pageSize = this.pageSize;
             this.list = res.data.items || [];

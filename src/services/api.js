@@ -10,6 +10,7 @@ module.exports = {
   INDEX_INFO: "/v1/index/baseinfo",
   HOST_LIST: "/v1/host",
   HOST_EXPORT: "/v1/export/hosts",
+  INVENTORY_EXPORT: "/v1/export/inventory",
   HOST_MOCK: "/v1/host/monitem",
   HOST_MOCKD: "/v1/history",
   INDEX_RESTOP: "/v1/index/restop",

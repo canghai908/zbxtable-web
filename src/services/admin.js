@@ -26,14 +26,21 @@ import {
   RULE,
   USER,
   GROUP,
+  INDEX_VERSION,
+  INVENTORY_EXPORT,
+  REPORT,
 } from "@/services/api";
 import { request, METHOD } from "@/utils/request";
-import { INDEX_VERSION, REPORT } from "./api";
+// import { INDEX_VERSION, INVENTORY_EXPORT, REPORT } from "./api";
 export async function hostList(params) {
   return request(HOST_LIST, METHOD.GET, { ...params });
 }
 export async function hostExport(params, config) {
   return request(HOST_EXPORT, METHOD.POST, params, config);
+}
+
+export async function inventoryExport(params, config) {
+  return request(INVENTORY_EXPORT, METHOD.POST, params, config);
 }
 export async function hostDetail(id) {
   return request(HOST_LIST + "/" + id, METHOD.GET);
@@ -251,6 +258,7 @@ export default {
   triggerList,
   deployTopology,
   inventoryTree,
+  inventoryExport,
   hostUpdate,
   netInterfaceList,
   winMonList,

@@ -34,7 +34,7 @@ const options = {
           children: [
             {
               path: "workplace",
-              name: "首页",
+              name: "面板",
               meta: { page: { closable: false } },
               component: () => import("@/pages/dashboard/index"),
             },
