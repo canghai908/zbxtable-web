@@ -3,13 +3,18 @@
     <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="!loading1 &&!loading2 && !loading3">
       <a-row :gutter="16">
         <a-col :xl="{ span: 12 }" :lg="{ span: 24 }">
-          <a-card title="告警列表" :headStyle="{background: '#FAFBFC'}" size="small" :loading="!loading1">
+          <a-card title="未恢复告警" :headStyle="{background: '#FAFBFC'}" size="small" :loading="!loading1">
             <div class="homeMain beauty-scroll">
               <a-timeline>
-                <a-timeline-item v-for="(v, i) in triggerList" :key="i" :color="v.severity == 3 ? '#ff0000': (v.severity == 2 ? '#F56C6C': '#E6A23C')">
-                  <a-icon slot="dot" type="close-circle" v-if="v.severity == 3" :style="{ fontSize: '16px', color: '#ff0000' }" />
-                  <a-icon slot="dot" type="minus-circle" v-else-if="v.severity == 2" :style="{ fontSize: '16px', color: '#F56C6C' }" />
-                  <a-icon slot="dot" type="exclamation-circle" v-else :style="{ fontSize: '16px', color: '#E6A23C' }" />
+                <a-timeline-item v-for="(v, i) in triggerList" :key="i">
+                  <a-tag v-if="v.severity == 1" color="#7499FF">信息</a-tag>
+                  <a-tag v-else-if="v.severity == 2" color="#FFC859">警告</a-tag>
+                  <a-tag v-else-if="v.severity == 3" color="#FFA059">一般</a-tag>
+                  <a-tag v-else-if="v.severity == 4" color="#E97659">严重</a-tag>
+                  <a-tag v-else-if="v.severity == 5" color="#f50000">灾难</a-tag>
+                  <a-tag v-else color="#97AAB3">未分类</a-tag>
+                  <!-- <a-icon slot="dot" type="minus-circle" v-else-if="v.severity == 2" :style="{ fontSize: '16px', color: '#F56C6C' }" />
+                  <a-icon slot="dot" type="exclamation-circle" v-else :style="{ fontSize: '16px', color: '#E6A23C' }" /> -->
                   {{v.lastchange | parsetime}} <b>{{v.name}}</b> {{v.lasteventname}}
                 </a-timeline-item>
               </a-timeline>
@@ -207,6 +212,7 @@ export default {
         .then((resp) => {
           let res = resp.data;
           this.triggerList = res.data.items || [];
+          console.log(res)
         })
         .finally(() => {
           this.loading1 = true;

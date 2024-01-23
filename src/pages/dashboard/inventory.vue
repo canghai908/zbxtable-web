@@ -15,6 +15,10 @@
             <a-row>
               <a-col :lg="24" :md="24">
                 <a-card title="资产信息" :headStyle="{background: '#FAFBFC'}" :bodyStyle="{height: '350px'}" size="small">
+                  <template #extra>
+                    <!-- <a-button type="primary" style="margin-left: 10px;" @click="inventoryexport">导入资产</a-button> -->
+                    <a-button type="info" style="margin-left: 10px;" @click="inventoryexport">导出资产</a-button>
+                  </template>
                   <a-table :loading="loading" :columns="columns" :data-source="list" @change="changePage" :pagination="pagination" :rowKey="(record) => { return record.hostid;}">
                     <span slot="hostid" slot-scope="record">{{record.hostid}}</span>
                     <span slot="name" slot-scope="record">{{record.name}}</span>
@@ -92,7 +96,7 @@
 
 <script>
 import PageLayout from "@/layouts/PageLayout";
-import { inventoryTree, hostDetail, hostUpdate, hostExport, hostList } from '@/services/admin'
+import { inventoryTree, inventoryExport, hostUpdate, hostList } from '@/services/admin'
 import DetailList from "@/components/tool/DetailList";
 const DetailListItem = DetailList.Item;
 export default {
@@ -180,7 +184,6 @@ export default {
       item.editable = false;
     },
     save(item) {
-      console.log(this.form.date_hw_install)
       let req = Object.assign(item, {
         location: this.form.location || "",
         department: this.form.department || "",
@@ -207,7 +210,6 @@ export default {
 
       // });
       this.hostid = selectedKeys[0]
-      console.log(selectedKeys[0])
       this.hostType = "VM_LIN";
       switch (selectedKeys[0]) {
         case 10:
@@ -277,10 +279,10 @@ export default {
     setVendor(e) {
       this.detail.vendor = e.target.value
     },
-    hostexport() {
-      hostExport(
+    inventoryexport() {
+      inventoryExport(
         {
-          hosts: this.detail.host
+          hostType: this.hostType
         },
         {
           responseType: "arraybuffer",
@@ -303,25 +305,6 @@ export default {
   filters: {
     parsetime(v) {
       return parseTimeFun(v);
-    },
-    kbFilters(v) {
-      if (v && v > 0) {
-        v = parseFloat(v);
-        if (v <= 1024) {
-          return v + "B/s";
-        }
-        if (v > 1024 && (v * 8) / 1024 < 1024) {
-          return ((v * 8) / 1024).toFixed(2) + "Kb/s";
-        }
-        if ((v * 8) / 1024 > 1024 && (v * 8) / 1024 / 1024 < 1024) {
-          return ((v * 8) / 1024 / 1024).toFixed(2) + "Mb/s";
-        }
-        if ((v * 8) / 1024 / 1024 > 1024) {
-          return ((v * 8) / 1024 / 1024 / 1024).toFixed(2) + "Gb/s";
-        }
-      } else {
-        return v;
-      }
     },
   },
 };

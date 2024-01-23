@@ -12,7 +12,7 @@
     <div class="login">
       <a-form @submit="onSubmit" :form="form">
         <a-tabs size="large" :tabBarStyle="{textAlign: 'center'}" style="padding: 0 2px;">
-          <a-tab-pane tab="登录" key="1">
+          <a-tab-pane tab="登录" key="1">i
             <a-alert type="error" :closable="true" v-show="error" :message="error" showIcon style="margin-bottom: 24px;" />
             <a-form-item>
               <a-input autocomplete="autocomplete" size="large" v-decorator="['name', {rules: [{ required: true, message: '请输入账户名', whitespace: true}]}]">

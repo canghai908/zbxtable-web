@@ -183,7 +183,6 @@ export default {
     dateFormat(val) {
       if (val) { //判断是否存在
         var date = new Date(val * 1000);
-        console.log(date)
         var year = date.getFullYear();
         var month = date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1;
         var day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
@@ -328,18 +327,15 @@ export default {
       if (open) {
         this.mode1 = "date";
         this.mode2 = "date";
-        console.log();
       }
     },
     datePanel1(value, mode) {
-      console.log(1, value, mode);
       if (mode == "time") {
         this.setTime(value);
       }
       this.mode1 = mode;
     },
     datePanel2(value, mode) {
-      console.log(2, value, mode);
       if (mode == "time") {
         this.setTime(value);
       }
