@@ -4,6 +4,9 @@ import { initRouter } from "./router";
 import "./theme/index.less";
 import Antd from "ant-design-vue";
 import Viser from "viser-vue";
+//import echats
+// import echarts from "echarts";
+// Vue.prototype.$echarts = echarts;
 // import '@/mock'
 import store from "./store";
 import "animate.css/source/animate.css";
@@ -20,7 +23,7 @@ Vue.use(Viser);
 Vue.use(Plugins);
 
 bootstrap({ router, store, i18n, message: Vue.prototype.$message });
-window.loginNoAuth = function() {
+window.loginNoAuth = function () {
   Vue.prototype.$message.warning("登录已失效，请重新登录");
   router.push({ path: "/login" });
 };

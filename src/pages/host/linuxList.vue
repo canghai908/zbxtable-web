@@ -31,6 +31,12 @@
         <div slot="memory_utilization" slot-scope="record">
           <a-progress :percent="parseFloat(record.memory_utilization || 0)" size="small" status="active" />
         </div>
+        <div slot="ping" slot-scope="record">
+          <a-tag v-if="record.ping.includes('Up')" color="#34af67">Up</a-tag>
+          <a-tag v-else-if="record.ping.includes('Down')" color="#DC143C">Down</a-tag>
+          <a-tag v-else status="default" color="#808080">Unknown</a-tag>
+          {{record.ping_sec.replace(/\s/g, '')}}/{{record.ping_loss.replace(/\s/g, '')}}
+        </div>
         <span slot="available" slot-scope="record">
           <a-tooltip>
             <template slot="title">
@@ -39,9 +45,6 @@
             <a-tag v-if="record.available == 1" color="#34af67">正常</a-tag>
             <a-tag v-else-if="record.available ==2" color="#DC143C">异常</a-tag>
             <a-tag v-else status="default" text="未知" />
-            <!-- <a-badge v-if="record.available == 1" status="processing" text="正常" />
-            <a-badge v-else-if="record.available == 2" status="error" text="异常" />
-            <a-badge v-else status="default" text="未配置" /> -->
           </a-tooltip>
         </span>
         <span slot="operation" slot-scope="record">
@@ -82,6 +85,7 @@ export default {
         { title: "运行时长", key: "uptime", align: "left", scopedSlots: { customRender: "uptime" }, },
         { title: "CPU使用率", key: "cpu_utilization", align: "left", width: "150px", scopedSlots: { customRender: "cpu_utilization" }, },
         { title: "内存使用率", key: "memory_utilization", align: "left", width: "150px", scopedSlots: { customRender: "memory_utilization" }, },
+        { title: "Ping(Sec/Loss)", key: "ping", align: "left", scopedSlots: { customRender: "ping" }, },
         { title: "采集状态", key: "available", align: "left", scopedSlots: { customRender: "available" }, },
         { title: "操作", key: "operation", align: "center", scopedSlots: { customRender: "operation" } },
       ],

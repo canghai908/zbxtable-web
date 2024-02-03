@@ -242,12 +242,6 @@ const options = {
               component: () => import("@/pages/system/init"),
             },
             {
-              path: "edit",
-              name: "映射编辑",
-              meta: { highlight: "/system", invisible: true },
-              component: () => import("@/pages/system/initedit"),
-            },
-            {
               path: "bandwidth",
               name: "出口配置",
               component: () => import("@/pages/system/bandwidth"),

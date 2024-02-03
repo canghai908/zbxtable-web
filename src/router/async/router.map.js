@@ -132,9 +132,6 @@ const routerMap = {
   sysInit: {
     component: () => import("@/pages/system/init"),
   },
-  sysInitEdit: {
-    component: () => import("@/pages/system/initedit"),
-  },
   systemBandwidth: {
     component: () => import("@/pages/system/bandwidth"),
   },

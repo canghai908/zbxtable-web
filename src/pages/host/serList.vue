@@ -37,6 +37,12 @@
         <div slot="memory_utilization" slot-scope="record">
           <a-progress :percent="parseFloat(record.memory_utilization || 0)" size="small" status="active" />
         </div>
+        <div slot="ping" slot-scope="record">
+          <a-tag v-if="record.ping.includes('Up')" color="#34af67">Up</a-tag>
+          <a-tag v-else-if="record.ping.includes('Down')" color="#DC143C">Down</a-tag>
+          <a-tag v-else status="default" color="#808080">Unknown</a-tag>
+          {{record.ping_sec.replace(/\s/g, '')}}/{{record.ping_loss.replace(/\s/g, '')}}
+        </div>
         <span slot="available" slot-scope="record">
           <a-tooltip>
             <template slot="title">
@@ -123,7 +129,13 @@ export default {
           scopedSlots: { customRender: "location" },
         },
         {
-          title: "监控状态",
+          title: "Ping(Sec/Loss)",
+          key: "ping",
+          align: "center",
+          scopedSlots: { customRender: "ping" },
+        },
+        {
+          title: "采集状态",
           key: "available",
           align: "center",
           scopedSlots: { customRender: "available" },

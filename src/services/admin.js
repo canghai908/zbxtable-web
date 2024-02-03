@@ -111,6 +111,9 @@ export async function hostSearch(params) {
 export async function netInterfaceList(id) {
   return request(HOST_LIST + "/interface/" + id, METHOD.GE);
 }
+export async function netInterfaceData(params) {
+  return request(HOST_LIST + "/interface/data", METHOD.POST, params);
+}
 export async function winMonList(id) {
   return request(HOST_LIST + "/winmon/" + id, METHOD.GE);
 }
@@ -261,6 +264,7 @@ export default {
   inventoryExport,
   hostUpdate,
   netInterfaceList,
+  netInterfaceData,
   winMonList,
   linMonList,
   indexOverview,

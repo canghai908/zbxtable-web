@@ -42,7 +42,7 @@
         </a-tab-pane>
       </a-tabs>
     </div>
-    <img slot="extra" src="https://gw.alipayobjects.com/zos/rmsportal/RzwpdLnhmvDJToTdfDPe.png" alt="" class="extraBg">
+    <img slot="extra" src="@/assets/img/extraBg.png" alt="" class="extraBg">
 
   </page-layout>
 </template>
