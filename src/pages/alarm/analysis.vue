@@ -118,9 +118,6 @@ export default {
         link.click();
       });
     },
-    handleTenantChange(value) {
-      this.tenantid = value
-    },
     changeCreationTime(e) {
       if (e.length) {
         this.beginTime = parseTimeFun(new Date(e[0]));
@@ -129,6 +126,9 @@ export default {
         this.beginTime = "";
         this.endTime = "";
       }
+    },
+    handleTenantChange(val) {
+      this.tenantid = val
     },
   },
 };
