@@ -34,7 +34,7 @@
               </a-col>
               <a-col :xl="{ span: 6 }" :lg="{ span: 12 }">
                 <a-card hoverable :headStyle="{textAlign: 'center', width: '100%', background: '#FAFBFC'}" :bodyStyle="{padding: '0'}" title="网络延时">
-                  <div id="liquidPingsec" class="text-pingsec">{{detail.ping_sec}}</div>
+                  <div id="liquidPingsec" class="text-pingsec">{{detail.ping_sec || "--"}}</div>
                 </a-card>
               </a-col>
             </a-row>
