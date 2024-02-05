@@ -35,7 +35,7 @@
           <a-tag v-if="record.ping.includes('Up')" color="#34af67">Up</a-tag>
           <a-tag v-else-if="record.ping.includes('Down')" color="#DC143C">Down</a-tag>
           <a-tag v-else status="default" color="#808080">Unknown</a-tag>
-          {{record.ping_sec.replace(/\s/g, '')}}/{{record.ping_loss.replace(/\s/g, '')}}
+          {{record.ping_sec.replace(/\s/g, '') || '--'}}/{{record.ping_loss.replace(/\s/g, '') || '--'}}
         </div>
         <span slot="available" slot-scope="record">
           <a-tooltip>

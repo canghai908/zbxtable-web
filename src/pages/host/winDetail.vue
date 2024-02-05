@@ -10,7 +10,7 @@
         <detail-list-item term="运行时长">{{detail.uptime || "--"}}</detail-list-item>
         <detail-list-item term="备注">{{detail.vendor || "--"}}</detail-list-item>
       </detail-list>
-      <a-tabs :tabBarStyle="{textAlign: 'left', width: '100%'}" style="padding: 0px 2px;">
+      <a-tabs :tabBarStyle="{textAlign: 'center', width: '100%'}" style="padding: 0px 2px;">
         <a-tab-pane tab="运行信息" key="1">
           <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="!detail">
             <a-row :gutter="16">
@@ -24,7 +24,7 @@
                   <div id="liquidMem" style="width: 300px; height: 300px;margin:0 auto;"></div>
                 </a-card>
               </a-col>
-              <a-col :xl="{ span: 12 }" :lg="{ span: 12 }">
+              <a-col :xl="{ span: 12 }" :lg="{ span: 12 }" style="height: 650px;margin:0 auto;">
                 <a-col :xl="{ span: 24 }" :lg="{ span: 12 }">
                   <a-table :loading="loading2" :columns="columns" :data-source="FileSystemList" style="height:650px;margin:0 auto;" :pagination=false :scroll="{ y: 1000, }" :rowKey="(record) => { return record.id;}">
                     <div slot="name" slot-scope="record">{{record.name}}</div>

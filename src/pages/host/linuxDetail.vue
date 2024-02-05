@@ -15,16 +15,16 @@
           <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="!detail">
             <a-row :gutter="16">
               <a-col :xl="{ span: 5 }" :lg="{ span: 12 }">
-                <a-card hoverable :headStyle="{textAlign: 'left', width: '100%', background: '#FAFBFC'}" :bodyStyle="{padding: '0'}" title="CPU使用率">
+                <a-card hoverable :headStyle="{textAlign: 'center', width: '100%', background: '#FAFBFC'}" :bodyStyle="{padding: '0'}" title="CPU使用率">
                   <div id="liquidCPU" style="width: 300px; height: 300px;margin:0 auto;"></div>
                 </a-card>
               </a-col>
               <a-col :xl="{ span: 5 }" :lg="{ span: 12 }">
-                <a-card hoverable :headStyle="{textAlign: 'left', width: '100%', background: '#FAFBFC'}" :bodyStyle="{padding: '0'}" title="内存使用率">
+                <a-card hoverable :headStyle="{textAlign: 'center', width: '100%', background: '#FAFBFC'}" :bodyStyle="{padding: '0'}" title="内存使用率">
                   <div id="liquidMem" style="width: 300px; height: 300px;margin:0 auto;"></div>
                 </a-card>
               </a-col>
-              <a-col :xl="{ span: 14 }" :lg="{ span: 12 }">
+              <a-col :xl="{ span: 14 }" :lg="{ span: 12 }" style="height: 650px;margin:0 auto;">
                 <a-col :xl="{ span: 24 }" :lg="{ span: 12 }">
                   <!-- <a-card hoverable :headStyle="{textAlign: 'center', width: '100%', background: '#FAFBFC'}" :bodyStyle="{padding: '0'}" title="磁盘使用率"> -->
                   <a-table :loading="loading2" :columns="columns" :data-source="FileSystemlist" :pagination=false :scroll="{ y: 600, }" :rowKey="(record) => { return record.id;}">
@@ -52,7 +52,7 @@
               <!--pingsec-->
               <a-col :xl="{ span: 5 }" :lg="{ span: 12 }" class="pingsec">
                 <a-card hoverable :headStyle="{textAlign: 'center', width: '100%', background: '#FAFBFC'}" :bodyStyle="{padding: '0'}" title="网络延时">
-                  <div id="liquidPingsec" class="text-pingsec">{{detail.ping_sec.replace(/\s/g, '') || "--"}}</div>
+                  <div id="liquidPingsec" class="text-pingsec">{{ detail.ping_sec === '' ? '' : detail.ping_sec.replace(/\s/g, '') || "--"}}</div>
                 </a-card>
               </a-col>
             </a-row>
@@ -211,7 +211,7 @@ export default {
     return {
       moment,
       id: "",
-      detail: "",
+      detail: '',
       cpuList: [],
       memoryList: [],
       dates: "",
@@ -221,10 +221,7 @@ export default {
       memory: "",
       loading1: false,
       loading2: false,
-      mode1: "date",
-      mode2: "date",
       disabledTime: { h: 0, m: 0, s: 0 },
-      tpercent: 0,
       zbx: false,
       liquidNode: null,
       FileSystemlist: [],
@@ -491,6 +488,7 @@ export default {
               },
               label: {
                 normal: {
+
                   formatter: this.detail.cpu_utilization.split(" ")[0] + "%",
                   textStyle: {
                     fontSize: 35
