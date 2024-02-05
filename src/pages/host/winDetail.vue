@@ -48,7 +48,7 @@
               <!--pingsec-->
               <a-col :xl="{ span: 6 }" :lg="{ span: 12 }" class="pingsec">
                 <a-card hoverable :headStyle="{textAlign: 'center', width: '100%', background: '#FAFBFC'}" :bodyStyle="{padding: '0'}" title="网络延时">
-                  <div id="liquidPingsec" class="text-pingsec">{{detail.ping_sec.replace(/\s/g, '') || "--"}}</div>
+                  <div id="liquidPingsec" class="text-pingsec">{{detail.ping_sec | dataFormat}}</div>
                 </a-card>
               </a-col>
             </a-row>
@@ -344,6 +344,13 @@ export default {
       const i = Math.floor(Math.log(bytes) / Math.log(k));
       return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
     },
+    dataFormat(val) {
+      if (val === null || val === undefined || val === '') {
+        return '--';
+      } else {
+        return val.replace(/\s/g, '');
+      }
+    },
     TrafficBytes(bytes, speed) {
       if (bytes === 0) return '0/(0.0%)';
       let by = bytes / 1000
@@ -422,7 +429,6 @@ export default {
     },
     initBaseChart() {
       //cpu
-      console.log(this.detail.cpu_utilization.split(" ")[0] / 100)
       this.myChart = echarts.init(document.getElementById('liquidCPU'));
       this.myChart.setOption(
         {

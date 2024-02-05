@@ -52,7 +52,7 @@
               <!--pingsec-->
               <a-col :xl="{ span: 5 }" :lg="{ span: 12 }" class="pingsec">
                 <a-card hoverable :headStyle="{textAlign: 'center', width: '100%', background: '#FAFBFC'}" :bodyStyle="{padding: '0'}" title="网络延时">
-                  <div id="liquidPingsec" class="text-pingsec">{{ detail.ping_sec === '' ? '' : detail.ping_sec.replace(/\s/g, '') || "--"}}</div>
+                  <div id="liquidPingsec" class="text-pingsec">{{ detail.ping_sec | dataFormat}}</div>
                 </a-card>
               </a-col>
             </a-row>
@@ -357,6 +357,13 @@ export default {
         per = by + "(" + pert.toFixed(2) + "%)";
       }
       return per
+    },
+    dataFormat(val) {
+      if (val === null || val === undefined || val === '') {
+        return '--';
+      } else {
+        return val.replace(/\s/g, '');
+      }
     },
     TrafficTBytes(bytes, decimals = 2) {
       if (bytes === "0.00") return '0 Bytes';

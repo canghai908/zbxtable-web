@@ -13,7 +13,7 @@
         <detail-list-item term="IP地址">{{detail.interfaces}}</detail-list-item>
         <detail-list-item term="备注">{{detail.vendor || "--"}}</detail-list-item>
       </detail-list>
-      <a-tabs :tabBarStyle="{textAlign: 'left', width: '100%'}" style="padding: 0px 2px;">
+      <a-tabs :tabBarStyle="{textAlign: 'left', width: '100%'}" style="padding: 0px 2px;" :loading="loading">
         <a-tab-pane tab="运行信息" key="2">
           <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}">
             <a-row :gutter="16">
@@ -34,7 +34,7 @@
               </a-col>
               <a-col :xl="{ span: 6 }" :lg="{ span: 12 }">
                 <a-card hoverable :headStyle="{textAlign: 'center', width: '100%', background: '#FAFBFC'}" :bodyStyle="{padding: '0'}" title="网络延时">
-                  <div id="liquidPingsec" class="text-pingsec">{{detail.ping_sec || "--"}}</div>
+                  <div id="liquidPingsec" class="text-pingsec">{{detail.ping_sec | dataFormat}}</div>
                 </a-card>
               </a-col>
             </a-row>
@@ -212,6 +212,7 @@ export default {
       historyType: "",
       cpu: "",
       memory: "",
+      loading: false,
       loading1: false,
       loading2: false,
       loading3: false,
@@ -353,6 +354,13 @@ export default {
       const i = Math.floor(Math.log(bytes) / Math.log(k));
       return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + sizes[i];
     },
+    dataFormat(val) {
+      if (val === null || val === undefined || val === '') {
+        return '--';
+      } else {
+        return val.replace(/\s/g, '');
+      }
+    },
     dateFormat(val) {
       if (val) { //判断是否存在
         var date = new Date(val * 1000);
@@ -373,6 +381,9 @@ export default {
       hostDetail(this.id).then((resp) => {
         let res = resp.data;
         this.detail = res;
+
+      }).finally(() => {
+        this.loading = false
         this.initBaseChart();
       })
       this.loading2 = true
@@ -1216,170 +1227,6 @@ export default {
     //     }
     //   };
     // },
-
-    initMock(dates) {
-      // 获取数据
-      hostMock(this.id).then((resp) => {
-        let res = resp.data,
-          cpu = {},
-          memory = {},
-          times = [parseTimeFun(dates - 1000 * 60 * 30), parseTimeFun(dates)];
-        for (let i = 0; i < res.length; i++) {
-          if (res[i].name == "CPU") {
-            for (let j = 0; j < res[i].items.length; j++) {
-              if (res[i].items[j].name == "CPU utilization") {
-                cpu = {
-                  type: "cpu",
-                  history: res[i].items[j].value_type,
-                  itemids: res[i].items[j].itemid,
-                  period: times,
-                };
-              }
-            }
-          }
-          if (res[i].name == "Memory") {
-            for (let j = 0; j < res[i].items.length; j++) {
-              if (res[i].items[j].name == "Memory utilization") {
-                memory = {
-                  type: "memory",
-                  history: res[i].items[j].value_type,
-                  itemids: res[i].items[j].itemid,
-                  period: times,
-                };
-              }
-            }
-          }
-        }
-        if (cpu.itemids) {
-          this.cpu = cpu;
-          hostMockd(cpu).then((retp) => {
-            let ret = retp.data;
-            let arr = ret.data.items || [];
-            arr.forEach((v) => {
-              v.value = parseFloat(v.value);
-            });
-            arr.reverse();
-            this.cpuList = arr;
-          });
-        }
-        if (memory.itemids) {
-          this.memory = memory;
-          hostMockd(memory).then((retp) => {
-            let ret = retp.data;
-            let arr = ret.data.items || [];
-            arr.forEach((v) => {
-              v.value = parseFloat(v.value);
-            });
-            arr.reverse();
-            this.memoryList = arr;
-          });
-        }
-      });
-    },
-    mockDate(dates) {
-      let mock = this.historyType == 1 ? this.cpu : this.memory;
-      let times = [parseTimeFun(dates - 1000 * 60 * 30), parseTimeFun(dates)];
-      mock.period = times;
-      if (this.historyType == 1) {
-        this.loading1 = true;
-        this.cpuList = [];
-      } else {
-        this.loading2 = false;
-        this.memoryList = [];
-      }
-      hostMockd(mock)
-        .then((retp) => {
-          let ret = retp.data;
-          let arr = ret.data.items || [];
-          arr.forEach((v) => {
-            v.value = parseFloat(v.value);
-          });
-          arr.reverse();
-          if (this.historyType == 1) {
-            this.cpuList = arr;
-          } else {
-            this.memoryList = arr;
-          }
-        })
-        .finally(() => {
-          this.loading1 = false;
-          this.loading2 = false;
-        });
-    },
-    dateOpen(open) {
-      if (open) {
-        this.mode1 = "date";
-        this.mode2 = "date";
-        console.log();
-      }
-    },
-    datePanel1(value, mode) {
-      console.log(1, value, mode);
-      if (mode == "time") {
-        this.setTime(value);
-      }
-      this.mode1 = mode;
-    },
-    datePanel2(value, mode) {
-      if (mode == "time") {
-        this.setTime(value);
-      }
-      this.mode2 = mode;
-    },
-    dateOk1(value) {
-      this.historyType = 1;
-      this.mockDate(moment(value).valueOf());
-    },
-    dateOk2(value) {
-      this.historyType = 2;
-      this.mockDate(moment(value).valueOf());
-    },
-    range(start, end) {
-      const result = [];
-      for (let i = start; i < end; i++) {
-        result.push(i);
-      }
-      return result;
-    },
-    disabledDate(current) {
-      return current && current >= moment().endOf("day");
-    },
-    disabledDateTime() {
-      return {
-        disabledHours: () => this.range(0, 24).splice(this.disabledTime.h, 24),
-        disabledMinutes: () =>
-          this.range(0, 60).splice(this.disabledTime.m + 1, 60),
-        disabledSeconds: () =>
-          this.range(0, 60).splice(this.disabledTime.s, 60),
-      };
-    },
-    setTime(data) {
-      this.resEndtimeDis();
-      let time = data.format("YYYY/MM/DD HH mm").split(" "); //切割存放的年月日，时，分
-      var date = new Date(); //获取当前时间
-      if (
-        moment(time[0]).valueOf() == moment(date.toLocaleDateString()).valueOf()
-      ) {
-        this.disabledTime.h = date.getHours(); //ban掉 时
-        if (date.getHours() < time[1]) {
-          this.disabledTime.m = 60; //解除分的禁止
-        } else {
-          this.disabledTime.m = date.getMinutes(); //ban掉 分
-          if (date.getMinutes() < time[2]) {
-            this.disabledTime.s = 60;
-          } else {
-            this.disabledTime.s = date.getSeconds();
-          }
-        }
-      } else {
-        //日期不同解除所有限制条件
-        this.resEndtimeDis();
-      }
-    },
-    resEndtimeDis() {
-      //解除限制
-      this.disabledTime = { h: 0, m: 0, s: 0 };
-    },
   },
 };
 </script>
@@ -1406,7 +1253,7 @@ export default {
   width: 300px;
   height: 300px;
   margin: 0 auto;
-  font-size: 150px;
+  font-size: 120px;
   color: #1ed80d;
   font-weight: 600;
   margin-top: 20px;
