@@ -151,7 +151,7 @@ export default {
       return parseTimeFun(v);
     },
     renderRole(v) {
-      return v === "admin" ? "admin" : "user";
+      return v === "admin" ? "管理员" : "普通用户";
     },
   },
   created() {

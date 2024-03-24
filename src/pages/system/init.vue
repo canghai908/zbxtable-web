@@ -22,7 +22,7 @@
         </div>
       </a-table>
       <a-drawer :title="title" :width="720" :visible="visible" :body-style="{ paddingBottom: '80px' }" @close="onClose">
-        <!-- host group -->
+        <!-- 主机组 -->
         <a-row :gutter="[16,2]">
           <a-col :span="12">
             <div class="height-50">
@@ -302,7 +302,7 @@ export default {
     //打开
     edit(record) {
       this.id = record.id
-      this.title = record.name + 'host type configured'
+      this.title = record.name + '指标初始化'	    
       this.visible = true;
       systemInfo(record.id).then((resp) => {
         let res = resp.data

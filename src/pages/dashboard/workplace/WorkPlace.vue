@@ -36,7 +36,7 @@
                 <p>流入: <span>{{net.val2 | kbFilters}} &#8595;&#8595;</span></p>
               </div>
               <div class="home_net1">
-                <a-button type="primary">电信1</a-button>
+                <a-button type="primary">电信2</a-button>
                 <p style="margin-top: 20px">带宽: <span>50MB</span></p>
                 <p>流出: <span>{{net.val3 | kbFilters}} &#8593;&#8593;</span></p>
                 <p>流入: <span>{{net.val4 | kbFilters}} &#8595;&#8595;</span></p>
