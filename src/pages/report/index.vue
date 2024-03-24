@@ -14,7 +14,7 @@
             :label="$t('success')"
           </a-select-option>
           <a-select-option value="3">
-            error
+            失败
           </a-select-option>
         </a-select> -->
       <!-- </a-form-model-item>
@@ -69,12 +69,12 @@
                   </a-select>
                 </a-form-model-item>
    		<a-form-model-item :label="$t('state')">
-                  <a-select :v-mode="form.status" style="width: 70px" @change="handleChange">
+                  <a-select :v-mode="form.status" style="width: px" @change="handleChange">
                     <a-select-option value="2">
                       $t('ok')
                     </a-select-option>
                     <a-select-option value="3">
-                      report failed
+                      失败
                     </a-select-option>
                   </a-select>
                 </a-form-model-item>
@@ -135,7 +135,7 @@ export default {
   components: { PageLayout },
   data() {
     return {
-      title: "traffice report",
+      title: "流量报表",
       ModalText: 'Content of the modal',
       visible: false,
       confirmLoading: false,

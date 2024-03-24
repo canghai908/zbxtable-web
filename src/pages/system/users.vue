@@ -37,7 +37,7 @@
         </span>
       </a-table>
     </div>
-    <a-modal title="new user" :visible="visible" :confirm-loading="confirmLoading" @ok="createUser" @cancel="handleCancel" width="600px">
+    <a-modal title="新增用户" :visible="visible" :confirm-loading="confirmLoading" @ok="createUser" @cancel="handleCancel" width="600px">
       <template>
         <a-form-model :rules="rules" :model="user">
           <a-form-model-item :label="$t('modalUsername')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="username">
@@ -165,25 +165,25 @@ export default {
         phone: "",
         wechat: "",
         status: "1",
-        ding: "",
+        ding_talk: "",
       },
       rules: {
-        username: [{ required: true, message: 'Enter a username', trigger: 'blur' }],
-        password: [{ required: true, message: 'Enter a password', trigger: 'change' }],
-        role: [{ required: true, message: 'Leave blank to not assign a role', trigger: 'change' }],
-        email: [{ required: false, type: 'email', message: 'Enter an E-mail address', trigger: 'change' }],
-        phone: [{ required: false, pattern: /^1(3[0-9]|4[01456879]|5[0-3,5-9]|6[2567]|7[0-8]|8[0-9]|9[0-3,5-9])\d{8}$/, message: 'Enter a phone number', trigger: 'change' }],
-        wechat: [{ required: false, type: 'string', message: 'enter a valid Wechat account', trigger: 'blur' }],
-        ding_talk: [{ required: false, type: 'string', message: 'enter a valid ding account', trigger: 'blur' }],
+	username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+        password: [{ required: true, message: '请输入用户密码', trigger: 'change' }],
+        role: [{ required: true, message: '请输入用户密码', trigger: 'change' }],
+        email: [{ required: false, type: 'email', message: '请输入正确邮箱', trigger: 'change' }],
+        phone: [{ required: false, pattern: /^1(3[0-9]|4[01456879]|5[0-3,5-9]|6[2567]|7[0-8]|8[0-9]|9[0-3,5-9])\d{8}$/, message: '请输入正确的手机号码', trigger: 'change' }],
+        wechat: [{ required: false, type: 'string', message: '请输入正确的微信账号', trigger: 'blur' }],
+        ding_talk: [{ required: false, type: 'string', message: '请输入正确的钉钉账号', trigger: 'blur' }],      
       },
       rulesUpdate: {
-        username: [{ required: false, message: 'Enter a username', trigger: 'blur' }],
-        password: [{ required: false, message: 'Leave blank to make no changes', trigger: 'change' }],
-        role: [{ required: true, message: 'Enter a password', trigger: 'change' }],
-        email: [{ required: false, type: 'email', message: 'Enter an email address', trigger: 'change' }],
-        phone: [{ required: false, pattern: /^1(3[0-9]|4[01456879]|5[0-3,5-9]|6[2567]|7[0-8]|8[0-9]|9[0-3,5-9])\d{8}$/, message: 'Enter a phone number', trigger: 'change' }],
-        wechat: [{ required: false, type: 'string', message: 'Enter a valid Wechat account', trigger: 'blur' }],
-        ding_talk: [{ required: false, type: 'string', message: 'Enter a valid ding account', trigger: 'blur' }],
+	username: [{ required: false, message: '请输入用户名', trigger: 'blur' }],
+        password: [{ required: false, message: '留空则不修改', trigger: 'change' }],
+        role: [{ required: true, message: '请输入用户密码', trigger: 'change' }],
+        email: [{ required: false, type: 'email', message: '请输入正确邮箱', trigger: 'change' }],
+        phone: [{ required: false, pattern: /^1(3[0-9]|4[01456879]|5[0-3,5-9]|6[2567]|7[0-8]|8[0-9]|9[0-3,5-9])\d{8}$/, message: '请输入正确的手机号码', trigger: 'change' }],
+        wechat: [{ required: false, type: 'string', message: '请输入正确的微信账号', trigger: 'blur' }],
+        ding_talk: [{ required: false, type: 'string', message: '请输入正确的钉钉账号', trigger: 'blur' }],
       },
       list: [],
       pagination: {
@@ -202,7 +202,7 @@ export default {
       return parseTimeFun(v);
     },
     renderRole(v) {
-      return v === "admin" ? "admin" : "user";
+      return v === "admin" ? "管理员" : "普通用户";
     },
   },
   created() {
