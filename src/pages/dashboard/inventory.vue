@@ -4,7 +4,7 @@
       <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}">
         <a-row :gutter="16">
           <a-col :xl="{ span: 4 }" :lg="{ span: 24 }">
-            <a-card title="资产树" :headStyle="{background: '#FAFBFC'}" size="small">
+	    <a-card :title="$t('overview')" :headStyle="{ background: '#FAFBFC' }" size="small">
               <div>
                 <a-tree :showLine=false show-icon :tree-data="treeData" :default-expand-all="autoExpandParent" :replace-fields="replaceFields" @select="onSelect" v-if="treeData">
                 </a-tree>
@@ -14,10 +14,11 @@
           <a-col :xl="{ span: 20 }" :lg="{ span: 24 }">
             <a-row>
               <a-col :lg="24" :md="24">
-                <a-card title="资产信息" :headStyle="{background: '#FAFBFC'}" :bodyStyle="{height: '350px'}" size="small">
+		<a-card :title="$t('information')" :headStyle="{ background: '#FAFBFC' }" :bodyStyle="{ height: '350px' }" size="small">
                   <template #extra>
                     <!-- <a-button type="primary" style="margin-left: 10px;" @click="inventoryexport">导入资产</a-button> -->
-                    <a-button type="info" style="margin-left: 10px;" @click="inventoryexport">导出资产</a-button>
+		    <a-button type="info" style="margin-left: 10px;" @click="inventoryexport">{{ $t('export_btn') }}</a-button>
+
                   </template>
                   <a-table :loading="loading" :columns="columns" :data-source="list" @change="changePage" :pagination="pagination" :rowKey="(record) => { return record.hostid;}">
                     <span slot="hostid" slot-scope="record">{{record.hostid}}</span>
@@ -26,25 +27,25 @@
                     <span slot="uptime" slot-scope="record">{{record.uptime}}</span>
                     <div slot="location" slot-scope="record">
                       <p v-if="record.editable">
-                        <a-input v-model.trim="form.location" placeholder="设备位置" />
+			<a-input v-model.trim="form.location" :placeholder="$t('location_placeholder')" />
                       </p>
                       <p v-else>{{record.location}}</p>
                     </div>
                     <span slot="department" slot-scope="record">
                       <p v-if="record.editable">
-                        <a-input v-model.trim="form.department" placeholder="所属部门" />
+                        <a-input v-model.trim="form.department" :placeholder="$t('department_placeholder')" />
                       </p>
                       <p v-else>{{record.department}}</p>
                     </span>
                     <span slot="resource_id" slot-scope="record">
                       <p v-if="record.editable">
-                        <a-input v-model.trim="form.resource_id" placeholder="资产编号" />
+                        <a-input v-model.trim="form.resource_id" :placeholder="$t('asset_number_placeholder')" />
                       </p>
                       <p v-else>{{record.resource_id}}</p>
                     </span>
                     <span slot="mac" slot-scope="record">
                       <p v-if="record.editable">
-                        <a-input v-model.trim="form.mac" placeholder="MAC地址" />
+                        <a-input v-model.trim="form.mac" :placeholder="$t('mac_address_placeholder')" />
                       </p>
                       <p v-else>{{record.mac}}</p>
                     </span>
@@ -65,21 +66,21 @@
                         <template slot="title">
                           {{record.error}}
                         </template>
-                        <a-tag v-if="record.available == 1" color="#34af67">正常</a-tag>
-                        <a-tag v-else-if="record.available ==2" color="#DC143C">异常</a-tag>
-                        <a-tag v-else status="default" text="未知" />
+ 			<a-tag v-if="record.available == 1" color="#34af67">{{ $t('status_available') }}</a-tag>
+    			<a-tag v-else-if="record.available == 2" color="#DC143C">{{ $t('status_not_available') }}</a-tag>
+    			<a-tag v-else status="default" :text="$t('status_unknown')" />
                       </a-tooltip>
                     </span>
                     <template slot="operation" slot-scope="text, record">
                       <div class="editable-row-operations">
                         <span v-if="record.editable">
-                          <a @click="save(record)" style="margin-right: 10px">保存</a>
-                          <a-popconfirm title="确定要取消?" @confirm="cancel(record)">
-                            <a>取消</a>
+		          <a @click="save(record)" style="margin-right: 10px">{{ $t('save_btn') }}</a>
+		          <a-popconfirm :title="$t('discard_btn')" @confirm="cancel(record)">
+      			    <a>{{ $t('cancel_btn') }}</a>
                           </a-popconfirm>
                         </span>
                         <span v-else>
-                          <a @click="edit(record)">编辑</a>
+    			  <a @click="edit(record)">{{ $t('edit_btn') }}</a>
                         </span>
                       </div>
                     </template>
@@ -100,6 +101,7 @@ import { inventoryTree, inventoryExport, hostUpdate, hostList } from '@/services
 import DetailList from "@/components/tool/DetailList";
 const DetailListItem = DetailList.Item;
 export default {
+  i18n: require('./i18n'),
   name: "index",
   components: { PageLayout, DetailListItem, DetailList },
   data() {
@@ -121,18 +123,17 @@ export default {
       detail: "",
       columns: [
         { title: "ID", key: "hostid", align: "left", scopedSlots: { customRender: "hostid" }, },
-        // { align: "left", width: "160px", scopedSlots: { customRender: "name" }, slots: { title: "nameTitle" } },
-        { title: "主机名", key: "name", align: "left", scopedSlots: { customRender: "name" } },
-        { title: "IP地址", key: "interfaces", align: "left", scopedSlots: { customRender: "interfaces" }, },
-        { title: "运行时长", key: "uptime", align: "left", scopedSlots: { customRender: "uptime" }, },
-        { title: "采集状态", key: "available", align: "left", width: "100px", scopedSlots: { customRender: "available" }, },
-        { title: "设备位置", key: "location", align: "left", scopedSlots: { customRender: "location" }, },
-        { title: "所属部门", key: "department", align: "left", scopedSlots: { customRender: "department" }, },
-        { title: "资产编号", key: "resource_id", align: "left", scopedSlots: { customRender: "resource_id" }, },
-        { title: "设备安装时间", key: "date_hw_install", align: "left", scopedSlots: { customRender: "date_hw_install" }, },
-        { title: "维保到期时间", key: "date_hw_expiry", align: "left", scopedSlots: { customRender: "date_hw_expiry" }, },
-        { title: "MAC地址", key: "mac", align: "left", scopedSlots: { customRender: "mac" }, },
-        { title: "操作", key: "operation", align: "center", fixed: "right", width: "80px", scopedSlots: { customRender: "operation" } },
+        { title: this.$t('column_hostname'), key: 'name', align: 'left', scopedSlots: { customRender: 'name' } },
+        { title: this.$t('column_ip_address'), key: 'interfaces', align: 'left', scopedSlots: { customRender: 'interfaces' } },
+        { title: this.$t('column_uptime'), key: 'uptime', align: 'left', scopedSlots: { customRender: 'uptime' } },
+        { title: this.$t('column_availability'), key: 'available', align: 'left', width: '120px', scopedSlots: { customRender: 'available' } },
+        { title: this.$t('column_location'), key: 'location', align: 'left', scopedSlots: { customRender: 'location' } },
+        { title: this.$t('column_department'), key: 'department', align: 'left', scopedSlots: { customRender: 'department' } },
+        { title: this.$t('column_asset_no'), key: 'resource_id', align: 'left', scopedSlots: { customRender: 'resource_id' } },
+        { title: this.$t('column_installation_date'), key: 'date_hw_install', align: 'left', scopedSlots: { customRender: 'date_hw_install' } },
+        { title: this.$t('column_hardware_expiration_date'), key: 'date_hw_expiry', align: 'left', scopedSlots: { customRender: 'date_hw_expiry' } },
+        { title: this.$t('column_mac_address'), key: 'mac', align: 'left', scopedSlots: { customRender: 'mac' } },
+        { title: this.$t('column_actions'), key: 'edit', align: 'center', fixed: 'right', width: '80px', scopedSlots: { customRender: 'operation' } }
       ],
       list: [],
       pagination: {
@@ -197,7 +198,7 @@ export default {
         if (res.code == 200) {
           item.editable = false;
           this.onSelect([this.hostid]);
-          this.$message.success("保存成功")
+	  this.$message.success(this.$t('message_save_success'));
         }
       })
     },

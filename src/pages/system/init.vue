@@ -9,20 +9,20 @@
         <span slot="id" slot-scope="record">{{record.id}}</span>
         <div slot="name" slot-scope="record">{{record.name}}</div>
         <div slot="status" slot-scope="record">
-          <a-tag v-if="record.status == 1" color="#2f9e5e">已完成</a-tag>
-          <a-tag v-else-if="record.status == 0" color="#d05253"> 未完成</a-tag>
-          <a-tag v-else status="default" text="未知" />
+          <a-tag v-if="record.status == 1" color="#2f9e5e">{{$t('conf_ok')}}</a-tag>
+          <a-tag v-else-if="record.status == 0" color="#d05253">{{$t('conf_bad')}}</a-tag>
+          <a-tag v-else status="default" :text="$t('conf_unknown')" />
         </div>
         <div slot="inited_at" slot-scope="record">
           {{ new Date(+new Date(record.inited_at) + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '') || '--' }}</div>
         <div slot="operation" slot-scope="record">
-          <!-- <a-button class="pd20 paddingleft0" type="link" size="small" @click="seeEdit(record)">编辑</a-button> -->
-          <a-button class="pd20 paddingleft0" type="link" size="small" @click="edit(record)">编辑</a-button>
-          <a-button class="pd20 paddingleft0" type="link" size="small" @click="deployInit(record)">初始化</a-button>
+          <!-- <a-button class="pd20 paddingleft0" type="link" size="small" @click="seeEdit(record)">{{ $t('edit_btn') }}</a-button> -->
+          <a-button class="pd20 paddingleft0" type="link" size="small" @click="edit(record)">{{ $t('edit_btn') }}</a-button>
+          <a-button class="pd20 paddingleft0" type="link" size="small" @click="deployInit(record)">{{ $t('update_btn') }}</a-button>
         </div>
       </a-table>
       <a-drawer :title="title" :width="720" :visible="visible" :body-style="{ paddingBottom: '80px' }" @close="onClose">
-        <!-- 主机组 -->
+        <!-- host group -->
         <a-row :gutter="[16,2]">
           <a-col :span="12">
             <div class="height-50">
@@ -154,7 +154,7 @@
             <div class="height-50">
               <a-form-item :label="$t('mem_uti')">
                 <a-select show-search optionFilterProp="label" style="width: 100%" :placeholder="$t('template_select')" option-label-prop="label" @change="handlMemUtiTempChange">
-                  <a-select-option v-for="(item, index) in templateList" :key="index" :value="item.templateid" :label="item.name" :title="item.name">
+                  <a-select-option v-for="(item, index) in templateList" :key="item" :value="item.templateid" :label="item.name" :title="item.name">
                     {{ item.name }}
                   </a-select-option>
                 </a-select>
@@ -165,7 +165,7 @@
             <div class="height-50">
               <a-form-item :label="$t('item')" :required="false">
                 <a-select mode="multiple" show-search optionFilterProp="label" style="width: 100%" v-model="system.memory_utilization_id" :placeholder="$t('item_select')" option-label-prop="label" @change="handleMemUtiItemChange">
-                  <a-select-option v-for="(item, index) in itemList" :key="index" :value="item.itemid" :label="item.name" :title="item.name">
+                  <a-select-option v-for="(item, index) in itemList" :key="item" :value="item.itemid" :label="item.name" :title="item.name">
                     {{ item.name }}
                   </a-select-option>
                 </a-select>
@@ -179,7 +179,7 @@
             <div class="height-50">
               <a-form-item :label="$t('mem_total')" :required="false">
                 <a-select show-search optionFilterProp="label" style="width: 100%" :placeholder="$t('template_select')" option-label-prop="label" @change="handlMemTotalTempChange">
-                  <a-select-option v-for="(item, index) in templateList" :key="index" :value="item.templateid" :label="item.name" :title="item.name">
+                  <a-select-option v-for="(item, index) in templateList" :key="item" :value="item.templateid" :label="item.name" :title="item.name">
                     {{ item.name }}
                   </a-select-option>
                 </a-select>
@@ -190,7 +190,7 @@
             <div class="height-50">
               <a-form-item :label="$t('item')" :required="false">
                 <a-select mode="multiple" show-search optionFilterProp="label" style="width: 100%" v-model="system.memory_total_id" :placeholder="$t('item_select')" option-label-prop="label" @change="handleMemTotalItemChange">
-                  <a-select-option v-for="(item, index) in itemList" :key="index" :value="item.itemid" :label="item.name" :title="item.name">
+                  <a-select-option v-for="(item, index) in itemList" :key="item" :value="item.itemid" :label="item.name" :title="item.name">
                     {{ item.name }}
                   </a-select-option>
                 </a-select>
@@ -209,15 +209,9 @@
           textAlign: 'right',
           zIndex: 1,
         }">
-          <a-button :style="{ marginRight: '8px' }" @click="onClose">
-            取消
-          </a-button>
-          <a-button :style="{ marginRight: '8px' }" type="primary" @click="saveData" :loading="saveLoading" :disabled="saveDisabled">
-            保存
-          </a-button>
-          <a-button type="primary" @click="deployInit" :loading="initLoading" :disabled="initDisabled">
-            初始化
-          </a-button>
+          <a-button :style="{ marginRight: '8px' }" @click="onClose">{{ $t('cancel_btn') }}</a-button>
+    	  <a-button :style="{ marginRight: '8px' }" type="primary" @click="saveData" :loading="saveLoading" :disabled="saveDisabled">{{ $t('save_btn') }}</a-button>
+    	  <a-button type="primary" @click="deployInit" :loading="initLoading" :disabled="initDisabled">{{ $t('init_btn') }}</a-button>
         </div>
       </a-drawer>
     </div>
@@ -241,11 +235,11 @@ export default {
       visible: false,
       list: [],
       columns: [
-        { title: '序号', key: 'id', align: 'left', scopedSlots: { customRender: 'id' } },
-        { title: '系统类型', key: 'name', align: 'left', scopedSlots: { customRender: 'name' } },
-        { title: '初始化状态', key: 'status', align: 'left', scopedSlots: { customRender: 'status' } },
-        { title: '最近初始化时间', key: 'inited_at', align: 'left', scopedSlots: { customRender: 'inited_at' } },
-        { title: '操作', key: 'operation', align: 'center', scopedSlots: { customRender: 'operation' } }
+        { title: this.$t('table_headers_id'), key: 'id', align: 'left', scopedSlots: { customRender: 'id' } },
+        { title: this.$t('table_headers_name'), key: 'name', align: 'left', scopedSlots: { customRender: 'name' } },
+        { title: this.$t('table_headers_status'), key: 'status', align: 'left', scopedSlots: { customRender: 'status' } },
+        { title: this.$t('table_headers_inited_at'), key: 'inited_at', align: 'left', scopedSlots: { customRender: 'inited_at' } },
+        { title: this.$t('table_headers_operation'), key: 'operation', align: 'center', scopedSlots: { customRender: 'operation' } }
       ],
       grouplist: [],
       templateList: [],
@@ -308,7 +302,7 @@ export default {
     //打开
     edit(record) {
       this.id = record.id
-      this.title = record.name + '指标初始化'
+      this.title = record.name + 'host type configured'
       this.visible = true;
       systemInfo(record.id).then((resp) => {
         let res = resp.data
@@ -483,7 +477,7 @@ export default {
         if (res.code == 200) {
           this.initDisabled = false
           this.saveLoading = false
-          this.$message.success(res.message + ",可以进行初始化!")
+	  this.$message.success(res.message + ",可以进行初始化!")
         }
       })
     },

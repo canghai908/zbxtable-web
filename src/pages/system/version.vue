@@ -2,9 +2,9 @@
   <page-layout :noTitle="true">
     <a-card :headStyle="{background: '#FAFBFC'}" size="small">
       <a-descriptions bordered>
-        <a-descriptions-item label="Zabbix版本" :span="3">{{ ZabbixVersion }}</a-descriptions-item>
-        <a-descriptions-item label=" 前端版本" :span="3">{{ UIVersion }}</a-descriptions-item>
-        <a-descriptions-item label="后端版本信息">
+        <a-descriptions-item :label="$t('zabbix_server_version')" :span="3">{{ ZabbixVersion }}</a-descriptions-item>
+        <a-descriptions-item :label="$t('zbxtable_version')" :span="3">{{ UIVersion }}</a-descriptions-item>
+        <a-descriptions-item :label="$t('buildinfo')">
           Version:{{ BackVersion }}
           <br />
           GitHash:{{ GitHash }}

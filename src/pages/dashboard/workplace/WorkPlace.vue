@@ -18,7 +18,7 @@
       <a-col style="padding: 0 12px" :xl="4" :lg="8" :md="24" :sm="24" :xs="24">
         <a-card title="设备统计" :headStyle="{background: '#ecf8ff'}" size="small">
           <div class="homeMain homeList">
-            <div class="homeItem"><div>Linux主机:</div><span>{{info.lin_count}}台</span></div>
+            <div class="homeItem"><div>Linux:</div><span>{{info.lin_count}}台</span></div>
             <div class="homeItem"><div>Window主机:</div><span>{{info.win_count}}台</span></div>
             <div class="homeItem"><div>硬件服务器:</div><span>{{info.srv_count}}台</span></div>
             <div class="homeItem"><div>网络设备:</div><span>{{info.net_count}}台</span></div>
@@ -30,13 +30,13 @@
           <div class="homeMain beauty-scroll">
             <div class="home_net">
               <div class="home_net1">
-                <a-button type="primary">电信1</a-button>
+                <a-button type="primary">mobile network1</a-button>
                 <p style="margin-top: 20px">带宽: <span>200MB</span></p>
                 <p>流出: <span>{{net.val1 | kbFilters}} &#8593;&#8593;</span></p>
                 <p>流入: <span>{{net.val2 | kbFilters}} &#8595;&#8595;</span></p>
               </div>
               <div class="home_net1">
-                <a-button type="primary">电信2</a-button>
+                <a-button type="primary">mobile network2</a-button>
                 <p style="margin-top: 20px">带宽: <span>50MB</span></p>
                 <p>流出: <span>{{net.val3 | kbFilters}} &#8593;&#8593;</span></p>
                 <p>流入: <span>{{net.val4 | kbFilters}} &#8595;&#8595;</span></p>
@@ -64,7 +64,7 @@
     </a-row>
     <a-row style="margin: 20px -12px">
       <a-col style="padding: 0 12px" :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
-        <a-card title="Linux操作系统 TOP5" :headStyle="{background: '#ecf8ff'}" size="small">
+        <a-card title="Linux operating system TOP5" :headStyle="{background: '#ecf8ff'}" size="small">
           <div class="home_line">
             <div style="flex: 0 0 50%" v-if="linC && linC.length">
               <h3>CPU使用率</h3>
