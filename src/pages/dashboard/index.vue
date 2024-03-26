@@ -3,16 +3,16 @@
     <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="!loading1 &&!loading2 && !loading3">
       <a-row :gutter="16">
         <a-col :xl="{ span: 12 }" :lg="{ span: 24 }">
-          <a-card title="未恢复告警" :headStyle="{background: '#FAFBFC'}" size="small" :loading="!loading1">
+          <a-card :title="$t('title_problems')" :headStyle="{ background: '#FAFBFC' }" size="small" :loading="!loading1">
             <div class="homeMain beauty-scroll">
               <a-timeline>
                 <a-timeline-item v-for="(v, i) in triggerList" :key="i">
-                  <a-tag v-if="v.severity == 1" color="#7499FF">信息</a-tag>
-                  <a-tag v-else-if="v.severity == 2" color="#FFC859">警告</a-tag>
-                  <a-tag v-else-if="v.severity == 3" color="#FFA059">一般</a-tag>
-                  <a-tag v-else-if="v.severity == 4" color="#E97659">严重</a-tag>
-                  <a-tag v-else-if="v.severity == 5" color="#f50000">灾难</a-tag>
-                  <a-tag v-else color="#97AAB3">未分类</a-tag>
+    		  <a-tag v-if="v.severity == 1" color="#7499FF">{{ $t('severity_informational') }}</a-tag>
+    	          <a-tag v-else-if="v.severity == 2" color="#FFC859">{{ $t('severity_warning') }}</a-tag>
+	          <a-tag v-else-if="v.severity == 3" color="#FFA059">{{ $t('severity_average') }}</a-tag>
+	          <a-tag v-else-if="v.severity == 4" color="#E97659">{{ $t('severity_high') }}</a-tag>
+	          <a-tag v-else-if="v.severity == 5" color="#f50000">{{ $t('severity_disaster') }}</a-tag>
+    		  <a-tag v-else color="#97AAB3">{{ $t('severity_unknown') }}</a-tag>
                   <!-- <a-icon slot="dot" type="minus-circle" v-else-if="v.severity == 2" :style="{ fontSize: '16px', color: '#F56C6C' }" />
                   <a-icon slot="dot" type="exclamation-circle" v-else :style="{ fontSize: '16px', color: '#E6A23C' }" /> -->
                   {{v.lastchange | parsetime}} <b>{{v.name}}</b> {{v.lasteventname}}
@@ -24,12 +24,12 @@
         <a-col :xl="{ span: 12 }" :lg="{ span: 24 }">
           <a-row>
             <a-col :lg="24" :md="24">
-              <a-card title="设备统计" :headStyle="{background: '#FAFBFC'}" :bodyStyle="{height: '180px'}" size="small" :loading="!loading2">
+   	      <a-card :title="$t('title_hosttypecount')" :headStyle="{background: '#FAFBFC'}" :bodyStyle="{height: '180px'}" size="small" :loading="!loading2">
                 <div class="homeHost beauty-scroll">
-                  <div class="homeHItem"><img src="../../assets/img/t1.png" alt=""><span>网络设备</span><em>{{info.net_count}}台</em></div>
-                  <div class="homeHItem"><img src="../../assets/img/t2.png" alt=""><span>硬件服务器</span><em>{{info.srv_count}}台</em></div>
-                  <div class="homeHItem"><img src="../../assets/img/t4.png" alt=""><span>Windows系统</span><em>{{info.win_count}}台</em></div>
-                  <div class="homeHItem"><img src="../../assets/img/t3.png" alt=""><span>Linux系统</span><em>{{info.lin_count}}台</em></div>
+    		  <div class="homeHItem"><img src="../../assets/img/t1.png" alt=""><span>{{ $t('device_network_devices') }}</span><em>{{ info.net_count }} {{ $t('device_count') }}</em></div>
+   		  <div class="homeHItem"><img src="../../assets/img/t2.png" alt=""><span>{{ $t('device_server_devices') }}</span><em>{{ info.srv_count }} {{ $t('device_count') }}</em></div>
+    		  <div class="homeHItem"><img src="../../assets/img/t4.png" alt=""><span>{{ $t('device_windows_hosts') }}</span><em>{{ info.win_count }} {{ $t('device_count') }}</em></div>
+    		  <div class="homeHItem"><img src="../../assets/img/t3.png" alt=""><span>{{ $t('device_linux_hosts') }}</span><em>{{ info.lin_count }} {{ $t('device_count') }}</em></div>
                 </div>
               </a-card>
             </a-col>
@@ -64,8 +64,8 @@
     <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="!loading4 && !loading5">
       <a-row :gutter="16">
         <a-col :xl="{ span: 12 }" :lg="{ span: 24 }">
-          <h2 class="homeH2">Windows TOP5</h2>
-          <a-card title="CPU使用率 TOP 5" :headStyle="{background: '#FAFBFC'}" size="small" :loading="!loading4">
+          <h2 class="homeH2">{{ $t('windows_systems_title') }}</h2>
+          <a-card :title="$t('cpu_top5_title')" :headStyle="{ background: '#FAFBFC' }" size="small" :loading="!loading4">
             <div class="homePies">
               <div class="homePied" v-for="(v, i) in winC" :key="'1'+i">
                 <div class="homePie">
@@ -77,7 +77,7 @@
           </a-card>
         </a-col>
         <a-col :xl="{ span: 12 }" :lg="{ span: 24 }">
-          <a-card title="内存使用率 TOP 5" :headStyle="{background: '#FAFBFC'}" :bodyStyle="{padding: 0}" size="small" :loading="!loading5">
+    	  <a-card :title="$t('memory_top5_title')" :headStyle="{ background: '#FAFBFC' }" :bodyStyle="{ padding: 0 }" size="small" :loading="!loading5">
             <div class="homeLegent" v-if="winM.length > 0">
               <div class="homeLegent1">
                 <div class="homeLeItem1">
@@ -112,8 +112,8 @@
     <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="!loading6 && !loading7">
       <a-row :gutter="16">
         <a-col :xl="{ span: 12 }" :lg="{ span: 24 }">
-          <h2 class="homeH2">Linux TOP5</h2>
-          <a-card title="CPU使用率 TOP 5" :headStyle="{background: '#FAFBFC'}" size="small" :loading="!loading6">
+          <h2 class="homeH2">{{ $t('linux_systems_title') }}</h2>
+   	  <a-card :title="$t('cpu_top5_title')" :headStyle="{ background: '#FAFBFC' }" size="small" :loading="!loading6">
             <div class="homePies">
               <div class="homePied" v-for="(v, i) in linC" :key="'2'+i">
                 <div class="homePie">
@@ -125,7 +125,7 @@
           </a-card>
         </a-col>
         <a-col :xl="{ span: 12 }" :lg="{ span: 24 }">
-          <a-card title="内存使用率 TOP 5" :headStyle="{background: '#FAFBFC'}" :bodyStyle="{padding: 0}" size="small" :loading="!loading7">
+    	  <a-card :title="$t('memory_top5_title')" :headStyle="{ background: '#FAFBFC' }" :bodyStyle="{ padding: 0 }" size="small" :loading="!loading5">
             <div class="homeLegent" v-if="linM.length > 0">
               <div class="homeLegent1">
                 <div class="homeLeItem1">
@@ -167,7 +167,8 @@ import { parseTimeFun } from "@/utils/formatter";
 import pie from "@/components/gcharts/pie";
 import legent from "@/components/gcharts/legent";
 export default {
-  name: "index",
+  name: "index", 
+  i18n: require('./i18n'),
   data() {
     return {
       loading1: false,
@@ -175,7 +176,7 @@ export default {
       loading2: false,
       info: "",
       loading3: false,
-      ptitle: '出口带宽',
+      ptitle: this.$t('bandwidth'),
       edata: {
         name_one: "--",
         in_one: "--",
@@ -233,7 +234,7 @@ export default {
         .then((resp) => {
           let res = resp.data;
           this.edata = res.data.items;
-          this.ptitle = this.ptitle + '(采集时间:' + this.edata.date + ')';
+	  this.ptitle = this.ptitle + "(" + this.$t('polling_date') + this.edata.date + ")";
         })
         .finally(() => {
           this.loading3 = true;

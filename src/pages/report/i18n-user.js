@@ -14,6 +14,7 @@ module.exports = {
         interface: "接口",
         linkbandwidth: "链路带宽",
         operation: "操作",
+      task: "任务名",
       },
     },
     HK: {
@@ -44,6 +45,7 @@ module.exports = {
         number: "Job Number",
         department: "Department",
         operation: "Operation",
+      task: "task",
       },
     },
   },

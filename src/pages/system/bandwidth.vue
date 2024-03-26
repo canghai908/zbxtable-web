@@ -4,7 +4,7 @@
       <a-card :bordered="false">
         <a-form>
           <a-form-item :label="$t('bindwidthone')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="false">
-            <a-input v-model="egress.name_one" placeholder="请输入名称" />
+            <a-input v-model="egress.name_one" :placeholder="$t('placeholder_enter_bandwidth_name')" />
           </a-form-item>
           <!-- Out1 -->
           <a-form-item :label="$t('bindwidthone_item')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="false">
@@ -25,7 +25,7 @@
             </a-select>
           </a-form-item>
           <a-form-item :label="$t('bindwidthtwo')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="false">
-            <a-input v-model="egress.name_two" placeholder="请输入系统名称" />
+            <a-input v-model="egress.name_two" :placeholder="$t('placeholder_enter_bandwidth_name')" />
           </a-form-item>
           <!-- Out2 -->
           <a-form-item :label="$t('bindwidthtwo_item')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="false">

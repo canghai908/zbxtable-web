@@ -1,13 +1,13 @@
 <template>
   <page-layout :noTitle="true">
     <a-form-model class="home-search" layout="inline" :colon='false'>
-      <a-form-model-item label="用户名">
-        <a-input v-model.trim="name" placeholder="用户名" />
+    <a-form-model-item :label="$t('label_group_name')">
+      <a-input v-model.trim="name" :placeholder="$t('label_group_name')" />
       </a-form-model-item>
       <a-form-model-item>
-        <a-button type="primary" @click="init">查询</a-button>
-        <a-button style="margin-left: 10px;" @click="resetData">重置</a-button>
-        <a-button type="primary" style="margin-left: 10px;" @click="showModal" v-auth="`add`">新增</a-button>
+    	<a-button type="primary" @click="init">{{ $t('search_btn') }}</a-button>
+    	<a-button style="margin-left: 10px;" @click="resetData">{{ $t('reset_btn') }}</a-button>
+    	<a-button type="primary" style="margin-left: 10px;" @click="showModal" v-auth="`add`">{{ $t('add_group_btn') }}</a-button>
       </a-form-model-item>
     </a-form-model>
     <div class="linux-list">
@@ -17,16 +17,15 @@
         <div slot="note" slot-scope="record">{{record.note}}</div>
         <div slot="created" slot-scope="record">{{record.created| parsetime}}</div>
         <span slot="operation" slot-scope="record">
-          <!-- <a-button class="pd20 paddingleft0" type="link" size="small" @click="seeDetail(record)">详细信息</a-button> -->
-          <a-button class="pd20 paddingleft0" type="link" size="small" @click="editModal(record)">编辑</a-button>
-          <a-button class="pd20 paddingleft0" type="link" size="small" @click="editMember(record)">成员编辑</a-button>
-          <a-popconfirm title="确定要删除吗?" ok-text="确定" cancel-text="取消" @confirm="deleteRecord(record)">
-            <a-button class="paddingleft0" type="link" size="small" v-auth="`delete`">删除</a-button>
+          <a-button class="pd20 paddingleft0" type="link" size="small" @click="editModal(record)">{{ $t('edit_btn') }}</a-button>
+          <a-button class="pd20 paddingleft0" type="link" size="small" @click="editMember(record)">{{ $t('members_btn') }}</a-button>
+          <a-popconfirm :title="$t('confirm_delete_group')" :ok-text="$t('confirm_yes')" :cancel-text="$t('confirm_no')" @confirm="deleteRecord(record)">
+          <a-button class="paddingleft0" type="link" size="small" v-auth="`delete`">{{ $t('delete_group_btn') }}</a-button>
           </a-popconfirm>
         </span>
       </a-table>
     </div>
-    <a-modal title="新增组织" :visible="visible" :confirm-loading="confirmLoading" @ok="createGroup" @cancel="handleCancel" width="600px">
+    <a-modal :title="$t('add_group')" :visible="visible" :confirm-loading="confirmLoading" @ok="createGroup" @cancel="handleCancel" width="600px">
       <template>
         <a-form-model :rules="rules" :model="group">
           <a-form-model-item :label="$t('group_name')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="name">
@@ -38,7 +37,7 @@
         </a-form-model>
       </template>
     </a-modal>
-    <a-modal title="编辑组织" :visible="visibleEdit" :confirm-loading="confirmLoading" @ok="updateGroup" @cancel="handleEditCancel" width="600px">
+    <a-modal :title="$t('edit_group')" :visible="visibleEdit" :confirm-loading="confirmLoading" @ok="updateGroup" @cancel="handleEditCancel" width="600px">
       <template>
         <a-form-model :rules="rulesUpdate" :model="group">
           <a-form-model-item :label="$t('group_name')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="name">
@@ -50,14 +49,14 @@
         </a-form-model>
       </template>
     </a-modal>
-    <a-modal title="编辑成员" :visible="visibleMember" :confirm-loading="confirmLoading" @ok="updateGroupMember" @cancel="handleMemberCancel" width="600px">
+    <a-modal :title="$t('edit_members')" :visible="visibleMember" :confirm-loading="confirmLoading" @ok="updateGroupMember" @cancel="handleMemberCancel" width="600px">
       <template>
         <a-form-model :rules="rulesUpdate" :model="group">
           <a-form-model-item :label="$t('group_name')" :labelCol="{span: 3}" :wrapperCol="{span: 10}" prop="name">
             <span>{{group.name}}</span>
           </a-form-model-item>
           <a-form-model-item prop="email">
-            <a-transfer :data-source="transferDataSource" :render="item => item.title" show-search :list-style="{width: '250px',height: '300px',}" :titles="['所有用户', '现有成员']" :target-keys="targetKeys" :selected-keys="selectedKeys" @change="handleChange" @selectChange="handleSelectChange" />
+    	    <a-transfer :data-source="transferDataSource" :render="item => item.title" show-search :list-style="{width: '250px',height: '300px',}" :titles="[$t('all_users'), $t('group_members')]" :target-keys="targetKeys" :selected-keys="selectedKeys" @change="handleChange" @selectChange="handleSelectChange" />
             <!-- <a-input v-model="group.members" :placeholder="$t('modalInputEmail')" /> -->
           </a-form-model-item>
         </a-form-model>
@@ -108,11 +107,11 @@ export default {
       ],
       columns: [
         { title: "ID", key: "id", align: "left", scopedSlots: { customRender: "id" }, },
-        { title: "用户组", key: "name", align: "left", scopedSlots: { customRender: "name" }, },
-        { title: "备注", key: "note", align: "left", scopedSlots: { customRender: "note" }, },
-        { title: "创建时间", key: "created", align: "left", scopedSlots: { customRender: "created" }, },
+        { title: this.$t('table_headers_group'), key: "name", align: "left", scopedSlots: { customRender: "name" }, },
+        { title: this.$t('table_headers_description'), key: "note", align: "left", scopedSlots: { customRender: "note" }, },
+        { title: this.$t('table_headers_creation_date'), key: "created", align: "left", scopedSlots: { customRender: "created" }, },
         // { title: "用户状态", key: "status", align: "left", scopedSlots: { customRender: "status" }, },
-        { title: "操作", key: "operation", align: "center", scopedSlots: { customRender: "operation" } },
+        { title: this.$t('table_headers_operation'), key: 'operation', align: 'center', scopedSlots: { customRender: 'operation' } }
       ],
       group: {
         name: "",
@@ -123,8 +122,8 @@ export default {
         username: "",
       },
       rules: {
-        name: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-        note: [{ required: false, message: '请输入用户密码', trigger: 'change' }],
+        name: [{ required: true, message: this.$t('username_required'), trigger: 'blur' }],
+        note: [{ required: false, message: this.$t('password_required'), trigger: 'change' }],
       },
       rulesUpdate: {
         name: [{ required: false, message: '请输入用户名', trigger: 'blur' }],

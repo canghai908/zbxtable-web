@@ -7,14 +7,15 @@
             <a-card hoverable :headStyle="{textAlign: 'left', width: '100%', background: '#FAFBFC'}" :title="winTitle">
               <a-list :grid=" {gutter: 24, column: 24 }" :data-source="win">
                 <a-list-item slot="renderItem" slot-scope="item">
-                  <a-popover title="设备信息" placement="topLeft">
+		  <a-popover :title="$t('title_device_info')" placement="topLeft">
                     <template slot="content">
-                      <p>名称:{{ item.name }}</p>
-                      <p>IP:{{ item.interfaces }}</p>
-                      <p>CPU:{{ item.cpu_utilization }}</p>
-                      <p>内存:{{ item.memory_utilization }}</p>
-                      <p>错误:{{ item.error }}</p>
-                      <p>告警:{{ item.alarm }}</p>
+                      <p>{{ $t('label_hostname') }}: {{ item.name }}</p>
+                      <p>{{ $t('label_IP') }}:{{ item.interfaces }}</p>
+		      <p>{{ $t('label_cpu_usage') }}: {{ item.cpu_utilization }}</p>
+		      <p>{{ $t('label_memory_usage') }}: {{ item.memory_utilization }}</p>
+	              <p>{{ $t('label_num_errors') }}: {{ item.error }}</p>
+		      <p>{{ $t('label_num_alarms') }}: {{ item.alarm }}</p>
+
                     </template>
                     <a-list-item-meta>
                       <div v-if="item.available==1 && item.alarm==0" class="primary-box" slot="avatar" id="one"></div>
@@ -29,14 +30,14 @@
             <a-card hoverable :headStyle="{textAlign: 'left', width: '100%', background: '#FAFBFC'}" :title="linTitle">
               <a-list :grid="{ gutter: 24, column: 24 }" :data-source="lin">
                 <a-list-item slot="renderItem" slot-scope="item">
-                  <a-popover title="设备信息" placement="topLeft">
+		  <a-popover :title="$t('title_device_info')" placement="topLeft">
                     <template slot="content">
-                      <p>设备名称:{{ item.name }}</p>
-                      <p>设备IP:{{ item.interfaces }}</p>
-                      <p>CPU使用率:{{ item.cpu_utilization }}</p>
-                      <p>内存使用率:{{ item.memory_utilization }}</p>
-                      <p>监控信息:{{ item.error }}</p>
-                      <p>告警数:{{ item.alarm }}</p>
+                      <p>{{ $t('label_hostname') }}: {{ item.name }}</p>
+                      <p>{{ $t('label_IP') }}:{{ item.interfaces }}</p>
+		      <p>{{ $t('label_cpu_usage') }}: {{ item.cpu_utilization }}</p>
+		      <p>{{ $t('label_memory_usage') }}: {{ item.memory_utilization }}</p>
+	              <p>{{ $t('label_num_errors') }}: {{ item.error }}</p>
+		      <p>{{ $t('label_num_alarms') }}: {{ item.alarm }}</p>
                     </template>
                     <a-list-item-meta>
                       <div v-if="item.available==1 && item.alarm==0" class="primary-box" slot="avatar" id="one"></div>
@@ -51,13 +52,14 @@
             <a-card hoverable :headStyle="{textAlign: 'left', width: '100%', background: '#FAFBFC'}" :title="netTitle">
               <a-list :grid="{ gutter: 24, column: 24 }" :data-source="net">
                 <a-list-item slot="renderItem" slot-scope="item">
-                  <a-popover title="设备信息" placement="topLeft">
+		  <a-popover :title="$t('title_device_info')" placement="topLeft">
                     <template slot="content">
-                      <p>设备名称:{{ item.name }}</p>
-                      <p>CPU使用率:{{ item.cpu_utilization }}</p>
-                      <p>内存使用率:{{ item.memory_utilization }}</p>
-                      <p>告警数:{{ item.alarm }}</p>
-                      <p>设备IP:{{ item.interfaces }}</p>
+                      <p>{{ $t('label_hostname') }}: {{ item.name }}</p>
+                      <p>{{ $t('label_IP') }}:{{ item.interfaces }}</p>
+		      <p>{{ $t('label_cpu_usage') }}: {{ item.cpu_utilization }}</p>
+		      <p>{{ $t('label_memory_usage') }}: {{ item.memory_utilization }}</p>
+	              <p>{{ $t('label_num_errors') }}: {{ item.error }}</p>
+		      <p>{{ $t('label_num_alarms') }}: {{ item.alarm }}</p>
                     </template>
                     <a-list-item-meta>
                       <div v-if="item.available==1 && item.alarm==0" class="primary-box" slot="avatar" id="one"></div>
@@ -72,13 +74,14 @@
             <a-card hoverable :headStyle="{textAlign: 'left', width: '100%', background: '#FAFBFC'}" :title="srvTitle">
               <a-list :grid="{ gutter: 24, column: 24 }" :data-source="srv">
                 <a-list-item slot="renderItem" slot-scope="item">
-                  <a-popover title="设备信息" placement="topLeft">
+		  <a-popover :title="$t('title_device_info')" placement="topLeft">
                     <template slot="content">
-                      <p>设备名称:{{ item.name }}</p>
-                      <p>CPU使用率:{{ item.cpu_utilization }}</p>
-                      <p>内存使用率:{{ item.memory_utilization }}</p>
-                      <p>告警数:{{ item.alarm }}</p>
-                      <p>设备IP:{{ item.interfaces }}</p>
+                      <p>{{ $t('label_hostname') }}: {{ item.name }}</p>
+                      <p>{{ $t('label_IP') }}:{{ item.interfaces }}</p>
+		      <p>{{ $t('label_cpu_usage') }}: {{ item.cpu_utilization }}</p>
+		      <p>{{ $t('label_memory_usage') }}: {{ item.memory_utilization }}</p>
+	              <p>{{ $t('label_num_errors') }}: {{ item.error }}</p>
+		      <p>{{ $t('label_num_alarms') }}: {{ item.alarm }}</p>
                     </template>
                     <a-list-item-meta>
                       <div v-if="item.available==1 && item.alarm==0" class="primary-box" slot="avatar" id="one"></div>
@@ -104,6 +107,7 @@ import PageLayout from "@/layouts/PageLayout";
 // import linuxLine from '../../components/chart/linuxLine'
 import { indexOverview } from "@/services/admin";
 export default {
+  i18n: require('./i18n'),
   name: "LinuxDetail",
   components: { PageLayout, },
   data() {
@@ -135,13 +139,13 @@ export default {
         let res = resp.data
         if (res.code == 200) {
           this.win = res.data.items.vm_win || []
-          this.winTitle = 'Windows操作系统 设备总数:' + this.win.length
+	  this.winTitle = this.$t('num_windows_hosts') + this.win.length;
           this.lin = res.data.items.vm_lin || []
-          this.linTitle = 'Linux操作系统 设备总数:' + this.lin.length
+	  this.linTitle = this.$t('num_linux_hosts') + this.lin.length;
           this.net = res.data.items.hw_net || []
-          this.netTitle = '网络设备 设备总数:' + this.net.length
+          this.netTitle = this.$t('num_networking_hosts') + this.net.length;
           this.srv = res.data.items.hw_srv || []
-          this.srvTitle = '物理服务器 设备总数:' + this.srv.length
+          this.srvTitle = this.$t('num_hardware_hosts') + this.srv.length;
         }
         console.log(this.win)
       }).finally(() => { this.loading = false })

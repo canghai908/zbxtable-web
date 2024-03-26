@@ -1,18 +1,18 @@
 <template>
   <page-layout :noTitle="true">
     <a-form-model class="home-search" layout="inline" :colon='false'>
-      <a-form-model-item label="用户名">
-        <a-input v-model.trim="username" placeholder="用户名" />
+      <a-form-model-item :label="$t('label_username')">
+        <a-input v-model.trim="username" :placeholder="$t('label_username')" />
       </a-form-model-item>
-      <a-form-model-item label="状态">
+      <a-form-model-item :label="$t('label_state')">
         <a-select style="width: 80px" v-model.trim="status">
           <a-select-option :value="item.value" v-for="item in statusOption" :key="item.value">{{item.label}}</a-select-option>
         </a-select>
       </a-form-model-item>
       <a-form-model-item>
-        <a-button type="primary" @click="init">查询</a-button>
-        <a-button style="margin-left: 10px;" @click="resetData">重置</a-button>
-        <a-button type="primary" style="margin-left: 10px;" @click="showModal" v-auth="`add`">新增</a-button>
+        <a-button type="primary" @click="init">{{ $t('search_btn') }}</a-button>
+        <a-button style="margin-left: 10px;" @click="resetData">{{ $t('reset_btn') }}</a-button>
+        <a-button type="primary" style="margin-left: 10px;" @click="showModal" v-auth="`add`">{{ $t('add_user_btn') }}</a-button>
       </a-form-model-item>
     </a-form-model>
     <div class="linux-list">
@@ -26,13 +26,13 @@
         <span slot="wechat" slot-scope="record">{{record.wechat}}</span>
         <div slot="created" slot-scope="record">{{record.created| parsetime}}</div>
         <span slot="status" slot-scope="record">
-          <a-switch :checked="record.status == '0' ? true : false" checked-children="启用" un-checked-children="禁用" @change="onStatusChange($event, record)" />
+          <a-switch :checked="record.status == '0' ? true : false" :checked-children="$t('enabled')"  :un-checked-children="$t('disabled')" @change="onStatusChange($event, record)" />
         </span>
         <span slot="operation" slot-scope="record">
-          <!-- <a-button class="pd20 paddingleft0" type="link" size="small" @click="seeDetail(record)">详细信息</a-button> -->
-          <a-button class="pd20 paddingleft0" type="link" size="small" @click="editModal(record)">编辑</a-button>
-          <a-popconfirm title="确定要删除吗?" ok-text="确定" cancel-text="取消" @confirm="deleteRecord(record)">
-            <a-button class="paddingleft0" type="link" size="small" v-auth="`delete`">删除</a-button>
+          <!-- <a-button class="pd20 paddingleft0" type="link" size="small" @click="editModal(record)"> {{ $t('edit_btn') }} </a-button> -->
+          <a-button class="pd20 paddingleft0" type="link" size="small" @click="editModal(record)">{{ $t('edit_btn') }}</a-button>
+          <a-popconfirm :title="$t('delete_user_confirm')" :ok-text="$t('yes_btn')" :cancel-text="$t('no_btn')" @confirm="deleteRecord(record)">
+            <a-button class="paddingleft0" type="link" size="small" v-auth="`delete`">{{ $t('delete_btn') }}</a-button>
           </a-popconfirm>
         </span>
       </a-table>
@@ -68,7 +68,7 @@
         </a-form-model>
       </template>
     </a-modal>
-    <a-modal title="编辑用户" :visible="visibleEdit" :confirm-loading="confirmLoading" @ok="updateUser" @cancel="handleEditCancel" width="600px">
+    <a-modal :title="$t('edit')" :visible="visibleEdit" :confirm-loading="confirmLoading" @ok="updateUser" @cancel="handleEditCancel" width="600px">
       <template>
         <a-form-model :rules="rulesUpdate" :model="user">
           <a-form-model-item :label="$t('modalUsername')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="username">
@@ -137,24 +137,25 @@ export default {
       nowuser: "",
       nowrole: "",
       statusOption: [
-        { label: "启用", value: "0" },
-        { label: "禁用", value: "1" },
+	{ label: this.$t('state_enabled'), value: "0" },
+	{ label: this.$t('state_disabled'), value: "1" },
       ],
       roleOption: [
-        { label: "普通用户", value: "user" },
-        { label: "管理员", value: "admin" },
+        { label: this.$t('role_user'), value: "user" },
+        { label: this.$t('role_admin'), value: "admin" },
       ],
       columns: [
         { title: "ID", key: "id", align: "left", scopedSlots: { customRender: "id" }, },
-        { title: "用户名", key: "username", align: "left", scopedSlots: { customRender: "username" }, },
-        { title: "角色", key: "role", align: "left", scopedSlots: { customRender: "role" }, },
-        { title: "邮箱", key: "email", align: "left", scopedSlots: { customRender: "email" }, },
-        { title: "手机", key: "phone", align: "left", scopedSlots: { customRender: "phone" }, },
-        { title: "钉钉", key: "ding_talk", align: "left", scopedSlots: { customRender: "ding_talk" }, },
-        { title: "微信", key: "wechat", align: "left", scopedSlots: { customRender: "wechat" }, },
-        { title: "创建时间", key: "created", align: "left", scopedSlots: { customRender: "created" }, },
-        { title: "用户状态", key: "status", align: "left", scopedSlots: { customRender: "status" }, },
-        { title: "操作", key: "operation", align: "center", scopedSlots: { customRender: "operation" } },
+        { title: this.$t('table_headers_username'), key: 'username', align: 'left', scopedSlots: { customRender: 'username' } },
+        { title: this.$t('table_headers_role'), key: 'role', align: 'left', scopedSlots: { customRender: 'role' } },
+        { title: this.$t('table_headers_email'), key: 'email', align: 'left', scopedSlots: { customRender: 'email' } },
+        { title: this.$t('table_headers_phone'), key: 'phone', align: 'left', scopedSlots: { customRender: 'phone' } },
+        { title: this.$t('table_headers_ding_talk'), key: 'ding_talk', align: 'left', scopedSlots: { customRender: 'ding_talk' } },
+        { title: this.$t('table_headers_wechat'), key: 'wechat', align: 'left', scopedSlots: { customRender: 'wechat' } },
+        { title: this.$t('table_headers_creation_date'), key: 'created', align: 'left', scopedSlots: { customRender: 'created' } },
+        { title: this.$t('table_headers_user_status'), key: 'status', align: 'left', scopedSlots: { customRender: 'status' } },
+        { title: this.$t('table_headers_operation'), key: 'operation', align: 'center', scopedSlots: { customRender: 'operation' } }
+
       ],
       user: {
         username: "",
@@ -167,16 +168,16 @@ export default {
         ding_talk: "",
       },
       rules: {
-        username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+	username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
         password: [{ required: true, message: '请输入用户密码', trigger: 'change' }],
         role: [{ required: true, message: '请输入用户密码', trigger: 'change' }],
         email: [{ required: false, type: 'email', message: '请输入正确邮箱', trigger: 'change' }],
         phone: [{ required: false, pattern: /^1(3[0-9]|4[01456879]|5[0-3,5-9]|6[2567]|7[0-8]|8[0-9]|9[0-3,5-9])\d{8}$/, message: '请输入正确的手机号码', trigger: 'change' }],
         wechat: [{ required: false, type: 'string', message: '请输入正确的微信账号', trigger: 'blur' }],
-        ding_talk: [{ required: false, type: 'string', message: '请输入正确的钉钉账号', trigger: 'blur' }],
+        ding_talk: [{ required: false, type: 'string', message: '请输入正确的钉钉账号', trigger: 'blur' }],      
       },
       rulesUpdate: {
-        username: [{ required: false, message: '请输入用户名', trigger: 'blur' }],
+	username: [{ required: false, message: '请输入用户名', trigger: 'blur' }],
         password: [{ required: false, message: '留空则不修改', trigger: 'change' }],
         role: [{ required: true, message: '请输入用户密码', trigger: 'change' }],
         email: [{ required: false, type: 'email', message: '请输入正确邮箱', trigger: 'change' }],
