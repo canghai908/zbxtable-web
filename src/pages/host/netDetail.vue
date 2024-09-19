@@ -86,7 +86,8 @@
                 <a-col>
                   <a-form-model class="home-search" layout="inline" style="width: 80%; height: 10%;margin:0 auto;" :colon='false'>
                     <a-form-model-item label="时间">
-                      <a-range-picker format="YYYY-MM-DD HH:mm:ss" :show-time="{ format: 'HH:mm', defaultValue:[moment('00:00:00', 'HH:mm:ss'),moment('23:59:59', 'HH:mm:ss')]}" v-model="timeValue" @change="changeCreationTime" :getCalendarContainer="triggerNode=>{return triggerNode.parentNode || document.body}" />
+                      <a-range-picker format="YYYY-MM-DD HH:mm:ss" :show-time="{ format: 'HH:mm', defaultValue:[moment('00:00:00', 'HH:mm:ss'),moment('23:59:59', 'HH:mm:ss')]}" v-model="timeValue"
+                        @change="changeCreationTime" :getCalendarContainer="triggerNode=>{return triggerNode.parentNode || document.body}" />
                     </a-form-model-item>
                     <a-form-model-item>
                       <a-button :style="{ marginRight: '10px' }" type="primary" @click="trafficeQuery">查询</a-button>
@@ -106,7 +107,8 @@
                   </a-row>
                   <a-row>
                     <a-col>
-                      <a-table :loading="loading3" style="width: 90%;margin:0 auto;" :columns="trafficeColumns" :data-source="trafficeSeries.list" :pagination="false" :rowKey="(record) => { return record.name}">
+                      <a-table :loading="loading3" style="width: 90%;margin:0 auto;" :columns="trafficeColumns" :data-source="trafficeSeries.list" :pagination="false"
+                        :rowKey="(record) => { return record.name}">
                         <div slot="name" slot-scope="record">{{record.name }}</div>
                         <div slot="min" slot-scope="record">{{record.min | TrafficTBytes}}</div>
                         <div slot="max" slot-scope="record">{{record.max | TrafficTBytes}}</div>
@@ -124,7 +126,8 @@
                       <div id="discardedChart" style="width: 700px; height: 300px;"></div>
                     </a-col>
                     <a-col>
-                      <a-table :loading="loading3" style="width: 90%; height: 10%;margin:0 auto;" :columns="discardedColumns" :data-source="diescardedSeries.list" :pagination="false" :rowKey="(record) => { return record.name}">
+                      <a-table :loading="loading3" style="width: 90%; height: 10%;margin:0 auto;" :columns="discardedColumns" :data-source="diescardedSeries.list" :pagination="false"
+                        :rowKey="(record) => { return record.name}">
                         <div slot="name" slot-scope="record">{{record.name }}</div>
                         <div slot="min" slot-scope="record">{{record.min }}</div>
                         <div slot="max" slot-scope="record">{{record.max}}</div>
@@ -144,7 +147,8 @@
                       <div id="errorsChart" style="width: 700px; height: 300px;"></div>
                     </a-col>
                     <a-col>
-                      <a-table :loading="loading3" style="width: 90%;margin:0 auto;" :columns="discardedColumns" :data-source="errorsSeries.list" :pagination="false" :rowKey="(record) => { return record.name}">
+                      <a-table :loading="loading3" style="width: 90%;margin:0 auto;" :columns="discardedColumns" :data-source="errorsSeries.list" :pagination="false"
+                        :rowKey="(record) => { return record.name}">
                         <div slot="name" slot-scope="record">{{record.name }}</div>
                         <div slot="min" slot-scope="record">{{record.min }}</div>
                         <div slot="max" slot-scope="record">{{record.max}}</div>
@@ -160,7 +164,8 @@
                       <div id="operationalChart" style="width: 700px; height: 300px;"></div>
                     </a-col>
                     <a-col>
-                      <a-table :loading="loading3" style="width: 90%;margin:0 auto;" :columns="discardedColumns" :data-source="operationalSeries.list" :pagination="false" :rowKey="(record) => { return record.name}">
+                      <a-table :loading="loading3" style="width: 90%;margin:0 auto;" :columns="discardedColumns" :data-source="operationalSeries.list" :pagination="false"
+                        :rowKey="(record) => { return record.name}">
                         <div slot="name" slot-scope="record">{{record.name }}</div>
                         <div slot="min" slot-scope="record">{{record.min }}</div>
                         <div slot="max" slot-scope="record">{{record.max}}</div>
@@ -183,219 +188,367 @@
 </template>
 
 <script>
-import PageLayout from "@/layouts/PageLayout";
-import DetailList from "@/components/tool/DetailList";
-const DetailListItem = DetailList.Item;
-import FileSaver from "file-saver";
-import XLSX from "xlsx";
-import { hostDetail, hostMock, hostMockd, netInterfaceList, netInterfaceData } from "@/services/admin";
-import { parseTimeFun, trafficeFormat } from "@/utils/formatter";
-import moment from "moment";
+import PageLayout from '@/layouts/PageLayout'
+import DetailList from '@/components/tool/DetailList'
+const DetailListItem = DetailList.Item
+import FileSaver from 'file-saver'
+import XLSX from 'xlsx'
+import {
+  hostDetail,
+  hostMock,
+  hostMockd,
+  netInterfaceList,
+  netInterfaceData
+} from '@/services/admin'
+import { parseTimeFun, trafficeFormat } from '@/utils/formatter'
+import moment from 'moment'
 // import pie from "@/components/gcharts/pie";
-import echarts from 'echarts';
-require('echarts-liquidfill');
+import echarts from 'echarts'
+require('echarts-liquidfill')
 // import gauge from "@/components/gcharts/gauge";
 export default {
-  name: "LinuxDetail",
-  components: { PageLayout, DetailListItem, DetailList, },
+  name: 'LinuxDetail',
+  components: { PageLayout, DetailListItem, DetailList },
   data() {
     return {
       moment,
-      id: "",
-      detail: "",
+      id: '',
+      detail: '',
       list: [],
       tList: [],
       cpuList: [],
       memoryList: [],
-      dates: "",
-      dater: "",
-      historyType: "",
-      cpu: "",
-      memory: "",
+      dates: '',
+      dater: '',
+      historyType: '',
+      cpu: '',
+      memory: '',
       loading: false,
       loading1: false,
       loading2: false,
       loading3: false,
-      mode1: "date",
-      mode2: "date",
+      mode1: 'date',
+      mode2: 'date',
       disabledTime: { h: 0, m: 0, s: 0 },
       page: 1,
       pageSize: 20,
-      interfaces: "",
-      operational_status: "",
-      data: "",
-      legendOptions: "",
-      yOptions: "",
+      interfaces: '',
+      operational_status: '',
+      data: '',
+      legendOptions: '',
+      yOptions: '',
       selectedRowKeys: [],
       selectedRows: [],
       visible: false,
       lineData: [],
-      currentName: "",
+      currentName: '',
       trafficeSeries: {
-        xAxis: "",
-        yAxis: "",
-        legend: "",
-        title: "",
-        list: "",
+        xAxis: '',
+        yAxis: '',
+        legend: '',
+        title: '',
+        list: ''
       },
       diescardedSeries: {
-        xAxis: "",
-        yAxis: "",
-        legend: "",
-        title: "",
+        xAxis: '',
+        yAxis: '',
+        legend: '',
+        title: ''
       },
       errorsSeries: {
-        xAxis: "",
-        yAxis: "",
-        legend: "",
-        title: "",
+        xAxis: '',
+        yAxis: '',
+        legend: '',
+        title: ''
       },
       operationalSeries: {
-        xAxis: "",
-        yAxis: "",
-        legend: "",
-        title: "",
+        xAxis: '',
+        yAxis: '',
+        legend: '',
+        title: ''
       },
       columns: [
-        { title: '状态', key: 'operational_status', align: 'left', scopedSlots: { customRender: 'operational_status' }, sorter: (a, b) => a.operational_status.localeCompare(b.operational_status) },
-        { title: '接口索引', key: 'index', align: 'left', scopedSlots: { customRender: 'index' }, sorter: (a, b) => b.index - a.index },
-        { title: '接口名', key: 'name', align: 'left', scopedSlots: { customRender: 'name' } },
-        { title: '接收流量(Kbps)', key: 'bits_received', align: 'left', scopedSlots: { customRender: 'bits_received' }, sorter: (a, b) => b.bits_received - a.bits_received },
-        { title: '发送流量(Kbps)', key: 'bits_sent', align: 'left', scopedSlots: { customRender: 'bits_sent' }, sorter: (a, b) => b.bits_sent - a.bits_sent },
-        { title: '进丢包/错包', key: 'instatus', align: 'left', scopedSlots: { customRender: 'instatus' }, sorter: (a, b) => b.instatus - a.instatus },
-        { title: '出丢包/错包', key: 'outstatus', align: 'left', scopedSlots: { customRender: 'outstatus' }, sorter: (a, b) => b.outstatus - a.outstatus },
-        { title: '端口速率', key: 'speed', align: 'left', scopedSlots: { customRender: 'speed' }, sorter: (a, b) => b.speed - a.speed },
-        { title: '采集时间', key: 'lastclock', align: 'left', scopedSlots: { customRender: 'lastclock' } },
-        { title: '操作', key: 'operation', align: 'left', scopedSlots: { customRender: 'operation' } }
+        {
+          title: '状态',
+          key: 'operational_status',
+          align: 'left',
+          scopedSlots: { customRender: 'operational_status' },
+          sorter: (a, b) =>
+            a.operational_status.localeCompare(b.operational_status)
+        },
+        {
+          title: '接口索引',
+          key: 'index',
+          align: 'left',
+          scopedSlots: { customRender: 'index' },
+          sorter: (a, b) => b.index - a.index
+        },
+        {
+          title: '接口名',
+          key: 'name',
+          align: 'left',
+          scopedSlots: { customRender: 'name' }
+        },
+        {
+          title: '接收流量(Kbps)',
+          key: 'bits_received',
+          align: 'left',
+          scopedSlots: { customRender: 'bits_received' },
+          sorter: (a, b) => b.bits_received - a.bits_received
+        },
+        {
+          title: '发送流量(Kbps)',
+          key: 'bits_sent',
+          align: 'left',
+          scopedSlots: { customRender: 'bits_sent' },
+          sorter: (a, b) => b.bits_sent - a.bits_sent
+        },
+        {
+          title: '进丢包/错包',
+          key: 'instatus',
+          align: 'left',
+          scopedSlots: { customRender: 'instatus' },
+          sorter: (a, b) => b.instatus - a.instatus
+        },
+        {
+          title: '出丢包/错包',
+          key: 'outstatus',
+          align: 'left',
+          scopedSlots: { customRender: 'outstatus' },
+          sorter: (a, b) => b.outstatus - a.outstatus
+        },
+        {
+          title: '端口速率',
+          key: 'speed',
+          align: 'left',
+          scopedSlots: { customRender: 'speed' },
+          sorter: (a, b) => b.speed - a.speed
+        },
+        {
+          title: '采集时间',
+          key: 'lastclock',
+          align: 'left',
+          scopedSlots: { customRender: 'lastclock' }
+        },
+        {
+          title: '操作',
+          key: 'operation',
+          align: 'left',
+          scopedSlots: { customRender: 'operation' }
+        }
       ],
       trafficeColumns: [
-        { title: '类型', key: 'name', align: 'left', scopedSlots: { customRender: 'name' } },
-        { title: '最小', key: 'min', align: 'left', scopedSlots: { customRender: 'min' } },
-        { title: '最大', key: 'max', align: 'left', scopedSlots: { customRender: 'max' } },
-        { title: '平均', key: 'avg', align: 'left', scopedSlots: { customRender: 'avg' } },
-        { title: '95th PercAvg', key: 'th_perc_avg', align: 'left', scopedSlots: { customRender: 'th_perc_avg' } },
+        {
+          title: '类型',
+          key: 'name',
+          align: 'left',
+          scopedSlots: { customRender: 'name' }
+        },
+        {
+          title: '最小',
+          key: 'min',
+          align: 'left',
+          scopedSlots: { customRender: 'min' }
+        },
+        {
+          title: '最大',
+          key: 'max',
+          align: 'left',
+          scopedSlots: { customRender: 'max' }
+        },
+        {
+          title: '平均',
+          key: 'avg',
+          align: 'left',
+          scopedSlots: { customRender: 'avg' }
+        },
+        {
+          title: '95th PercAvg',
+          key: 'th_perc_avg',
+          align: 'left',
+          scopedSlots: { customRender: 'th_perc_avg' }
+        }
         // { title: '95th PercVal', key: 'th_perc_val', align: 'left', scopedSlots: { customRender: 'th_perc_val' } },
       ],
       discardedColumns: [
-        { title: '类型', key: 'name', align: 'left', scopedSlots: { customRender: 'name' } },
-        { title: '最小', key: 'min', align: 'left', scopedSlots: { customRender: 'min' } },
-        { title: '最大', key: 'max', align: 'left', scopedSlots: { customRender: 'max' } },
-        { title: '平均', key: 'avg', align: 'left', scopedSlots: { customRender: 'avg' } },
+        {
+          title: '类型',
+          key: 'name',
+          align: 'left',
+          scopedSlots: { customRender: 'name' }
+        },
+        {
+          title: '最小',
+          key: 'min',
+          align: 'left',
+          scopedSlots: { customRender: 'min' }
+        },
+        {
+          title: '最大',
+          key: 'max',
+          align: 'left',
+          scopedSlots: { customRender: 'max' }
+        },
+        {
+          title: '平均',
+          key: 'avg',
+          align: 'left',
+          scopedSlots: { customRender: 'avg' }
+        }
       ],
       pagination: {
-        total: 0, current: 1, "show-quick-jumper": true, "page-size-options": ["10", "20", "30", "40", "50", "100", "200"],
-        pageSize: 10, "show-size-changer": true, "show-total": (total) => `共 ${total} 条数据`
+        total: 0,
+        current: 1,
+        'show-quick-jumper': true,
+        'page-size-options': ['10', '20', '30', '40', '50', '100', '200'],
+        pageSize: 10,
+        'show-size-changer': true,
+        'show-total': (total) => `共 ${total} 条数据`
       },
-      timeValue: "",
+      timeValue: '',
       //trafficQuery
-      index: "",
-      name: "",
-      bits_received_itemid: "",
-      bits_received_value_type: "",
-      bits_sent_itemid: "",
-      bits_sent_value_type: "",
-      in_discarded_itemid: "",
-      in_discarded_value_type: "",
-      in_errors_itemid: "",
-      in_errors_value_type: "",
-      operational_status_itemid: "",
-      operational_status_value_type: "",
-      out_discarded_itemid: "",
-      out_discarded_value_type: "",
-      out_errors_itemid: "",
-      out_errors_value_type: "",
-      beginTime: "",
-      endTime: "",
+      index: '',
+      name: '',
+      bits_received_itemid: '',
+      bits_received_value_type: '',
+      bits_sent_itemid: '',
+      bits_sent_value_type: '',
+      in_discarded_itemid: '',
+      in_discarded_value_type: '',
+      in_errors_itemid: '',
+      in_errors_value_type: '',
+      operational_status_itemid: '',
+      operational_status_value_type: '',
+      out_discarded_itemid: '',
+      out_discarded_value_type: '',
+      out_errors_itemid: '',
+      out_errors_value_type: '',
+      beginTime: '',
+      endTime: '',
       //sync
       firstChart: null,
       secondChart: null,
       thirdChart: null,
-      fourthChart: null,
-    };
+      fourthChart: null
+    }
   },
   created() {
-    this.dates = new Date().getTime();
+    this.dates = new Date().getTime()
     let ntime = new Date(),
-      qtime = new Date(new Date().getTime() - 2 * 60 * 60 * 1000);
-    this.beginTime = parseTimeFun(qtime);
-    this.endTime = parseTimeFun(ntime);
+      qtime = new Date(new Date().getTime() - 2 * 60 * 60 * 1000)
+    this.beginTime = parseTimeFun(qtime)
+    this.endTime = parseTimeFun(ntime)
     this.timeValue = [
-      moment(qtime, "YYYY-MM-DD HH:mm:ss"),
-      moment(ntime, "YYYY-MM-DD HH:mm:ss"),
-    ];
-    this.dater = parseTimeFun(this.dates);
-    this.id = this.$route.query.id || "";
-    this.init();
+      moment(qtime, 'YYYY-MM-DD HH:mm:ss'),
+      moment(ntime, 'YYYY-MM-DD HH:mm:ss')
+    ]
+    this.dater = parseTimeFun(this.dates)
+    this.id = this.$route.query.id || ''
+    this.init()
   },
   filters: {
     SpeedToSize(bytes) {
-      var sizes = ['B', 'K', 'M', 'G', 'T'];
-      if (bytes == 0) return '';
-      var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1000)));
-      return Math.round(bytes / Math.pow(1000, i), 2) + '' + sizes[i];
+      var sizes = ['B', 'K', 'M', 'G', 'T']
+      if (bytes == 0) return ''
+      var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1000)))
+      return Math.round(bytes / Math.pow(1000, i), 2) + '' + sizes[i]
     },
     TrafficBytes(bytes, speed) {
-      if (bytes === 0) return '0/(0.0%)';
+      if (bytes === 0) return '0/(0.0%)'
       let by = bytes / 1000
       var per
       if (speed == 0) {
-        per = by + "(0%)";
+        per = by + '(0%)'
       } else {
-        let pert = bytes / speed * 100
-        per = by + "(" + pert.toFixed(2) + "%)";
+        let pert = (bytes / speed) * 100
+        per = by + '(' + pert.toFixed(2) + '%)'
       }
       return per
     },
     TrafficTBytes(bytes, decimals = 2) {
-      if (bytes === "0.00") return '0 Bytes';
-      const k = 1000;
-      const dm = decimals < 0 ? 0 : decimals;
-      const sizes = ['Bytes', 'KBps', 'MBps', 'GBps', 'TBps', 'PBps', 'EBps', 'ZBps', 'YBps'];
-      const i = Math.floor(Math.log(bytes) / Math.log(k));
-      return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + sizes[i];
+      if (bytes === '0.00') return '0 Bytes'
+      const k = 1000
+      const dm = decimals < 0 ? 0 : decimals
+      const sizes = [
+        'Bytes',
+        'KBps',
+        'MBps',
+        'GBps',
+        'TBps',
+        'PBps',
+        'EBps',
+        'ZBps',
+        'YBps'
+      ]
+      const i = Math.floor(Math.log(bytes) / Math.log(k))
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + sizes[i]
     },
     dataFormat(val) {
       if (val === null || val === undefined || val === '') {
-        return '--';
+        return '--'
       } else {
-        return val.replace(/\s/g, '');
+        return val.replace(/\s/g, '')
       }
     },
     dateFormat(val) {
-      if (val) { //判断是否存在
-        var date = new Date(val * 1000);
-        var year = date.getFullYear();
-        var month = date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1;
-        var day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
-        var hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
-        var minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
-        var seconds = date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
-        return year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds;
+      if (val) {
+        //判断是否存在
+        var date = new Date(val * 1000)
+        var year = date.getFullYear()
+        var month =
+          date.getMonth() + 1 < 10
+            ? '0' + (date.getMonth() + 1)
+            : date.getMonth() + 1
+        var day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
+        var hours =
+          date.getHours() < 10 ? '0' + date.getHours() : date.getHours()
+        var minutes =
+          date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
+        var seconds =
+          date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
+        return (
+          year +
+          '-' +
+          month +
+          '-' +
+          day +
+          ' ' +
+          hours +
+          ':' +
+          minutes +
+          ':' +
+          seconds
+        )
       } else {
-        return "--"
+        return '--'
       }
-    },
+    }
   },
   methods: {
     init() {
-      hostDetail(this.id).then((resp) => {
-        let res = resp.data;
-        this.detail = res;
-
-      }).finally(() => {
-        this.loading = false
-        this.initBaseChart();
-      })
+      hostDetail(this.id)
+        .then((resp) => {
+          let res = resp.data
+          this.detail = res
+        })
+        .finally(() => {
+          this.loading = false
+          this.initBaseChart()
+        })
       this.loading2 = true
-      netInterfaceList(this.id).then((resp) => {
-        let res = resp.data
-        if (res.code == 200) {
-          this.pagination.total = res.data.total
-          this.pagination.current = this.page
-          this.pagination.pageSize = this.pageSize
-          this.list = res.data.items || []
-        }
-      }).finally(() => { this.loading2 = false })
+      netInterfaceList(this.id)
+        .then((resp) => {
+          let res = resp.data
+          if (res.code == 200) {
+            this.pagination.total = res.data.total
+            this.pagination.current = this.page
+            this.pagination.pageSize = this.pageSize
+            this.list = res.data.items || []
+          }
+        })
+        .finally(() => {
+          this.loading2 = false
+        })
     },
     changePage(e) {
       this.page = e.current
@@ -404,21 +557,21 @@ export default {
     },
     restDate() {
       let ntime = new Date(),
-        qtime = new Date(new Date().getTime() - 2 * 60 * 60 * 1000);
-      this.beginTime = parseTimeFun(qtime);
-      this.endTime = parseTimeFun(ntime);
+        qtime = new Date(new Date().getTime() - 2 * 60 * 60 * 1000)
+      this.beginTime = parseTimeFun(qtime)
+      this.endTime = parseTimeFun(ntime)
       this.timeValue = [
-        moment(qtime, "YYYY-MM-DD HH:mm:ss"),
-        moment(ntime, "YYYY-MM-DD HH:mm:ss"),
-      ];
+        moment(qtime, 'YYYY-MM-DD HH:mm:ss'),
+        moment(ntime, 'YYYY-MM-DD HH:mm:ss')
+      ]
     },
     changeCreationTime(e) {
       if (e.length) {
-        this.beginTime = parseTimeFun(new Date(e[0]));
-        this.endTime = parseTimeFun(new Date(e[1]));
+        this.beginTime = parseTimeFun(new Date(e[0]))
+        this.endTime = parseTimeFun(new Date(e[1]))
       } else {
-        this.beginTime = "";
-        this.endTime = "";
+        this.beginTime = ''
+        this.endTime = ''
       }
     },
     handleCancel() {
@@ -426,7 +579,7 @@ export default {
     },
     initBaseChart() {
       //cpu
-      this.myChart = echarts.init(document.getElementById('liquidCPU'));
+      this.myChart = echarts.init(document.getElementById('liquidCPU'))
       this.myChart.setOption(
         {
           series: [
@@ -434,7 +587,7 @@ export default {
               type: 'liquidFill',
               radius: '85%',
               center: ['50%', '50%'],
-              data: [this.detail.cpu_utilization.split(" ")[0] / 100],
+              data: [this.detail.cpu_utilization.split(' ')[0] / 100],
               backgroundStyle: {
                 color: {
                   type: 'linear',
@@ -491,7 +644,7 @@ export default {
               },
               label: {
                 normal: {
-                  formatter: this.detail.cpu_utilization.split(" ")[0] + "%",
+                  formatter: this.detail.cpu_utilization.split(' ')[0] + '%',
                   textStyle: {
                     fontSize: 35
                   }
@@ -501,9 +654,9 @@ export default {
           ]
         },
         true
-      );
+      )
       //memory
-      this.myChart = echarts.init(document.getElementById('liquidMem'));
+      this.myChart = echarts.init(document.getElementById('liquidMem'))
       this.myChart.setOption(
         {
           series: [
@@ -511,7 +664,7 @@ export default {
               type: 'liquidFill',
               radius: '85%',
               center: ['50%', '50%'],
-              data: [this.detail.memory_utilization.split(" ")[0] / 100],
+              data: [this.detail.memory_utilization.split(' ')[0] / 100],
               backgroundStyle: {
                 color: {
                   type: 'linear',
@@ -568,7 +721,7 @@ export default {
               },
               label: {
                 normal: {
-                  formatter: this.detail.memory_utilization.split(" ")[0] + "%",
+                  formatter: this.detail.memory_utilization.split(' ')[0] + '%',
                   textStyle: {
                     fontSize: 35
                   }
@@ -578,9 +731,9 @@ export default {
           ]
         },
         true
-      );
+      )
       //pingloss
-      this.myChart = echarts.init(document.getElementById('liquidPingloss'));
+      this.myChart = echarts.init(document.getElementById('liquidPingloss'))
       this.myChart.setOption(
         {
           series: [
@@ -588,20 +741,21 @@ export default {
               type: 'gauge',
               radius: '85%',
               center: ['50%', '50%'],
-              data: [this.detail.ping_loss.split(" ")[0]],
-              detail: { // 中间数据
+              data: [this.detail.ping_loss.split(' ')[0]],
+              detail: {
+                // 中间数据
                 valueAnimation: true,
                 formatter: '{value}%', // 数据值的样式
                 textStyle: {
                   fontSize: 14
                 },
                 offsetCenter: [0, '80%'] // 中间值的位置
-              },
+              }
             }
           ]
         },
         true
-      );
+      )
     },
     trafficeQuery() {
       netInterfaceData({
@@ -616,15 +770,16 @@ export default {
         in_errors_itemid: this.record.in_errors_itemid,
         in_errors_value_type: this.record.in_errors_value_type,
         operational_status_itemid: this.record.operational_status_itemid,
-        operational_status_value_type: this.record.operational_status_value_type,
+        operational_status_value_type:
+          this.record.operational_status_value_type,
         out_discarded_itemid: this.record.out_discarded_itemid,
         out_discarded_value_type: this.record.out_discarded_value_type,
         out_errors_itemid: this.record.out_errors_itemid,
         out_errors_value_type: this.record.out_errors_itemid,
         begin: this.beginTime,
-        end: this.endTime,
+        end: this.endTime
       }).then((resp) => {
-        let res = resp.data;
+        let res = resp.data
         this.loading3 = false
         //流量
         this.trafficeSeries.xAxis = res.traffic_series.xAxis
@@ -647,15 +802,15 @@ export default {
         //端口状态
         this.operationalSeries.xAxis = res.operational_status_series.xAxis
         this.operationalSeries.yAxis = res.operational_status_series.yAxis
-        this.operationalSeries.legend = res.operational_status_series.legend.data
+        this.operationalSeries.legend =
+          res.operational_status_series.legend.data
         this.operationalSeries.list = res.operational_status_series.table || []
         this.operationalSeries.title = '接口' + this.record.name + '端口状态'
-        echarts.connect('group1');
+        echarts.connect('group1')
         this.initTrafficChart()
         this.initDiscardedChart()
         this.initErrorsChart()
         this.initOperationalChart()
-
       })
     },
     onSelectChange(selectedRowKeys) {
@@ -711,82 +866,109 @@ export default {
               //optionToContent为重画表格的函数
               optionToContent: function (opt) {
                 //axisData是你想定义的表格第一列的数据，我这里设置为柱形图的x轴数据
-                var axisData = opt.xAxis[0].data;
+                var axisData = opt.xAxis[0].data
                 //tAxis[0]为你想定义的表格第一行的数据
-                var txisData = opt.series;
-                var series = opt.series;
+                var txisData = opt.series
+                var series = opt.series
                 //表头
-                var tdHeads = '<td  style="padding: 0 10px"></td>';
-                var tdBodys = '';
-                var nameData = txisData;
+                var tdHeads = '<td  style="padding: 0 10px"></td>'
+                var tdBodys = ''
+                var nameData = txisData
                 for (var i = 0; i < nameData.length; i++) {
-                  tdHeads += '<td style="padding: 0 10px">' + nameData[i].name + '</ td >';
+                  tdHeads +=
+                    '<td style="padding: 0 10px">' +
+                    nameData[i].name +
+                    '</ td >'
                 }
-                var table = '<table id="Mytable" border="1" class="table table-bordered table-striped table-hover" style="width:100%;text-align:center" ><tbody><tr>' + tdHeads + ' </tr>';
+                var table =
+                  '<table id="Mytable" border="1" class="table table-bordered table-striped table-hover" style="width:100%;text-align:center" ><tbody><tr>' +
+                  tdHeads +
+                  ' </tr>'
                 for (var i = 0, l = axisData.length; i < l; i++) {
                   for (var j = 0; j < series.length; j++) {
-                    var temp = series[j].data[i];
+                    var temp = series[j].data[i]
                     if (temp != null && temp != undefined) {
-                      tdBodys += '<td>' + temp + '</td>';
+                      tdBodys += '<td>' + temp + '</td>'
                     } else {
-                      tdBodys += '<td></td>';
+                      tdBodys += '<td></td>'
                     }
                   }
-                  table += '<tr><td style="padding: 0 10px">' + axisData[i] + '</td>' + tdBodys + '</tr>';
-                  tdBodys = '';
+                  table +=
+                    '<tr><td style="padding: 0 10px">' +
+                    axisData[i] +
+                    '</td>' +
+                    tdBodys +
+                    '</tr>'
+                  tdBodys = ''
                 }
-                table += '</tbody></table>';
-                return table;
+                table += '</tbody></table>'
+                return table
               },
               //contentToOption为重写“刷新”按钮的语句
               contentToOption: function (HTMLDomElement, opt) {
                 let et = XLSX.utils.table_to_book(
-                  document.getElementById("Mytable")
-                );
+                  document.getElementById('Mytable')
+                )
                 let etout = XLSX.write(et, {
-                  bookType: "xlsx",
+                  bookType: 'xlsx',
                   bookSST: true,
-                  type: "array",
-                });
+                  type: 'array'
+                })
                 try {
                   FileSaver.saveAs(
                     new Blob([etout], {
-                      type: "application/octet-stream",
+                      type: 'application/octet-stream'
                     }),
-                    opt.title[0].text + "-" + new Date().toLocaleString() + ".xlsx"
-                  );
-                } catch (e) {
-                }
-                return etout;
-              },
-            },
+                    opt.title[0].text +
+                      '-' +
+                      new Date().toLocaleString() +
+                      '.xlsx'
+                  )
+                } catch (e) {}
+                return etout
+              }
+            }
           },
-          left: "5%",
+          left: '5%'
         },
         tooltip: {
           trigger: 'axis',
           formatter: function (value) {
             //这里的value[0].value就是我需要每次显示在图上的数据
             if (value[0].value <= 0) {
-              value[0].value = '0B';
+              value[0].value = '0B'
             } else {
-              var k = 1000;
-              var sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-              var v1 = Math.floor(Math.log(value[0].value) / Math.log(k));
-              var v2 = Math.floor(Math.log(value[1].value) / Math.log(k));
-              value[0].value = (value[0].value / Math.pow(k, v1)).toPrecision(3) + ' ' + sizes[v1];
-              value[1].value = (value[1].value / Math.pow(k, v2)).toPrecision(3) + ' ' + sizes[v2];
+              var k = 1000
+              var sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+              var v1 = Math.floor(Math.log(value[0].value) / Math.log(k))
+              var v2 = Math.floor(Math.log(value[1].value) / Math.log(k))
+              value[0].value =
+                (value[0].value / Math.pow(k, v1)).toPrecision(3) +
+                ' ' +
+                sizes[v1]
+              value[1].value =
+                (value[1].value / Math.pow(k, v2)).toPrecision(3) +
+                ' ' +
+                sizes[v2]
             }
-            return value[0].axisValue + "<br/>" +
-              value[0].seriesName + " :" + value[0].value + "<br/>" +
-              value[1].seriesName + " :" + value[1].value;
+            return (
+              value[0].axisValue +
+              '<br/>' +
+              value[0].seriesName +
+              ' :' +
+              value[0].value +
+              '<br/>' +
+              value[1].seriesName +
+              ' :' +
+              value[1].value
+            )
           }
         },
         legend: {
           data: this.trafficeSeries.legend,
           icon: 'rect',
           right: '4%',
-          orient: 'vertical',
+          orient: 'vertical'
         },
         xAxis: this.trafficeSeries.xAxis,
         yAxis: {
@@ -794,19 +976,19 @@ export default {
           scale: true,
           axisLabel: {
             formatter: function (value) {
-              if ((value / (1024 * 1024 * 1024)) > 1) {
-                return (value / (1024 * 1024 * 1024)).toFixed(2) + " GB";
-              } else if ((value / (1024 * 1024)) > 1) {
-                return (value / (1024 * 1024)).toFixed(2) + " MB";
-              } else if ((value / 1024) > 1) {
-                return (value / 1024).toFixed(2) + " KB";
+              if (value / (1024 * 1024 * 1024) > 1) {
+                return (value / (1024 * 1024 * 1024)).toFixed(2) + ' GB'
+              } else if (value / (1024 * 1024) > 1) {
+                return (value / (1024 * 1024)).toFixed(2) + ' MB'
+              } else if (value / 1024 > 1) {
+                return (value / 1024).toFixed(2) + ' KB'
               } else {
-                return value + " B";
+                return value + ' B'
               }
             }
           }
         },
-        series: this.trafficeSeries.yAxis,
+        series: this.trafficeSeries.yAxis
       }
       chart.setOption(option)
       chart.dispatchAction({
@@ -814,8 +996,8 @@ export default {
         key: 'dataZoomSelect',
         dataZoomSelectActive: true
       })
-      chart.group = 'group1';
-      this.firstChart = chart;
+      chart.group = 'group1'
+      this.firstChart = chart
     },
     initDiscardedChart() {
       const chart = echarts.init(document.getElementById('discardedChart'))
@@ -840,72 +1022,93 @@ export default {
               //optionToContent为重画表格的函数
               optionToContent: function (opt) {
                 //axisData是你想定义的表格第一列的数据，我这里设置为柱形图的x轴数据
-                var axisData = opt.xAxis[0].data;
+                var axisData = opt.xAxis[0].data
                 //tAxis[0]为你想定义的表格第一行的数据
-                var txisData = opt.series;
-                var series = opt.series;
+                var txisData = opt.series
+                var series = opt.series
                 //表头
-                var tdHeads = '<td  style="padding: 0 10px"></td>';
-                var tdBodys = '';
-                var nameData = txisData;
+                var tdHeads = '<td  style="padding: 0 10px"></td>'
+                var tdBodys = ''
+                var nameData = txisData
                 for (var i = 0; i < nameData.length; i++) {
-                  tdHeads += '<td style="padding: 0 10px">' + nameData[i].name + '</ td >';
+                  tdHeads +=
+                    '<td style="padding: 0 10px">' +
+                    nameData[i].name +
+                    '</ td >'
                 }
-                var table = '<table id="Mytable" border="1" class="table table-bordered table-striped table-hover" style="width:100%;text-align:center" ><tbody><tr>' + tdHeads + ' </tr>';
+                var table =
+                  '<table id="Mytable" border="1" class="table table-bordered table-striped table-hover" style="width:100%;text-align:center" ><tbody><tr>' +
+                  tdHeads +
+                  ' </tr>'
                 for (var i = 0, l = axisData.length; i < l; i++) {
                   for (var j = 0; j < series.length; j++) {
-                    var temp = series[j].data[i];
+                    var temp = series[j].data[i]
                     if (temp != null && temp != undefined) {
-                      tdBodys += '<td>' + temp + '</td>';
+                      tdBodys += '<td>' + temp + '</td>'
                     } else {
-                      tdBodys += '<td></td>';
+                      tdBodys += '<td></td>'
                     }
                   }
-                  table += '<tr><td style="padding: 0 10px">' + axisData[i] + '</td>' + tdBodys + '</tr>';
-                  tdBodys = '';
+                  table +=
+                    '<tr><td style="padding: 0 10px">' +
+                    axisData[i] +
+                    '</td>' +
+                    tdBodys +
+                    '</tr>'
+                  tdBodys = ''
                 }
-                table += '</tbody></table>';
-                return table;
+                table += '</tbody></table>'
+                return table
               },
               //contentToOption为重写“刷新”按钮的语句
               contentToOption: function (HTMLDomElement, opt) {
                 let et = XLSX.utils.table_to_book(
-                  document.getElementById("Mytable")
-                );
+                  document.getElementById('Mytable')
+                )
                 let etout = XLSX.write(et, {
-                  bookType: "xlsx",
+                  bookType: 'xlsx',
                   bookSST: true,
-                  type: "array",
-                });
+                  type: 'array'
+                })
                 try {
                   FileSaver.saveAs(
                     new Blob([etout], {
-                      type: "application/octet-stream",
+                      type: 'application/octet-stream'
                     }),
-                    opt.title[0].text + "-" + new Date().toLocaleString() + ".xlsx"
-                  );
-                } catch (e) {
-                }
-                return etout;
-              },
-            },
+                    opt.title[0].text +
+                      '-' +
+                      new Date().toLocaleString() +
+                      '.xlsx'
+                  )
+                } catch (e) {}
+                return etout
+              }
+            }
           },
-          left: "5%",
+          left: '5%'
         },
         tooltip: {
           trigger: 'axis',
           formatter: function (value) {
             //这里的value[0].value就是我需要每次显示在图上的数据
-            return value[0].axisValue + "<br/>" +
-              value[0].seriesName + " :" + value[0].value + "<br/>" +
-              value[1].seriesName + " :" + value[1].value;
+            return (
+              value[0].axisValue +
+              '<br/>' +
+              value[0].seriesName +
+              ' :' +
+              value[0].value +
+              '<br/>' +
+              value[1].seriesName +
+              ' :' +
+              value[1].value
+            )
           }
         },
         legend: {
           data: this.diescardedSeries.legend,
           icon: 'rect',
           right: '4%',
-          orient: 'vertical',
+          orient: 'vertical'
         },
         xAxis: this.diescardedSeries.xAxis,
         yAxis: {
@@ -917,9 +1120,9 @@ export default {
           // boundaryGap: [0, '30%'],//坐标轴两边留白策略
           splitLine: {
             show: true
-          },
+          }
         },
-        series: this.diescardedSeries.yAxis,
+        series: this.diescardedSeries.yAxis
       }
       chart.setOption(option)
       chart.dispatchAction({
@@ -927,8 +1130,8 @@ export default {
         key: 'dataZoomSelect',
         dataZoomSelectActive: true
       })
-      chart.group = 'group1';
-      this.secondChart = chart;
+      chart.group = 'group1'
+      this.secondChart = chart
     },
     initErrorsChart() {
       const chart = echarts.init(document.getElementById('errorsChart'))
@@ -953,72 +1156,93 @@ export default {
               //optionToContent为重画表格的函数
               optionToContent: function (opt) {
                 //axisData是你想定义的表格第一列的数据，我这里设置为柱形图的x轴数据
-                var axisData = opt.xAxis[0].data;
+                var axisData = opt.xAxis[0].data
                 //tAxis[0]为你想定义的表格第一行的数据
-                var txisData = opt.series;
-                var series = opt.series;
+                var txisData = opt.series
+                var series = opt.series
                 //表头
-                var tdHeads = '<td  style="padding: 0 10px"></td>';
-                var tdBodys = '';
-                var nameData = txisData;
+                var tdHeads = '<td  style="padding: 0 10px"></td>'
+                var tdBodys = ''
+                var nameData = txisData
                 for (var i = 0; i < nameData.length; i++) {
-                  tdHeads += '<td style="padding: 0 10px">' + nameData[i].name + '</ td >';
+                  tdHeads +=
+                    '<td style="padding: 0 10px">' +
+                    nameData[i].name +
+                    '</ td >'
                 }
-                var table = '<table id="Mytable" border="1" class="table table-bordered table-striped table-hover" style="width:100%;text-align:center" ><tbody><tr>' + tdHeads + ' </tr>';
+                var table =
+                  '<table id="Mytable" border="1" class="table table-bordered table-striped table-hover" style="width:100%;text-align:center" ><tbody><tr>' +
+                  tdHeads +
+                  ' </tr>'
                 for (var i = 0, l = axisData.length; i < l; i++) {
                   for (var j = 0; j < series.length; j++) {
-                    var temp = series[j].data[i];
+                    var temp = series[j].data[i]
                     if (temp != null && temp != undefined) {
-                      tdBodys += '<td>' + temp + '</td>';
+                      tdBodys += '<td>' + temp + '</td>'
                     } else {
-                      tdBodys += '<td></td>';
+                      tdBodys += '<td></td>'
                     }
                   }
-                  table += '<tr><td style="padding: 0 10px">' + axisData[i] + '</td>' + tdBodys + '</tr>';
-                  tdBodys = '';
+                  table +=
+                    '<tr><td style="padding: 0 10px">' +
+                    axisData[i] +
+                    '</td>' +
+                    tdBodys +
+                    '</tr>'
+                  tdBodys = ''
                 }
-                table += '</tbody></table>';
-                return table;
+                table += '</tbody></table>'
+                return table
               },
               //contentToOption为重写“刷新”按钮的语句
               contentToOption: function (HTMLDomElement, opt) {
                 let et = XLSX.utils.table_to_book(
-                  document.getElementById("Mytable")
-                );
+                  document.getElementById('Mytable')
+                )
                 let etout = XLSX.write(et, {
-                  bookType: "xlsx",
+                  bookType: 'xlsx',
                   bookSST: true,
-                  type: "array",
-                });
+                  type: 'array'
+                })
                 try {
                   FileSaver.saveAs(
                     new Blob([etout], {
-                      type: "application/octet-stream",
+                      type: 'application/octet-stream'
                     }),
-                    opt.title[0].text + "-" + new Date().toLocaleString() + ".xlsx"
-                  );
-                } catch (e) {
-                }
-                return etout;
-              },
-            },
+                    opt.title[0].text +
+                      '-' +
+                      new Date().toLocaleString() +
+                      '.xlsx'
+                  )
+                } catch (e) {}
+                return etout
+              }
+            }
           },
-          left: "5%",
+          left: '5%'
         },
         tooltip: {
           trigger: 'axis',
           formatter: function (value) {
             //这里的value[0].value就是我需要每次显示在图上的数据
-            return value[0].axisValue + "<br/>" +
-              value[0].seriesName + " :" + value[0].value + "<br/>" +
-              value[1].seriesName + " :" + value[1].value;
+            return (
+              value[0].axisValue +
+              '<br/>' +
+              value[0].seriesName +
+              ' :' +
+              value[0].value +
+              '<br/>' +
+              value[1].seriesName +
+              ' :' +
+              value[1].value
+            )
           }
         },
         legend: {
           data: this.errorsSeries.legend,
           icon: 'rect',
           right: '4%',
-          orient: 'vertical',
+          orient: 'vertical'
         },
         xAxis: this.errorsSeries.xAxis,
         yAxis: {
@@ -1030,9 +1254,9 @@ export default {
           // boundaryGap: [0, '30%'],//坐标轴两边留白策略
           splitLine: {
             show: true
-          },
+          }
         },
-        series: this.errorsSeries.yAxis,
+        series: this.errorsSeries.yAxis
       }
       chart.setOption(option)
       chart.dispatchAction({
@@ -1040,8 +1264,8 @@ export default {
         key: 'dataZoomSelect',
         dataZoomSelectActive: true
       })
-      chart.group = 'group1';
-      this.thirdChart = chart;
+      chart.group = 'group1'
+      this.thirdChart = chart
     },
     //端口状态
     initOperationalChart() {
@@ -1067,71 +1291,89 @@ export default {
               //optionToContent为重画表格的函数
               optionToContent: function (opt) {
                 //axisData是你想定义的表格第一列的数据，我这里设置为柱形图的x轴数据
-                var axisData = opt.xAxis[0].data;
+                var axisData = opt.xAxis[0].data
                 //tAxis[0]为你想定义的表格第一行的数据
-                var txisData = opt.series;
-                var series = opt.series;
+                var txisData = opt.series
+                var series = opt.series
                 //表头
-                var tdHeads = '<td  style="padding: 0 10px"></td>';
-                var tdBodys = '';
-                var nameData = txisData;
+                var tdHeads = '<td  style="padding: 0 10px"></td>'
+                var tdBodys = ''
+                var nameData = txisData
                 for (var i = 0; i < nameData.length; i++) {
-                  tdHeads += '<td style="padding: 0 10px">' + nameData[i].name + '</ td >';
+                  tdHeads +=
+                    '<td style="padding: 0 10px">' +
+                    nameData[i].name +
+                    '</ td >'
                 }
-                var table = '<table id="Mytable" border="1" class="table table-bordered table-striped table-hover" style="width:100%;text-align:center" ><tbody><tr>' + tdHeads + ' </tr>';
+                var table =
+                  '<table id="Mytable" border="1" class="table table-bordered table-striped table-hover" style="width:100%;text-align:center" ><tbody><tr>' +
+                  tdHeads +
+                  ' </tr>'
                 for (var i = 0, l = axisData.length; i < l; i++) {
                   for (var j = 0; j < series.length; j++) {
-                    var temp = series[j].data[i];
+                    var temp = series[j].data[i]
                     if (temp != null && temp != undefined) {
-                      tdBodys += '<td>' + temp + '</td>';
+                      tdBodys += '<td>' + temp + '</td>'
                     } else {
-                      tdBodys += '<td></td>';
+                      tdBodys += '<td></td>'
                     }
                   }
-                  table += '<tr><td style="padding: 0 10px">' + axisData[i] + '</td>' + tdBodys + '</tr>';
-                  tdBodys = '';
+                  table +=
+                    '<tr><td style="padding: 0 10px">' +
+                    axisData[i] +
+                    '</td>' +
+                    tdBodys +
+                    '</tr>'
+                  tdBodys = ''
                 }
-                table += '</tbody></table>';
-                return table;
+                table += '</tbody></table>'
+                return table
               },
               //contentToOption为重写“刷新”按钮的语句
               contentToOption: function (HTMLDomElement, opt) {
                 let et = XLSX.utils.table_to_book(
-                  document.getElementById("Mytable")
-                );
+                  document.getElementById('Mytable')
+                )
                 let etout = XLSX.write(et, {
-                  bookType: "xlsx",
+                  bookType: 'xlsx',
                   bookSST: true,
-                  type: "array",
-                });
+                  type: 'array'
+                })
                 try {
                   FileSaver.saveAs(
                     new Blob([etout], {
-                      type: "application/octet-stream",
+                      type: 'application/octet-stream'
                     }),
-                    opt.title[0].text + "-" + new Date().toLocaleString() + ".xlsx"
-                  );
-                } catch (e) {
-                }
-                return etout;
-              },
-            },
+                    opt.title[0].text +
+                      '-' +
+                      new Date().toLocaleString() +
+                      '.xlsx'
+                  )
+                } catch (e) {}
+                return etout
+              }
+            }
           },
-          left: "5%",
+          left: '5%'
         },
         tooltip: {
           trigger: 'axis',
           formatter: function (value) {
             //这里的value[0].value就是我需要每次显示在图上的数据
-            return value[0].axisValue + "<br/>" +
-              value[0].seriesName + " :" + value[0].value
+            return (
+              value[0].axisValue +
+              '<br/>' +
+              value[0].seriesName +
+              ' :' +
+              value[0].value
+            )
           }
         },
         legend: {
           data: this.operationalSeries.legend,
           icon: 'rect',
           right: '4%',
-          orient: 'vertical',
+          orient: 'vertical'
         },
         xAxis: this.operationalSeries.xAxis,
         yAxis: {
@@ -1143,9 +1385,9 @@ export default {
           // boundaryGap: [0, '30%'],//坐标轴两边留白策略
           splitLine: {
             show: true
-          },
+          }
         },
-        series: this.operationalSeries.yAxis,
+        series: this.operationalSeries.yAxis
       }
       chart.setOption(option)
       chart.dispatchAction({
@@ -1153,8 +1395,8 @@ export default {
         key: 'dataZoomSelect',
         dataZoomSelectActive: true
       })
-      chart.group = 'group1';
-      this.fourthChart = chart;
+      chart.group = 'group1'
+      this.fourthChart = chart
     },
     seeDetail(record) {
       this.visible = true
@@ -1177,9 +1419,9 @@ export default {
         out_errors_itemid: record.out_errors_itemid,
         out_errors_value_type: record.out_errors_itemid,
         begin: this.beginTime,
-        end: this.endTime,
+        end: this.endTime
       }).then((resp) => {
-        let res = resp.data;
+        let res = resp.data
         this.loading3 = false
         //流量
         this.trafficeSeries.xAxis = res.traffic_series.xAxis
@@ -1202,10 +1444,11 @@ export default {
         //端口状态
         this.operationalSeries.xAxis = res.operational_status_series.xAxis
         this.operationalSeries.yAxis = res.operational_status_series.yAxis
-        this.operationalSeries.legend = res.operational_status_series.legend.data
+        this.operationalSeries.legend =
+          res.operational_status_series.legend.data
         this.operationalSeries.list = res.operational_status_series.table || []
         this.operationalSeries.title = '接口' + record.name + '端口状态'
-        echarts.connect('group1');
+        echarts.connect('group1')
         this.initTrafficChart()
         this.initDiscardedChart()
         this.initErrorsChart()
@@ -1213,9 +1456,9 @@ export default {
       })
     },
     handleOk() {
-      console.log("ok")
-    },
-    // 
+      console.log('ok')
+    }
+    //
     // Rowclick(record, index) {
     //   return {
     //     on: {
@@ -1227,8 +1470,8 @@ export default {
     //     }
     //   };
     // },
-  },
-};
+  }
+}
 </script>
 
 <style lang="less" scoped>

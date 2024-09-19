@@ -48,91 +48,223 @@
           </a-tooltip>
         </span>
         <span slot="operation" slot-scope="record">
+          <a-button class="pd20 paddingleft0" type="link" size="small" @click="seeGraph(record)">查看图形</a-button>
           <a-button class="pd20 paddingleft0" type="link" size="small" @click="seeDetail(record)">详细信息</a-button>
         </span>
       </a-table>
+      <a-modal :visible="visible" width="1400px" title="图形查看" @ok="handleCancel" @cancel="handleCancel">
+        <a-row>
+          <a-col>
+            <a-form-model class="time-select" layout="inline" style=" display: flex; justify-content: center; align-items: center; width: 80%; height: 10%; margin: 0 auto;" :colon='false'>
+              <a-form-model-item label="时间">
+                <a-range-picker format="YYYY-MM-DD HH:mm:ss" :show-time="{ format: 'HH:mm', defaultValue:[moment('00:00:00', 'HH:mm:ss'),moment('23:59:59', 'HH:mm:ss')]}" v-model="timeValue"
+                  @change="changeCreationTime" :getCalendarContainer="triggerNode=>{return triggerNode.parentNode || document.body}" />
+              </a-form-model-item>
+              <a-form-model-item>
+                <a-button :style="{ marginRight: '10px' }" type="primary" @click="Query">查询</a-button>
+                <a-button @click="restDate">重置</a-button>
+              </a-form-model-item>
+            </a-form-model>
+          </a-col>
+        </a-row>
+        <a-row>
+          <a-col>
+            <div class="png-data-container">
+
+              <div v-for="item in sortedPngData" :key="item.name" class="png-data-item">
+                <h3 style="">{{ item.name }}</h3>
+                <div class="png-container">
+                  <img :src="`data:image/png;base64,${item.png}`" :alt="item.name" />
+                </div>
+              </div>
+            </div>
+          </a-col>
+        </a-row>
+      </a-modal>
     </div>
   </page-layout>
 </template>
 
 <script>
-import PageLayout from "@/layouts/PageLayout";
-import { hostList, hostExport } from "@/services/admin";
+import PageLayout from '@/layouts/PageLayout'
+import { hostList, hostExport, hostGraph } from '@/services/admin'
+import moment from 'moment'
+import { parseTimeFun } from '@/utils/formatter'
+import echarts from 'echarts'
+import FileSaver from 'file-saver'
+import XLSX from 'xlsx'
+require('echarts-liquidfill')
 export default {
-  name: "LinuxList",
+  name: 'LinuxList',
   components: {
-    PageLayout,
+    PageLayout
   },
   data() {
     return {
+      moment,
       page: 1,
       pageSize: 10,
-      hosts: "",
-      ip: "",
-      available: "",
-      interfaces: "",
-      hosttype: "VM_LIN",
+      hosts: '',
+      ip: '',
+      available: '',
+      interfaces: '',
+      hosttype: 'VM_LIN',
       loading: false,
+      visible: false,
+      timeValue: '',
+      beginTime: '',
+      endTime: '',
       availableOption: [
-        { label: "正常", value: "1" },
-        { label: "异常", value: "2" },
+        { label: '正常', value: '1' },
+        { label: '异常', value: '2' }
       ],
       columns: [
-        { title: "主机ID", key: "hostid", align: "left", scopedSlots: { customRender: "hostid" }, },
-        { title: "主机名", key: "name", align: "left", scopedSlots: { customRender: "name" }, },
-        { title: "IP地址", key: "interfaces", align: "left", scopedSlots: { customRender: "interfaces" }, },
-        { title: "内核版本", key: "os", align: "left", scopedSlots: { customRender: "os" }, },
-        { title: "运行时长", key: "uptime", align: "left", scopedSlots: { customRender: "uptime" }, },
-        { title: "CPU使用率", key: "cpu_utilization", align: "left", width: "150px", scopedSlots: { customRender: "cpu_utilization" }, },
-        { title: "内存使用率", key: "memory_utilization", align: "left", width: "150px", scopedSlots: { customRender: "memory_utilization" }, },
-        { title: "Ping(Sec/Loss)", key: "ping", align: "left", scopedSlots: { customRender: "ping" }, },
-        { title: "采集状态", key: "available", align: "left", scopedSlots: { customRender: "available" }, },
-        { title: "操作", key: "operation", align: "center", scopedSlots: { customRender: "operation" } },
+        {
+          title: '主机ID',
+          key: 'hostid',
+          align: 'left',
+          scopedSlots: { customRender: 'hostid' }
+        },
+        {
+          title: '主机名',
+          key: 'name',
+          align: 'left',
+          scopedSlots: { customRender: 'name' }
+        },
+        {
+          title: 'IP地址',
+          key: 'interfaces',
+          align: 'left',
+          scopedSlots: { customRender: 'interfaces' }
+        },
+        {
+          title: '内核版本',
+          key: 'os',
+          align: 'left',
+          scopedSlots: { customRender: 'os' }
+        },
+        {
+          title: '运行时长',
+          key: 'uptime',
+          align: 'left',
+          scopedSlots: { customRender: 'uptime' }
+        },
+        {
+          title: 'CPU使用率',
+          key: 'cpu_utilization',
+          align: 'left',
+          width: '150px',
+          scopedSlots: { customRender: 'cpu_utilization' }
+        },
+        {
+          title: '内存使用率',
+          key: 'memory_utilization',
+          align: 'left',
+          width: '150px',
+          scopedSlots: { customRender: 'memory_utilization' }
+        },
+        {
+          title: 'Ping(Sec/Loss)',
+          key: 'ping',
+          align: 'left',
+          scopedSlots: { customRender: 'ping' }
+        },
+        {
+          title: '采集状态',
+          key: 'available',
+          align: 'left',
+          scopedSlots: { customRender: 'available' }
+        },
+        {
+          title: '操作',
+          key: 'operation',
+          align: 'center',
+          scopedSlots: { customRender: 'operation' }
+        }
       ],
       list: [],
+      pngData: [],
+      sortedPngData: [],
       pagination: {
         total: 0,
         current: 1,
-        "show-quick-jumper": true,
-        "page-size-options": ["10", "20", "30", "40", "50", "100", "200"],
+        'show-quick-jumper': true,
+        'page-size-options': ['10', '20', '30', '40', '50', '100', '200'],
         pageSize: 10,
-        "show-size-changer": true,
-        "show-total": (total) => `共 ${total} 条数据`,
+        'show-size-changer': true,
+        'show-total': (total) => `共 ${total} 条数据`
       },
-    };
+      pagination: {
+        total: 0,
+        current: 1,
+        'show-quick-jumper': true,
+        'page-size-options': ['10', '20', '30', '40', '50', '100', '200'],
+        pageSize: 10,
+        'show-size-changer': true,
+        'show-total': (total) => `共 ${total} 条数据`
+      }
+    }
   },
   created() {
-    this.init();
+    this.dates = new Date().getTime()
+    let ntime = new Date(),
+      qtime = new Date(new Date().getTime() - 2 * 60 * 60 * 1000)
+    this.beginTime = parseTimeFun(qtime)
+    this.endTime = parseTimeFun(ntime)
+    this.timeValue = [
+      moment(qtime, 'YYYY-MM-DD HH:mm:ss'),
+      moment(ntime, 'YYYY-MM-DD HH:mm:ss')
+    ]
+    this.init()
   },
   methods: {
     init() {
-      this.loading = true;
+      this.loading = true
       hostList({
         page: this.page,
         limit: this.pageSize,
         hosttype: this.hosttype,
         hosts: this.hosts,
         ip: this.interfaces,
-        available: this.available,
+        available: this.available
       })
         .then((resp) => {
-          let res = resp.data;
+          let res = resp.data
           if (res.code == 200) {
-            this.pagination.total = res.data.total;
-            this.pagination.current = this.page;
-            this.pagination.pageSize = this.pageSize;
-            this.list = res.data.items || [];
+            this.pagination.total = res.data.total
+            this.pagination.current = this.page
+            this.pagination.pageSize = this.pageSize
+            this.list = res.data.items || []
           }
         })
         .finally(() => {
-          this.loading = false;
-        });
+          this.loading = false
+        })
+    },
+    changeCreationTime(e) {
+      if (e.length) {
+        this.beginTime = parseTimeFun(new Date(e[0]))
+        this.endTime = parseTimeFun(new Date(e[1]))
+      } else {
+        this.beginTime = ''
+        this.endTime = ''
+      }
+    },
+    restDate() {
+      let ntime = new Date(),
+        qtime = new Date(new Date().getTime() - 2 * 60 * 60 * 1000)
+      this.beginTime = parseTimeFun(qtime)
+      this.endTime = parseTimeFun(ntime)
+      this.timeValue = [
+        moment(qtime, 'YYYY-MM-DD HH:mm:ss'),
+        moment(ntime, 'YYYY-MM-DD HH:mm:ss')
+      ]
     },
     changePage(e) {
       // 切换页码
-      this.page = e.current;
-      this.pageSize = e.pageSize;
-      this.init();
+      this.page = e.current
+      this.pageSize = e.pageSize
+      this.init()
     },
     hostexport() {
       hostExport(
@@ -140,38 +272,93 @@ export default {
           hosttype: this.hosttype,
           hosts: this.hosts,
           ip: this.interfaces,
-          available: this.available,
+          available: this.available
         },
         {
-          responseType: "arraybuffer",
+          responseType: 'arraybuffer'
         }
       ).then((resp) => {
-        let filename = resp.headers["content-disposition"]
-          .split(";")
-          .find((n) => n.includes("filename="))
-          .replace("filename=", "")
-          .trim();
-        const url = window.URL.createObjectURL(new Blob([resp.data]));
-        const link = document.createElement("a");
-        link.href = url;
-        link.setAttribute("download", filename);
-        document.body.appendChild(link);
-        link.click();
-      });
+        let filename = resp.headers['content-disposition']
+          .split(';')
+          .find((n) => n.includes('filename='))
+          .replace('filename=', '')
+          .trim()
+        const url = window.URL.createObjectURL(new Blob([resp.data]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', filename)
+        document.body.appendChild(link)
+        link.click()
+      })
     },
     seeDetail(v) {
-      this.$router.push("/host/lindetail?id=" + v.hostid + "&type=1");
+      this.$router.push('/host/lindetail?id=' + v.hostid + '&type=1')
+    },
+    seeGraph(v) {
+      hostGraph(v.hostid, {
+        start: this.beginTime,
+        end: this.endTime
+      }).then((resp) => {
+        let res = resp.data
+        if (res.code == 200) {
+          this.hostid = v.hostid
+          this.pngData = res.data.items
+          this.sortPngData()
+          this.visible = true
+        }
+      })
+      // this.$router.push("/host/lindetail?id=" + v.hostid + "&type=2");
+      // this.visible = true
+    },
+    Query() {
+      hostGraph(this.hostid, {
+        start: this.beginTime,
+        end: this.endTime
+      }).then((resp) => {
+        let res = resp.data
+        if (res.code == 200) {
+          this.pngData = res.data.items
+          this.sortPngData()
+        }
+      })
+    },
+    sortPngData() {
+      this.sortedPngData = [...this.pngData].sort((a, b) => {
+        return a.name.localeCompare(b.name)
+      })
+    },
+    handleCancel() {
+      this.visible = false
     },
     resetData() {
       if (this.hosts || this.interfaces || this.available) {
-        this.hosts = "";
-        this.interfaces = "";
-        this.available = "";
-        this.init();
+        this.hosts = ''
+        this.interfaces = ''
+        this.available = ''
+        this.init()
       }
     },
-  },
-};
+    restDate() {
+      let ntime = new Date(),
+        qtime = new Date(new Date().getTime() - 2 * 60 * 60 * 1000)
+      this.beginTime = parseTimeFun(qtime)
+      this.endTime = parseTimeFun(ntime)
+      this.timeValue = [
+        moment(qtime, 'YYYY-MM-DD HH:mm:ss'),
+        moment(ntime, 'YYYY-MM-DD HH:mm:ss')
+      ]
+    },
+    changeCreationTime(e) {
+      if (e.length) {
+        this.beginTime = parseTimeFun(new Date(e[0]))
+        this.endTime = parseTimeFun(new Date(e[1]))
+      } else {
+        this.beginTime = ''
+        this.endTime = ''
+      }
+    }
+  }
+}
 </script>
 
 <style lang="less" scoped>
@@ -187,6 +374,12 @@ export default {
 }
 .home-search {
   margin-bottom: 10px;
+}
+.time-select {
+  margin-top: 10px;
+  //水平居中
+
+  display: flex;
 }
 .meta-content {
   position: relative;
@@ -204,5 +397,20 @@ export default {
   /deep/ .ant-progress-text {
     margin-left: 2px;
   }
+}
+.png-data-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.png-data-item {
+  text-align: center;
+  margin: 20px;
+}
+
+.png-container {
+  display: flex;
+  justify-content: center;
 }
 </style>

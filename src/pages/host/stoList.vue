@@ -7,8 +7,8 @@
       <a-form-model-item label="型号">
         <a-input v-model.trim="model" placeholder="型号" />
       </a-form-model-item>
-      <a-form-model-item label="IP">
-        <a-input v-model.trim="interfaces" placeholder="IP" />
+      <a-form-model-item label="管理地址">
+        <a-input v-model.trim="interfaces" placeholder="ip" />
       </a-form-model-item>
       <a-form-model-item label="监控状态">
         <a-select style="width: 80px" v-model.trim="available">
@@ -26,8 +26,10 @@
         <span slot="hostid" slot-scope="record">{{record.hostid}}</span>
         <div slot="name" slot-scope="record">{{record.name}}</div>
         <div slot="model" slot-scope="record">{{record.model}}</div>
-        <div slot="location" slot-scope="record">{{record.location}}</div>
+        <div slot="serial_no" slot-scope="record">{{record.serial_no}}</div>
+        <div slot="os" slot-scope="record">{{record.os}}</div>
         <div slot="interfaces" slot-scope="record">{{record.interfaces}}</div>
+        <div slot="location" slot-scope="record">{{record.location}}</div>
         <span slot="uptime" slot-scope="record">{{record.uptime||'--'}}</span>
         <div slot="cpu_utilization" slot-scope="record">
           <a-progress :percent="parseFloat(record.cpu_utilization || 0)" size="small" status="active" />
@@ -39,7 +41,7 @@
           <a-tag v-if="record.ping.includes('Up')" color="#34af67">Up</a-tag>
           <a-tag v-else-if="record.ping.includes('Down')" color="#DC143C">Down</a-tag>
           <a-tag v-else status="default" color="#808080">Unknown</a-tag>
-          {{record.ping_sec.replace(/\s/g, '') || '--'}}/{{record.ping_loss.replace(/\s/g, '') || '--'}}
+          {{record.ping_sec.replace(/\s/g, '')}}/{{record.ping_loss.replace(/\s/g, '')}}
         </div>
         <span slot="available" slot-scope="record">
           <a-tooltip>
@@ -51,6 +53,7 @@
             <a-tag v-else status="default" text="未知" />
           </a-tooltip>
         </span>
+        <div slot="error" slot-scope="record">{{record.error}}</div>
         <span slot="operation" slot-scope="record">
           <a-button class="pd20 paddingleft0" type="link" size="small" @click="seeDetail(record)">详细信息</a-button>
         </span>
@@ -63,7 +66,7 @@
 import PageLayout from '@/layouts/PageLayout'
 import { hostList, hostExport } from '@/services/admin'
 export default {
-  name: 'NetList',
+  name: 'LinuxList',
   components: {
     PageLayout
   },
@@ -75,9 +78,9 @@ export default {
       model: '',
       ip: '',
       available: '',
-      hosttype: 'HW_NET',
-      loading: false,
+      hosttype: 'HW_STO',
       interfaces: '',
+      loading: false,
       availableOption: [
         { label: '正常', value: '1' },
         { label: '异常', value: '2' }
@@ -86,61 +89,54 @@ export default {
         {
           title: '序号',
           key: 'hostid',
-          align: 'left',
+          align: 'center',
           scopedSlots: { customRender: 'hostid' }
         },
         {
-          title: '设备名称',
+          title: '主机名',
           key: 'name',
-          align: 'left',
+          align: 'center',
           scopedSlots: { customRender: 'name' }
         },
         {
-          title: '设备型号',
+          title: '型号',
           key: 'model',
-          align: 'left',
+          align: 'center',
           scopedSlots: { customRender: 'model' }
         },
         {
-          title: '位置',
-          key: 'location',
-          align: 'left',
-          scopedSlots: { customRender: 'location' }
+          title: '序列号',
+          key: 'serial_no',
+          align: 'center',
+          scopedSlots: { customRender: 'serial_no' }
         },
+        // {
+        //   title: '操作系统',
+        //   key: 'os',
+        //   align: 'center',
+        //   scopedSlots: { customRender: 'os' }
+        // },
         {
-          title: 'IP地址',
+          title: '管理地址',
           key: 'interfaces',
-          align: 'left',
+          align: 'center',
           scopedSlots: { customRender: 'interfaces' }
         },
         {
-          title: '运行时长',
-          key: 'uptime',
-          align: 'left',
-          scopedSlots: { customRender: 'uptime' }
-        },
-
-        {
-          title: 'CPU使用率',
-          key: 'cpu_utilization',
-          align: 'left',
-          scopedSlots: { customRender: 'cpu_utilization' }
-        },
-        {
-          title: '内存使用率',
-          key: 'memory_utilization',
-          align: 'left',
-          scopedSlots: { customRender: 'memory_utilization' }
+          title: '设备位置',
+          key: 'location',
+          align: 'center',
+          scopedSlots: { customRender: 'location' }
         },
         {
           title: 'Ping(Sec/Loss)',
-          key: 'left',
+          key: 'ping',
           align: 'center',
           scopedSlots: { customRender: 'ping' }
         },
         {
           title: '采集状态',
-          key: 'left',
+          key: 'available',
           align: 'center',
           scopedSlots: { customRender: 'available' }
         },
@@ -224,14 +220,11 @@ export default {
       })
     },
     seeDetail(v) {
-      this.$router.push('/net/detail?id=' + v.hostid)
+      this.$router.push('/server/detail?id=' + v.hostid)
     },
     resetData() {
-      if (this.hosts || this.interfaces || this.available || this.model) {
+      if (this.hosts) {
         this.hosts = ''
-        this.model = ''
-        this.interfaces = ''
-        this.available = ''
         this.init()
       }
     }
@@ -258,13 +251,5 @@ export default {
   height: 64px;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
-}
-.linux-list {
-  /deep/ .ant-progress-bg {
-    height: 14px !important;
-  }
-  /deep/ .ant-progress-text {
-    margin-left: 2px;
-  }
 }
 </style>

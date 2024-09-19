@@ -4,7 +4,7 @@
       <div class="header">
         <span class="title">ZbxTable</span>
         <div>
-          <!-- <span class="title" style="font-size: 25px;">智能运维平台</span> -->
+          <span class="title" style="font-size: 25px;"></span>
         </div>
       </div>
       <div class="desc"></div>
@@ -35,43 +35,42 @@
 </template>
 
 <script>
-import CommonLayout from "@/layouts/CommonLayout";
-import { login, getRoutesConfig } from "@/services/user";
-import { setAuthorization } from "@/utils/request";
+import CommonLayout from '@/layouts/CommonLayout'
+import { login, getRoutesConfig } from '@/services/user'
+import { setAuthorization } from '@/utils/request'
 import { loadRoutes } from '@/utils/routerUtil'
-import { mapMutations } from "vuex";
+import { mapMutations } from 'vuex'
 export default {
-  name: "Login",
+  name: 'Login',
   components: { CommonLayout },
   data() {
     return {
       logging: false,
-      error: "",
-      form: this.$form.createForm(this),
-    };
+      error: '',
+      form: this.$form.createForm(this)
+    }
   },
   computed: {
     systemName() {
-      return this.$store.state.setting.systemName;
-    },
-
+      return this.$store.state.setting.systemName
+    }
   },
   methods: {
-    ...mapMutations("account", ["setUser", "setPermissions", "setRoles"]),
+    ...mapMutations('account', ['setUser', 'setPermissions', 'setRoles']),
     onSubmit(e) {
-      e.preventDefault();
+      e.preventDefault()
       this.form.validateFields((err) => {
         if (!err) {
-          this.logging = true;
-          const name = this.form.getFieldValue("name");
-          const password = this.form.getFieldValue("password");
-          login(name, password).then(this.afterLogin);
+          this.logging = true
+          const name = this.form.getFieldValue('name')
+          const password = this.form.getFieldValue('password')
+          login(name, password).then(this.afterLogin)
         }
-      });
+      })
     },
     afterLogin(res) {
-      this.logging = false;
-      const loginRes = res.data;
+      this.logging = false
+      const loginRes = res.data
       if (loginRes.code == 200) {
         const { user, permissions, roles } = loginRes.data
         // let premissions = [{ id: "queryForm", operation: ["add", "edit", 'delete'] }]
@@ -82,23 +81,23 @@ export default {
         //     "https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png",
         //   address: "武汉",
         // };
-        this.setUser(user);
+        this.setUser(user)
         // this.setPermissions(premissions);
-        this.setRoles(roles);
-        setAuthorization({ token: loginRes.data.token });
+        this.setRoles(roles)
+        setAuthorization({ token: loginRes.data.token })
         // 获取路由配置
-        getRoutesConfig().then(result => {
-          const routesConfig = result.data.data.items;
+        getRoutesConfig().then((result) => {
+          const routesConfig = result.data.data.items
           loadRoutes(routesConfig)
-          this.$router.push("/dashboard/workplace");
+          this.$router.push('/dashboard/workplace')
           this.$message.success(loginRes.message, 1)
         })
       } else {
-        this.error = loginRes.message;
+        this.error = loginRes.message
       }
-    },
-  },
-};
+    }
+  }
+}
 </script>
 
 <style lang="less" scoped>

@@ -7,12 +7,12 @@
             <div class="homeMain beauty-scroll">
               <a-timeline>
                 <a-timeline-item v-for="(v, i) in triggerList" :key="i">
-    		  <a-tag v-if="v.severity == 1" color="#7499FF">{{ $t('severity_informational') }}</a-tag>
-    	          <a-tag v-else-if="v.severity == 2" color="#FFC859">{{ $t('severity_warning') }}</a-tag>
-	          <a-tag v-else-if="v.severity == 3" color="#FFA059">{{ $t('severity_average') }}</a-tag>
-	          <a-tag v-else-if="v.severity == 4" color="#E97659">{{ $t('severity_high') }}</a-tag>
-	          <a-tag v-else-if="v.severity == 5" color="#f50000">{{ $t('severity_disaster') }}</a-tag>
-    		  <a-tag v-else color="#97AAB3">{{ $t('severity_unknown') }}</a-tag>
+                  <a-tag v-if="v.severity == 1" color="#7499FF">{{ $t('severity_informational') }}</a-tag>
+                  <a-tag v-else-if="v.severity == 2" color="#FFC859">{{ $t('severity_warning') }}</a-tag>
+                  <a-tag v-else-if="v.severity == 3" color="#FFA059">{{ $t('severity_average') }}</a-tag>
+                  <a-tag v-else-if="v.severity == 4" color="#E97659">{{ $t('severity_high') }}</a-tag>
+                  <a-tag v-else-if="v.severity == 5" color="#f50000">{{ $t('severity_disaster') }}</a-tag>
+                  <a-tag v-else color="#97AAB3">{{ $t('severity_unknown') }}</a-tag>
                   <!-- <a-icon slot="dot" type="minus-circle" v-else-if="v.severity == 2" :style="{ fontSize: '16px', color: '#F56C6C' }" />
                   <a-icon slot="dot" type="exclamation-circle" v-else :style="{ fontSize: '16px', color: '#E6A23C' }" /> -->
                   {{v.lastchange | parsetime}} <b>{{v.name}}</b> {{v.lasteventname}}
@@ -24,12 +24,12 @@
         <a-col :xl="{ span: 12 }" :lg="{ span: 24 }">
           <a-row>
             <a-col :lg="24" :md="24">
-   	      <a-card :title="$t('title_hosttypecount')" :headStyle="{background: '#FAFBFC'}" :bodyStyle="{height: '180px'}" size="small" :loading="!loading2">
+              <a-card :title="$t('title_hosttypecount')" :headStyle="{background: '#FAFBFC'}" :bodyStyle="{height: '180px'}" size="small" :loading="!loading2">
                 <div class="homeHost beauty-scroll">
-    		  <div class="homeHItem"><img src="../../assets/img/t1.png" alt=""><span>{{ $t('device_network_devices') }}</span><em>{{ info.net_count }} {{ $t('device_count') }}</em></div>
-   		  <div class="homeHItem"><img src="../../assets/img/t2.png" alt=""><span>{{ $t('device_server_devices') }}</span><em>{{ info.srv_count }} {{ $t('device_count') }}</em></div>
-    		  <div class="homeHItem"><img src="../../assets/img/t4.png" alt=""><span>{{ $t('device_windows_hosts') }}</span><em>{{ info.win_count }} {{ $t('device_count') }}</em></div>
-    		  <div class="homeHItem"><img src="../../assets/img/t3.png" alt=""><span>{{ $t('device_linux_hosts') }}</span><em>{{ info.lin_count }} {{ $t('device_count') }}</em></div>
+                  <div class="homeHItem"><img src="../../assets/img/t1.png" alt=""><span>{{ $t('device_network_devices') }}</span><em>{{ info.net_count }} {{ $t('device_count') }}</em></div>
+                  <div class="homeHItem"><img src="../../assets/img/t2.png" alt=""><span>{{ $t('device_server_devices') }}</span><em>{{ info.srv_count }} {{ $t('device_count') }}</em></div>
+                  <div class="homeHItem"><img src="../../assets/img/t4.png" alt=""><span>{{ $t('device_windows_hosts') }}</span><em>{{ info.win_count }} {{ $t('device_count') }}</em></div>
+                  <div class="homeHItem"><img src="../../assets/img/t3.png" alt=""><span>{{ $t('device_linux_hosts') }}</span><em>{{ info.lin_count }} {{ $t('device_count') }}</em></div>
                 </div>
               </a-card>
             </a-col>
@@ -45,14 +45,14 @@
                     <div class="homeNet4"><img src="../../assets/img/nbg.png" alt=""></div>
                   </div>
                   <div class="homeNetL"></div>
-                  <div class="homeNet1">
+                  <!-- <div class="homeNet1">
                     <div class="homeNet2"><span>{{edata.name_two}}</span></div>
                     <div class="homeNet3">
                       <p>In:<span>{{edata.in_two}}</span></p>
                       <p>Out:<span>{{edata.out_two}}</span></p>
                     </div>
                     <div class="homeNet4"><img src="../../assets/img/nbg.png" alt=""></div>
-                  </div>
+                  </div> -->
                 </div>
               </a-card>
             </a-col>
@@ -77,7 +77,7 @@
           </a-card>
         </a-col>
         <a-col :xl="{ span: 12 }" :lg="{ span: 24 }">
-    	  <a-card :title="$t('memory_top5_title')" :headStyle="{ background: '#FAFBFC' }" :bodyStyle="{ padding: 0 }" size="small" :loading="!loading5">
+          <a-card :title="$t('memory_top5_title')" :headStyle="{ background: '#FAFBFC' }" :bodyStyle="{ padding: 0 }" size="small" :loading="!loading5">
             <div class="homeLegent" v-if="winM.length > 0">
               <div class="homeLegent1">
                 <div class="homeLeItem1">
@@ -113,7 +113,7 @@
       <a-row :gutter="16">
         <a-col :xl="{ span: 12 }" :lg="{ span: 24 }">
           <h2 class="homeH2">{{ $t('linux_systems_title') }}</h2>
-   	  <a-card :title="$t('cpu_top5_title')" :headStyle="{ background: '#FAFBFC' }" size="small" :loading="!loading6">
+          <a-card :title="$t('cpu_top5_title')" :headStyle="{ background: '#FAFBFC' }" size="small" :loading="!loading6">
             <div class="homePies">
               <div class="homePied" v-for="(v, i) in linC" :key="'2'+i">
                 <div class="homePie">
@@ -125,7 +125,7 @@
           </a-card>
         </a-col>
         <a-col :xl="{ span: 12 }" :lg="{ span: 24 }">
-    	  <a-card :title="$t('memory_top5_title')" :headStyle="{ background: '#FAFBFC' }" :bodyStyle="{ padding: 0 }" size="small" :loading="!loading5">
+          <a-card :title="$t('memory_top5_title')" :headStyle="{ background: '#FAFBFC' }" :bodyStyle="{ padding: 0 }" size="small" :loading="!loading5">
             <div class="homeLegent" v-if="linM.length > 0">
               <div class="homeLegent1">
                 <div class="homeLeItem1">
@@ -161,29 +161,34 @@
 </template>
 
 <script>
-import PageLayout from "@/layouts/PageLayout";
-import { indexTrigger, indexInfo, indexRestop, indexEgress } from "@/services/admin";
-import { parseTimeFun } from "@/utils/formatter";
-import pie from "@/components/gcharts/pie";
-import legent from "@/components/gcharts/legent";
+import PageLayout from '@/layouts/PageLayout'
+import {
+  indexTrigger,
+  indexInfo,
+  indexRestop,
+  indexEgress
+} from '@/services/admin'
+import { parseTimeFun } from '@/utils/formatter'
+import pie from '@/components/gcharts/pie'
+import legent from '@/components/gcharts/legent'
 export default {
-  name: "index", 
+  name: 'index',
   i18n: require('./i18n'),
   data() {
     return {
       loading1: false,
       triggerList: [],
       loading2: false,
-      info: "",
+      info: '',
       loading3: false,
       ptitle: this.$t('bandwidth'),
       edata: {
-        name_one: "--",
-        in_one: "--",
-        out_one: "--",
-        name_two: "",
-        in_two: "--",
-        out_tw0: "--",
+        name_one: '--',
+        in_one: '--',
+        out_one: '--',
+        name_two: '',
+        in_two: '--',
+        out_tw0: '--',
         date: '--'
       },
       loading4: false,
@@ -193,137 +198,148 @@ export default {
       loading6: false,
       linC: [],
       loading7: false,
-      linM: [],
-    };
+      linM: []
+    }
   },
   components: {
     PageLayout,
     pie,
-    legent,
+    legent
   },
   created() {
-    this.initTrigger();
-    this.initInfo();
-    this.edataInfo();
-    this.initMock();
+    this.initTrigger()
+    this.initInfo()
+    this.edataInfo()
+    this.initMock()
   },
   methods: {
     initTrigger() {
       indexTrigger()
         .then((resp) => {
-          let res = resp.data;
-          this.triggerList = res.data.items || [];
+          let res = resp.data
+          this.triggerList = res.data.items || []
           console.log(res)
         })
         .finally(() => {
-          this.loading1 = true;
-        });
+          this.loading1 = true
+        })
     },
     initInfo() {
       indexInfo()
         .then((resp) => {
-          let res = resp.data;
-          this.info = res.data.items;
+          let res = resp.data
+          this.info = res.data.items
         })
         .finally(() => {
-          this.loading2 = true;
-        });
+          this.loading2 = true
+        })
     },
     edataInfo() {
       indexEgress()
         .then((resp) => {
-          let res = resp.data;
-          this.edata = res.data.items;
-	  this.ptitle = this.ptitle + "(" + this.$t('polling_date') + this.edata.date + ")";
+          let res = resp.data
+          this.edata = res.data.items
+          this.ptitle =
+            this.ptitle + '(' + this.$t('polling_date') + this.edata.date + ')'
         })
         .finally(() => {
-          this.loading3 = true;
-        });
+          this.loading3 = true
+        })
     },
     initMock() {
-      indexRestop({ host_type: "VM_WIN", metrics_type: "CPU", top_num: "5" })
+      indexRestop({ host_type: 'VM_WIN', metrics_type: 'CPU', top_num: '5' })
         .then((resp) => {
-          let res = resp.data;
-          let arr = res.data.top_list || [];
+          let res = resp.data
+          let arr = res.data.top_list || []
           arr.sort((a, b) => {
-            return b.score - a.score;
-          });
-          this.winC = arr.slice(0, 5);
+            return b.score - a.score
+          })
+          this.winC = arr.slice(0, 5)
         })
         .finally(() => {
-          this.loading4 = true;
-        });
-      indexRestop({ host_type: "VM_WIN", metrics_type: "MEM", top_num: "5" })
+          this.loading4 = true
+        })
+      indexRestop({ host_type: 'VM_WIN', metrics_type: 'MEM', top_num: '5' })
         .then((resp) => {
-          let res = resp.data;
-          let arr = res.data.top_list || [];
+          let res = resp.data
+          let arr = res.data.top_list || []
           arr.sort((a, b) => {
-            return b.score - a.score;
-          });
-          this.winM = arr.slice(0, 5);
+            return b.score - a.score
+          })
+          this.winM = arr.slice(0, 5)
         })
         .finally(() => {
-          this.loading5 = true;
-        });
-      indexRestop({ host_type: "VM_LIN", metrics_type: "CPU", top_num: "5" })
+          this.loading5 = true
+        })
+      indexRestop({ host_type: 'VM_LIN', metrics_type: 'CPU', top_num: '5' })
         .then((resp) => {
-          let res = resp.data;
-          let arr = res.data.top_list || [];
+          let res = resp.data
+          let arr = res.data.top_list || []
           arr.sort((a, b) => {
-            return b.score - a.score;
-          });
-          this.linC = arr.slice(0, 5);
+            return b.score - a.score
+          })
+          this.linC = arr.slice(0, 5)
         })
         .finally(() => {
-          this.loading6 = true;
-        });
-      indexRestop({ host_type: "VM_LIN", metrics_type: "MEM", top_num: "5" })
+          this.loading6 = true
+        })
+      indexRestop({ host_type: 'VM_LIN', metrics_type: 'MEM', top_num: '5' })
         .then((resp) => {
-          let res = resp.data;
-          let arr = res.data.top_list || [];
+          let res = resp.data
+          let arr = res.data.top_list || []
           arr.sort((a, b) => {
-            return b.score - a.score;
-          });
-          this.linM = arr.slice(0, 5);
+            return b.score - a.score
+          })
+          this.linM = arr.slice(0, 5)
         })
         .finally(() => {
-          this.loading7 = true;
-        });
-    },
+          this.loading7 = true
+        })
+    }
   },
   filters: {
     parsetime(v) {
-      return parseTimeFun(v);
+      return parseTimeFun(v)
     },
     TrafficBytes(bytes, decimals = 2) {
-      if (bytes === 0) return '0 Bytes';
-      const k = 1000;
-      const dm = decimals < 0 ? 0 : decimals;
-      const sizes = ['Bytes', 'KBps', 'MBps', 'GBps', 'TBps', 'PBps', 'EBps', 'ZBps', 'YBps'];
-      const i = Math.floor(Math.log(bytes) / Math.log(k));
-      return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + sizes[i];
+      if (bytes === 0) return '0 Bytes'
+      const k = 1000
+      const dm = decimals < 0 ? 0 : decimals
+      const sizes = [
+        'Bytes',
+        'KBps',
+        'MBps',
+        'GBps',
+        'TBps',
+        'PBps',
+        'EBps',
+        'ZBps',
+        'YBps'
+      ]
+      const i = Math.floor(Math.log(bytes) / Math.log(k))
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + sizes[i]
     },
     kbFilters(v) {
       if (v && v > 0) {
-        v = parseFloat(v);
+        v = parseFloat(v)
         if (v <= 1024) {
-          return v + "B/s";
+          return v + 'B/s'
         }
         if (v > 1024 && (v * 8) / 1024 < 1024) {
-          return ((v * 8) / 1024).toFixed(2) + "Kb/s";
+          return ((v * 8) / 1024).toFixed(2) + 'Kb/s'
         }
         if ((v * 8) / 1024 > 1024 && (v * 8) / 1024 / 1024 < 1024) {
-          return ((v * 8) / 1024 / 1024).toFixed(2) + "Mb/s";
+          return ((v * 8) / 1024 / 1024).toFixed(2) + 'Mb/s'
         }
         if ((v * 8) / 1024 / 1024 > 1024) {
-          return ((v * 8) / 1024 / 1024 / 1024).toFixed(2) + "Gb/s";
+          return ((v * 8) / 1024 / 1024 / 1024).toFixed(2) + 'Gb/s'
         }
       } else {
-        return v;
+        return v
       }
-    },
-  },
-};
+    }
+  }
+}
 </script>
 
 <style lang="less">

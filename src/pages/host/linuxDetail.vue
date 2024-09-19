@@ -15,7 +15,7 @@
           <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="!detail">
             <a-row :gutter="16">
               <a-col :xl="{ span: 5 }" :lg="{ span: 12 }">
-                <a-card hoverable :headStyle="{textAlign: 'center', width: '100%', background: '#FAFBFC'}" :bodyStyle="{padding: '0'}" title="CPU使用率">
+                <a-card hoverable :headStyle="{textAlign: 'center', width: '100%', background: '#FAFBFC'}" :bodyStyle="{padding: '0'}" title="CPU使用率">\
                   <div id="liquidCPU" style="width: 300px; height: 300px;margin:0 auto;"></div>
                 </a-card>
               </a-col>
@@ -132,7 +132,7 @@
           <a-col :span="12">
             <a-row>
               <a-col>
-                <div id="discardedChart" style="width: 700px; height: 300px;"></div>
+                <div id="discardedChart" style="width: 900px; height: 300px;"></div>
               </a-col>
               <a-col>
                 <a-table :loading="loading3" style="width: 90%; height: 10%;margin:0 auto;" :columns="discardedColumns" :data-source="diescardedSeries.list" :pagination="false" :rowKey="(record) => { return record.name}">
