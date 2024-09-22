@@ -45,14 +45,14 @@
                     <div class="homeNet4"><img src="../../assets/img/nbg.png" alt=""></div>
                   </div>
                   <div class="homeNetL"></div>
-                  <!-- <div class="homeNet1">
+                  <div class="homeNet1">
                     <div class="homeNet2"><span>{{edata.name_two}}</span></div>
                     <div class="homeNet3">
                       <p>In:<span>{{edata.in_two}}</span></p>
                       <p>Out:<span>{{edata.out_two}}</span></p>
                     </div>
                     <div class="homeNet4"><img src="../../assets/img/nbg.png" alt=""></div>
-                  </div> -->
+                  </div>
                 </div>
               </a-card>
             </a-col>
