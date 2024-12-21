@@ -134,20 +134,20 @@ export default {
         },
         {
           title: 'Ping(Sec/Loss)',
-          key: 'left',
-          align: 'center',
+          key: 'ping',
+          align: 'left',
           scopedSlots: { customRender: 'ping' }
         },
         {
           title: '采集状态',
-          key: 'left',
-          align: 'center',
+          key: 'available',
+          align: 'left',
           scopedSlots: { customRender: 'available' }
         },
         {
           title: '更多',
           key: 'operation',
-          align: 'center',
+          align: 'left',
           scopedSlots: { customRender: 'operation' }
         }
       ],

@@ -63,108 +63,108 @@
 </template>
 
 <script>
-import PageLayout from "@/layouts/PageLayout";
-import { hostList, hostExport } from "@/services/admin";
+import PageLayout from '@/layouts/PageLayout'
+import { hostList, hostExport } from '@/services/admin'
 export default {
-  name: "LinuxList",
+  name: 'LinuxList',
   components: {
-    PageLayout,
+    PageLayout
   },
   data() {
     return {
       page: 1,
       pageSize: 10,
-      hosts: "",
-      model: "",
-      ip: "",
-      available: "",
-      hosttype: "HW_SRV",
-      interfaces: "",
+      hosts: '',
+      model: '',
+      ip: '',
+      available: '',
+      hosttype: 'HW_SRV',
+      interfaces: '',
       loading: false,
       availableOption: [
-        { label: "正常", value: "1" },
-        { label: "异常", value: "2" },
+        { label: '正常', value: '1' },
+        { label: '异常', value: '2' }
       ],
       columns: [
         {
-          title: "序号",
-          key: "hostid",
-          align: "center",
-          scopedSlots: { customRender: "hostid" },
+          title: '序号',
+          key: 'hostid',
+          align: 'left',
+          scopedSlots: { customRender: 'hostid' }
         },
         {
-          title: "主机名",
-          key: "name",
-          align: "center",
-          scopedSlots: { customRender: "name" },
+          title: '主机名',
+          key: 'name',
+          align: 'left',
+          scopedSlots: { customRender: 'name' }
         },
         {
-          title: "型号",
-          key: "model",
-          align: "center",
-          scopedSlots: { customRender: "model" },
+          title: '型号',
+          key: 'model',
+          align: 'left',
+          scopedSlots: { customRender: 'model' }
         },
         {
-          title: "序列号",
-          key: "serial_no",
-          align: "center",
-          scopedSlots: { customRender: "serial_no" },
+          title: '序列号',
+          key: 'serial_no',
+          align: 'left',
+          scopedSlots: { customRender: 'serial_no' }
         },
         {
-          title: "操作系统",
-          key: "os",
-          align: "center",
-          scopedSlots: { customRender: "os" },
+          title: '操作系统',
+          key: 'os',
+          align: 'left',
+          scopedSlots: { customRender: 'os' }
         },
         {
-          title: "IPMI地址",
-          key: "interfaces",
-          align: "center",
-          scopedSlots: { customRender: "interfaces" },
+          title: 'IPMI地址',
+          key: 'interfaces',
+          align: 'left',
+          scopedSlots: { customRender: 'interfaces' }
         },
         {
-          title: "设备位置",
-          key: "location",
-          align: "center",
-          scopedSlots: { customRender: "location" },
+          title: '设备位置',
+          key: 'location',
+          align: 'left',
+          scopedSlots: { customRender: 'location' }
         },
         {
-          title: "Ping(Sec/Loss)",
-          key: "ping",
-          align: "center",
-          scopedSlots: { customRender: "ping" },
+          title: 'Ping(Sec/Loss)',
+          key: 'ping',
+          align: 'left',
+          scopedSlots: { customRender: 'ping' }
         },
         {
-          title: "采集状态",
-          key: "available",
-          align: "center",
-          scopedSlots: { customRender: "available" },
+          title: '采集状态',
+          key: 'available',
+          align: 'left',
+          scopedSlots: { customRender: 'available' }
         },
         {
-          title: "更多",
-          key: "operation",
-          align: "center",
-          scopedSlots: { customRender: "operation" },
-        },
+          title: '更多',
+          key: 'operation',
+          align: 'left',
+          scopedSlots: { customRender: 'operation' }
+        }
       ],
       list: [],
       pagination: {
         total: 0,
         current: 1,
-        "show-quick-jumper": true,
-        "page-size-options": ["10", "20", "30", "40", "50", "100", "200"],
+        'show-quick-jumper': true,
+        'page-size-options': ['10', '20', '30', '40', '50', '100', '200'],
         pageSize: 10,
-        "show-size-changer": true,
-        "show-total": (total) => `共 ${total} 条数据`,
-      },
-    };
+        'show-size-changer': true,
+        'show-total': (total) => `共 ${total} 条数据`
+      }
+    }
   },
   created() {
-    this.init();
+    this.init()
   },
   methods: {
     init() {
-      this.loading = true;
+      this.loading = true
       hostList({
         page: this.page,
         limit: this.pageSize,
@@ -172,26 +172,26 @@ export default {
         hosts: this.hosts,
         model: this.model,
         ip: this.interfaces,
-        available: this.available,
+        available: this.available
       })
         .then((resp) => {
-          let res = resp.data;
+          let res = resp.data
           if (res.code == 200) {
-            this.pagination.total = res.data.total;
-            this.pagination.current = this.page;
-            this.pagination.pageSize = this.pageSize;
-            this.list = res.data.items || [];
+            this.pagination.total = res.data.total
+            this.pagination.current = this.page
+            this.pagination.pageSize = this.pageSize
+            this.list = res.data.items || []
           }
         })
         .finally(() => {
-          this.loading = false;
-        });
+          this.loading = false
+        })
     },
     changePage(e) {
       // 切换页码
-      this.page = e.current;
-      this.pageSize = e.pageSize;
-      this.init();
+      this.page = e.current
+      this.pageSize = e.pageSize
+      this.init()
     },
     hostexport() {
       hostExport(
@@ -200,36 +200,36 @@ export default {
           hosts: this.hosts,
           model: this.model,
           ip: this.interfaces,
-          available: this.available,
+          available: this.available
         },
         {
-          responseType: "arraybuffer",
+          responseType: 'arraybuffer'
         }
       ).then((resp) => {
-        let filename = resp.headers["content-disposition"]
-          .split(";")
-          .find((n) => n.includes("filename="))
-          .replace("filename=", "")
-          .trim();
-        const url = window.URL.createObjectURL(new Blob([resp.data]));
-        const link = document.createElement("a");
-        link.href = url;
-        link.setAttribute("download", filename);
-        document.body.appendChild(link);
-        link.click();
-      });
+        let filename = resp.headers['content-disposition']
+          .split(';')
+          .find((n) => n.includes('filename='))
+          .replace('filename=', '')
+          .trim()
+        const url = window.URL.createObjectURL(new Blob([resp.data]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', filename)
+        document.body.appendChild(link)
+        link.click()
+      })
     },
     seeDetail(v) {
-      this.$router.push("/server/detail?id=" + v.hostid);
+      this.$router.push('/server/detail?id=' + v.hostid)
     },
     resetData() {
       if (this.hosts) {
-        this.hosts = "";
-        this.init();
+        this.hosts = ''
+        this.init()
       }
-    },
-  },
-};
+    }
+  }
+}
 </script>
 
 <style lang="less" scoped>

@@ -7,6 +7,8 @@ import {
 	INDEX_TRIGGER,
 	INDEX__OVERVIEW,
 	INDEX__EGRESS,
+	INDEX_VERSION,
+	INDEX_SESSION,
 	TRIGGER_LIST,
 	INDEX_INFO,
 	ALARM,
@@ -26,7 +28,6 @@ import {
 	RULE,
 	USER,
 	GROUP,
-	INDEX_VERSION,
 	INVENTORY_EXPORT,
 	REPORT,
 } from '@/services/api'
@@ -143,6 +144,15 @@ export async function egressGet() {
 export async function egressUpdate(params) {
 	return request(SYSTEM_LIST + '/egress/', METHOD.PUT, params)
 }
+export async function configGetList() {
+	return request(SYSTEM_LIST + '/config/', METHOD.GET)
+}
+export async function configGetOne(id) {
+	return request(SYSTEM_LIST + '/config/' + id, METHOD.GET)
+}
+export async function configUpdate(id, params) {
+	return request(SYSTEM_LIST + '/config/' + id, METHOD.PUT, params)
+}
 export async function hostgroupList() {
 	return request(HOST_GROUP + '/all', METHOD.GET)
 }
@@ -154,6 +164,9 @@ export async function templateGetItemList(id) {
 }
 export async function baseVersion() {
 	return request(INDEX_VERSION, METHOD.GET)
+}
+export async function zbxSession() {
+	return request(INDEX_SESSION, METHOD.GET)
 }
 export async function reportAdd(params) {
 	return request(REPORT, METHOD.POST, params)
@@ -277,10 +290,14 @@ export default {
 	systemInit,
 	egressGet,
 	egressUpdate,
+	configGetList,
+	configGetOne,
+	configUpdate,
 	hostgroupList,
 	templateList,
 	templateGetItemList,
 	baseVersion,
+	zbxSession,
 	reportAdd,
 	reportList,
 	reportGet,

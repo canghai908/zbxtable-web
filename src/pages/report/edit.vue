@@ -26,7 +26,7 @@
         </a-select>
       </a-form-model-item>
       <a-form-model-item :label="$t('bandwidth')" prop="linkbandwidth">
-        <a-input v-model="form.linkbandwidth" addon-after="MB" :placeholder="$t('bandwidth_placeholder')" />
+        <a-input v-model="form.linkbandwidth" addon-after="Mbps" :placeholder="$t('bandwidth_placeholder')" />
       </a-form-model-item>
       <a-form-model-item :label="$t('email')" prop="emails">
         <a-input v-model.trim="form.emails" :placeholder="$t('email_placeholder')" />
@@ -37,10 +37,10 @@
       <a-form-model-item :label="$t('period')" prop="cycle">
         <a-checkbox-group v-model="form.cycle">
           <a-checkbox value="day" name="type">
-	  {{ $t('day') }}
+            {{ $t('day') }}
           </a-checkbox>
           <a-checkbox value="week" name="type">
-	  {{ $t('week') }}
+            {{ $t('week') }}
           </a-checkbox>
         </a-checkbox-group>
       </a-form-model-item>
@@ -64,16 +64,21 @@
 <script>
 const selectSize = 30
 import PageLayout from '@/layouts/PageLayout'
-import { hostList, itemListTraffic, reportGet, reportPut } from "@/services/admin"
+import {
+  hostList,
+  itemListTraffic,
+  reportGet,
+  reportPut
+} from '@/services/admin'
 const debounce = (func, delay = 60) => {
-  let timer = null;
+  let timer = null
   return function (...args) {
-    clearTimeout(timer);
-    timer = setTimeout(() => func.apply(this, args), delay);
+    clearTimeout(timer)
+    timer = setTimeout(() => func.apply(this, args), delay)
   }
-};
+}
 export default {
-  name: "add",
+  name: 'add',
   i18n: require('./i18n'),
   components: { PageLayout },
   data() {
@@ -98,7 +103,7 @@ export default {
           label: this.$t('network_device')
         }
       ],
-      //带宽列表  
+      //带宽列表
       DefaultHostType: {
         key: '',
         label: ''
@@ -121,7 +126,7 @@ export default {
         emails: '',
         status: 1,
         report_type: '1',
-        desc: '',
+        desc: ''
       },
       HostsList: [],
       curHostsList: [],
@@ -133,42 +138,96 @@ export default {
       flow: '',
       itemmlist: [],
       rules: {
-        name: [{ required: true, message: this.$t('message_report_name'), trigger: 'blur' },],
-        hoststype: [{ required: true, message: this.$t('message_host_type'), trigger: 'change' }],
-        hosts: [{ required: true, message: this.$t('message_host'), trigger: 'change' }],
-        items: [{ required: true, message: this.$t('message_interface'), trigger: 'change' }],
-        linkbandwidth: [{ type: 'number', required: true, message: this.$t('message_bandwidth'), trigger: 'blur' }],
-        emails: [{ required: false, message: this.$t('message_email'), trigger: 'blur' }],
-        cycle: [{ type: 'array', required: true, message: this.$t('message_reporting_period'), trigger: 'change', },],
-        status: [{ required: true, message: this.$t('message_state'), trigger: 'change' }],
-        desc: [{ required: false, }],
-      },
-    };
+        name: [
+          {
+            required: true,
+            message: this.$t('message_report_name'),
+            trigger: 'blur'
+          }
+        ],
+        hoststype: [
+          {
+            required: true,
+            message: this.$t('message_host_type'),
+            trigger: 'change'
+          }
+        ],
+        hosts: [
+          {
+            required: true,
+            message: this.$t('message_host'),
+            trigger: 'change'
+          }
+        ],
+        items: [
+          {
+            required: true,
+            message: this.$t('message_interface'),
+            trigger: 'change'
+          }
+        ],
+        linkbandwidth: [
+          {
+            type: 'number',
+            required: true,
+            message: this.$t('message_bandwidth'),
+            trigger: 'blur'
+          }
+        ],
+        emails: [
+          {
+            required: false,
+            message: this.$t('message_email'),
+            trigger: 'blur'
+          }
+        ],
+        cycle: [
+          {
+            type: 'array',
+            required: true,
+            message: this.$t('message_reporting_period'),
+            trigger: 'change'
+          }
+        ],
+        status: [
+          {
+            required: true,
+            message: this.$t('message_state'),
+            trigger: 'change'
+          }
+        ],
+        desc: [{ required: false }]
+      }
+    }
   },
   created() {
-    this.id = this.$route.query.id || ""
+    this.id = this.$route.query.id || ''
     this.init(this.id)
   },
   methods: {
     init(id) {
       this.loading = true
-      reportGet(id).then((resp) => {
-        let res = resp.data
-        if (res.code == 200) {
-          this.form = res.data.items || []
-          this.form.items = res.data.items.items.split(',')
-          console.log(this.form.items)
-          console.log(this.form)
-        }
-      }).finally(() => { this.loading = false })
+      reportGet(id)
+        .then((resp) => {
+          let res = resp.data
+          if (res.code == 200) {
+            this.form = res.data.items || []
+            this.form.items = res.data.items.items.split(',')
+            console.log(this.form.items)
+            console.log(this.form)
+          }
+        })
+        .finally(() => {
+          this.loading = false
+        })
     },
     onSubmit() {
       reportPut(this.id, this.form).then((resp) => {
         console.log(this.form)
         let res = resp.data
         if (res.code == 200) {
-          this.$message.success(this.$t('message_task_edited'));
-          console.log(this.form);
+          this.$message.success(this.$t('message_task_edited'))
+          console.log(this.form)
           this.$router.push('/report/traffic')
         }
       })
@@ -219,12 +278,12 @@ export default {
       }
     }),
     handleHostSearch: debounce(function (value) {
-      this.hostsFilterList = this.HostsList.filter(item => {
-        const reg = new RegExp(value, 'gi');
-        const match = item.name.toString().match(reg);
-        return match;
-      });
-      this.curHostsList = this.hostsFilterList.slice(0, selectSize);
+      this.hostsFilterList = this.HostsList.filter((item) => {
+        const reg = new RegExp(value, 'gi')
+        const match = item.name.toString().match(reg)
+        return match
+      })
+      this.curHostsList = this.hostsFilterList.slice(0, selectSize)
     }),
     handleFlowChange(value) {
       console.log('flow', value)
@@ -237,24 +296,27 @@ export default {
       const curLen = this.curFlowItemList.length
       const allLen = this.flowItemFilterList.length
       if (curLen < allLen) {
-        const nextPage = this.flowItemFilterList.slice(curLen, curLen + selectSize)
+        const nextPage = this.flowItemFilterList.slice(
+          curLen,
+          curLen + selectSize
+        )
         this.curFlowItemList = this.curFlowItemList.concat(nextPage)
       }
     }),
     handleSearch: debounce(function (value) {
-      this.flowItemFilterList = this.FlowItemList.filter(item => {
-        const reg = new RegExp(value, 'gi');
-        const match = item.name.toString().match(reg);
-        return match;
-      });
-      this.curFlowItemList = this.flowItemFilterList.slice(0, selectSize);
+      this.flowItemFilterList = this.FlowItemList.filter((item) => {
+        const reg = new RegExp(value, 'gi')
+        const match = item.name.toString().match(reg)
+        return match
+      })
+      this.curFlowItemList = this.flowItemFilterList.slice(0, selectSize)
     }),
     statuschanage(checked) {
       console.log(checked)
     },
     back() {
-      this.$router.push("/report/traffic")
+      this.$router.push('/report/traffic')
     }
-  },
-};
+  }
+}
 </script>

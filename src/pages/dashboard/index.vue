@@ -218,7 +218,6 @@ export default {
         .then((resp) => {
           let res = resp.data
           this.triggerList = res.data.items || []
-          console.log(res)
         })
         .finally(() => {
           this.loading1 = true
