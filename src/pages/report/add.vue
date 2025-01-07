@@ -160,7 +160,6 @@ export default {
         ],
         linkbandwidth: [
           {
-            type: 'number',
             required: true,
             message: this.$t('message_bandwidth'),
             trigger: 'blur'
@@ -168,7 +167,7 @@ export default {
         ],
         emails: [
           {
-            required: false,
+            required: true,
             message: this.$t('message_email'),
             trigger: 'blur'
           }
