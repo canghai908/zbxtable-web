@@ -11,7 +11,7 @@
         <v-legend dataKey="item" position="left" />
         <v-pie position="percent" color="item" :vStyle="pieStyle" :label="labelConfig" />
         <v-coord type="theta" />
-      </v-chart>  
+      </v-chart>
     </div>
   </div>
 </template>
@@ -27,7 +27,7 @@ export default {
       mockData: "",
       show: 0,         // 0-loading 1-有数据  2-无数据
       scale: [{ dataKey: 'percent', min: 0, formatter: '.0%'}],
-      height: 400,
+      height: 380,
       pieStyle: {
         stroke: '#fff',
         lineWidth: 1
@@ -84,6 +84,8 @@ export default {
   }
   .pie-main{
     width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
     h3{
       line-height: 30px;
       text-align: center;

@@ -3,7 +3,8 @@
     <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="!showPage">
       <a-form-model class="home-search" layout="inline" :colon='false'>
         <a-form-model-item label="告警时间">
-          <a-range-picker format="YYYY-MM-DD HH:mm:ss" :show-time="{ format: 'HH:mm', defaultValue:[moment('00:00:00', 'HH:mm:ss'),moment('23:59:59', 'HH:mm:ss')]}" v-model="timeValue" @change="changeCreationTime" :getCalendarContainer="triggerNode=>{return triggerNode.parentNode || document.body}" />
+          <a-range-picker format="YYYY-MM-DD HH:mm:ss" :show-time="{ format: 'HH:mm', defaultValue:[moment('00:00:00', 'HH:mm:ss'),moment('23:59:59', 'HH:mm:ss')]}" v-model="timeValue"
+            @change="changeCreationTime" :getCalendarContainer="triggerNode=>{return triggerNode.parentNode || document.body}" />
         </a-form-model-item>
         <a-form-model-item label="租户">
           <a-select optionFilterProp="label" style="width:100px" v-model="tenantid" option-label-prop="label" @change="handleTenantChange">
@@ -20,12 +21,12 @@
         </a-form-model-item>
       </a-form-model>
       <a-row style="margin: 20px -12px">
-        <a-col style="padding: 0 12px" :xl="14" :lg="16" :md="24" :sm="24" :xs="24" v-if="nameList && nameList.length">
+        <a-col style="padding: 0 12px" :xl="12" :lg="12" :md="24" :sm="24" :xs="24" v-if="nameList && nameList.length">
           <a-card hoverable :headStyle="{textAlign: 'center', width: '100%', background: '#FAFBFC'}" :bodyStyle="{padding: '0'}" title="历史告警TOP10">
             <e-line :mock="nameList" :numList="numList" />
           </a-card>
         </a-col>
-        <a-col style="padding: 0 12px" :xl="10" :lg="8" :md="24" :sm="24" :xs="24" v-if="list && list.length">
+        <a-col style="padding: 0 12px" :xl="12" :lg="12" :md="24" :sm="24" :xs="24" v-if="list && list.length">
           <a-card hoverable :headStyle="{textAlign: 'center', width: '100%', background: '#FAFBFC'}" :bodyStyle="{padding: '0'}" title="告警分类TOP">
             <e-pie :mock="list" />
           </a-card>

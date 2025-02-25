@@ -5,16 +5,16 @@
         <a-row :gutter="16">
           <a-col :xl="{ span: 24 }" :lg="{ span: 24 }">
             <a-card hoverable :headStyle="{textAlign: 'left', width: '100%', background: '#FAFBFC'}" :title="winTitle">
-              <a-list :grid=" {gutter: 24, column: 24 }" :data-source="win">
+              <a-list :grid=" {gutter: 12, column: 24 }" :data-source="win">
                 <a-list-item slot="renderItem" slot-scope="item">
-		  <a-popover :title="$t('title_device_info')" placement="topLeft">
+                  <a-popover :title="$t('title_device_info')" placement="topLeft">
                     <template slot="content">
                       <p>{{ $t('label_hostname') }}: {{ item.name }}</p>
                       <p>{{ $t('label_IP') }}:{{ item.interfaces }}</p>
-		      <p>{{ $t('label_cpu_usage') }}: {{ item.cpu_utilization }}</p>
-		      <p>{{ $t('label_memory_usage') }}: {{ item.memory_utilization }}</p>
-	              <p>{{ $t('label_num_errors') }}: {{ item.error }}</p>
-		      <p>{{ $t('label_num_alarms') }}: {{ item.alarm }}</p>
+                      <p>{{ $t('label_cpu_usage') }}: {{ item.cpu_utilization }}</p>
+                      <p>{{ $t('label_memory_usage') }}: {{ item.memory_utilization }}</p>
+                      <p>{{ $t('label_num_errors') }}: {{ item.error }}</p>
+                      <p>{{ $t('label_num_alarms') }}: {{ item.alarm }}</p>
 
                     </template>
                     <a-list-item-meta>
@@ -28,16 +28,16 @@
               </a-list>
             </a-card>
             <a-card hoverable :headStyle="{textAlign: 'left', width: '100%', background: '#FAFBFC'}" :title="linTitle">
-              <a-list :grid="{ gutter: 24, column: 24 }" :data-source="lin">
+              <a-list :grid="{ gutter: 12, column: 24 }" :data-source="lin">
                 <a-list-item slot="renderItem" slot-scope="item">
-		  <a-popover :title="$t('title_device_info')" placement="topLeft">
+                  <a-popover :title="$t('title_device_info')" placement="topLeft">
                     <template slot="content">
                       <p>{{ $t('label_hostname') }}: {{ item.name }}</p>
                       <p>{{ $t('label_IP') }}:{{ item.interfaces }}</p>
-		      <p>{{ $t('label_cpu_usage') }}: {{ item.cpu_utilization }}</p>
-		      <p>{{ $t('label_memory_usage') }}: {{ item.memory_utilization }}</p>
-	              <p>{{ $t('label_num_errors') }}: {{ item.error }}</p>
-		      <p>{{ $t('label_num_alarms') }}: {{ item.alarm }}</p>
+                      <p>{{ $t('label_cpu_usage') }}: {{ item.cpu_utilization }}</p>
+                      <p>{{ $t('label_memory_usage') }}: {{ item.memory_utilization }}</p>
+                      <p>{{ $t('label_num_errors') }}: {{ item.error }}</p>
+                      <p>{{ $t('label_num_alarms') }}: {{ item.alarm }}</p>
                     </template>
                     <a-list-item-meta>
                       <div v-if="item.available==1 && item.alarm==0" class="primary-box" slot="avatar" id="one"></div>
@@ -50,16 +50,16 @@
               </a-list>
             </a-card>
             <a-card hoverable :headStyle="{textAlign: 'left', width: '100%', background: '#FAFBFC'}" :title="netTitle">
-              <a-list :grid="{ gutter: 24, column: 24 }" :data-source="net">
+              <a-list :grid="{ gutter: 12, column: 24 }" :data-source="net">
                 <a-list-item slot="renderItem" slot-scope="item">
-		  <a-popover :title="$t('title_device_info')" placement="topLeft">
+                  <a-popover :title="$t('title_device_info')" placement="topLeft">
                     <template slot="content">
                       <p>{{ $t('label_hostname') }}: {{ item.name }}</p>
                       <p>{{ $t('label_IP') }}:{{ item.interfaces }}</p>
-		      <p>{{ $t('label_cpu_usage') }}: {{ item.cpu_utilization }}</p>
-		      <p>{{ $t('label_memory_usage') }}: {{ item.memory_utilization }}</p>
-	              <p>{{ $t('label_num_errors') }}: {{ item.error }}</p>
-		      <p>{{ $t('label_num_alarms') }}: {{ item.alarm }}</p>
+                      <p>{{ $t('label_cpu_usage') }}: {{ item.cpu_utilization }}</p>
+                      <p>{{ $t('label_memory_usage') }}: {{ item.memory_utilization }}</p>
+                      <p>{{ $t('label_num_errors') }}: {{ item.error }}</p>
+                      <p>{{ $t('label_num_alarms') }}: {{ item.alarm }}</p>
                     </template>
                     <a-list-item-meta>
                       <div v-if="item.available==1 && item.alarm==0" class="primary-box" slot="avatar" id="one"></div>
@@ -72,16 +72,16 @@
               </a-list>
             </a-card>
             <a-card hoverable :headStyle="{textAlign: 'left', width: '100%', background: '#FAFBFC'}" :title="srvTitle">
-              <a-list :grid="{ gutter: 24, column: 24 }" :data-source="srv">
+              <a-list :grid="{ gutter: 12, column: 24 }" :data-source="srv">
                 <a-list-item slot="renderItem" slot-scope="item">
-		  <a-popover :title="$t('title_device_info')" placement="topLeft">
+                  <a-popover :title="$t('title_device_info')" placement="topLeft">
                     <template slot="content">
                       <p>{{ $t('label_hostname') }}: {{ item.name }}</p>
                       <p>{{ $t('label_IP') }}:{{ item.interfaces }}</p>
-		      <p>{{ $t('label_cpu_usage') }}: {{ item.cpu_utilization }}</p>
-		      <p>{{ $t('label_memory_usage') }}: {{ item.memory_utilization }}</p>
-	              <p>{{ $t('label_num_errors') }}: {{ item.error }}</p>
-		      <p>{{ $t('label_num_alarms') }}: {{ item.alarm }}</p>
+                      <p>{{ $t('label_cpu_usage') }}: {{ item.cpu_utilization }}</p>
+                      <p>{{ $t('label_memory_usage') }}: {{ item.memory_utilization }}</p>
+                      <p>{{ $t('label_num_errors') }}: {{ item.error }}</p>
+                      <p>{{ $t('label_num_alarms') }}: {{ item.alarm }}</p>
                     </template>
                     <a-list-item-meta>
                       <div v-if="item.available==1 && item.alarm==0" class="primary-box" slot="avatar" id="one"></div>
@@ -167,35 +167,55 @@ export default {
 }
 .primary-box {
   display: flex;
-  width: 30px;
-  height: 30px;
-  background: rgb(0, 255, 0);
+  width: 24px;
+  height: 24px;
+  background: #52c41a;
   color: white;
-  border-radius: 30px;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: all 0.3s;
+  &:hover {
+    transform: scale(1.1);
+  }
 }
 .danger-box {
   display: flex;
-  width: 30px;
-  height: 30px;
-  background: rgb(255, 0, 0);
+  width: 24px;
+  height: 24px;
+  background: #f5222d;
   color: white;
-  border-radius: 30px;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: all 0.3s;
+  &:hover {
+    transform: scale(1.1);
+  }
 }
 .warnning-box {
   display: flex;
-  width: 30px;
-  height: 30px;
-  background: rgb(255, 255, 0);
+  width: 24px;
+  height: 24px;
+  background: #faad14;
   color: white;
-  border-radius: 30px;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: all 0.3s;
+  &:hover {
+    transform: scale(1.1);
+  }
 }
 .unknown-box {
   display: flex;
-  width: 30px;
-  height: 30px;
-  background: #67c23a;
+  width: 24px;
+  height: 24px;
+  background: #bfbfbf;
   color: white;
-  border-radius: 30px;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: all 0.3s;
+  &:hover {
+    transform: scale(1.1);
+  }
 }
 .linux-charts {
   display: flex;
@@ -203,5 +223,20 @@ export default {
   position: relative;
   left: 5px;
   right: 5px;
+}
+
+// 添加新的样式来控制列表项的间距
+.ant-list-item {
+  padding: 4px !important;  // 减小内边距
+  margin: 0 !important;     // 移除外边距
+}
+
+.ant-list-item-meta {
+  margin-bottom: 0 !important;  // 移除底部边距
+}
+
+// 调整卡片内容区域的内边距
+.ant-card-body {
+  padding: 12px !important;
 }
 </style>

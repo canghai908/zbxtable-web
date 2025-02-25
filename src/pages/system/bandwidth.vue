@@ -8,7 +8,8 @@
           </a-form-item>
           <!-- Out1 -->
           <a-form-item :label="$t('bindwidthone_item')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="false">
-            <a-select style="width: 30%" show-search option-filter-prop="children" :filter-option="filterOption" :placeholder="$t('host_select')" option-label-prop="label" @change="handlHostOneChange">
+            <a-select style="width: 30%" show-search option-filter-prop="children" :filter-option="filterOption" :placeholder="$t('host_select')" option-label-prop="label"
+              @change="handlHostOneChange">
               <a-select-option v-for="(item, index) in hostonelist" :key="index" :value="item.hostid" :label="item.name" :title="item.name">
                 {{ item.name }}
               </a-select-option>
@@ -29,7 +30,8 @@
           </a-form-item>
           <!-- Out2 -->
           <a-form-item :label="$t('bindwidthtwo_item')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="false">
-            <a-select style="width: 30%" show-search option-filter-prop="children" :filter-option="filterOption" :placeholder="$t('host_select')" option-label-prop="label" @change="handlHostTwoChange">
+            <a-select style="width: 30%" show-search option-filter-prop="children" :filter-option="filterOption" :placeholder="$t('host_select')" option-label-prop="label"
+              @change="handlHostTwoChange">
               <a-select-option v-for="(item, index) in hosttwolist" :key="index" :value="item.hostid" :label="item.name" :title="item.name">
                 {{ item.name }}
               </a-select-option>

@@ -39,5 +39,6 @@ module.exports = {
 	RULE: '/v1/rule',
 	USER: '/v1/user',
 	GROUP: '/v1/group',
+	AI: '/v1/ai',
 	API_WS: '/ws',
 }

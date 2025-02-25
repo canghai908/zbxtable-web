@@ -28,6 +28,7 @@ import {
 	RULE,
 	USER,
 	GROUP,
+	AI,
 	INVENTORY_EXPORT,
 	REPORT,
 } from '@/services/api'
@@ -255,6 +256,28 @@ export async function groupDelete(id) {
 export async function eventLogGet(id) {
 	return request(EVENT_LOG + '/' + id, METHOD.GET)
 }
+export async function alarmDeepseekAnalysis(params) {
+	return request(AI+'/chat', METHOD.POST, params, {
+		responseType: 'text',
+		timeout: 300000,
+		retry: 3,
+		retryDelay: 1000,
+		signal: params.signal,
+		onDownloadProgress: (progressEvent) => {
+			try {
+				const xhr = progressEvent.target;
+				if (xhr.status === 200) {
+					const responseText = xhr.responseText;
+					if (params.onProgress && typeof params.onProgress === 'function') {
+						params.onProgress(responseText, params.requestId);
+					}
+				}
+			} catch (error) {
+				console.debug('Stream progress error:', error);
+			}
+		}
+	})
+}
 export default {
 	hostList,
 	hostDetail,
@@ -325,4 +348,5 @@ export default {
 	groupPut,
 	groupMemberPut,
 	groupDelete,
+	alarmDeepseekAnalysis,
 }

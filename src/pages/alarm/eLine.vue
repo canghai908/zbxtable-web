@@ -1,92 +1,159 @@
 <template>
   <div style="">
-    <div class="pie-info" v-if="show != 1">
+    <div class="line-info" v-if="show != 1">
       <a-icon type="loading" v-show="show == 0" style="font-size: 50px" />
-      <span style="color: #333;font-size: 24px;" v-show="show == 2">告警TOP10暂无数据</span>
+      <span style="color: #333;font-size: 24px;" v-show="show == 2">告警统计暂无数据</span>
     </div>
-    <div class="pie-main" v-if="show == 1">
-      <v-chart :forceFit="true" height="400" :data="mockData" :scale="scale" :padding="padding">
-        <v-tooltip></v-tooltip>
-        <v-interval position="name*num" opacity="1" :label="barLabel" :size="20"></v-interval>
-        <v-axis dataKey="name"></v-axis>
-        <v-coord type="rect" direction="LB"></v-coord>
-        <v-axis dataKey="num"></v-axis>
+    <div class="line-main" v-if="show == 1">
+      <v-chart :forceFit="true" :height="height" :data="data" :scale="scale" :padding="[20, 60, 60, 120]">
+        <v-tooltip />
+        <v-coord type="rect" direction="LT" />
+        <v-axis dataKey="name" position="left" :label="{
+            textStyle: {
+              fontSize: 12,
+              textBaseline: 'middle',
+            },
+            formatter: (text) => formatLongText(text, 15)
+          }" :line="null" :grid="null" />
+        <v-axis dataKey="value" position="bottom" :label="{
+            textStyle: {
+              fontSize: 12,
+              textBaseline: 'top',
+              offset: 15
+            },
+            formatter: (val) => `${val}次`
+          }" :line="null" :grid="null" />
+        <v-bar position="name*value" color="#1890ff" :label="['value', {
+            position: 'right',
+            offsetX: 5,
+            textStyle: {
+              fill: '#666',
+              fontSize: 12
+            },
+            formatter: (val) => `${val}次`
+          }]" />
       </v-chart>
     </div>
+
+    <!-- 添加悬浮提示 -->
+    <a-tooltip placement="right" v-if="currentHoverText">
+      <template slot="title">
+        {{ currentHoverText }}
+      </template>
+    </a-tooltip>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'LinuxPie',
-  props: ["mock", "numList", "timer"],
-  data() {
-    return {
-      mockData: "",
-      show: 0,         // 0-loading 1-有数据  2-无数据
-      padding: [20, 50, 50, 100],
-      scale: [{ dataKey: 'num', min: 0, formatter: function (v) { return v + '个' } }],
-      barLabel: ['num', { textStyle: { fill: '#8d8d8d' }, offset: 5 }],
+  name: 'LinuxLine',
+  props: {
+    mock: {
+      type: Array,
+      default: () => []
+    },
+    numList: {
+      type: Array,
+      default: () => []
     }
   },
-  mounted() {
+  data () {
+    return {
+      data: [],
+      show: 0,
+      height: 380,
+      scale: [
+        {
+          dataKey: 'name',
+          type: 'cat'
+        },
+        {
+          dataKey: 'value',
+          min: 0,
+          alias: '告警次数'
+        }
+      ],
+      currentHoverText: '', // 当前悬浮显示的完整文本
+    }
+  },
+  watch: {
+    mock: {
+      handler(val) {
+        this.init();
+      },
+      deep: true
+    }
+  },
+  mounted () {
     this.init();
   },
   methods: {
     init() {
-      if (this.mock && this.mock.length) {
+      if(this.mock && this.mock.length) {
         this.show = 1;
-        this.$nextTick(() => {
-          let list = [];
-          this.mock.forEach((v, i) => {
-            list.push({ num: this.numList[i], name: v.length > 10 ? (v.substring(0, 10) + '...') : v });
-          })
-          this.mockData = list;
-        })
+        let list = [];
+        this.mock.forEach((v, i) => {
+          list.push({
+            name: v,
+            value: this.numList[i] || 0
+          });
+        });
+        list.sort((a, b) => b.value - a.value);
+        this.data = list;
       } else {
         this.show = 2;
       }
     },
-    levelFilter(v) {
-      let res = "未分类";
-      switch (v) {
-        case "0": res = "未分类"; break;
-        case "1": res = "信息"; break;
-        case "2": res = "警告"; break;
-        case "3": res = "一般"; break;
-        case "4": res = "严重"; break;
-        case "5": res = "灾难"; break;
+    formatLongText(text, maxLength) {
+      if (text && text.length > maxLength) {
+        return text.substring(0, maxLength) + '...';
       }
-      return res;
+      return text;
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
-.pie-info {
+.line-info {
   width: 100%;
   height: 120px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
-.pie-main {
+
+.line-main {
   width: 100%;
-  h3 {
-    line-height: 30px;
-    text-align: center;
-    font-size: 20px;
-    font-weight: 600;
-    color: #333;
-    margin: 0;
-  }
-  .pie-msg {
-    line-height: 20px;
-    margin: 4px 0 20px;
-    text-align: center;
-    font-size: 14px;
-    color: #999;
+  position: relative;
+  padding: 10px;
+  margin-bottom: 10px;
+  
+  :deep(.g2-tooltip) {
+    background-color: rgba(255, 255, 255, 0.96);
+    padding: 8px;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    
+    .g2-tooltip-title {
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    
+    .g2-tooltip-list {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+      
+      .g2-tooltip-list-item {
+        margin: 4px 0;
+        white-space: nowrap;
+        
+        .g2-tooltip-name {
+          margin-right: 8px;
+        }
+      }
+    }
   }
 }
 </style>
