@@ -27,7 +27,8 @@
           <a-col :span="12">
             <div class="height-50">
               <a-form-item :label="$t('group')">
-                <a-select mode="multiple" show-search optionFilterProp="label" style="width: 100%" v-model="system.group_id" :placeholder="$t('groupselect')" option-label-prop="label" @change="handleGroupChange">
+                <a-select mode="multiple" show-search optionFilterProp="label" style="width: 100%" v-model="system.group_id" :placeholder="$t('groupselect')" option-label-prop="label"
+                  @change="handleGroupChange">
                   <a-select-option v-for="(item, index) in grouplist" :key="index" :value="item.groupid" :label="item.name" :title="item.groupid">
                     {{ item.name }}
                   </a-select-option>
@@ -39,7 +40,8 @@
             <!-- Ping -->
             <div class="height-50">
               <a-form-item :label="$t('ping')" :required="false">
-                <a-select show-search optionFilterProp="label" style="width: 100%" v-model="system.ping_template_id" :placeholder="$t('template_select')" option-label-prop="label" @change="handlPingTempChange">
+                <a-select show-search optionFilterProp="label" style="width: 100%" v-model="system.ping_template_id" :placeholder="$t('template_select')" option-label-prop="label"
+                  @change="handlPingTempChange">
                   <a-select-option v-for="(item, index) in templateList" :key="index" :value="item.templateid" :label="item.name" :title="item.name">
                     {{ item.name }}
                   </a-select-option>
@@ -64,7 +66,8 @@
           <a-col :span="12">
             <div class="height-50">
               <a-form-item :label="$t('item')" :required="false">
-                <a-select mode="multiple" v-model="system.uptime_id" show-search optionFilterProp="label" style="width: 100%" :placeholder="$t('item_select')" option-label-prop="label" @change="handleUptimeItemChange">
+                <a-select mode="multiple" v-model="system.uptime_id" show-search optionFilterProp="label" style="width: 100%" :placeholder="$t('item_select')" option-label-prop="label"
+                  @change="handleUptimeItemChange">
                   <a-select-option v-for="(item, index) in itemList" :key="index" :value="item.itemid" :label="item.name" :title="item.name">
                     {{ item.name }}
                   </a-select-option>
@@ -89,7 +92,8 @@
           <a-col :span="12">
             <div class="height-50">
               <a-form-item :label="$t('item')" :required="false">
-                <a-select mode="multiple" style="width: 100%" show-search optionFilterProp="label" v-model="system.model" :placeholder="$t('item_select')" option-label-prop="label" @change="handleModelItemChange">
+                <a-select mode="multiple" style="width: 100%" show-search optionFilterProp="label" v-model="system.model" :placeholder="$t('item_select')" option-label-prop="label"
+                  @change="handleModelItemChange">
                   <a-select-option v-for="(item, index) in itemList" :key="index" :value="item.itemid" :label="item.name" :title="item.name">
                     {{ item.name }}
                   </a-select-option>
@@ -114,7 +118,8 @@
           <a-col :span="12">
             <div class="height-50">
               <a-form-item :label="$t('item')" :required="false">
-                <a-select mode="multiple" show-search optionFilterProp="label" style="width: 100%" v-model="system.cpu_core" :placeholder="$t('item_select')" option-label-prop="label" @change="handleCPUCoreItemChange">
+                <a-select mode="multiple" show-search optionFilterProp="label" style="width: 100%" v-model="system.cpu_core" :placeholder="$t('item_select')" option-label-prop="label"
+                  @change="handleCPUCoreItemChange">
                   <a-select-option v-for="(item, index) in itemList" :key="index" :value="item.itemid" :label="item.name" :title="item.name">
                     {{ item.name }}
                   </a-select-option>
@@ -139,7 +144,8 @@
           <a-col :span="12">
             <div class="height-50">
               <a-form-item :label="$t('item')" :required="false">
-                <a-select mode="multiple" show-search optionFilterProp="label" style="width: 100%" v-model="system.cpu_utilization_id" :placeholder="$t('item_select')" option-label-prop="label" @change="handleCPUtiItemChange">
+                <a-select mode="multiple" show-search optionFilterProp="label" style="width: 100%" v-model="system.cpu_utilization_id" :placeholder="$t('item_select')" option-label-prop="label"
+                  @change="handleCPUtiItemChange">
                   <a-select-option v-for="(item, index) in itemList" :key="index" :value="item.itemid" :label="item.name" :title="item.name">
                     {{ item.name }}
                   </a-select-option>
@@ -164,7 +170,8 @@
           <a-col :span="12">
             <div class="height-50">
               <a-form-item :label="$t('item')" :required="false">
-                <a-select mode="multiple" show-search optionFilterProp="label" style="width: 100%" v-model="system.memory_utilization_id" :placeholder="$t('item_select')" option-label-prop="label" @change="handleMemUtiItemChange">
+                <a-select mode="multiple" show-search optionFilterProp="label" style="width: 100%" v-model="system.memory_utilization_id" :placeholder="$t('item_select')" option-label-prop="label"
+                  @change="handleMemUtiItemChange">
                   <a-select-option v-for="(item, index) in itemList" :key="item" :value="item.itemid" :label="item.name" :title="item.name">
                     {{ item.name }}
                   </a-select-option>
@@ -189,7 +196,8 @@
           <a-col :span="12">
             <div class="height-50">
               <a-form-item :label="$t('item')" :required="false">
-                <a-select mode="multiple" show-search optionFilterProp="label" style="width: 100%" v-model="system.memory_total_id" :placeholder="$t('item_select')" option-label-prop="label" @change="handleMemTotalItemChange">
+                <a-select mode="multiple" show-search optionFilterProp="label" style="width: 100%" v-model="system.memory_total_id" :placeholder="$t('item_select')" option-label-prop="label"
+                  @change="handleMemTotalItemChange">
                   <a-select-option v-for="(item, index) in itemList" :key="item" :value="item.itemid" :label="item.name" :title="item.name">
                     {{ item.name }}
                   </a-select-option>
@@ -210,8 +218,8 @@
           zIndex: 1,
         }">
           <a-button :style="{ marginRight: '8px' }" @click="onClose">{{ $t('cancel_btn') }}</a-button>
-    	  <a-button :style="{ marginRight: '8px' }" type="primary" @click="saveData" :loading="saveLoading" :disabled="saveDisabled">{{ $t('save_btn') }}</a-button>
-    	  <a-button type="primary" @click="deployInit" :loading="initLoading" :disabled="initDisabled">{{ $t('init_btn') }}</a-button>
+          <a-button :style="{ marginRight: '8px' }" type="primary" @click="saveData" :loading="saveLoading" :disabled="saveDisabled">{{ $t('save_btn') }}</a-button>
+          <a-button type="primary" @click="deployInit" :loading="initLoading" :disabled="initDisabled">{{ $t('init_btn') }}</a-button>
         </div>
       </a-drawer>
     </div>
@@ -279,12 +287,18 @@ export default {
       }).finally(() => { this.loading = false })
     },
     //初始化
-    deployInit() {
+    deployInit(record) {
+      // 如果传入了record参数，使用record.id；否则使用this.id
+      const id = record ? record.id : this.id
+      if (!id) {
+        this.$message.error('ID不能为空')
+        return
+      }
       this.loading = true
       this.initLoading = true
       //禁用保存
       this.saveDisabled = true
-      systemInit(this.id,).then((resp) => {
+      systemInit(id,).then((resp) => {
         let res = resp.data
         if (res.code == 200) {
           this.initLoading = false

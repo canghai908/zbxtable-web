@@ -70,12 +70,16 @@
         <a-row>
           <a-col>
             <div class="png-data-container">
-
-              <div v-for="item in sortedPngData" :key="item.name" class="png-data-item">
-                <h3 style="">{{ item.name }}</h3>
-                <div class="png-container">
-                  <img :src="`data:image/png;base64,${item.png}`" :alt="item.name" />
+              <div v-if="sortedPngData && sortedPngData.length > 0">
+                <div v-for="item in sortedPngData" :key="item.name" class="png-data-item">
+                  <h3 style="">{{ item.name }}</h3>
+                  <div class="png-container">
+                    <img :src="`data:image/png;base64,${item.png}`" :alt="item.name" />
+                  </div>
                 </div>
+              </div>
+              <div v-else class="empty-state">
+                <a-empty description="暂无图形数据" />
               </div>
             </div>
           </a-col>
@@ -305,7 +309,16 @@ export default {
           this.pngData = res.data.items
           this.sortPngData()
           this.visible = true
+        } else if (res.code == 403) {
+          // 密码没有配置，显示错误提示
+          this.$message.error(res.message || '密码没有配置，无法查看图形')
+        } else {
+          // 其他错误
+          this.$message.error(res.message || '获取图形数据失败')
         }
+      }).catch((error) => {
+        // 处理请求异常
+        this.$message.error('请求失败，请稍后重试')
       })
       // this.$router.push("/host/lindetail?id=" + v.hostid + "&type=2");
       // this.visible = true
@@ -319,7 +332,22 @@ export default {
         if (res.code == 200) {
           this.pngData = res.data.items
           this.sortPngData()
+        } else if (res.code == 403) {
+          // 密码没有配置，显示错误提示
+          this.$message.error(res.message || '密码没有配置，无法查看图形')
+          this.pngData = []
+          this.sortPngData()
+        } else {
+          // 其他错误
+          this.$message.error(res.message || '获取图形数据失败')
+          this.pngData = []
+          this.sortPngData()
         }
+      }).catch((error) => {
+        // 处理请求异常
+        this.$message.error('请求失败，请稍后重试')
+        this.pngData = []
+        this.sortPngData()
       })
     },
     sortPngData() {
