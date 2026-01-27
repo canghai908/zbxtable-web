@@ -136,6 +136,7 @@ export default {
       rChannelOptions: [
         { value: "mail", label: "邮件" },
         { value: "wechat", label: "微信" },
+        { value: "wechat_robot", label: "企业微信群机器人" },
         // { value: "dingding", label: "钉钉" },
         // { value: "sms", label: "短信" },
       ],

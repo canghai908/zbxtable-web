@@ -98,6 +98,9 @@ export default {
               if (items == "wechat") {
                 allist.push("微信");
               }
+              if (items == "wechat_robot") {
+                allist.push("企业微信群机器人");
+              }
               if (items == "sms") {
                 allist.push("短信");
               }

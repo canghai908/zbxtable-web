@@ -1,11 +1,11 @@
 <template>
   <page-layout>
     <div slot="headerContent" class="linux-detail">
-      <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading=loading>
-        <a-row :gutter="16">
-          <a-col :xl="{ span: 24 }" :lg="{ span: 24 }">
-            <a-card hoverable :headStyle="{textAlign: 'left', width: '100%', background: '#FAFBFC'}" :title="winTitle">
-              <a-list :grid=" {gutter: 12, column: 24 }" :data-source="win">
+      <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd', padding: '16px'}" :loading=loading>
+        <a-row :gutter="[16, 16]">
+          <a-col :xl="{ span: 12 }" :lg="{ span: 12 }" :md="{ span: 24 }">
+            <a-card hoverable :headStyle="{textAlign: 'left', background: '#FAFBFC', padding: '12px 16px'}" :bodyStyle="{padding: '12px'}" :title="winTitle">
+              <a-list :grid="{ gutter: 8, column: 12, xs: 6, sm: 8, md: 10, lg: 12, xl: 12 }" :data-source="win">
                 <a-list-item slot="renderItem" slot-scope="item">
                   <a-popover :title="$t('title_device_info')" placement="topLeft">
                     <template slot="content">
@@ -27,8 +27,10 @@
                 </a-list-item>
               </a-list>
             </a-card>
-            <a-card hoverable :headStyle="{textAlign: 'left', width: '100%', background: '#FAFBFC'}" :title="linTitle">
-              <a-list :grid="{ gutter: 12, column: 24 }" :data-source="lin">
+          </a-col>
+          <a-col :xl="{ span: 12 }" :lg="{ span: 12 }" :md="{ span: 24 }">
+            <a-card hoverable :headStyle="{textAlign: 'left', background: '#FAFBFC', padding: '12px 16px'}" :bodyStyle="{padding: '12px'}" :title="linTitle">
+              <a-list :grid="{ gutter: 8, column: 12, xs: 6, sm: 8, md: 10, lg: 12, xl: 12 }" :data-source="lin">
                 <a-list-item slot="renderItem" slot-scope="item">
                   <a-popover :title="$t('title_device_info')" placement="topLeft">
                     <template slot="content">
@@ -49,8 +51,10 @@
                 </a-list-item>
               </a-list>
             </a-card>
-            <a-card hoverable :headStyle="{textAlign: 'left', width: '100%', background: '#FAFBFC'}" :title="netTitle">
-              <a-list :grid="{ gutter: 12, column: 24 }" :data-source="net">
+          </a-col>
+          <a-col :xl="{ span: 12 }" :lg="{ span: 12 }" :md="{ span: 24 }">
+            <a-card hoverable :headStyle="{textAlign: 'left', background: '#FAFBFC', padding: '12px 16px'}" :bodyStyle="{padding: '12px'}" :title="netTitle">
+              <a-list :grid="{ gutter: 8, column: 12, xs: 6, sm: 8, md: 10, lg: 12, xl: 12 }" :data-source="net">
                 <a-list-item slot="renderItem" slot-scope="item">
                   <a-popover :title="$t('title_device_info')" placement="topLeft">
                     <template slot="content">
@@ -71,8 +75,10 @@
                 </a-list-item>
               </a-list>
             </a-card>
-            <a-card hoverable :headStyle="{textAlign: 'left', width: '100%', background: '#FAFBFC'}" :title="srvTitle">
-              <a-list :grid="{ gutter: 12, column: 24 }" :data-source="srv">
+          </a-col>
+          <a-col :xl="{ span: 12 }" :lg="{ span: 12 }" :md="{ span: 24 }">
+            <a-card hoverable :headStyle="{textAlign: 'left', background: '#FAFBFC', padding: '12px 16px'}" :bodyStyle="{padding: '12px'}" :title="srvTitle">
+              <a-list :grid="{ gutter: 8, column: 12, xs: 6, sm: 8, md: 10, lg: 12, xl: 12 }" :data-source="srv">
                 <a-list-item slot="renderItem" slot-scope="item">
                   <a-popover :title="$t('title_device_info')" placement="topLeft">
                     <template slot="content">

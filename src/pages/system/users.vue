@@ -24,6 +24,21 @@
         <div slot="phone" slot-scope="record">{{record.phone}}</div>
         <span slot="ding_talk" slot-scope="record">{{record.ding_talk}}</span>
         <span slot="wechat" slot-scope="record">{{record.wechat}}</span>
+        <span slot="wechat_robot_key" slot-scope="record">
+          <template v-if="record.wechat_robot_key">
+            <span style="display: inline-flex; align-items: center; max-width: 300px;">
+              <span style="flex: 1; margin-right: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;">
+                {{ wechatRobotKeyVisible[record.id] ? record.wechat_robot_key : maskKey(record.wechat_robot_key) }}
+              </span>
+              <a-icon 
+                :type="wechatRobotKeyVisible[record.id] ? 'eye-invisible' : 'eye'" 
+                @click="toggleWechatRobotKey(record.id)"
+                style="cursor: pointer; color: #1890ff; flex-shrink: 0;"
+              />
+            </span>
+          </template>
+          <span v-else>-</span>
+        </span>
         <div slot="created" slot-scope="record">{{record.created| parsetime}}</div>
         <span slot="status" slot-scope="record">
           <a-switch :checked="record.status == '0' ? true : false" :checked-children="$t('enabled')"  :un-checked-children="$t('disabled')" @change="onStatusChange($event, record)" />
@@ -62,6 +77,9 @@
           <a-form-model-item :label="$t('wechat')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="wechat">
             <a-input v-model.trim="user.wechat" :placeholder="$t('modalInputWechat')" />
           </a-form-model-item>
+          <a-form-model-item :label="$t('wechat_robot_key')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="wechat_robot_key">
+            <a-input-password v-model.trim="user.wechat_robot_key" :placeholder="$t('modalInputWechatRobotKey')" />
+          </a-form-model-item>
           <a-form-model-item :label="$t('ding_talk')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="ding_talk">
             <a-input v-model.trim="user.ding_talk" :placeholder="$t('modalInputDingTalk')" />
           </a-form-model-item>
@@ -92,6 +110,9 @@
           </a-form-model-item>
           <a-form-model-item :label="$t('wechat')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="wechat">
             <a-input v-model.trim="user.wechat" :placeholder="$t('modalInputWechat')" />
+          </a-form-model-item>
+          <a-form-model-item :label="$t('wechat_robot_key')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="wechat_robot_key">
+            <a-input-password v-model.trim="user.wechat_robot_key" :placeholder="$t('modalInputWechatRobotKey')" />
           </a-form-model-item>
           <a-form-model-item :label="$t('ding_talk')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="ding_talk">
             <a-input v-model.trim="user.ding_talk" :placeholder="$t('modalInputDingTalk')" />
@@ -136,6 +157,7 @@ export default {
       username: "",
       nowuser: "",
       nowrole: "",
+      wechatRobotKeyVisible: {}, // 存储每行key的显示状态 {recordId: true/false}
       statusOption: [
 	{ label: this.$t('state_enabled'), value: "0" },
 	{ label: this.$t('state_disabled'), value: "1" },
@@ -152,6 +174,7 @@ export default {
         { title: this.$t('table_headers_phone'), key: 'phone', align: 'left', scopedSlots: { customRender: 'phone' } },
         { title: this.$t('table_headers_ding_talk'), key: 'ding_talk', align: 'left', scopedSlots: { customRender: 'ding_talk' } },
         { title: this.$t('table_headers_wechat'), key: 'wechat', align: 'left', scopedSlots: { customRender: 'wechat' } },
+        { title: this.$t('table_headers_wechat_robot_key'), key: 'wechat_robot_key', align: 'left', scopedSlots: { customRender: 'wechat_robot_key' } },
         { title: this.$t('table_headers_creation_date'), key: 'created', align: 'left', scopedSlots: { customRender: 'created' } },
         { title: this.$t('table_headers_user_status'), key: 'status', align: 'left', scopedSlots: { customRender: 'status' } },
         { title: this.$t('table_headers_operation'), key: 'operation', align: 'center', scopedSlots: { customRender: 'operation' } }
@@ -164,6 +187,7 @@ export default {
         email: "",
         phone: "",
         wechat: "",
+        wechat_robot_key: "",
         status: "1",
         ding_talk: "",
       },
@@ -174,6 +198,7 @@ export default {
         email: [{ required: false, type: 'email', message: '请输入正确邮箱', trigger: 'change' }],
         phone: [{ required: false, pattern: /^1(3[0-9]|4[01456879]|5[0-3,5-9]|6[2567]|7[0-8]|8[0-9]|9[0-3,5-9])\d{8}$/, message: '请输入正确的手机号码', trigger: 'change' }],
         wechat: [{ required: false, type: 'string', message: '请输入正确的微信账号', trigger: 'blur' }],
+        wechat_robot_key: [{ required: false, type: 'string', message: '请输入企业微信群机器人webhook key', trigger: 'blur' }],
         ding_talk: [{ required: false, type: 'string', message: '请输入正确的钉钉账号', trigger: 'blur' }],      
       },
       rulesUpdate: {
@@ -183,6 +208,7 @@ export default {
         email: [{ required: false, type: 'email', message: '请输入正确邮箱', trigger: 'change' }],
         phone: [{ required: false, pattern: /^1(3[0-9]|4[01456879]|5[0-3,5-9]|6[2567]|7[0-8]|8[0-9]|9[0-3,5-9])\d{8}$/, message: '请输入正确的手机号码', trigger: 'change' }],
         wechat: [{ required: false, type: 'string', message: '请输入正确的微信账号', trigger: 'blur' }],
+        wechat_robot_key: [{ required: false, type: 'string', message: '请输入企业微信群机器人webhook key', trigger: 'blur' }],
         ding_talk: [{ required: false, type: 'string', message: '请输入正确的钉钉账号', trigger: 'blur' }],
       },
       list: [],
@@ -313,6 +339,7 @@ export default {
         email: record.email,
         phone: record.phone,
         wechat: record.wechat,
+        wechat_robot_key: record.wechat_robot_key,
         ding_talk: record.ding_talk,
       }
     },
@@ -334,6 +361,19 @@ export default {
         this.status = "";
         this.init();
       }
+    },
+    toggleWechatRobotKey(recordId) {
+      this.$set(this.wechatRobotKeyVisible, recordId, !this.wechatRobotKeyVisible[recordId]);
+    },
+    maskKey(key) {
+      if (!key || key.length <= 8) {
+        return "****";
+      }
+      // 显示前4位和后4位，中间用*代替
+      const start = key.substring(0, 4);
+      const end = key.substring(key.length - 4);
+      const masked = "*".repeat(Math.max(4, key.length - 8));
+      return start + masked + end;
     },
   },
 };

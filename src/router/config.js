@@ -190,6 +190,11 @@ const options = {
               component: () => import("@/pages/report/index"),
             },
             {
+              path: "hostReport",
+              name: "主机报表",
+              component: () => import("@/pages/report/hostReport"),
+            },
+            {
               path: "host",
               name: "主机报表",
               meta: { highlight: "/report", invisible: true },
