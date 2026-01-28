@@ -9,7 +9,8 @@ const resp401 = {
    */
   onFulfilled(response, options) {
     const {message} = options
-    if (response.code === 401) {
+    // response 现在已经是 response.data 了
+    if (response && response.code === 401) {
       message.error('无此权限')
     }
     return response
@@ -23,7 +24,8 @@ const resp401 = {
   onRejected(error, options) {
     const {message} = options
     const {response} = error
-    if (response.status === 401) {
+    // 检查 response 是否存在，避免访问 undefined 的属性
+    if (response && response.status === 401) {
       message.error('无此权限')
     }
     return Promise.reject(error)
@@ -33,7 +35,8 @@ const resp401 = {
 const resp403 = {
   onFulfilled(response, options) {
     const {message} = options
-    if (response.code === 403) {
+    // response 现在已经是 response.data 了
+    if (response && response.code === 403) {
       message.error('请求被拒绝')
     }
     return response
@@ -41,7 +44,8 @@ const resp403 = {
   onRejected(error, options) {
     const {message} = options
     const {response} = error
-    if (response.status === 403) {
+    // 检查 response 是否存在，避免访问 undefined 的属性
+    if (response && response.status === 403) {
       message.error('请求被拒绝')
     }
     return Promise.reject(error)
@@ -58,7 +62,24 @@ const reqCommon = {
   onFulfilled(config, options) {
     const {message} = options
     const {url, xsrfCookieName} = config
-    if (url.indexOf('login') === -1 && xsrfCookieName && !Cookie.get(xsrfCookieName)) {
+    // 确保每次请求都带上 token（后端默认从 X-Token 读取）
+    // 仅依赖 axios 的 xsrf 机制在某些跨域/代理场景下不稳定，这里显式注入一次。
+    const token = xsrfCookieName ? Cookie.get(xsrfCookieName) : undefined
+    if (token) {
+      config.headers = config.headers || {}
+      if (!config.headers['X-Token']) {
+        config.headers['X-Token'] = token
+      }
+      // 兼容部分后端/中间件可能读取 Authorization
+      if (!config.headers['Authorization']) {
+        config.headers['Authorization'] = `Bearer ${token}`
+      }
+    }
+    // 安装相关的 API 不需要 token 验证
+    const isInstallAPI = url && (url.indexOf('/install') !== -1)
+    const isLoginAPI = url && (url.indexOf('login') !== -1)
+    // 如果不是登录或安装 API，且没有 token，则提示
+    if (!isLoginAPI && !isInstallAPI && xsrfCookieName && !Cookie.get(xsrfCookieName)) {
       message.warning('认证 token 已过期，请重新登录')
     }
     return config

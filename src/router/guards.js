@@ -1,9 +1,70 @@
 import {hasAuthority} from '@/utils/authority-utils'
 import {loginIgnore} from '@/router/index'
 import {checkAuthorization} from '@/utils/request'
+import {getInstallStatus} from '@/services/install'
 import NProgress from 'nprogress'
 
 NProgress.configure({ showSpinner: false })
+
+// 安装状态缓存
+let installStatusChecked = false
+let isInstalled = false
+export const resetInstallStatusCache = () => {
+  installStatusChecked = false
+  isInstalled = false
+}
+
+/**
+ * 安装状态检查守卫
+ * @param to
+ * @param from
+ * @param next
+ * @param options
+ */
+const installGuard = async (to, from, next, options) => {
+  // 如果已经在安装页面，直接通过
+  if (to.path === '/install') {
+    next()
+    return
+  }
+
+  // 如果已经检查过安装状态，使用缓存
+  if (installStatusChecked) {
+    if (!isInstalled) {
+      next({path: '/install', replace: true})
+      return
+    }
+    next()
+    return
+  }
+
+  // 检查安装状态
+  try {
+    const res = await getInstallStatus()
+    installStatusChecked = true
+    // 兼容多种返回（历史 + 当前统一格式）：
+    // 1) 旧：{ installed: true }
+    // 2) 旧 axios-like：{ data: { installed: true } }
+    // 3) 新统一：{ data: { code, message, data: { installed: true } } }
+    // 4) 新统一 axios-like：{ data: { code, message, data: { installed: true } } }（由全局 request.js 返回）
+    const biz = (res && res.data) ? res.data : res
+    const installed =
+      (biz && biz.data && typeof biz.data.installed !== 'undefined' ? biz.data.installed : undefined) ??
+      (biz && typeof biz.installed !== 'undefined' ? biz.installed : undefined)
+    if (installed) {
+      isInstalled = true
+      next()
+    } else {
+      isInstalled = false
+      next({path: '/install', replace: true})
+    }
+  } catch (error) {
+    // 如果接口不存在或出错，说明可能未安装，跳转到安装页面
+    installStatusChecked = true
+    isInstalled = false
+    next({path: '/install', replace: true})
+  }
+}
 
 /**
  * 进度条开始
@@ -99,6 +160,6 @@ const progressDone = () => {
 }
 
 export default {
-  beforeEach: [progressStart, loginGuard, authorityGuard, redirectGuard],
+  beforeEach: [progressStart, installGuard, loginGuard, authorityGuard, redirectGuard],
   afterEach: [progressDone]
 }

@@ -128,7 +128,6 @@ function loadInterceptors(interceptors, options) {
 	})
 	// 加载响应拦截器
 	response.forEach((item) => {
-		console.log(item)
 		let { onFulfilled, onRejected } = item
 		if (!onFulfilled || typeof onFulfilled !== 'function') {
 			onFulfilled = (response) => response
@@ -138,13 +137,38 @@ function loadInterceptors(interceptors, options) {
 		}
 		axios.interceptors.response.use(
 			(response) => {
-				if (response.data.code == 50014) {
+				// 兼容多重拦截器链：这里的 response 可能已经是业务对象 {code,message,data}
+				const isBizObject =
+					response && typeof response === 'object' && typeof response.code !== 'undefined'
+				const biz = isBizObject ? response : (response && response.data ? response.data : undefined)
+
+				// token 失效（统一用业务 code 判断）
+				if (biz && biz.code == 50014) {
 					window.loginNoAuth()
+					return Promise.reject(response)
 				} else {
-					return onFulfilled(response, options)
+					// 向后兼容：项目里大量地方使用 resp.data.code
+					// 因此始终返回 axios-like 结构：{ data: <biz> }
+					const axiosLike =
+						(!isBizObject && response && typeof response === 'object' && typeof response.data !== 'undefined')
+							? { ...response, data: biz }
+							: { data: biz }
+					return onFulfilled(axiosLike, options)
 				}
 			},
-			(error) => onRejected(error, options)
+			(error) => {
+				// 错误处理：保持 axios-like 结构，避免调用方既有代码崩溃
+				if (error.response && error.response.data) {
+					return onRejected({ ...error.response, data: error.response.data }, options)
+				}
+				// 如果没有 response，创建一个错误对象
+				const errorData = {
+					code: error.code || 500,
+					message: error.message || '网络错误，请检查网络连接',
+					error: error
+				}
+				return onRejected({ data: errorData }, options)
+			}
 		)
 	})
 }

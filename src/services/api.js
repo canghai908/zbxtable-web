@@ -41,4 +41,5 @@ module.exports = {
 	GROUP: '/v1/group',
 	AI: '/v1/ai',
 	API_WS: '/ws',
+	ZABBIX: '/v1/zabbix',
 }

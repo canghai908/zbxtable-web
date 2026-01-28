@@ -4,13 +4,7 @@
       <a-form-model-item label="搜索">
         <a-input v-model.trim="hosts" placeholder="主机名" />
       </a-form-model-item>
-      <a-form-model-item label="租户">
-        <a-select optionFilterProp="label" style="width:100px" v-model="tenantid" option-label-prop="label" @change="handleTenantChange">
-          <a-select-option v-for="(item, index) in tenantlist" :key="index" :value="item.tenant_id" :label="item.tenant_id" :title="item.tenant_id">
-            {{ item.tenant_id }}
-          </a-select-option>
-        </a-select>
-      </a-form-model-item>
+      <!-- 租户筛选已取消：统一跟随顶部“当前 Zabbix 连接” -->
       <a-form-model-item>
         <a-button type="primary" @click="init">查询</a-button>
         <a-button style="margin-left: 10px;" @click="resetData">重置</a-button>
@@ -388,7 +382,7 @@ export default {
       this.loading = true;
       let req = {
         page: this.page, limit: this.pageSize,
-        hosts: this.hosts, tenant_id: this.tenantid,
+        hosts: this.hosts,
         status: this.status, m_type: "3"
       };
       ruleList(req).then((resp) => {

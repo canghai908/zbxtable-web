@@ -26,11 +26,16 @@ module.exports = {
     proxy: {
       "/v1": {
         //此处要与 /services/api.js 中的 API_PROXY_PREFIX 值保持一致
-        target: process.env.VUE_APP_API_BASE_URL,
+        target: process.env.VUE_APP_API_BASE_URL || "http://localhost:8085",
+        changeOrigin: true,
+      },
+      "/install": {
+        // 安装相关 API 代理到后端
+        target: process.env.VUE_APP_API_BASE_URL || "http://localhost:8085",
         changeOrigin: true,
       },
       "/ws": {
-        target: process.env.VUE_APP_WS_BASE_URL,
+        target: process.env.VUE_APP_WS_BASE_URL || "http://localhost:8085",
         changeOrigin: true, //是否允许跨域
         ws: true, //开启ws, 如果是http代理此处可以不用设置
       },

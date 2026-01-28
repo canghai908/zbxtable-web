@@ -6,6 +6,11 @@ import BlankView from "@/layouts/BlankView";
 const options = {
   routes: [
     {
+      path: "/install",
+      name: "安装",
+      component: () => import("@/pages/install"),
+    },
+    {
       path: "/login",
       name: "登录",
       component: () => import("@/pages/login"),
@@ -142,11 +147,6 @@ const options = {
               component: () => import("@/pages/alarm/rule"),
             },
             {
-              path: "rule-edit",
-              name: "分发规则",
-              component: () => import("@/pages/alarm/ruleEdit"),
-            },
-            {
               path: "mutes",
               name: "屏蔽规则",
               component: () => import("@/pages/alarm/mutes"),
@@ -250,6 +250,16 @@ const options = {
               path: "bandwidth",
               name: "出口配置",
               component: () => import("@/pages/system/bandwidth"),
+            },
+            {
+              path: "zabbix",
+              name: "Zabbix 管理",
+              component: () => import("@/pages/system/zabbix"),
+            },
+            {
+              path: "zabbix-tenant",
+              name: "租户绑定",
+              component: () => import("@/pages/system/zabbixTenant"),
             },
             {
               path: "chpwd",

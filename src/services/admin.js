@@ -31,6 +31,7 @@ import {
 	AI,
 	INVENTORY_EXPORT,
 	REPORT,
+	ZABBIX,
 } from '@/services/api'
 import { request, METHOD } from '@/utils/request'
 // import { INDEX_VERSION, INVENTORY_EXPORT, REPORT } from "./api";
@@ -81,6 +82,9 @@ export async function alarmExport(params, config) {
 }
 export async function alarmTenantGet() {
 	return request(ALARM + '/tenant', METHOD.GET)
+}
+export async function zabbixTenantList() {
+	return request(ZABBIX + '/tenants', METHOD.GET)
 }
 export async function topologyList(params) {
 	return request(TOPOLOGY_LIST, METHOD.GET, { ...params })
@@ -297,6 +301,7 @@ export default {
 	alarm,
 	alarmAnalysis,
 	alarmTenantGet,
+	zabbixTenantList,
 	topologyList,
 	topologyDetail,
 	createTopology,

@@ -7,6 +7,11 @@ const view = {
 
 // 路由组件注册
 const routerMap = {
+	install: {
+		authority: '*',
+		path: '/install',
+		component: () => import('@/pages/install'),
+	},
 	login: {
 		authority: '*',
 		path: '/login',
@@ -92,12 +97,6 @@ const routerMap = {
 	alarmRule: {
 		component: () => import('@/pages/alarm/rule'),
 	},
-	alarmRuleAdd: {
-		component: () => import('@/pages/alarm/ruleAdd'),
-	},
-	alarmRuleEdit: {
-		component: () => import('@/pages/alarm/ruleEdit'),
-	},
 	alarmMutes: {
 		component: () => import('@/pages/alarm/mutes'),
 	},
@@ -160,6 +159,12 @@ const routerMap = {
 	},
 	sysConfig: {
 		component: () => import('@/pages/system/config'),
+	},
+	zabbixConfig: {
+		component: () => import('@/pages/system/zabbix'),
+	},
+	zabbixTenant: {
+		component: () => import('@/pages/system/zabbixTenant'),
 	},
 	analysis: {
 		name: '分析页',

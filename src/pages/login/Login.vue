@@ -64,15 +64,39 @@ export default {
           this.logging = true
           const name = this.form.getFieldValue('name')
           const password = this.form.getFieldValue('password')
-          login(name, password).then(this.afterLogin)
+          
+          login(name, password)
+            .then(this.afterLogin)
+            .catch((error) => {
+              this.logging = false
+              // 兼容 axios error / 自定义 error 对象
+              if (error && typeof error === 'object') {
+                const msg =
+                  error.message ||
+                  (error.data && error.data.message) ||
+                  (error.response && error.response.data && error.response.data.message)
+                this.error = msg || '登录失败'
+              } else {
+                this.error = '登录失败'
+              }
+            })
         }
       })
     },
     afterLogin(res) {
       this.logging = false
-      const loginRes = res.data
-      if (loginRes.code == 200) {
-        const { user, permissions, roles } = loginRes.data
+      // 兼容两种形态：
+      // 1) 全局 request.js 返回 axios-like：{ data: { code, message, data } }
+      // 2) 极端情况下直接返回业务对象：{ code, message, data }
+      const loginRes =
+        (res && res.data && typeof res.data.code !== 'undefined')
+          ? res.data
+          : res
+
+      const code = loginRes && loginRes.code
+      // 兼容历史 mock 返回 code = 0，以及当前后端返回 code = 200
+      if (loginRes && (code === 200 || code === 0 || code === '200' || code === '0')) {
+        const { user, permissions, roles } = (loginRes && loginRes.data) || {}
         // let premissions = [{ id: "queryForm", operation: ["add", "edit", 'delete'] }]
         // roles = [{ id: "admin", operation: ["add", "edit", "delete"] }],
         // user = {
@@ -84,16 +108,31 @@ export default {
         this.setUser(user)
         // this.setPermissions(premissions);
         this.setRoles(roles)
-        setAuthorization({ token: loginRes.data.token })
+        setAuthorization({ token: loginRes && loginRes.data && loginRes.data.token })
         // 获取路由配置
         getRoutesConfig().then((result) => {
-          const routesConfig = result.data.data.items
-          loadRoutes(routesConfig)
+          try {
+            const routesRes =
+              (result && result.data && typeof result.data.code !== 'undefined')
+                ? result.data
+                : result
+            const routesConfig =
+              routesRes && routesRes.data && routesRes.data.items ? routesRes.data.items : []
+            loadRoutes(routesConfig)
+            this.$router.push('/dashboard/workplace')
+            this.$message.success(loginRes.message || '登录成功', 1)
+          } catch (e) {
+            // 路由加载失败时也至少完成登录并进入首页
+            this.$router.push('/dashboard/workplace')
+            this.$message.success(loginRes && loginRes.message ? loginRes.message : '登录成功', 1)
+          }
+        }).catch(() => {
+          // 路由配置接口异常时，至少完成基本登录跳转
           this.$router.push('/dashboard/workplace')
-          this.$message.success(loginRes.message, 1)
+          this.$message.success(loginRes && loginRes.message ? loginRes.message : '登录成功', 1)
         })
       } else {
-        this.error = loginRes.message
+        this.error = (loginRes && loginRes.message) ? loginRes.message : '登录失败'
       }
     }
   }

@@ -6,13 +6,7 @@
           <a-range-picker format="YYYY-MM-DD HH:mm:ss" :show-time="{ format: 'HH:mm', defaultValue:[moment('00:00:00', 'HH:mm:ss'),moment('23:59:59', 'HH:mm:ss')]}" v-model="timeValue"
             @change="changeCreationTime" :getCalendarContainer="triggerNode=>{return triggerNode.parentNode || document.body}" />
         </a-form-model-item>
-        <a-form-model-item label="租户">
-          <a-select optionFilterProp="label" style="width:100px" v-model="tenantid" option-label-prop="label" @change="handleTenantChange">
-            <a-select-option v-for="(item, index) in tenantlist" :key="index" :value="item.tenant_id" :label="item.tenant_id" :title="item.tenant_id">
-              {{ item.tenant_id }}
-            </a-select-option>
-          </a-select>
-        </a-form-model-item>
+        <!-- 租户筛选已取消：统一跟随顶部“当前 Zabbix 连接” -->
         <a-form-model-item>
           <a-button type="primary" @click="init">查询</a-button>
         </a-form-model-item>
@@ -40,7 +34,7 @@
 import PageLayout from "@/layouts/PageLayout";
 import ePie from "./ePie";
 import eLine from "./eLine";
-import { alarmAnalysis, alarmTenantGet, alarmExport } from "@/services/admin";
+import { alarmAnalysis, alarmExport } from "@/services/admin";
 import { parseTimeFun } from "@/utils/formatter";
 import moment from "moment";
 import "moment/locale/zh-cn";
@@ -53,8 +47,7 @@ export default {
   },
   data() {
     return {
-      tenantid: "",
-      tenantlist: [],
+      // tenantid/tenantlist 已取消：跟随“当前 Zabbix 连接”
       list: [],
       nameList: [],
       numList: [],
@@ -82,7 +75,7 @@ export default {
       this.list = [];
       this.nameList = [];
       this.numList = [];
-      alarmAnalysis({ begin: this.beginTime, end: this.endTime, tenant_id: this.tenantid })
+      alarmAnalysis({ begin: this.beginTime, end: this.endTime })
         .then((resp) => {
           let res = resp.data;
           if (res.code == 200) {
@@ -94,16 +87,11 @@ export default {
         .finally(() => {
           this.showPage = true;
         });
-      alarmTenantGet().then((resp) => {
-        let res = resp.data
-        if (res.code == 200) {
-          this.tenantlist = res.data.items || []
-        }
-      }).finally(() => { this.loading2 = false })
+      // alarmTenantGet 已不再需要
     },
     anayexport() {
       alarmExport(
-        { begin: this.beginTime, end: this.endTime, tenant_id: this.tenantid },
+        { begin: this.beginTime, end: this.endTime },
         { responseType: "arraybuffer", }
       ).then((resp) => {
         let filename = resp.headers["content-disposition"]
@@ -127,9 +115,6 @@ export default {
         this.beginTime = "";
         this.endTime = "";
       }
-    },
-    handleTenantChange(val) {
-      this.tenantid = val
     },
   },
 };
