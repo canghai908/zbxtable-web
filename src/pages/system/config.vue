@@ -87,7 +87,8 @@ export default {
       return this.list.filter(item => 
         item.key === 'zbx_dash' || 
         item.key === 'dash_id' || 
-        item.key === 'sync_inventory'
+        item.key === 'sync_inventory' ||
+        item.key === 'webhook_url'
       )
     },
     emailConfigs() {
