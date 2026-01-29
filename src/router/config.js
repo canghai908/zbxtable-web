@@ -254,11 +254,6 @@ const options = {
             {
               path: "zabbix",
               name: "Zabbix 管理",
-              component: () => import("@/pages/system/zabbix"),
-            },
-            {
-              path: "zabbix-tenant",
-              name: "租户绑定",
               component: () => import("@/pages/system/zabbixTenant"),
             },
             {
