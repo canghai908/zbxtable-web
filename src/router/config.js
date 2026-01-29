@@ -254,7 +254,7 @@ const options = {
             {
               path: "zabbix",
               name: "Zabbix 管理",
-              component: () => import("@/pages/system/zabbixTenant"),
+              component: () => import("@/pages/system/zabbix"),
             },
             {
               path: "chpwd",

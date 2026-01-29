@@ -160,8 +160,8 @@ const routerMap = {
 	sysConfig: {
 		component: () => import('@/pages/system/config'),
 	},
-	zabbixTenant: {
-		component: () => import('@/pages/system/zabbixTenant'),
+	zabbix: {
+		component: () => import('@/pages/system/zabbix'),
 	},
 	analysis: {
 		name: '分析页',
