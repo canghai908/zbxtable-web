@@ -95,8 +95,8 @@ export async function topologyDetail(id) {
 export async function createTopology(params) {
 	return request(TOPOLOGY_LIST, METHOD.POST, params)
 }
-export async function updateTopology(params) {
-	return request(TOPOLOGY_LIST, METHOD.PUT, params)
+export async function updateTopology(id, params) {
+	return request(TOPOLOGY_LIST + '/' + id, METHOD.PUT, params)
 }
 export async function deleteTopology(id) {
 	return request(TOPOLOGY_LIST + '/' + id, METHOD.DELETE)

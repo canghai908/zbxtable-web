@@ -28,110 +28,110 @@
     </div>
     <!-- 新增/编辑规则弹窗 -->
     <a-modal :title="editingId ? '编辑分发规则' : '新增分发规则'" :visible="modalVisible" :confirmLoading="modalLoading" @ok="saveRule" @cancel="closeModal" width="900px">
-      <a-form-model :model="editRule" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
-        <a-form-model-item label="名称" required>
-          <a-input v-model.trim="editRule.name" placeholder="请输入规则名称" />
-        </a-form-model-item>
-        <a-form-model-item label="租户" required>
+    <a-form-model :model="editRule" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
+      <a-form-model-item label="名称" required>
+        <a-input v-model.trim="editRule.name" placeholder="请输入规则名称" />
+      </a-form-model-item>
+      <a-form-model-item label="租户" required>
           <a-select v-model="editRule.tenant_id" mode="multiple" style="width: 100%" placeholder="选择告警租户">
             <a-select-option v-for="(item, index) in tenantlist" :key="index" :value="item.tenant_id" :label="item.tenant_id" :title="item.tenant_id">
-              {{ item.tenant_id }}
-            </a-select-option>
-          </a-select>
-        </a-form-model-item>
+            {{ item.tenant_id }}
+          </a-select-option>
+        </a-select>
+      </a-form-model-item>
 
-        <a-card title="匹配条件" :bordered="false" size="small">
+      <a-card title="匹配条件" :bordered="false" size="small">
           <div v-for="(itv, its) in editRule.conditions" :key="its" class="condition-row">
             <a-row :gutter="8" type="flex" align="middle">
               <a-col :span="6">
                 <a-form-item label="字段" :label-col="{ span: 24 }" :wrapper-col="{ span: 24 }">
-                  <a-select v-model="itv.r_type">
-                    <a-select-option v-for="(item, index) in rTypeOptions" :key="index" :value="item.value">
-                      {{ item.label }}
-                    </a-select-option>
-                  </a-select>
-                </a-form-item>
-              </a-col>
+              <a-select v-model="itv.r_type">
+                <a-select-option v-for="(item, index) in rTypeOptions" :key="index" :value="item.value">
+                  {{ item.label }}
+                </a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
               <a-col :span="5">
                 <a-form-item label="操作符" :label-col="{ span: 24 }" :wrapper-col="{ span: 24 }">
-                  <a-select v-model="itv.r_func">
-                    <a-select-option v-for="(item, index) in rFuncOptions" :key="index" :value="item.value">
-                      {{ item.label }}
-                    </a-select-option>
-                  </a-select>
-                </a-form-item>
-              </a-col>
+              <a-select v-model="itv.r_func">
+                <a-select-option v-for="(item, index) in rFuncOptions" :key="index" :value="item.value">
+                  {{ item.label }}
+                </a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
               <a-col :span="8">
                 <a-form-item label="值" :label-col="{ span: 24 }" :wrapper-col="{ span: 24 }">
-                  <a-input v-model="itv.r_value" placeholder="匹配值" />
-                </a-form-item>
-              </a-col>
+              <a-input v-model="itv.r_value" placeholder="匹配值" />
+            </a-form-item>
+          </a-col>
               <a-col :span="5" class="condition-actions">
-                <a-button 
+              <a-button
                   type="danger" 
-                  v-if="editRule.conditions && editRule.conditions.length > 1" 
-                  icon="delete" 
+                v-if="editRule.conditions && editRule.conditions.length > 1"
+                icon="delete"
                   size="small"
-                  @click="editRule.conditions.splice(its, 1)"
+                @click="editRule.conditions.splice(its, 1)"
                 >
                   删除
                 </a-button>
-                <a-button 
-                  type="primary" 
-                  v-if="its === 0" 
-                  icon="plus" 
+              <a-button
+                type="primary"
+                v-if="its === 0"
+                icon="plus"
                   size="small"
-                  @click="editRule.conditions.push({ r_type: '', r_func: '', r_value: '' })"
+                @click="editRule.conditions.push({ r_type: '', r_func: '', r_value: '' })"
                   style="margin-left: 8px;"
                 >
                   添加
                 </a-button>
-              </a-col>
-            </a-row>
+          </a-col>
+        </a-row>
           </div>
-        </a-card>
+      </a-card>
 
-        <a-card title="时间与通道" :bordered="false" size="small" style="margin-top: 12px;">
-          <a-form-model-item label="星期">
-            <a-select v-model="editRule.s_week" mode="multiple" style="width: 100%">
-              <a-select-option v-for="(item, index) in rWeekOptions" :key="index" :value="item.value">
-                {{ item.label }}
-              </a-select-option>
-            </a-select>
-          </a-form-model-item>
-          <a-form-model-item label="时间段">
-            <a-time-picker v-model="editRule.s_time" format="HH:mm" style="margin-right: 8px;" />
-            <a-time-picker v-model="editRule.e_time" format="HH:mm" />
-          </a-form-model-item>
-          <a-form-model-item label="通道">
-            <a-checkbox-group v-model="editRule.channel" :options="rChannelOptions" />
-          </a-form-model-item>
-        </a-card>
+      <a-card title="时间与通道" :bordered="false" size="small" style="margin-top: 12px;">
+        <a-form-model-item label="星期">
+          <a-select v-model="editRule.s_week" mode="multiple" style="width: 100%">
+            <a-select-option v-for="(item, index) in rWeekOptions" :key="index" :value="item.value">
+              {{ item.label }}
+            </a-select-option>
+          </a-select>
+        </a-form-model-item>
+        <a-form-model-item label="时间段">
+          <a-time-picker v-model="editRule.s_time" format="HH:mm" style="margin-right: 8px;" />
+          <a-time-picker v-model="editRule.e_time" format="HH:mm" />
+        </a-form-model-item>
+        <a-form-model-item label="通道">
+          <a-checkbox-group v-model="editRule.channel" :options="rChannelOptions" />
+        </a-form-model-item>
+      </a-card>
 
-        <a-card title="接收对象" :bordered="false" size="small" style="margin-top: 12px;">
-          <a-form-model-item label="接收人">
-            <a-select v-model="editRule.user_ids" mode="multiple" style="width: 100%" placeholder="告警接收人">
+      <a-card title="接收对象" :bordered="false" size="small" style="margin-top: 12px;">
+        <a-form-model-item label="接收人">
+          <a-select v-model="editRule.user_ids" mode="multiple" style="width: 100%" placeholder="告警接收人">
               <a-select-option v-for="(item, index) in userlist" :key="index" :value="item.id.toString()" :label="item.username" :title="item.username">
-                {{ item.username }}
-              </a-select-option>
-            </a-select>
-          </a-form-model-item>
-          <a-form-model-item label="接收组">
-            <a-select v-model="editRule.group_ids" mode="multiple" style="width: 100%" placeholder="告警接收组">
+              {{ item.username }}
+            </a-select-option>
+          </a-select>
+        </a-form-model-item>
+        <a-form-model-item label="接收组">
+          <a-select v-model="editRule.group_ids" mode="multiple" style="width: 100%" placeholder="告警接收组">
               <a-select-option v-for="(item, index) in grouplist" :key="index" :value="item.id.toString()" :label="item.name" :title="item.name">
-                {{ item.name }}
-              </a-select-option>
-            </a-select>
-          </a-form-model-item>
-        </a-card>
+              {{ item.name }}
+            </a-select-option>
+          </a-select>
+        </a-form-model-item>
+      </a-card>
 
-        <a-form-model-item label="备注" style="margin-top: 12px;">
-          <a-input v-model.trim="editRule.note" placeholder="备注说明" />
-        </a-form-model-item>
-        <a-form-model-item label="状态">
-          <a-switch v-model="editRule.status" checked-children="启用" un-checked-children="禁用" />
-        </a-form-model-item>
-      </a-form-model>
+      <a-form-model-item label="备注" style="margin-top: 12px;">
+        <a-input v-model.trim="editRule.note" placeholder="备注说明" />
+      </a-form-model-item>
+      <a-form-model-item label="状态">
+        <a-switch v-model="editRule.status" checked-children="启用" un-checked-children="禁用" />
+      </a-form-model-item>
+    </a-form-model>
     </a-modal>
   </page-layout>
 </template>

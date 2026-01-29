@@ -26,25 +26,38 @@
               </a-select>
             </a-form-model-item>
 
-            <a-form-model-item label="数据库地址" prop="dbhost">
-              <a-input v-model="dbForm.dbhost" placeholder="localhost" />
-            </a-form-model-item>
+            <!-- SQLite 只显示数据库路径 -->
+            <template v-if="dbForm.dbtype === 'sqlite'">
+              <a-form-model-item label="数据库路径" prop="dbname">
+                <a-input v-model="dbForm.dbname" placeholder="./data/zbxtable.db" />
+                <div class="form-help-text">
+                  SQLite 数据库文件路径，支持相对路径和绝对路径。例如：./data/zbxtable.db
+                </div>
+              </a-form-model-item>
+            </template>
 
-            <a-form-model-item label="数据库端口" prop="dbport">
-              <a-input-number v-model="dbForm.dbport" :min="1" :max="65535" style="width: 100%" />
-            </a-form-model-item>
+            <!-- MySQL/PostgreSQL 显示完整配置 -->
+            <template v-else>
+              <a-form-model-item label="数据库地址" prop="dbhost">
+                <a-input v-model="dbForm.dbhost" placeholder="localhost" />
+              </a-form-model-item>
 
-            <a-form-model-item label="数据库名称" prop="dbname">
-              <a-input v-model="dbForm.dbname" placeholder="zbxtable" />
-            </a-form-model-item>
+              <a-form-model-item label="数据库端口" prop="dbport">
+                <a-input-number v-model="dbForm.dbport" :min="1" :max="65535" style="width: 100%" />
+              </a-form-model-item>
 
-            <a-form-model-item label="数据库用户" prop="dbuser">
-              <a-input v-model="dbForm.dbuser" placeholder="zbxtable" />
-            </a-form-model-item>
+              <a-form-model-item label="数据库名称" prop="dbname">
+                <a-input v-model="dbForm.dbname" placeholder="zbxtable" />
+              </a-form-model-item>
 
-            <a-form-model-item label="数据库密码" prop="dbpass">
-              <a-input-password v-model="dbForm.dbpass" placeholder="请输入数据库密码" />
-            </a-form-model-item>
+              <a-form-model-item label="数据库用户" prop="dbuser">
+                <a-input v-model="dbForm.dbuser" placeholder="zbxtable" />
+              </a-form-model-item>
+
+              <a-form-model-item label="数据库密码" prop="dbpass">
+                <a-input-password v-model="dbForm.dbpass" placeholder="请输入数据库密码" />
+              </a-form-model-item>
+            </template>
 
             <a-form-model-item :wrapper-col="{ span: 14, offset: 6 }">
               <a-button type="primary" :loading="dbChecking" @click="checkDatabase">
@@ -207,19 +220,27 @@ export default {
       }
     },
     handleDbTypeChange(value) {
+      // 清空之前的检查结果
+      this.dbCheckResult = null
+      
       if (value === 'mysql') {
         this.dbForm.dbport = 3306
         this.dbForm.dbhost = 'localhost'
         this.dbForm.dbuser = 'root'
+        this.dbForm.dbname = 'zbxtable'
+        this.dbForm.dbpass = ''
       } else if (value === 'postgresql') {
         this.dbForm.dbport = 5432
         this.dbForm.dbhost = 'localhost'
         this.dbForm.dbuser = 'postgres'
+        this.dbForm.dbname = 'zbxtable'
+        this.dbForm.dbpass = ''
       } else if (value === 'sqlite') {
-        // SQLite 不需要端口、主机和用户
+        // SQLite 不需要端口、主机、用户和密码
         this.dbForm.dbport = null
         this.dbForm.dbhost = ''
         this.dbForm.dbuser = ''
+        this.dbForm.dbpass = ''
         this.dbForm.dbname = './data/zbxtable.db'
       }
     },
@@ -242,7 +263,7 @@ export default {
             dbData.dbuser = this.dbForm.dbuser
             dbData.dbpass = this.dbForm.dbpass
           } else {
-            // SQLite 使用默认值
+            // SQLite 使用空值
             dbData.dbhost = ''
             dbData.dbport = ''
             dbData.dbuser = ''
@@ -256,7 +277,7 @@ export default {
             (biz && typeof biz.success !== 'undefined' ? biz.success : undefined)
 
           if (ok && success) {
-            this.dbCheckResult = { success: true, message: biz.message }
+            this.dbCheckResult = { success: true, message: biz.message || '数据库连接成功' }
           } else {
             this.dbCheckResult = { success: false, message: (biz && biz.message) || '数据库连接失败' }
           }
@@ -314,7 +335,7 @@ export default {
             installData.dbuser = this.dbForm.dbuser
             installData.dbpass = this.dbForm.dbpass
           } else {
-            // SQLite 使用默认值
+            // SQLite 使用空值
             installData.dbhost = ''
             installData.dbport = ''
             installData.dbuser = ''

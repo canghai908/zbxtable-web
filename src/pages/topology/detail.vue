@@ -387,10 +387,9 @@ export default {
         nodes: JSON.stringify(nodes),
         topology: this.form.name,
         status: this.form.status,
-        id: this.id,
       })
       if (this.id) {
-        updateTopology(params).then((resp) => {
+        updateTopology(this.id, params).then((resp) => {
           let res = resp.data
           if (res.code == 200) {
             this.$message.success(res.message)
