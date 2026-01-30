@@ -11,6 +11,7 @@
       <a-steps :current="currentStep" class="install-steps">
         <a-step title="数据库配置" />
         <a-step title="系统配置" />
+        <a-step title="确认配置" />
         <a-step title="完成安装" />
       </a-steps>
 
@@ -90,8 +91,86 @@
           </a-form-model>
         </div>
 
-        <!-- 步骤 3: 完成安装 -->
+        <!-- 步骤 3: 确认配置 -->
         <div v-show="currentStep === 2" class="step-content">
+          <div class="confirm-container">
+            <a-alert
+              message="请确认以下配置信息"
+              description="请仔细检查配置信息，确认无误后点击开始安装按钮进行安装"
+              type="info"
+              show-icon
+              style="margin-bottom: 24px"
+            />
+
+            <div class="config-section">
+              <h3 class="section-title">
+                <a-icon type="database" />
+                数据库配置
+              </h3>
+              <a-descriptions bordered :column="1" size="small">
+                <a-descriptions-item label="数据库类型">
+                  <a-tag :color="getDbTypeColor(dbForm.dbtype)">
+                    {{ getDbTypeName(dbForm.dbtype) }}
+                  </a-tag>
+                </a-descriptions-item>
+                <a-descriptions-item v-if="dbForm.dbtype !== 'sqlite'" label="数据库地址">
+                  {{ dbForm.dbhost }}
+                </a-descriptions-item>
+                <a-descriptions-item v-if="dbForm.dbtype !== 'sqlite'" label="数据库端口">
+                  {{ dbForm.dbport }}
+                </a-descriptions-item>
+                <a-descriptions-item label="数据库名称/路径">
+                  <span class="config-value">{{ dbForm.dbname }}</span>
+                </a-descriptions-item>
+                <a-descriptions-item v-if="dbForm.dbtype !== 'sqlite'" label="数据库用户">
+                  {{ dbForm.dbuser }}
+                </a-descriptions-item>
+                <a-descriptions-item v-if="dbForm.dbtype !== 'sqlite'" label="数据库密码">
+                  <span class="password-mask">{{ dbForm.dbpass ? '••••••••' : '(未设置)' }}</span>
+                </a-descriptions-item>
+                <a-descriptions-item label="连接状态">
+                  <a-tag v-if="dbCheckResult && dbCheckResult.success" color="green">
+                    <a-icon type="check-circle" /> 连接成功
+                  </a-tag>
+                  <a-tag v-else color="orange">
+                    <a-icon type="warning" /> 未测试
+                  </a-tag>
+                </a-descriptions-item>
+              </a-descriptions>
+            </div>
+
+            <div class="config-section">
+              <h3 class="section-title">
+                <a-icon type="setting" />
+                系统配置
+              </h3>
+              <a-descriptions bordered :column="1" size="small">
+                <a-descriptions-item label="HTTP 端口">
+                  <a-tag color="blue">{{ systemForm.httpport }}</a-tag>
+                </a-descriptions-item>
+                <a-descriptions-item label="运行模式">
+                  <a-tag :color="systemForm.runmode === 'prod' ? 'green' : 'orange'">
+                    {{ systemForm.runmode === 'prod' ? '生产环境' : '开发环境' }}
+                  </a-tag>
+                </a-descriptions-item>
+                <a-descriptions-item label="会话超时">
+                  {{ systemForm.timeout }} 小时
+                </a-descriptions-item>
+              </a-descriptions>
+            </div>
+
+            <a-alert
+              message="提示"
+              description="安装过程将创建数据库表结构并初始化系统数据，请确保数据库配置正确且有足够的权限。"
+              type="warning"
+              show-icon
+              style="margin-top: 24px"
+            />
+          </div>
+        </div>
+
+        <!-- 步骤 4: 完成安装 -->
+        <div v-show="currentStep === 3" class="step-content">
           <a-result status="success" title="安装完成！" sub-title="ZbxTable 已成功安装，您现在可以开始使用了。">
             <template slot="extra">
               <a-button type="primary" @click="goToLogin">前往登录</a-button>
@@ -101,12 +180,12 @@
       </div>
 
       <div class="install-footer">
-        <a-button v-if="currentStep > 0" @click="prevStep">上一步</a-button>
+        <a-button v-if="currentStep > 0 && currentStep < 3" @click="prevStep">上一步</a-button>
         <a-button v-if="currentStep < 2" type="primary" :loading="installing" @click="nextStep" style="margin-left: 8px">
           下一步
         </a-button>
-        <a-button v-if="currentStep === 1" type="primary" :loading="installing" @click="doInstall" style="margin-left: 8px">
-          开始安装
+        <a-button v-if="currentStep === 2" type="primary" :loading="installing" @click="doInstall" style="margin-left: 8px">
+          <a-icon type="rocket" /> 开始安装
         </a-button>
       </div>
     </a-card>
@@ -315,61 +394,73 @@ export default {
       }
     },
     async doInstall() {
-      this.$refs.systemForm.validate(async (valid) => {
-        if (!valid) return
+      this.installing = true
 
-        this.installing = true
-
-        try {
-          const installData = {
-            ...this.systemForm,
-            httpport: String(this.systemForm.httpport),
-            timeout: String(this.systemForm.timeout)
-          }
-          // 数据库配置
-          installData.dbtype = this.dbForm.dbtype
-          installData.dbname = this.dbForm.dbname
-          if (this.dbForm.dbtype !== 'sqlite') {
-            installData.dbhost = this.dbForm.dbhost
-            installData.dbport = String(this.dbForm.dbport)
-            installData.dbuser = this.dbForm.dbuser
-            installData.dbpass = this.dbForm.dbpass
-          } else {
-            // SQLite 使用空值
-            installData.dbhost = ''
-            installData.dbport = ''
-            installData.dbuser = ''
-            installData.dbpass = ''
-          }
-
-          const res = await doInstallAPI(installData)
-          const biz = (res && res.data) ? res.data : res
-          const ok = biz && (biz.code === 200 || biz.code === 0 || biz.code === '200' || biz.code === '0')
-          const success =
-            (biz && biz.data && typeof biz.data.success !== 'undefined' ? biz.data.success : undefined) ??
-            (biz && typeof biz.success !== 'undefined' ? biz.success : undefined)
-
-          if (ok && success) {
-            this.$message.success('安装成功！')
-            resetInstallStatusCache()
-            this.currentStep = 2
-          } else {
-            this.$message.error((biz && biz.message) || '安装失败')
-          }
-        } catch (error) {
-          // 错误可能是字符串或对象
-          const errorMessage = error.message || (typeof error === 'string' ? error : '安装失败')
-          this.$message.error(errorMessage)
-        } finally {
-          this.installing = false
+      try {
+        const installData = {
+          ...this.systemForm,
+          httpport: String(this.systemForm.httpport),
+          timeout: String(this.systemForm.timeout)
         }
-      })
+        // 数据库配置
+        installData.dbtype = this.dbForm.dbtype
+        installData.dbname = this.dbForm.dbname
+        if (this.dbForm.dbtype !== 'sqlite') {
+          installData.dbhost = this.dbForm.dbhost
+          installData.dbport = String(this.dbForm.dbport)
+          installData.dbuser = this.dbForm.dbuser
+          installData.dbpass = this.dbForm.dbpass
+        } else {
+          // SQLite 使用空值
+          installData.dbhost = ''
+          installData.dbport = ''
+          installData.dbuser = ''
+          installData.dbpass = ''
+        }
+
+        const res = await doInstallAPI(installData)
+        const biz = (res && res.data) ? res.data : res
+        const ok = biz && (biz.code === 200 || biz.code === 0 || biz.code === '200' || biz.code === '0')
+        const success =
+          (biz && biz.data && typeof biz.data.success !== 'undefined' ? biz.data.success : undefined) ??
+          (biz && typeof biz.success !== 'undefined' ? biz.success : undefined)
+
+        if (ok && success) {
+          this.$message.success('安装成功！')
+          resetInstallStatusCache()
+          this.currentStep = 3
+        } else {
+          this.$message.error((biz && biz.message) || '安装失败')
+        }
+      } catch (error) {
+        // 错误可能是字符串或对象
+        const errorMessage = error.message || (typeof error === 'string' ? error : '安装失败')
+        this.$message.error(errorMessage)
+      } finally {
+        this.installing = false
+      }
     },
     goToLogin() {
       resetInstallStatusCache()
       // 安装完成后，刷新页面以重新检查安装状态
       // 这样路由守卫会检测到已安装，自动跳转到登录页
       window.location.href = '/login'
+    },
+    getDbTypeName(type) {
+      const names = {
+        mysql: 'MySQL',
+        postgresql: 'PostgreSQL',
+        sqlite: 'SQLite'
+      }
+      return names[type] || type
+    },
+    getDbTypeColor(type) {
+      const colors = {
+        mysql: 'blue',
+        postgresql: 'cyan',
+        sqlite: 'green'
+      }
+      return colors[type] || 'default'
     }
   }
 }
@@ -387,7 +478,7 @@ export default {
 
 .install-card {
   width: 100%;
-  max-width: 800px;
+  max-width: 900px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
 }
 
@@ -438,5 +529,40 @@ export default {
 
 .error-text {
   color: #f5222d;
+}
+
+// 确认配置页面样式
+.confirm-container {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.config-section {
+  margin-bottom: 32px;
+  
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #262626;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #1890ff;
+    
+    .anticon {
+      margin-right: 8px;
+      color: #1890ff;
+    }
+  }
+}
+
+.config-value {
+  font-family: 'Courier New', monospace;
+  color: #1890ff;
+  font-weight: 500;
+}
+
+.password-mask {
+  color: #999;
+  letter-spacing: 2px;
 }
 </style>

@@ -29,6 +29,11 @@ module.exports = {
         target: process.env.VUE_APP_API_BASE_URL || "http://localhost:8085",
         changeOrigin: true,
       },
+      "/download": {
+        // 报表下载
+        target: process.env.VUE_APP_API_BASE_URL || "http://localhost:8085",
+        changeOrigin: true,
+      },
       "/install": {
         // 安装相关 API 代理到后端
         target: process.env.VUE_APP_API_BASE_URL || "http://localhost:8085",
