@@ -1,5 +1,11 @@
 <template>
   <page-layout :noTitle="true">
+    <a-alert message="多实例告警规则说明" type="info" show-icon closable style="margin-bottom: 16px;">
+      <template slot="description">
+        系统已支持多实例数据聚合。在配置告警分发规则时，可以选择一个或多个实例，规则将应用于所选实例的告警。
+      </template>
+    </a-alert>
+    
     <a-form-model class="home-search" layout="inline" :colon='false'>
       <a-form-model-item label="搜索">
         <a-input v-model.trim="name" placeholder="策略名称" />

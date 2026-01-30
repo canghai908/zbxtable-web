@@ -1,7 +1,18 @@
 <template>
   <page-layout :noTitle="true">
+    <a-alert message="实例选择提示" type="info" show-icon closable style="margin-bottom: 16px;">
+      <template slot="description">
+        指标映射需要从指定的 Zabbix 实例获取主机组、模板和监控项数据。请先选择要配置的实例。
+      </template>
+    </a-alert>
+    
     <a-form-model class="home-search" layout="inline" :colon='false'>
-      <a-form-model-item>
+      <a-form-model-item label="选择实例">
+        <a-select v-model="selectedInstance" placeholder="请选择 Zabbix 实例" @change="handleInstanceChange" style="width: 300px">
+          <a-select-option v-for="item in instanceList" :key="item.tenant_id" :value="item.tenant_id">
+            {{ item.name }} ({{ item.tenant_id }})
+          </a-select-option>
+        </a-select>
       </a-form-model-item>
     </a-form-model>
     <div class="linux-list">
@@ -229,6 +240,7 @@
 import PageLayout from '@/layouts/PageLayout'
 import { systemList, systemInit } from '@/services/admin'
 import { systemInfo, hostgroupList, templateList, templateGetItemList, systemUpdate } from "@/services/admin";
+import { listZabbixInstances } from '@/services/zabbix'
 export default {
   name: 'tuopu',
   i18n: require('./i18n'),
@@ -242,6 +254,8 @@ export default {
       loading: false,
       visible: false,
       list: [],
+      instanceList: [],
+      selectedInstance: undefined,
       columns: [
         { title: this.$t('table_headers_id'), key: 'id', align: 'left', scopedSlots: { customRender: 'id' } },
         { title: this.$t('table_headers_name'), key: 'name', align: 'left', scopedSlots: { customRender: 'name' } },
@@ -275,6 +289,7 @@ export default {
   },
   created() {
     this.init()
+    this.loadInstances()
   },
   methods: {
     init() {
@@ -286,8 +301,61 @@ export default {
         }
       }).finally(() => { this.loading = false })
     },
+    loadInstances() {
+      listZabbixInstances().then((resp) => {
+        let res = resp.data
+        if (res.code == 200) {
+          // 注意：后端返回的是 res.data 直接是数组，不是 res.data.items
+          const allItems = Array.isArray(res.data) ? res.data : []
+          this.instanceList = allItems.filter(item => item.enabled)
+          if (this.instanceList.length > 0 && !this.selectedInstance) {
+            this.selectedInstance = this.instanceList[0].tenant_id
+          }
+        }
+      }).catch(err => {
+        console.error('加载实例列表失败:', err)
+        this.$message.error('加载实例列表失败')
+      })
+    },
+    handleInstanceChange(value) {
+      this.selectedInstance = value
+      // 清空已选择的数据
+      this.grouplist = []
+      this.templateList = []
+      this.itemList = []
+      // 如果drawer是打开的，重新加载数据
+      if (this.visible) {
+        this.loadInstanceData()
+      }
+    },
+    loadInstanceData() {
+      if (!this.selectedInstance) {
+        this.$message.warning('请先选择 Zabbix 实例')
+        return
+      }
+      // 加载主机组
+      hostgroupList(this.selectedInstance).then((resp) => {
+        let res = resp.data
+        if (res.code == 200) {
+          this.grouplist = res.data.items || []
+        }
+      })
+      // 加载模板
+      templateList(this.selectedInstance).then((resp) => {
+        let res = resp.data
+        if (res.code == 200) {
+          this.templateList = res.data.items || []
+        }
+      })
+    },
     //初始化
     deployInit(record) {
+      // 检查是否选择了实例
+      if (!this.selectedInstance) {
+        this.$message.warning('请先选择 Zabbix 实例')
+        return
+      }
+      
       // 如果传入了record参数，使用record.id；否则使用this.id
       const id = record ? record.id : this.id
       if (!id) {
@@ -298,7 +366,8 @@ export default {
       this.initLoading = true
       //禁用保存
       this.saveDisabled = true
-      systemInit(id,).then((resp) => {
+      // 传递实例ID参数
+      systemInit(id, this.selectedInstance).then((resp) => {
         let res = resp.data
         if (res.code == 200) {
           this.initLoading = false
@@ -310,11 +379,23 @@ export default {
           this.visible = false
           this.$message.success(res.message)
           this.init()
+        } else {
+          this.$message.error(res.message || '初始化失败')
         }
-      }).finally(() => { this.loading = false })
+      }).catch(err => {
+        this.$message.error('初始化失败: ' + (err.message || '未知错误'))
+      }).finally(() => { 
+        this.loading = false
+        this.initLoading = false
+        this.saveDisabled = false
+      })
     },
     //打开
     edit(record) {
+      if (!this.selectedInstance) {
+        this.$message.warning('请先选择 Zabbix 实例')
+        return
+      }
       this.id = record.id
       this.title = record.name + '指标初始化'	    
       this.visible = true;
@@ -372,19 +453,9 @@ export default {
           }
         }
       }).finally(() => { this.loading2 = false })
-      hostgroupList().then((resp) => {
-        let res = resp.data
-        if (res.code == 200) {
-          this.grouplist = res.data.items || []
-        }
-
-      }).finally(() => { this.loading2 = false })
-      templateList().then((resp) => {
-        let res = resp.data
-        if (res.code == 200) {
-          this.templateList = res.data.items || []
-        }
-      }).finally(() => { this.loading2 = false })
+      
+      // 加载实例数据
+      this.loadInstanceData()
     },
     onClose() {
       this.visible = false;
@@ -398,7 +469,11 @@ export default {
       this.system.ping_template_id = val
     },
     handlUptimeTempChange(value) {
-      templateGetItemList(value).then((resp) => {
+      if (!this.selectedInstance) {
+        this.$message.warning('请先选择 Zabbix 实例')
+        return
+      }
+      templateGetItemList(value, this.selectedInstance).then((resp) => {
         let res = resp.data
         if (res.code == 200) {
           this.itemList = res.data.items[0].items || []
@@ -409,7 +484,11 @@ export default {
       this.system.uptime_id = value
     },
     handlCPUTempChange(value) {
-      templateGetItemList(value).then((resp) => {
+      if (!this.selectedInstance) {
+        this.$message.warning('请先选择 Zabbix 实例')
+        return
+      }
+      templateGetItemList(value, this.selectedInstance).then((resp) => {
         let res = resp.data
         if (res.code == 200) {
           this.itemList = res.data.items[0].items || []
@@ -420,7 +499,11 @@ export default {
       this.system.cpu_utilization_id = val
     },
     handlMemUtiTempChange(value) {
-      templateGetItemList(value).then((resp) => {
+      if (!this.selectedInstance) {
+        this.$message.warning('请先选择 Zabbix 实例')
+        return
+      }
+      templateGetItemList(value, this.selectedInstance).then((resp) => {
         let res = resp.data
         if (res.code == 200) {
           this.itemList = res.data.items[0].items || []
@@ -431,7 +514,11 @@ export default {
       this.system.memory_utilization_id = val
     },
     handlMemUsedTempChange(value) {
-      templateGetItemList(value).then((resp) => {
+      if (!this.selectedInstance) {
+        this.$message.warning('请先选择 Zabbix 实例')
+        return
+      }
+      templateGetItemList(value, this.selectedInstance).then((resp) => {
         let res = resp.data
         if (res.code == 200) {
           this.itemList = res.data.items[0].items || []
@@ -442,7 +529,11 @@ export default {
       this.system.memory_used_id = val
     },
     handlMemTotalTempChange(value) {
-      templateGetItemList(value).then((resp) => {
+      if (!this.selectedInstance) {
+        this.$message.warning('请先选择 Zabbix 实例')
+        return
+      }
+      templateGetItemList(value, this.selectedInstance).then((resp) => {
         let res = resp.data
         if (res.code == 200) {
           this.itemList = res.data.items[0].items || []
@@ -453,7 +544,11 @@ export default {
       this.system.memory_total_id = val
     },
     handlCPUCoreTempChange(value) {
-      templateGetItemList(value).then((resp) => {
+      if (!this.selectedInstance) {
+        this.$message.warning('请先选择 Zabbix 实例')
+        return
+      }
+      templateGetItemList(value, this.selectedInstance).then((resp) => {
         let res = resp.data
         if (res.code == 200) {
           this.itemList = res.data.items[0].items || []
@@ -464,7 +559,11 @@ export default {
       this.system.cpu_core = val
     },
     handlModelTempChange(value) {
-      templateGetItemList(value).then((resp) => {
+      if (!this.selectedInstance) {
+        this.$message.warning('请先选择 Zabbix 实例')
+        return
+      }
+      templateGetItemList(value, this.selectedInstance).then((resp) => {
         let res = resp.data
         if (res.code == 200) {
           this.itemList = res.data.items[0].items || []
@@ -476,6 +575,10 @@ export default {
     },
     //保存
     saveData() {
+      if (!this.selectedInstance) {
+        this.$message.warning('请先选择 Zabbix 实例')
+        return
+      }
       this.saveLoading = true
       this.system.group_id = this.system.group_id.toString()
       this.system.uptime_id = this.system.uptime_id.toString()
@@ -486,13 +589,19 @@ export default {
       this.system.memory_used_id = this.system.memory_used_id.toString()
       this.system.memory_total_id = this.system.memory_total_id.toString()
       this.system.ping_template_id = this.system.ping_template_id.toString()
-      systemUpdate(this.id, this.system).then((resp) => {
+      // 添加实例ID
+      this.system.instance_id = this.selectedInstance
+      systemUpdate(this.id, this.system, this.selectedInstance).then((resp) => {
         let res = resp.data
         if (res.code == 200) {
           this.initDisabled = false
           this.saveLoading = false
 	  this.$message.success(res.message + ",可以进行初始化!")
         }
+      }).catch(err => {
+        this.$message.error('保存失败: ' + (err.message || '未知错误'))
+      }).finally(() => {
+        this.saveLoading = false
       })
     },
   },

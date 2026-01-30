@@ -137,11 +137,11 @@ export async function systemList() {
 export async function systemInfo(id) {
 	return request(SYSTEM_LIST + '/' + id, METHOD.GET)
 }
-export async function systemUpdate(id, params) {
-	return request(SYSTEM_LIST + '/' + id, METHOD.PUT, params)
+export async function systemUpdate(id, params, instanceId) {
+	return request(SYSTEM_LIST + '/' + id, METHOD.PUT, { ...params, instance_id: instanceId })
 }
-export async function systemInit(id, params) {
-	return request(SYSTEM_LIST + '/init/' + id, METHOD.POST, params)
+export async function systemInit(id, instanceId) {
+	return request(SYSTEM_LIST + '/init/' + id, METHOD.POST, { instance_id: instanceId })
 }
 export async function egressGet() {
 	return request(SYSTEM_LIST + '/egress/', METHOD.GET)
@@ -158,14 +158,14 @@ export async function configGetOne(id) {
 export async function configUpdate(id, params) {
 	return request(SYSTEM_LIST + '/config/' + id, METHOD.PUT, params)
 }
-export async function hostgroupList() {
-	return request(HOST_GROUP + '/all', METHOD.GET)
+export async function hostgroupList(instanceId) {
+	return request(HOST_GROUP + '/all', METHOD.GET, { instance_id: instanceId })
 }
-export async function templateList() {
-	return request(TEMPLATE_lIST + '/list', METHOD.GET)
+export async function templateList(instanceId) {
+	return request(TEMPLATE_lIST + '/list', METHOD.GET, { instance_id: instanceId })
 }
-export async function templateGetItemList(id) {
-	return request(TEMPLATE_lIST + '/item/' + id, METHOD.GET)
+export async function templateGetItemList(id, instanceId) {
+	return request(TEMPLATE_lIST + '/item/' + id, METHOD.GET, { instance_id: instanceId })
 }
 export async function baseVersion() {
 	return request(INDEX_VERSION, METHOD.GET)

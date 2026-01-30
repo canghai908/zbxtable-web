@@ -25,6 +25,9 @@
       <a-table :loading="loading" :columns="columns" :data-source="list" @change="changePage" :pagination="pagination" :rowKey="(record) => { return record.hostid;}">
         <span slot="hostid" slot-scope="record">{{record.hostid}}</span>
         <div slot="name" slot-scope="record">{{record.name}}</div>
+        <div slot="instance_name" slot-scope="record">
+          <a-tag color="blue">{{record.instance_name || '未知'}}</a-tag>
+        </div>
         <div slot="model" slot-scope="record">{{record.model}}</div>
         <div slot="location" slot-scope="record">{{record.location}}</div>
         <div slot="interfaces" slot-scope="record">{{record.interfaces}}</div>
@@ -94,6 +97,13 @@ export default {
           key: 'name',
           align: 'left',
           scopedSlots: { customRender: 'name' }
+        },
+        {
+          title: '所属实例',
+          key: 'instance_name',
+          align: 'left',
+          width: 120,
+          scopedSlots: { customRender: 'instance_name' }
         },
         {
           title: '设备型号',

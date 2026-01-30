@@ -25,10 +25,6 @@
           <a-tag v-else-if="record.enabled && !record.last_test_ok" color="orange">未验证</a-tag>
           <a-tag v-else color="default">不可用</a-tag>
         </template>
-        <template slot="is_active" slot-scope="text, record">
-          <a-tag v-if="record.is_active" color="green">当前</a-tag>
-          <a-tag v-else>-</a-tag>
-        </template>
         <template slot="notify_method" slot-scope="text, record">
           <a-tag v-if="record.notify_method === 'webhook'" color="blue">
             <a-icon type="api" /> Webhook
@@ -56,11 +52,9 @@
           </template>
         </template>
         <template slot="operation" slot-scope="text, record">
-          <a-button type="link" size="small" :disabled="record.is_active" @click="activate(record)">设为当前</a-button>
-          <a-divider type="vertical" />
           <a-button type="link" size="small" @click="test(record)">测试</a-button>
           <a-divider type="vertical" />
-          <a-button type="link" size="small" :disabled="record.is_active && record.enabled" @click="toggleEnabled(record)">{{ record.enabled ? '禁用' : '启用' }}</a-button>
+          <a-button type="link" size="small" @click="toggleEnabled(record)">{{ record.enabled ? '禁用' : '启用' }}</a-button>
           <a-divider type="vertical" />
           <a-button type="link" size="small" @click="openEdit(record)">编辑</a-button>
           <a-divider type="vertical" />
@@ -393,7 +387,6 @@ import {
   deleteZabbixTenant, 
   testZabbixTenantConfig, 
   testZabbixTenant, 
-  activateZabbixTenant, 
   setZabbixTenantEnabled,
   installMSAgent, 
   getMSAgentScript, 
@@ -447,7 +440,6 @@ export default {
         { title: 'Zabbix 信息', key: 'zabbix', scopedSlots: { customRender: 'zabbix' }, width: 250 },
         { title: '版本', key: 'version', scopedSlots: { customRender: 'version' }, width: 100 },
         { title: '连接', key: 'conn', scopedSlots: { customRender: 'conn' }, width: 100 },
-        { title: '当前', key: 'is_active', scopedSlots: { customRender: 'is_active' }, width: 80 },
         { title: '通知方式', key: 'notify_method', scopedSlots: { customRender: 'notify_method' }, width: 130 },
         { title: '安装状态', key: 'install_status', scopedSlots: { customRender: 'install_status' }, width: 120 },
         { title: '启用', key: 'enabled', scopedSlots: { customRender: 'enabled' }, width: 80 },
@@ -572,16 +564,6 @@ export default {
         await this.load()
       } else {
         this.$message.error((biz && biz.message) || '操作失败')
-      }
-    },
-    async activate (record) {
-      const res = await activateZabbixTenant(record.id)
-      const biz = (res && res.data) ? res.data : res
-      if (biz && biz.code === 200) {
-        this.$message.success('已设为当前 Zabbix')
-        await this.load()
-      } else {
-        this.$message.error((biz && biz.message) || '切换失败')
       }
     },
     async remove (record) {

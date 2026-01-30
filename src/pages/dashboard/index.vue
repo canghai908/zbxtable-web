@@ -13,6 +13,7 @@
                   <a-tag v-else-if="v.severity == 4" color="#E97659">{{ $t('severity_high') }}</a-tag>
                   <a-tag v-else-if="v.severity == 5" color="#f50000">{{ $t('severity_disaster') }}</a-tag>
                   <a-tag v-else color="#97AAB3">{{ $t('severity_unknown') }}</a-tag>
+                  <a-tag v-if="v.instance_name" color="#108ee9" style="margin-left: 4px;">{{ v.instance_name }}</a-tag>
                   <!-- <a-icon slot="dot" type="minus-circle" v-else-if="v.severity == 2" :style="{ fontSize: '16px', color: '#F56C6C' }" />
                   <a-icon slot="dot" type="exclamation-circle" v-else :style="{ fontSize: '16px', color: '#E6A23C' }" /> -->
                   {{v.lastchange | parsetime}} <b>{{v.name}}</b> {{v.lasteventname}}
@@ -71,7 +72,10 @@
                 <div class="homePie">
                   <pie :name="v.hostname" :rate="v.score" :height="130"></pie>
                 </div>
-                <div class="homePieN">{{v.hostname}}</div>
+                <div class="homePieN" :title="v.hostname + (v.instance_name ? ' [' + v.instance_name + ']' : '')">
+                  <div>{{v.hostname}}</div>
+                  <a-tag v-if="v.instance_name" color="blue" class="instance-tag">{{v.instance_name}}</a-tag>
+                </div>
               </div>
             </div>
           </a-card>
@@ -83,7 +87,10 @@
                 <div class="homeLeItem1">
                   <div class="homeLeLeft">
                     <div class="homeLeLeft1"><img src="../../assets/img/top1.png" alt=""><span>{{winM[0].score}}%</span></div>
-                    <div class="homeLeLeft2">{{winM[0].hostname}}</div>
+                    <div class="homeLeLeft2" :title="winM[0].hostname + (winM[0].instance_name ? ' [' + winM[0].instance_name + ']' : '')">
+                      <div>{{winM[0].hostname}}</div>
+                      <a-tag v-if="winM[0].instance_name" color="blue" class="instance-tag-small">{{winM[0].instance_name}}</a-tag>
+                    </div>
                   </div>
                   <div class="homeLeRight">
                     <legent :rate="winM[0].score" :height="38"></legent>
@@ -94,7 +101,10 @@
                 <div class="homeLeItem" v-for="(v, i) in winM.slice(1)" :key="i">
                   <div class="homeLeTop">
                     <div class="homeLeTop1"><img :src="require('../../assets/img/top'+(i+2)+'.png')" alt=""></div>
-                    <div class="homeLeTop2">{{v.hostname}}</div>
+                    <div class="homeLeTop2" :title="v.hostname + (v.instance_name ? ' [' + v.instance_name + ']' : '')">
+                      <div>{{v.hostname}}</div>
+                      <a-tag v-if="v.instance_name" color="blue" class="instance-tag-small">{{v.instance_name}}</a-tag>
+                    </div>
                     <div class="homeLeTop3">{{v.score}}%</div>
                   </div>
                   <div class="homeLeBot">
@@ -119,7 +129,10 @@
                 <div class="homePie">
                   <pie :name="v.hostname" :rate="v.score" :height="130"></pie>
                 </div>
-                <div class="homePieN">{{v.hostname}}</div>
+                <div class="homePieN" :title="v.hostname + (v.instance_name ? ' [' + v.instance_name + ']' : '')">
+                  <div>{{v.hostname}}</div>
+                  <a-tag v-if="v.instance_name" color="blue" class="instance-tag">{{v.instance_name}}</a-tag>
+                </div>
               </div>
             </div>
           </a-card>
@@ -131,7 +144,10 @@
                 <div class="homeLeItem1">
                   <div class="homeLeLeft">
                     <div class="homeLeLeft1"><img src="../../assets/img/top1.png" alt=""><span>{{linM[0].score}}%</span></div>
-                    <div class="homeLeLeft2">{{linM[0].hostname}}</div>
+                    <div class="homeLeLeft2" :title="linM[0].hostname + (linM[0].instance_name ? ' [' + linM[0].instance_name + ']' : '')">
+                      <div>{{linM[0].hostname}}</div>
+                      <a-tag v-if="linM[0].instance_name" color="blue" class="instance-tag-small">{{linM[0].instance_name}}</a-tag>
+                    </div>
                   </div>
                   <div class="homeLeRight">
                     <legent :rate="linM[0].score" :height="38"></legent>
@@ -142,7 +158,10 @@
                 <div class="homeLeItem" v-for="(v, i) in linM.slice(1)" :key="i">
                   <div class="homeLeTop">
                     <div class="homeLeTop1"><img :src="require('../../assets/img/top'+(i+2)+'.png')" alt=""></div>
-                    <div class="homeLeTop2">{{v.hostname}}</div>
+                    <div class="homeLeTop2" :title="v.hostname + (v.instance_name ? ' [' + v.instance_name + ']' : '')">
+                      <div>{{v.hostname}}</div>
+                      <a-tag v-if="v.instance_name" color="blue" class="instance-tag-small">{{v.instance_name}}</a-tag>
+                    </div>
                     <div class="homeLeTop3">{{v.score}}%</div>
                   </div>
                   <div class="homeLeBot">
@@ -385,13 +404,14 @@ export default {
 .homeLeLeft2 {
   width: 90%;
   text-align: center;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
   font-size: 14px;
   font-weight: 500;
   color: #354052;
   line-height: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 .homeLeRight {
   flex: 0 0 60%;
@@ -437,14 +457,15 @@ export default {
 .homeLeTop2 {
   flex: 1;
   width: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
   font-size: 12px;
   font-weight: 500;
   color: #354052;
-  line-height: 20px;
+  line-height: 16px;
   margin: 0 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
 }
 .homeLeTop3 {
   font-size: 16px;
@@ -465,14 +486,14 @@ export default {
 }
 .homePies {
   width: 100%;
-  height: 150px;
+  height: 170px;
   display: flex;
   align-items: center;
 }
 .homePied {
   flex: 0 0 20%;
   width: 0;
-  height: 150px;
+  height: 170px;
   display: inline-flex;
   flex-direction: column;
   justify-content: center;
@@ -483,15 +504,31 @@ export default {
   height: 130px;
 }
 .homePieN {
-  height: 20px;
-  line-height: 20px;
+  height: 40px;
+  line-height: 16px;
   font-size: 12px;
   color: #000;
   text-align: center;
   width: 80%;
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.instance-tag {
+  font-size: 10px;
+  margin-top: 4px;
+  height: 18px;
+  line-height: 16px;
+  padding: 0 6px;
+}
+.instance-tag-small {
+  font-size: 10px;
+  margin-top: 2px;
+  height: 16px;
+  line-height: 14px;
+  padding: 0 4px;
 }
 .homeHost {
   height: 156px;

@@ -2,11 +2,18 @@
   <page-layout :noTitle="true">
     <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="!showPage">
       <a-form-model class="home-search" layout="inline" :colon='false'>
+        <a-form-model-item label="选择实例">
+          <a-select v-model="selectedInstance" placeholder="全部实例" allowClear style="width: 200px">
+            <a-select-option value="">全部实例</a-select-option>
+            <a-select-option v-for="item in instanceList" :key="item.tenant_id" :value="item.tenant_id">
+              {{ item.name }}
+            </a-select-option>
+          </a-select>
+        </a-form-model-item>
         <a-form-model-item label="告警时间">
           <a-range-picker format="YYYY-MM-DD HH:mm:ss" :show-time="{ format: 'HH:mm', defaultValue:[moment('00:00:00', 'HH:mm:ss'),moment('23:59:59', 'HH:mm:ss')]}" v-model="timeValue"
             @change="changeCreationTime" :getCalendarContainer="triggerNode=>{return triggerNode.parentNode || document.body}" />
         </a-form-model-item>
-        <!-- 租户筛选已取消：统一跟随顶部“当前 Zabbix 连接” -->
         <a-form-model-item>
           <a-button type="primary" @click="init">查询</a-button>
         </a-form-model-item>
@@ -35,6 +42,7 @@ import PageLayout from "@/layouts/PageLayout";
 import ePie from "./ePie";
 import eLine from "./eLine";
 import { alarmAnalysis, alarmExport } from "@/services/admin";
+import { listZabbixInstances } from '@/services/zabbix'
 import { parseTimeFun } from "@/utils/formatter";
 import moment from "moment";
 import "moment/locale/zh-cn";
@@ -47,7 +55,8 @@ export default {
   },
   data() {
     return {
-      // tenantid/tenantlist 已取消：跟随“当前 Zabbix 连接”
+      instanceList: [],
+      selectedInstance: '',
       list: [],
       nameList: [],
       numList: [],
@@ -68,14 +77,33 @@ export default {
       moment(qtime, "YYYY-MM-DD HH:mm:ss"),
       moment(ntime, "YYYY-MM-DD HH:mm:ss"),
     ];
+    this.loadInstances();
     this.init();
   },
   methods: {
+    loadInstances() {
+      listZabbixInstances().then((resp) => {
+        let res = resp.data
+        if (res.code == 200) {
+          const allItems = Array.isArray(res.data) ? res.data : []
+          this.instanceList = allItems.filter(item => item.enabled)
+        }
+      }).catch(err => {
+        console.error('加载实例列表失败:', err)
+      })
+    },
     init() {
       this.list = [];
       this.nameList = [];
       this.numList = [];
-      alarmAnalysis({ begin: this.beginTime, end: this.endTime })
+      const params = { 
+        begin: this.beginTime, 
+        end: this.endTime
+      };
+      if (this.selectedInstance) {
+        params.instance_id = this.selectedInstance;
+      }
+      alarmAnalysis(params)
         .then((resp) => {
           let res = resp.data;
           if (res.code == 200) {
@@ -87,11 +115,17 @@ export default {
         .finally(() => {
           this.showPage = true;
         });
-      // alarmTenantGet 已不再需要
     },
     anayexport() {
+      const params = { 
+        begin: this.beginTime, 
+        end: this.endTime
+      };
+      if (this.selectedInstance) {
+        params.instance_id = this.selectedInstance;
+      }
       alarmExport(
-        { begin: this.beginTime, end: this.endTime },
+        params,
         { responseType: "arraybuffer", }
       ).then((resp) => {
         let filename = resp.headers["content-disposition"]

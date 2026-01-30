@@ -23,6 +23,9 @@
                   <a-table :loading="loading" :columns="columns" :data-source="list" @change="changePage" :pagination="pagination" :rowKey="(record) => { return record.hostid;}">
                     <span slot="hostid" slot-scope="record">{{record.hostid}}</span>
                     <span slot="name" slot-scope="record">{{record.name}}</span>
+                    <span slot="instance_name" slot-scope="record">
+                      <a-tag color="blue">{{record.instance_name || '未知'}}</a-tag>
+                    </span>
                     <span slot="interfaces" slot-scope="record">{{record.interfaces}}</span>
                     <span slot="uptime" slot-scope="record">{{record.uptime}}</span>
                     <div slot="location" slot-scope="record">
@@ -124,6 +127,7 @@ export default {
       columns: [
         { title: "ID", key: "hostid", align: "left", scopedSlots: { customRender: "hostid" }, },
         { title: this.$t('column_hostname'), key: 'name', align: 'left', scopedSlots: { customRender: 'name' } },
+        { title: '所属实例', key: 'instance_name', align: 'left', width: 120, scopedSlots: { customRender: 'instance_name' } },
         { title: this.$t('column_ip_address'), key: 'interfaces', align: 'left', scopedSlots: { customRender: 'interfaces' } },
         { title: this.$t('column_uptime'), key: 'uptime', align: 'left', scopedSlots: { customRender: 'uptime' } },
         { title: this.$t('column_availability'), key: 'available', align: 'left', width: '120px', scopedSlots: { customRender: 'available' } },

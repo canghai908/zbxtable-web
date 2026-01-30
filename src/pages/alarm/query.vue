@@ -44,6 +44,9 @@
             {{record.status | notifyResult }}
           </span>
         </a-table>
+        <div slot="instance_name" slot-scope="record">
+          <a-tag color="orange">{{record.instance_name || record.tenant_name || '未知'}}</a-tag>
+        </div>
         <div slot="level" slot-scope="record">
           <a-tag v-if="record.level==0" color="#97AAB3">{{record.level | levelFilter}}</a-tag>
           <a-tag v-else-if="record.level==1" color=" #7499FF">{{record.level | levelFilter}}</a-tag>
@@ -181,7 +184,7 @@ export default {
       ],
       columns: [
         { title: "ID", dataIndex: "id", align: "left" },
-        { title: "告警实例", dataIndex: "tenant_id", align: "left" },
+        { title: "所属实例", key: "instance_name", align: "left", width: 120, scopedSlots: { customRender: "instance_name" } },
         { title: "告警类型", key: "status", align: "left", scopedSlots: { customRender: "status" }, },
         { title: "设备名称", dataIndex: "hostname", align: "left" },
         { title: "IP", dataIndex: "host_ip", align: "left", scopedSlots: { customRender: "host_ip" }, },

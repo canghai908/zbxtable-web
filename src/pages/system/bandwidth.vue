@@ -2,6 +2,20 @@
   <page-layout :title="title">
     <div>
       <a-card :bordered="false">
+        <a-alert message="实例选择提示" type="info" show-icon closable style="margin-bottom: 16px;">
+          <template slot="description">
+            出口配置需要指定 Zabbix 实例。请先选择要配置的实例，然后选择该实例下的主机和监控项。
+          </template>
+        </a-alert>
+        
+        <a-form-item label="选择实例" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="true">
+          <a-select v-model="selectedInstance" placeholder="请选择 Zabbix 实例" @change="handleInstanceChange" style="width: 100%">
+            <a-select-option v-for="item in instanceList" :key="item.tenant_id" :value="item.tenant_id">
+              {{ item.name }} ({{ item.tenant_id }})
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+
         <a-form>
           <a-form-item :label="$t('bindwidthone')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" :required="false">
             <a-input v-model="egress.name_one" :placeholder="$t('placeholder_enter_bandwidth_name')" />
@@ -59,6 +73,7 @@
 <script>
 import PageLayout from "@/layouts/PageLayout";
 import { egressGet, egressUpdate, itemListTraffic, hostSearch } from "@/services/admin";
+import { listZabbixInstances } from "@/services/zabbix";
 export default {
   name: 'edit',
   i18n: require('./i18n'),
@@ -66,6 +81,8 @@ export default {
   data() {
     return {
       loading: false,
+      instanceList: [],
+      selectedInstance: undefined,
       hostonelist: [],
       hosttwolist: [],
       itemOneList: [],
@@ -83,9 +100,55 @@ export default {
     }
   },
   created() {
+    this.loadInstances()
     this.init()
   },
   methods: {
+    async loadInstances() {
+      try {
+        const res = await listZabbixInstances()
+        const biz = (res && res.data) ? res.data : res
+        if (biz && biz.code === 200) {
+          this.instanceList = biz.data || []
+          // 如果只有一个实例，自动选中
+          if (this.instanceList.length === 1) {
+            this.selectedInstance = this.instanceList[0].tenant_id
+          }
+        }
+      } catch (e) {
+        console.error('加载实例列表失败', e)
+      }
+    },
+    handleInstanceChange(value) {
+      this.selectedInstance = value
+      // 清空已选择的主机和监控项
+      this.hostonelist = []
+      this.hosttwolist = []
+      this.itemOneList = []
+      this.itemTwoList = []
+      this.egress.in_one = undefined
+      this.egress.out_one = undefined
+      this.egress.in_two = undefined
+      this.egress.out_two = undefined
+      // 重新加载主机列表
+      this.loadHosts()
+    },
+    loadHosts() {
+      if (!this.selectedInstance) {
+        this.$message.warning('请先选择实例')
+        return
+      }
+      hostSearch({ tenant_id: this.selectedInstance }).then((resp) => {
+        let res = resp.data
+        if (res.code == 200) {
+          this.hostonelist = res.data.items || []
+          this.hosttwolist = res.data.items || []
+        } else {
+          this.hostonelist = []
+          this.hosttwolist = []
+        }
+      })
+    },
     init() {
       this.loading = true
       egressGet().then((resp) => {
@@ -107,16 +170,6 @@ export default {
         }
 
       }).finally(() => { this.loading2 = false })
-      hostSearch().then((resp) => {
-        let res = resp.data
-        if (res.code == 200) {
-          this.hostonelist = res.data.items || []
-          this.hosttwolist = res.data.items || []
-        } else {
-          this.hostonelist = []
-          this.hosttwolist = []
-        }
-      })
     },
     filterOption(input, option) {
       return (
@@ -147,8 +200,13 @@ export default {
     //   })
     // },
     handlHostOneChange(value) {
+      if (!this.selectedInstance) {
+        this.$message.warning('请先选择实例')
+        return
+      }
       let params = {
-        hostid: value
+        hostid: value,
+        tenant_id: this.selectedInstance
       }
       itemListTraffic(params).then((resp) => {
         let res = resp.data
@@ -158,8 +216,13 @@ export default {
       })
     },
     handlHostTwoChange(value) {
+      if (!this.selectedInstance) {
+        this.$message.warning('请先选择实例')
+        return
+      }
       let params = {
-        hostid: value
+        hostid: value,
+        tenant_id: this.selectedInstance
       }
       itemListTraffic(params).then((resp) => {
         let res = resp.data
@@ -181,8 +244,16 @@ export default {
       this.egress.out_two = value
     },
     saveData() {
+      if (!this.selectedInstance) {
+        this.$message.warning('请先选择实例')
+        return
+      }
       console.log(this.egress)
-      egressUpdate(this.egress).then((resp) => {
+      const payload = {
+        ...this.egress,
+        tenant_id: this.selectedInstance
+      }
+      egressUpdate(payload).then((resp) => {
         let res = resp.data
         if (res.code == 200) {
           this.$message.success(res.message)

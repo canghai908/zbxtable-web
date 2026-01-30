@@ -1,5 +1,11 @@
 <template>
   <page-layout :noTitle="true">
+    <a-alert message="多实例主机报表说明" type="info" show-icon closable style="margin-bottom: 16px;">
+      <template slot="description">
+        系统已支持多实例数据聚合。在配置主机报表时，需要先选择实例，然后选择该实例下的主机和监控项。
+      </template>
+    </a-alert>
+    
     <a-form-model class="home-search" layout="inline" :colon='false'>
       <a-form-model-item :label="$t('task')">
         <a-input v-model.trim="name" :placeholder="$t('task')" />
@@ -88,6 +94,13 @@
         <a-form-model-item :label="$t('host_report_name')" prop="name">
           <a-input v-model="formData.name" />
         </a-form-model-item>
+        <a-form-model-item label="选择实例" prop="selectedInstance">
+          <a-select v-model="formData.selectedInstance" placeholder="请选择 Zabbix 实例" @change="handleInstanceChangeInModal" style="width: 100%">
+            <a-select-option v-for="item in instanceList" :key="item.tenant_id" :value="item.tenant_id">
+              {{ item.name }} ({{ item.tenant_id }})
+            </a-select-option>
+          </a-select>
+        </a-form-model-item>
         <a-form-model-item :label="$t('report_mode')" prop="reportMode">
           <a-radio-group v-model="formData.reportMode" @change="handleReportModeChange">
             <a-radio value="realtime">{{ $t('realtime_report') }}</a-radio>
@@ -173,6 +186,7 @@
 const selectSize = 30
 import PageLayout from '@/layouts/PageLayout'
 import { reportList, reportDelete, deleteTopology, reportStatusUpdate, taskLogList, taskLogDelete, reportCheckNow, reportGetHosts, reportGetItems, reportAdd, reportGet, reportPut } from '@/services/admin'
+import { listZabbixInstances } from '@/services/zabbix'
 import moment from 'moment'
 
 const debounce = (func, delay = 60) => {
@@ -209,6 +223,8 @@ export default {
         status: '2',
         cycle: 'day',
       },
+      // 实例列表
+      instanceList: [],
       // 表单弹窗相关
       formModalVisible: false,
       formModalLoading: false,
@@ -235,6 +251,7 @@ export default {
       ],
       formData: {
         name: '',
+        selectedInstance: undefined,
         reportMode: 'realtime', // 默认实时报表
         hostConfigs: [
           {
@@ -262,6 +279,13 @@ export default {
             required: true,
             message: this.$t('message_report_name'),
             trigger: 'blur'
+          }
+        ],
+        selectedInstance: [
+          {
+            required: true,
+            message: '请选择实例',
+            trigger: 'change'
           }
         ],
         hostConfigs: [
@@ -390,6 +414,7 @@ export default {
     }
   },
   created() {
+    this.loadInstances()
     this.init()
   },
   filters: {
@@ -412,6 +437,30 @@ export default {
     }
   },
   methods: {
+    async loadInstances() {
+      try {
+        const res = await listZabbixInstances()
+        const biz = (res && res.data) ? res.data : res
+        if (biz && biz.code === 200) {
+          this.instanceList = biz.data || []
+        }
+      } catch (e) {
+        console.error('加载实例列表失败', e)
+      }
+    },
+    handleInstanceChangeInModal(value) {
+      this.formData.selectedInstance = value
+      // 清空已选择的主机配置
+      this.formData.hostConfigs = [{
+        host_type: '',
+        host_id: '',
+        item_ids: []
+      }]
+      this.configHostsList = {}
+      this.configHostsFilterList = {}
+      this.curItemsList = {}
+      this.itemsFilterList = {}
+    },
     formatReportTime(timeStr) {
       if (!timeStr || timeStr === '0001-01-01T00:00:00Z' || timeStr === '0001-01-01 00:00:00') {
         return '--'
@@ -495,6 +544,7 @@ export default {
     resetFormData() {
       this.formData = {
         name: '',
+        selectedInstance: undefined,
         reportMode: 'realtime', // 默认实时报表
         hostConfigs: [
           {
@@ -679,10 +729,16 @@ export default {
         return
       }
       
+      if (!this.formData.selectedInstance) {
+        this.$message.warning('请先选择实例')
+        return
+      }
+      
       let params = {
         page: 1,
         limit: 10000,
-        host_type: config.host_type
+        host_type: config.host_type,
+        tenant_id: this.formData.selectedInstance
       }
       reportGetHosts(params).then((resp) => {
         let res = resp.data
@@ -729,8 +785,15 @@ export default {
         this.$set(this.curItemsList, index, [])
         return
       }
+      
+      if (!this.formData.selectedInstance) {
+        this.$message.warning('请先选择实例')
+        return
+      }
+      
       let params = {
-        host_id: config.host_id
+        host_id: config.host_id,
+        tenant_id: this.formData.selectedInstance
       }
       reportGetItems(params).then((resp) => {
         let res = resp.data
