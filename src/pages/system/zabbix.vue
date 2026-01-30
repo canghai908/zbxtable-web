@@ -1,8 +1,8 @@
 <template>
   <page-layout :noTitle="true">
-    <a-card title="Zabbix 租户管理" :bordered="false">
+    <a-card title="Zabbix 实例管理" :bordered="false">
       <div style="margin-bottom: 12px; display: flex; gap: 8px; align-items: center;">
-        <a-button type="primary" @click="openCreate">新增租户</a-button>
+        <a-button type="primary" @click="openCreate">新增实例</a-button>
         <a-button @click="load">刷新</a-button>
       </div>
 
@@ -116,7 +116,7 @@
           </template>
 
           <a-divider type="vertical" />
-          <a-popconfirm title="确定要删除这个租户吗？" okText="确定" cancelText="取消" @confirm="remove(record)">
+          <a-popconfirm title="确定要删除这个实例吗？" okText="确定" cancelText="取消" @confirm="remove(record)">
             <a-button type="link" size="small" style="color:#f5222d;">删除</a-button>
           </a-popconfirm>
         </template>
@@ -124,10 +124,10 @@
     </a-card>
 
     <!-- 编辑/新增对话框 -->
-    <a-modal :title="editingId ? '编辑租户' : '新增租户'" :visible="visible" @ok="save" @cancel="visible=false" :confirmLoading="saving" :okButtonProps="{ disabled: !testOk }">
+    <a-modal :title="editingId ? '编辑实例' : '新增实例'" :visible="visible" @ok="save" @cancel="visible=false" :confirmLoading="saving" :okButtonProps="{ disabled: !testOk }">
       <a-form-model :model="form" :label-col="{span: 7}" :wrapper-col="{span: 15}">
-        <a-form-model-item label="租户 ID" required>
-          <a-input v-model="form.tenant_id" placeholder="例如：tenant-001" :disabled="!!editingId" />
+        <a-form-model-item label="实例 ID" required>
+          <a-input v-model="form.tenant_id" placeholder="例如：instance-001" :disabled="!!editingId" />
         </a-form-model-item>
         <a-form-model-item label="名称" required>
           <a-input v-model="form.name" placeholder="例如：生产环境" />
@@ -282,10 +282,10 @@
               <a-button size="small" icon="copy" @click="copyToClipboard(webhookInfo.webhook_url, 'Webhook URL')">复制</a-button>
             </div>
           </a-descriptions-item>
-          <a-descriptions-item label="租户 ID">
+          <a-descriptions-item label="实例 ID">
             <div style="display: flex; align-items: center; gap: 8px;">
               <code style="flex: 1;">{{ webhookInfo.tenant_id }}</code>
-              <a-button size="small" icon="copy" @click="copyToClipboard(webhookInfo.tenant_id, '租户 ID')">复制</a-button>
+              <a-button size="small" icon="copy" @click="copyToClipboard(webhookInfo.tenant_id, '实例 ID')">复制</a-button>
             </div>
           </a-descriptions-item>
           <a-descriptions-item label="认证 Token">
@@ -310,8 +310,8 @@
           <template slot="description">
             <div style="color: #666; font-size: 13px;">
               <div>• Zabbix 触发告警时，会自动通过 Webhook 将告警信息发送到 ZbxTable</div>
-              <div>• Webhook 脚本已内置租户 ID 和 Token，无需手动配置</div>
-              <div>• 告警数据会自动路由到对应的租户</div>
+              <div>• Webhook 脚本已内置实例 ID 和 Token，无需手动配置</div>
+              <div>• 告警数据会自动路由到对应的实例</div>
               <div>• 相比 MS-Agent，Webhook 方式无需在服务器上安装额外服务</div>
             </div>
           </template>
@@ -443,7 +443,7 @@ export default {
       webhookInfo: null,
       columns: [
         { title: 'ID', dataIndex: 'id', key: 'id', width: 60 },
-        { title: '租户 ID', dataIndex: 'tenant_id', key: 'tenant_id', width: 120 },
+        { title: '实例 ID', dataIndex: 'tenant_id', key: 'tenant_id', width: 120 },
         { title: 'Zabbix 信息', key: 'zabbix', scopedSlots: { customRender: 'zabbix' }, width: 250 },
         { title: '版本', key: 'version', scopedSlots: { customRender: 'version' }, width: 100 },
         { title: '连接', key: 'conn', scopedSlots: { customRender: 'conn' }, width: 100 },
@@ -525,7 +525,7 @@ export default {
     },
     async save () {
       if (!this.form.tenant_id || !this.form.name || !this.form.web_url) {
-        this.$message.warning('请填写租户 ID、名称和 Zabbix URL')
+        this.$message.warning('请填写实例 ID、名称和 Zabbix URL')
         return
       }
       if (!this.testOk) {
@@ -636,7 +636,7 @@ export default {
         if (this.currentInstallType === 'webhook') {
           // Webhook 安装流程
           this.addLog('info', '开始安装 Webhook 配置...')
-          this.addLog('info', `租户: ${this.currentRecord.tenant_id}`)
+          this.addLog('info', `实例: ${this.currentRecord.tenant_id}`)
           this.addLog('info', `Zabbix: ${this.currentRecord.name} (${this.currentRecord.web_url})`)
           this.addLog('info', '---')
           
@@ -673,9 +673,9 @@ export default {
             this.addLog('success', '✓ Token 生成成功')
             
             this.currentStep = 3
-            this.addLog('info', '[步骤 4/4] 更新租户绑定...')
+            this.addLog('info', '[步骤 4/4] 更新实例绑定...')
             await this.sleep(500)
-            this.addLog('success', '✓ 租户绑定更新成功')
+            this.addLog('success', '✓ 实例绑定更新成功')
             
             this.addLog('info', '---')
             this.addLog('success', '✓ Webhook 配置安装完成！')
@@ -691,7 +691,7 @@ export default {
         } else {
           // MS-Agent 安装流程
           this.addLog('info', '开始安装 MS-Agent 配置...')
-          this.addLog('info', `租户: ${this.currentRecord.tenant_id}`)
+          this.addLog('info', `实例: ${this.currentRecord.tenant_id}`)
           this.addLog('info', `Zabbix: ${this.currentRecord.name} (${this.currentRecord.web_url})`)
           this.addLog('info', '---')
           
@@ -726,9 +726,9 @@ export default {
             this.addLog('success', '✓ Token 生成成功')
             
             this.currentStep = 3
-            this.addLog('info', '[步骤 4/4] 更新租户绑定...')
+            this.addLog('info', '[步骤 4/4] 更新实例绑定...')
             await this.sleep(500)
-            this.addLog('success', '✓ 租户绑定更新成功')
+            this.addLog('success', '✓ 实例绑定更新成功')
             
             this.addLog('info', '---')
             this.addLog('success', '✓ MS-Agent 配置安装完成！')

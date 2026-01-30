@@ -13,7 +13,7 @@
       <div :class="['admin-header-right', headerTheme]">
         <!-- 全局 Zabbix 实例切换 -->
         <div v-if="zabbixList && zabbixList.length" class="header-item" style="display: flex; align-items: center; gap: 8px;">
-          <span style="font-size: 14px;">当前连接:</span>
+          <span style="font-size: 14px;">当前实例:</span>
           <a-select class="zabbix-select" size="small" style="min-width: 160px" :value="activeZabbixId" :loading="zabbixLoading" @change="onZabbixChange">
             <a-select-option v-for="z in zabbixList" :key="z.id" :value="z.id">
               {{ z.name }}

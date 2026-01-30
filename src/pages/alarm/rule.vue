@@ -32,8 +32,8 @@
       <a-form-model-item label="名称" required>
         <a-input v-model.trim="editRule.name" placeholder="请输入规则名称" />
       </a-form-model-item>
-      <a-form-model-item label="租户" required>
-          <a-select v-model="editRule.tenant_id" mode="multiple" style="width: 100%" placeholder="选择告警租户">
+      <a-form-model-item label="实例" required>
+          <a-select v-model="editRule.tenant_id" mode="multiple" style="width: 100%" placeholder="选择告警实例">
             <a-select-option v-for="(item, index) in tenantlist" :key="index" :value="item.tenant_id" :label="item.tenant_id" :title="item.tenant_id">
             {{ item.tenant_id }}
           </a-select-option>
@@ -215,8 +215,8 @@ export default {
         { title: "ID", dataIndex: "id", align: "left" },
         { title: "名称", dataIndex: "name", align: "left" },
         {
-          title: "租户", dataIndex: "tenant_id", align: "left", customRender: (value) => {
-            // 直接展示规则中配置的租户字符串（支持多租户用逗号分隔）
+          title: "实例", dataIndex: "tenant_id", align: "left", customRender: (value) => {
+            // 直接展示规则中配置的实例字符串（支持多实例用逗号分隔）
             const text = (value || '').toString()
             return { children: text, attrs: {} }
           },
@@ -356,7 +356,7 @@ export default {
       }).finally(() => {
         this.loading = false;
       });
-      // 使用 zabbixTenantList 从租户绑定表获取租户列表
+      // 使用 zabbixTenantList 从实例绑定表获取实例列表
       zabbixTenantList().then((resp) => {
         let res = resp.data
         if (res.code == 200) {
@@ -488,7 +488,7 @@ export default {
         return
       }
       if (!this.editRule.tenant_id || this.editRule.tenant_id.length === 0) {
-        this.$message.warning("请选择租户")
+        this.$message.warning("请选择实例")
         return
       }
       this.modalLoading = true

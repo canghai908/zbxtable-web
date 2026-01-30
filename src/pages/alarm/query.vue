@@ -7,7 +7,7 @@
       <a-form-model-item label="IP">
         <a-input v-model.trim="hostIp" placeholder="主机IP" />
       </a-form-model-item>
-      <!-- 租户筛选已取消：统一跟随顶部“当前 Zabbix 连接” -->
+      <!-- 实例筛选已取消：统一跟随顶部“当前 Zabbix 连接” -->
       <a-form-model-item label="告警类型">
         <a-select optionFilterProp="label" style="width:100px" v-model="status" option-label-prop="label" @change="handleStatusChange">
           <a-select-option v-for="(item, index) in statuslist" :key="index" :value="item.id" :label="item.value" :title="item.value">
@@ -181,7 +181,7 @@ export default {
       ],
       columns: [
         { title: "ID", dataIndex: "id", align: "left" },
-        { title: "告警租户", dataIndex: "tenant_id", align: "left" },
+        { title: "告警实例", dataIndex: "tenant_id", align: "left" },
         { title: "告警类型", key: "status", align: "left", scopedSlots: { customRender: "status" }, },
         { title: "设备名称", dataIndex: "hostname", align: "left" },
         { title: "IP", dataIndex: "host_ip", align: "left", scopedSlots: { customRender: "host_ip" }, },

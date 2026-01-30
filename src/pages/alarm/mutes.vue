@@ -4,7 +4,7 @@
       <a-form-model-item label="搜索">
         <a-input v-model.trim="hosts" placeholder="主机名" />
       </a-form-model-item>
-      <!-- 租户筛选已取消：统一跟随顶部“当前 Zabbix 连接” -->
+      <!-- 实例筛选已取消：统一跟随顶部“当前 Zabbix 连接” -->
       <a-form-model-item>
         <a-button type="primary" @click="init">查询</a-button>
         <a-button style="margin-left: 10px;" @click="resetData">重置</a-button>
@@ -35,7 +35,7 @@
             <a-input v-model.trim="rule.name" :placeholder="$t('titleInput')" />
           </a-form-model-item>
           <a-form-model-item :label="$t('tenant_id')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="tenant_id" :required="true">
-            <a-select v-model="rule.tenant_id" mode="multiple" style="width: 100%" placeholder="选择告警租户" @change="handleTenantChange">
+            <a-select v-model="rule.tenant_id" mode="multiple" style="width: 100%" placeholder="选择告警实例" @change="handleTenantChange">
               <a-select-option v-for="(item, index) in tenantlist" :key="index" :value="item.tenant_id" :label="item.tenant_id" :title="item.tenant_id">
                 {{ item.tenant_id }}
               </a-select-option>
@@ -122,7 +122,7 @@
             <a-input v-model.trim="rule.name" :placeholder="$t('titleInput')" />
           </a-form-model-item>
           <a-form-model-item :label="$t('tenant_id')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="tenant_id">
-            <a-select v-model="rule.tenant_id" mode="multiple" style="width: 100%" placeholder="选择告警租户" @change="handleTenantChange" :required="true">
+            <a-select v-model="rule.tenant_id" mode="multiple" style="width: 100%" placeholder="选择告警实例" @change="handleTenantChange" :required="true">
               <a-select-option v-for="(item, index) in tenantlist" :key="index" :value="item.tenant_id" :label="item.tenant_id" :title="item.tenant_id">
                 {{ item.tenant_id }}
               </a-select-option>
@@ -267,7 +267,7 @@ export default {
         { title: "ID", dataIndex: "id", align: "center" },
         { title: "策略名称", dataIndex: "name", align: "left" },
         {
-          title: "租户", dataIndex: "tenant_id", align: "left", customRender: (value, row, index) => {
+          title: "实例", dataIndex: "tenant_id", align: "left", customRender: (value, row, index) => {
             let allist = []
             value.split(",").forEach(items => {
               this.tenantlist.forEach(tid => {
