@@ -320,7 +320,7 @@
         <div style="margin-top: 16px; padding: 12px; background: #fafafa; border-radius: 4px;">
           <h4 style="margin-bottom: 8px;">验证方法</h4>
           <div style="color: #666; font-size: 13px;">
-            <div>1. 在 Zabbix 中查看 Media Type: <strong>ZbxTable Webhook</strong></div>
+            <div>1. 在 Zabbix 中查看 Media Type: <strong>ZbxTable</strong></div>
             <div>2. 在 Zabbix 中查看 Action: <strong>ZbxTable Webhook</strong></div>
             <div>3. 触发一个测试告警，验证是否能正常接收</div>
           </div>

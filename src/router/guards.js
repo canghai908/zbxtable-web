@@ -22,6 +22,8 @@ export const resetInstallStatusCache = () => {
  * @param options
  */
 const installGuard = async (to, from, next, options) => {
+  const {message} = options
+  
   // 如果已经在安装页面，直接通过
   if (to.path === '/install') {
     next()
@@ -51,18 +53,27 @@ const installGuard = async (to, from, next, options) => {
     const installed =
       (biz && biz.data && typeof biz.data.installed !== 'undefined' ? biz.data.installed : undefined) ??
       (biz && typeof biz.installed !== 'undefined' ? biz.installed : undefined)
-    if (installed) {
+    
+    // 只有明确返回 installed 为 false 时才跳转到安装页面
+    if (installed === false) {
+      isInstalled = false
+      next({path: '/install', replace: true})
+    } else if (installed === true) {
       isInstalled = true
       next()
     } else {
-      isInstalled = false
-      next({path: '/install', replace: true})
+      // 如果无法获取到 installed 字段，说明接口返回格式异常，显示错误并停留在当前页
+      console.error('无法获取安装状态，接口返回数据格式异常:', res)
+      message.error('无法获取系统安装状态，请检查后台服务')
+      installStatusChecked = false // 重置状态，允许下次重试
+      next(false) // 取消导航
     }
   } catch (error) {
-    // 如果接口不存在或出错，说明可能未安装，跳转到安装页面
-    installStatusChecked = true
-    isInstalled = false
-    next({path: '/install', replace: true})
+    // 如果接口出错（如500错误），不应该跳转到安装页面，而是显示错误信息
+    console.error('检查安装状态失败:', error)
+    message.error('后台服务异常，请检查服务是否正常运行')
+    installStatusChecked = false // 重置状态，允许下次重试
+    next(false) // 取消导航，停留在当前页
   }
 }
 
