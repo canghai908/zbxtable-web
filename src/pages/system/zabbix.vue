@@ -181,7 +181,7 @@
               <li>Media Type: ZbxTable Webhook（类型：Webhook）</li>
               <li>User Group: ZbxTable Webhook Group</li>
               <li>User: zbxtable-webhook（自动生成强密码）</li>
-              <li>Action: ZbxTable Webhook Action（包含告警和恢复操作）</li>
+              <li>Action: ZbxTable Webhook（包含告警和恢复操作）</li>
               <li>Token: 自动生成唯一 Token</li>
               <li>Webhook URL: 自动配置回调地址</li>
             </ul>
@@ -189,7 +189,7 @@
               <li>Media Type: MS-Agent Media</li>
               <li>User Group: MS-Agent Group</li>
               <li>User: ms-agent（自动生成强密码）</li>
-              <li>Action: MS-Agent Action（包含告警和恢复操作）</li>
+              <li>Action: MS-Agent（包含告警和恢复操作）</li>
               <li>Token: 自动生成唯一 Token</li>
             </ul>
             <div style="margin-top: 8px;">
@@ -321,7 +321,7 @@
           <h4 style="margin-bottom: 8px;">验证方法</h4>
           <div style="color: #666; font-size: 13px;">
             <div>1. 在 Zabbix 中查看 Media Type: <strong>ZbxTable Webhook</strong></div>
-            <div>2. 在 Zabbix 中查看 Action: <strong>ZbxTable Webhook Action</strong></div>
+            <div>2. 在 Zabbix 中查看 Action: <strong>ZbxTable Webhook</strong></div>
             <div>3. 触发一个测试告警，验证是否能正常接收</div>
           </div>
         </div>
@@ -649,15 +649,15 @@ export default {
           this.currentStep = 1
           this.addLog('info', '[步骤 2/4] 创建 Webhook 配置...')
           await this.sleep(300)
-          this.addLog('info', '  - 创建 Media Type: ZbxTable Webhook')
+          this.addLog('info', '  - 创建 Media Type: ZbxTable')
           await this.sleep(300)
-          this.addLog('info', '  - 创建 User Group: ZbxTable Webhook Group')
+          this.addLog('info', '  - 创建 User Group: ZbxTable Webhook')
           await this.sleep(300)
           this.addLog('info', '  - 创建 User: zbxtable-webhook')
           await this.sleep(300)
           this.addLog('info', '  - 配置 Webhook 脚本')
           await this.sleep(300)
-          this.addLog('info', '  - 创建 Action: ZbxTable Webhook Action')
+          this.addLog('info', '  - 创建 Action: ZbxTable Webhook')
           
           // 调用后端 API
           const res = await installWebhook(this.currentRecord.id)
@@ -704,13 +704,13 @@ export default {
           this.currentStep = 1
           this.addLog('info', '[步骤 2/4] 创建 Zabbix 配置...')
           await this.sleep(300)
-          this.addLog('info', '  - 创建 Media Type: MS-Agent Media')
+          this.addLog('info', '  - 创建 Media Type: MS-Agent')
           await this.sleep(300)
-          this.addLog('info', '  - 创建 User Group: MS-Agent Group')
+          this.addLog('info', '  - 创建 User Group: MS-Agent')
           await this.sleep(300)
           this.addLog('info', '  - 创建 User: ms-agent')
           await this.sleep(300)
-          this.addLog('info', '  - 创建 Action: MS-Agent Action')
+          this.addLog('info', '  - 创建 Action: MS-Agent')
           
           // 调用后端 API
           const res = await installMSAgent(this.currentRecord.id)
