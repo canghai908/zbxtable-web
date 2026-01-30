@@ -142,7 +142,7 @@
           <a-input-password v-model="form.pass" placeholder="可选（Token优先）" />
         </a-form-model-item>
         <a-form-model-item label="Zabbix Token">
-          <a-input v-model="form.zabbix_token" placeholder="Zabbix API Token（可选）" />
+          <a-input v-model="form.token" placeholder="Zabbix API Token（可选）" />
         </a-form-model-item>
         <a-form-model-item label="通知方式">
           <a-radio-group v-model="form.notify_method">
@@ -290,8 +290,8 @@
           </a-descriptions-item>
           <a-descriptions-item label="认证 Token">
             <div style="display: flex; align-items: center; gap: 8px;">
-              <code style="flex: 1; word-break: break-all;">{{ webhookInfo.token }}</code>
-              <a-button size="small" icon="copy" @click="copyToClipboard(webhookInfo.token, 'Token')">复制</a-button>
+              <code style="flex: 1; word-break: break-all;">{{ webhookInfo.webhook_token }}</code>
+              <a-button size="small" icon="copy" @click="copyToClipboard(webhookInfo.webhook_token, 'WebhookToken')">复制</a-button>
             </div>
           </a-descriptions-item>
           <a-descriptions-item label="请求方法">
@@ -435,7 +435,7 @@ export default {
         web_url: '',
         user: '',
         pass: '',
-        zabbix_token: '',
+        token: '',
         notify_method: 'webhook', 
         enabled: true 
       },
@@ -477,7 +477,7 @@ export default {
         web_url: '',
         user: '',
         pass: '',
-        zabbix_token: '',
+        token: '',
         notify_method: 'webhook', 
         enabled: true 
       }
@@ -493,7 +493,7 @@ export default {
         web_url: record.web_url || '',
         user: record.user || '',
         pass: record.pass || '',
-        zabbix_token: record.zabbix_token || '',
+        token: record.token || '',
         notify_method: record.notify_method || 'webhook',
         enabled: !!record.enabled
       }
