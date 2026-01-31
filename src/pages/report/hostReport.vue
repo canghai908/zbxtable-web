@@ -2,7 +2,7 @@
   <page-layout :noTitle="true">
     <a-alert message="多实例主机报表说明" type="info" show-icon closable style="margin-bottom: 16px;">
       <template slot="description">
-        系统已支持多实例数据聚合。在配置主机报表时，需要先选择实例，然后选择该实例下的主机和监控项。
+        系统已支持多实例数据聚合。在配置主机报表时，可以为每个主机选择不同的实例。一个报表可以包含来自不同实例的主机数据。
       </template>
     </a-alert>
     
@@ -94,13 +94,6 @@
         <a-form-model-item :label="$t('host_report_name')" prop="name">
           <a-input v-model="formData.name" />
         </a-form-model-item>
-        <a-form-model-item label="选择实例" prop="selectedInstance">
-          <a-select v-model="formData.selectedInstance" placeholder="请选择 Zabbix 实例" @change="handleInstanceChangeInModal" style="width: 100%">
-            <a-select-option v-for="item in instanceList" :key="item.tenant_id" :value="item.tenant_id">
-              {{ item.name }} ({{ item.tenant_id }})
-            </a-select-option>
-          </a-select>
-        </a-form-model-item>
         <a-form-model-item :label="$t('report_mode')" prop="reportMode">
           <a-radio-group v-model="formData.reportMode" @change="handleReportModeChange">
             <a-radio value="realtime">{{ $t('realtime_report') }}</a-radio>
@@ -118,10 +111,19 @@
         </template>
         <a-form-model-item :label="$t('host_selection')" prop="hostConfigs">
           <div v-for="(config, index) in formData.hostConfigs" :key="index" style="margin-bottom: 16px; padding: 16px; border: 1px solid #d9d9d9; border-radius: 4px;">
+            <a-row :gutter="16" style="margin-bottom: 8px;" v-if="instanceList.length > 1">
+              <a-col :span="22">
+                <a-select v-model="config.instance_id" placeholder="请选择实例" @change="(value) => handleInstanceChange(value, index)" style="width: 100%">
+                  <a-select-option v-for="item in instanceList" :key="item.tenant_id" :value="item.tenant_id">
+                    {{ item.name }} ({{ item.tenant_id }})
+                  </a-select-option>
+                </a-select>
+              </a-col>
+            </a-row>
             <a-row :gutter="16">
               <a-col :span="10">
                 <a-select v-model="config.host_id" show-search :placeholder="$t('select_host')" @popupScroll="handleHostPopupScrollForConfig(index)"
-                  @search="(value) => handleHostSearchForConfig(value, index)" option-filter-prop="label" @change="handleHostChange(config, index)" style="width: 100%">
+                  @search="(value) => handleHostSearchForConfig(value, index)" option-filter-prop="label" @change="handleHostChange(config, index)" style="width: 100%" :disabled="!config.instance_id">
                   <a-select-option v-for="(host, idx) in configHostsList[index]" :key="idx" :title="host.name" :label="host.name" :value="host.hostid">
                     {{ host.name }}
                   </a-select-option>
@@ -178,7 +180,7 @@
 <script>
 const selectSize = 30
 import PageLayout from '@/layouts/PageLayout'
-import { reportList, reportDelete, deleteTopology, reportStatusUpdate, taskLogList, taskLogDelete, reportCheckNow, reportGetHosts, reportGetItems, reportAdd, reportGet, reportPut } from '@/services/admin'
+import { reportList, reportDelete, deleteTopology, reportStatusUpdate, taskLogList, taskLogDelete, reportCheckNow, reportAdd, reportGet, reportPut, hostList, itemList } from '@/services/admin'
 import { listZabbixInstances } from '@/services/zabbix'
 import moment from 'moment'
 
@@ -226,10 +228,10 @@ export default {
       editId: '',
       formData: {
         name: '',
-        selectedInstance: undefined,
         reportMode: 'realtime', // 默认实时报表
         hostConfigs: [
           {
+            instance_id: undefined,
             host_id: '',
             item_ids: []
           }
@@ -257,7 +259,7 @@ export default {
         ],
         selectedInstance: [
           {
-            required: true,
+            required: false,
             message: '请选择实例',
             trigger: 'change'
           }
@@ -273,6 +275,10 @@ export default {
                 return
               }
               for (let config of value) {
+                if (!config.instance_id) {
+                  callback(new Error('请为每个主机配置选择实例'))
+                  return
+                }
                 if (!config.host_id) {
                   callback(new Error(this.$t('message_host_required')))
                   return
@@ -413,40 +419,44 @@ export default {
         const biz = (res && res.data) ? res.data : res
         if (biz && biz.code === 200) {
           this.instanceList = biz.data || []
+          // 如果只有一个实例，自动为第一个主机配置选中
+          if (this.instanceList.length === 1 && this.formData.hostConfigs.length > 0) {
+            this.formData.hostConfigs[0].instance_id = this.instanceList[0].tenant_id
+            this.handleInstanceChange(this.instanceList[0].tenant_id, 0)
+          }
         }
       } catch (e) {
         console.error('加载实例列表失败', e)
       }
     },
-    handleInstanceChangeInModal(value) {
-      this.formData.selectedInstance = value
-      // 清空已选择的主机配置
-      this.formData.hostConfigs = [{
-        host_id: '',
-        item_ids: []
-      }]
-      this.curItemsList = {}
-      this.itemsFilterList = {}
+    handleInstanceChange(value, index) {
+      // 设置该配置的实例ID
+      this.$set(this.formData.hostConfigs[index], 'instance_id', value)
+      // 清空该配置的主机和监控项
+      this.$set(this.formData.hostConfigs[index], 'host_id', '')
+      this.$set(this.formData.hostConfigs[index], 'item_ids', [])
+      this.$set(this.curItemsList, index, [])
+      this.$set(this.itemsFilterList, index, [])
       
-      // 直接加载该实例的所有主机（不限制设备类型）
+      // 加载该实例的所有主机
       if (value) {
         let params = {
           page: 1,
           limit: 10000,
-          tenant_id: value
+          instance_id: value
         }
-        reportGetHosts(params).then((resp) => {
+        hostList(params).then((resp) => {
           let res = resp.data
           if (res.code == 200) {
             const hosts = res.data.items || []
-            // 为第一个配置加载主机列表
-            this.$set(this.configHostsFilterList, 0, hosts)
-            this.$set(this.configHostsList, 0, hosts.slice(0, selectSize))
+            // 为该配置加载主机列表
+            this.$set(this.configHostsFilterList, index, hosts)
+            this.$set(this.configHostsList, index, hosts.slice(0, selectSize))
           }
         })
       } else {
-        this.configHostsList = {}
-        this.configHostsFilterList = {}
+        this.$set(this.configHostsList, index, [])
+        this.$set(this.configHostsFilterList, index, [])
       }
     },
     formatReportTime(timeStr) {
@@ -530,12 +540,13 @@ export default {
       this.formModalVisible = true
     },
     resetFormData() {
+      const defaultInstanceId = this.instanceList.length === 1 ? this.instanceList[0].tenant_id : undefined
       this.formData = {
         name: '',
-        selectedInstance: undefined,
         reportMode: 'realtime', // 默认实时报表
         hostConfigs: [
           {
+            instance_id: defaultInstanceId,
             host_id: '',
             item_ids: []
           }
@@ -555,6 +566,10 @@ export default {
       this.itemsFilterList = {}
       if (this.$refs.formModal) {
         this.$refs.formModal.resetFields()
+      }
+      // 如果只有一个实例，自动加载主机列表
+      if (defaultInstanceId) {
+        this.handleInstanceChange(defaultInstanceId, 0)
       }
     },
     loadFormData(id) {
@@ -591,45 +606,35 @@ export default {
                 const hostConfigs = JSON.parse(reportData.host_ids)
                 if (Array.isArray(hostConfigs) && hostConfigs.length > 0) {
                   this.formData.hostConfigs = hostConfigs.map((config, idx) => ({
-                    host_id: config.host_id ? String(config.host_id) : '', // 统一转换为字符串
-                    item_ids: (config.item_ids || []).map(id => String(id)) // 统一转换为字符串数组
+                    instance_id: config.instance_id ? String(config.instance_id) : undefined,
+                    host_id: config.host_id ? String(config.host_id) : '',
+                    item_ids: (config.item_ids || []).map(id => String(id))
                   }))
                   
                   // 为每个配置加载对应的主机列表和items
-                  const savedConfigs = this.formData.hostConfigs.map(config => ({
-                    host_id: config.host_id,
-                    item_ids: config.item_ids || []
-                  }))
-                  
-                  // 如果有实例ID，加载主机列表
-                  if (reportData.instance_id) {
-                    this.formData.selectedInstance = String(reportData.instance_id)
-                    // 加载所有主机
-                    let params = {
-                      page: 1,
-                      limit: 10000,
-                      tenant_id: this.formData.selectedInstance
-                    }
-                    reportGetHosts(params).then((resp) => {
-                      let res = resp.data
-                      if (res.code == 200) {
-                        const hosts = res.data.items || []
-                        // 为每个配置设置主机列表
-                        this.formData.hostConfigs.forEach((config, index) => {
+                  this.formData.hostConfigs.forEach((config, index) => {
+                    if (config.instance_id) {
+                      // 加载该实例的主机列表
+                      let params = {
+                        page: 1,
+                        limit: 10000,
+                        instance_id: config.instance_id
+                      }
+                      hostList(params).then((resp) => {
+                        let res = resp.data
+                        if (res.code == 200) {
+                          const hosts = res.data.items || []
                           this.$set(this.configHostsFilterList, index, hosts)
                           this.$set(this.configHostsList, index, hosts.slice(0, selectSize))
                           
-                          // 恢复已选择的主机和监控项
-                          if (savedConfigs[index].host_id) {
-                            config.host_id = savedConfigs[index].host_id
-                            config.item_ids = savedConfigs[index].item_ids
-                            // 加载监控项
+                          // 如果有已选择的主机，加载监控项
+                          if (config.host_id) {
                             this.handleHostChange(config, index)
                           }
-                        })
-                      }
-                    })
-                  }
+                        }
+                      })
+                    }
+                  })
                 }
               } catch (e) {
                 console.error('Parse host_ids error:', e)
@@ -649,7 +654,7 @@ export default {
           const hostIds = JSON.stringify(this.formData.hostConfigs.map(c => ({
             host_id: c.host_id,
             item_ids: c.item_ids,
-            instance_id: this.formData.selectedInstance
+            instance_id: c.instance_id
           })))
           const itemIds = JSON.stringify(this.formData.hostConfigs.flatMap(c => c.item_ids))
           
@@ -667,7 +672,6 @@ export default {
             name: this.formData.name,
             report_type: 'host',
             report_mode: this.formData.reportMode,
-            instance_id: this.formData.selectedInstance,
             host_ids: hostIds,
             item_ids: itemIds,
             cycle: this.formData.reportMode === 'scheduled' ? this.formData.cycle.join(',') : '', // 循环报表需要周期
@@ -724,16 +728,16 @@ export default {
         return
       }
       
-      if (!this.formData.selectedInstance) {
+      if (!config.instance_id) {
         this.$message.warning('请先选择实例')
         return
       }
       
       let params = {
-        host_id: config.host_id,
-        tenant_id: this.formData.selectedInstance
+        hostid: config.host_id,
+        instance_id: config.instance_id
       }
-      reportGetItems(params).then((resp) => {
+      itemList(params).then((resp) => {
         let res = resp.data
         if (res.code == 200) {
           this.$set(this.ItemsList, config.host_id, res.data.items)
@@ -754,21 +758,18 @@ export default {
       })
     },
     addHostConfig() {
-      if (!this.formData.selectedInstance) {
-        this.$message.warning('请先选择实例')
-        return
-      }
-      
       const newIndex = this.formData.hostConfigs.length
+      const defaultInstanceId = this.instanceList.length === 1 ? this.instanceList[0].tenant_id : undefined
+      
       this.formData.hostConfigs.push({
+        instance_id: defaultInstanceId,
         host_id: '',
         item_ids: []
       })
       
-      // 为新配置复制主机列表（从第一个配置复制）
-      if (this.configHostsFilterList[0]) {
-        this.$set(this.configHostsFilterList, newIndex, this.configHostsFilterList[0])
-        this.$set(this.configHostsList, newIndex, this.configHostsFilterList[0].slice(0, selectSize))
+      // 如果只有一个实例，自动加载主机列表
+      if (defaultInstanceId) {
+        this.handleInstanceChange(defaultInstanceId, newIndex)
       } else {
         this.$set(this.configHostsList, newIndex, [])
         this.$set(this.configHostsFilterList, newIndex, [])
