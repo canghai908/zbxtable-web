@@ -119,22 +119,15 @@
         <a-form-model-item :label="$t('host_selection')" prop="hostConfigs">
           <div v-for="(config, index) in formData.hostConfigs" :key="index" style="margin-bottom: 16px; padding: 16px; border: 1px solid #d9d9d9; border-radius: 4px;">
             <a-row :gutter="16">
-              <a-col :span="6">
-                <a-select v-model="config.host_type" :placeholder="$t('hosttype')" @change="handleHostTypeChangeForConfig(config, index)" style="width: 100%">
-                  <a-select-option v-for="(item, idx) in hostTypeList" :key="idx" :value="item.value" :label="item.label">
-                    {{ item.label }}
-                  </a-select-option>
-                </a-select>
-              </a-col>
-              <a-col :span="8">
+              <a-col :span="10">
                 <a-select v-model="config.host_id" show-search :placeholder="$t('select_host')" @popupScroll="handleHostPopupScrollForConfig(index)"
-                  @search="(value) => handleHostSearchForConfig(value, index)" option-filter-prop="label" @change="handleHostChange(config, index)" style="width: 100%" :disabled="!config.host_type">
+                  @search="(value) => handleHostSearchForConfig(value, index)" option-filter-prop="label" @change="handleHostChange(config, index)" style="width: 100%">
                   <a-select-option v-for="(host, idx) in configHostsList[index]" :key="idx" :title="host.name" :label="host.name" :value="host.hostid">
                     {{ host.name }}
                   </a-select-option>
                 </a-select>
               </a-col>
-              <a-col :span="8">
+              <a-col :span="12">
                 <a-select mode="multiple" show-search v-model="config.item_ids" :placeholder="$t('select_items')" @popupScroll="() => handleItemPopupScroll(index)"
                   @search="(value) => handleItemSearch(value, index)" option-filter-prop="label" style="width: 100%" :disabled="!config.host_id">
                   <a-select-option v-for="(item, idx) in curItemsList[index]" :key="idx" :label="item.name" :title="item.name" :value="item.itemid">
@@ -231,31 +224,12 @@ export default {
       formModalTitle: '',
       isEditMode: false,
       editId: '',
-      hostTypeList: [
-        {
-          value: 'VM_WIN',
-          label: this.$t('windows_device')
-        },
-        {
-          value: 'VM_LIN',
-          label: this.$t('linux_device')
-        },
-        {
-          value: 'HW_SRV',
-          label: this.$t('hardware_device')
-        },
-        {
-          value: 'HW_NET',
-          label: this.$t('network_device')
-        }
-      ],
       formData: {
         name: '',
         selectedInstance: undefined,
         reportMode: 'realtime', // 默认实时报表
         hostConfigs: [
           {
-            host_type: '',
             host_id: '',
             item_ids: []
           }
@@ -299,10 +273,6 @@ export default {
                 return
               }
               for (let config of value) {
-                if (!config.host_type) {
-                  callback(new Error(this.$t('message_host_type')))
-                  return
-                }
                 if (!config.host_id) {
                   callback(new Error(this.$t('message_host_required')))
                   return
@@ -452,14 +422,32 @@ export default {
       this.formData.selectedInstance = value
       // 清空已选择的主机配置
       this.formData.hostConfigs = [{
-        host_type: '',
         host_id: '',
         item_ids: []
       }]
-      this.configHostsList = {}
-      this.configHostsFilterList = {}
       this.curItemsList = {}
       this.itemsFilterList = {}
+      
+      // 直接加载该实例的所有主机（不限制设备类型）
+      if (value) {
+        let params = {
+          page: 1,
+          limit: 10000,
+          tenant_id: value
+        }
+        reportGetHosts(params).then((resp) => {
+          let res = resp.data
+          if (res.code == 200) {
+            const hosts = res.data.items || []
+            // 为第一个配置加载主机列表
+            this.$set(this.configHostsFilterList, 0, hosts)
+            this.$set(this.configHostsList, 0, hosts.slice(0, selectSize))
+          }
+        })
+      } else {
+        this.configHostsList = {}
+        this.configHostsFilterList = {}
+      }
     },
     formatReportTime(timeStr) {
       if (!timeStr || timeStr === '0001-01-01T00:00:00Z' || timeStr === '0001-01-01 00:00:00') {
@@ -548,7 +536,6 @@ export default {
         reportMode: 'realtime', // 默认实时报表
         hostConfigs: [
           {
-            host_type: '',
             host_id: '',
             item_ids: []
           }
@@ -604,28 +591,45 @@ export default {
                 const hostConfigs = JSON.parse(reportData.host_ids)
                 if (Array.isArray(hostConfigs) && hostConfigs.length > 0) {
                   this.formData.hostConfigs = hostConfigs.map((config, idx) => ({
-                    host_type: config.host_type || reportData.hoststype || '', // 优先使用配置中的host_type，否则使用旧的hoststype
                     host_id: config.host_id ? String(config.host_id) : '', // 统一转换为字符串
                     item_ids: (config.item_ids || []).map(id => String(id)) // 统一转换为字符串数组
                   }))
                   
                   // 为每个配置加载对应的主机列表和items
-                  // 需要先保存host_id和item_ids，因为handleHostTypeChangeForConfig会清空它们
                   const savedConfigs = this.formData.hostConfigs.map(config => ({
                     host_id: config.host_id,
                     item_ids: config.item_ids || []
                   }))
                   
-                  // 加载主机列表，使用preserveSelection参数来保留已选择的值
-                  this.formData.hostConfigs.forEach((config, index) => {
-                    if (config.host_type) {
-                      const savedHostId = savedConfigs[index].host_id
-                      const savedItemIds = savedConfigs[index].item_ids
-                      
-                      // 调用handleHostTypeChangeForConfig加载主机列表，传入preserveSelection=true
-                      this.handleHostTypeChangeForConfig(config, index, true, savedHostId, savedItemIds)
+                  // 如果有实例ID，加载主机列表
+                  if (reportData.instance_id) {
+                    this.formData.selectedInstance = String(reportData.instance_id)
+                    // 加载所有主机
+                    let params = {
+                      page: 1,
+                      limit: 10000,
+                      tenant_id: this.formData.selectedInstance
                     }
-                  })
+                    reportGetHosts(params).then((resp) => {
+                      let res = resp.data
+                      if (res.code == 200) {
+                        const hosts = res.data.items || []
+                        // 为每个配置设置主机列表
+                        this.formData.hostConfigs.forEach((config, index) => {
+                          this.$set(this.configHostsFilterList, index, hosts)
+                          this.$set(this.configHostsList, index, hosts.slice(0, selectSize))
+                          
+                          // 恢复已选择的主机和监控项
+                          if (savedConfigs[index].host_id) {
+                            config.host_id = savedConfigs[index].host_id
+                            config.item_ids = savedConfigs[index].item_ids
+                            // 加载监控项
+                            this.handleHostChange(config, index)
+                          }
+                        })
+                      }
+                    })
+                  }
                 }
               } catch (e) {
                 console.error('Parse host_ids error:', e)
@@ -641,11 +645,11 @@ export default {
       this.$refs.formModal.validate((valid) => {
         if (valid) {
           this.formModalLoading = true
-          // 构建host_ids和item_ids JSON字符串，包含host_type
+          // 构建host_ids和item_ids JSON字符串
           const hostIds = JSON.stringify(this.formData.hostConfigs.map(c => ({
-            host_type: c.host_type,
             host_id: c.host_id,
-            item_ids: c.item_ids
+            item_ids: c.item_ids,
+            instance_id: this.formData.selectedInstance
           })))
           const itemIds = JSON.stringify(this.formData.hostConfigs.flatMap(c => c.item_ids))
           
@@ -663,6 +667,7 @@ export default {
             name: this.formData.name,
             report_type: 'host',
             report_mode: this.formData.reportMode,
+            instance_id: this.formData.selectedInstance,
             host_ids: hostIds,
             item_ids: itemIds,
             cycle: this.formData.reportMode === 'scheduled' ? this.formData.cycle.join(',') : '', // 循环报表需要周期
@@ -713,73 +718,6 @@ export default {
         this.$refs.formModal.validate()
       }
     },
-    handleHostTypeChangeForConfig(config, index, preserveSelection = false, savedHostId = null, savedItemIds = null) {
-      config.host_type = config.host_type || ''
-      
-      // 如果不是保留选择模式，清空当前配置的主机和指标选择
-      if (!preserveSelection) {
-        config.host_id = ''
-        config.item_ids = []
-        this.$set(this.curItemsList, index, [])
-      }
-      
-      if (!config.host_type) {
-        this.$set(this.configHostsList, index, [])
-        this.$set(this.configHostsFilterList, index, [])
-        return
-      }
-      
-      if (!this.formData.selectedInstance) {
-        this.$message.warning('请先选择实例')
-        return
-      }
-      
-      let params = {
-        page: 1,
-        limit: 10000,
-        host_type: config.host_type,
-        tenant_id: this.formData.selectedInstance
-      }
-      reportGetHosts(params).then((resp) => {
-        let res = resp.data
-        if (res.code == 200) {
-          // 保存完整列表到filterList，显示列表只显示前selectSize条
-          this.$set(this.configHostsFilterList, index, res.data.items)
-          this.$set(this.configHostsList, index, res.data.items.slice(0, selectSize))
-          
-          // 如果是保留选择模式，恢复host_id和item_ids
-          if (preserveSelection && savedHostId) {
-            // 检查host_id是否在新的列表中（统一转换为字符串进行比较）
-            const savedHostIdStr = String(savedHostId)
-            const hostExists = res.data.items.some(h => String(h.hostid) === savedHostIdStr)
-            if (hostExists) {
-              // 恢复host_id和item_ids（统一转换为字符串）
-              config.host_id = savedHostIdStr
-              config.item_ids = (savedItemIds || []).map(id => String(id))
-              // 加载items列表
-              this.handleHostChange(config, index)
-            } else {
-              // 如果host_id不在新列表中，清空选择
-              config.host_id = ''
-              config.item_ids = []
-            }
-          } else if (this.isEditMode && config.host_id) {
-            // 编辑模式下，如果config.host_id已存在，检查是否在新的列表中
-            const configHostIdStr = String(config.host_id)
-            const hostExists = res.data.items.some(h => String(h.hostid) === configHostIdStr)
-            if (hostExists) {
-              // 确保host_id是字符串类型
-              config.host_id = configHostIdStr
-              this.handleHostChange(config, index)
-            } else {
-              // 如果host_id不在新列表中，清空选择
-              config.host_id = ''
-              config.item_ids = []
-            }
-          }
-        }
-      })
-    },
     handleHostChange(config, index) {
       if (!config.host_id) {
         this.$set(this.curItemsList, index, [])
@@ -816,15 +754,26 @@ export default {
       })
     },
     addHostConfig() {
+      if (!this.formData.selectedInstance) {
+        this.$message.warning('请先选择实例')
+        return
+      }
+      
+      const newIndex = this.formData.hostConfigs.length
       this.formData.hostConfigs.push({
-        host_type: '',
         host_id: '',
         item_ids: []
       })
-      const index = this.formData.hostConfigs.length - 1
-      this.$set(this.curItemsList, index, [])
-      this.$set(this.configHostsList, index, [])
-      this.$set(this.configHostsFilterList, index, [])
+      
+      // 为新配置复制主机列表（从第一个配置复制）
+      if (this.configHostsFilterList[0]) {
+        this.$set(this.configHostsFilterList, newIndex, this.configHostsFilterList[0])
+        this.$set(this.configHostsList, newIndex, this.configHostsFilterList[0].slice(0, selectSize))
+      } else {
+        this.$set(this.configHostsList, newIndex, [])
+        this.$set(this.configHostsFilterList, newIndex, [])
+      }
+      this.$set(this.curItemsList, newIndex, [])
     },
     removeHostConfig(index) {
       this.formData.hostConfigs.splice(index, 1)

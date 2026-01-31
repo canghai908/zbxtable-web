@@ -200,24 +200,6 @@ const options = {
               meta: { highlight: "/report", invisible: true },
               component: () => import("@/pages/report/index"),
             },
-            {
-              path: "edit",
-              name: "报表编辑",
-              meta: { highlight: "/report", invisible: true },
-              component: () => import("@/pages/report/edit"),
-            },
-            {
-              path: "add",
-              name: "添加",
-              meta: {
-                highlight: "/report",
-                invisible: true,
-                authority: {
-                  role: "admin1",
-                },
-              },
-              component: () => import("@/pages/report/add"),
-            },
           ],
         },
         {

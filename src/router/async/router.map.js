@@ -123,18 +123,6 @@ const routerMap = {
 	hostReport: {
 		component: () => import('@/pages/report/hostReport'),
 	},
-	hostReportEdit: {
-		component: () => import('@/pages/report/hostEdit'),
-	},
-	hostReportAdd: {
-		component: () => import('@/pages/report/hostAdd'),
-	},
-	reportTrafficEdit: {
-		component: () => import('@/pages/report/edit'),
-	},
-	reportTrafficAdd: {
-		component: () => import('@/pages/report/add'),
-	},
 	reportHost: {
 		component: () => import('@/pages/report/index'),
 	},

@@ -198,12 +198,6 @@ export async function reportCheckNow(params) {
 export async function reportStatusUpdate(params) {
 	return request(REPORT + '/status', METHOD.POST, params)
 }
-export async function reportGetHosts(params) {
-	return request(REPORT + '/hosts', METHOD.GET, params)
-}
-export async function reportGetItems(params) {
-	return request(REPORT + '/items', METHOD.GET, params)
-}
 export async function itemListTraffic(params) {
 	return request(ITEM_TRAFFIC, METHOD.GET, params)
 }

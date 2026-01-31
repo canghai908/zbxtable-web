@@ -55,6 +55,17 @@ export default {
       return this.$store.state.setting.systemName
     }
   },
+  mounted() {
+    // 开发模式下自动填充账号密码
+    if (process.env.NODE_ENV === 'development') {
+      this.$nextTick(() => {
+        this.form.setFieldsValue({
+          name: 'admin',
+          password: 'Zbxtable'
+        })
+      })
+    }
+  },
   methods: {
     ...mapMutations('account', ['setUser', 'setPermissions', 'setRoles']),
     onSubmit(e) {
