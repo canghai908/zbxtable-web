@@ -15,7 +15,7 @@
           <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="!detail">
             <a-row :gutter="16">
               <a-col :xl="{ span: 5 }" :lg="{ span: 12 }">
-                <a-card hoverable :headStyle="{textAlign: 'center', width: '100%', background: '#FAFBFC'}" :bodyStyle="{padding: '0'}" title="CPU使用率">\
+                <a-card hoverable :headStyle="{textAlign: 'center', width: '100%', background: '#FAFBFC'}" :bodyStyle="{padding: '0'}" title="CPU使用率">
                   <div id="liquidCPU" style="width: 300px; height: 300px;margin:0 auto;"></div>
                 </a-card>
               </a-col>
@@ -1171,7 +1171,7 @@ export default {
         end: this.endTime,
         instance_id: this.instance_id, // 添加实例ID
       }).then((resp) => {
-        let res = resp.data;
+        let res = resp.data.data;
         this.loading3 = false
         //流量
         this.trafficeSeries.xAxis = res.traffic_series.xAxis

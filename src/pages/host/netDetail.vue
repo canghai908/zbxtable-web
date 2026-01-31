@@ -195,8 +195,6 @@ import FileSaver from 'file-saver'
 import XLSX from 'xlsx'
 import {
   hostDetail,
-  hostMock,
-  hostMockd,
   netInterfaceList,
   netInterfaceData
 } from '@/services/admin'
@@ -207,7 +205,7 @@ import echarts from 'echarts'
 require('echarts-liquidfill')
 // import gauge from "@/components/gcharts/gauge";
 export default {
-  name: 'LinuxDetail',
+  name: 'NetDetail',
   components: { PageLayout, DetailListItem, DetailList },
   data() {
     return {
@@ -781,7 +779,8 @@ export default {
         end: this.endTime,
         instance_id: this.instance_id,
       }).then((resp) => {
-        let res = resp.data
+        let res = resp.data.data
+        console.log(res)
         this.loading3 = false
         //流量
         this.trafficeSeries.xAxis = res.traffic_series.xAxis
@@ -1424,7 +1423,7 @@ export default {
         end: this.endTime,
         instance_id: this.instance_id,
       }).then((resp) => {
-        let res = resp.data
+        let res = resp.data.data
         this.loading3 = false
         //流量
         this.trafficeSeries.xAxis = res.traffic_series.xAxis

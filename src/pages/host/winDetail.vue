@@ -1097,7 +1097,7 @@ export default {
         end: this.endTime,
         instance_id: this.instance_id,
       }).then((resp) => {
-        let res = resp.data;
+        let res = resp.data.data;
         this.loading3 = false
         //流量
         this.trafficeSeries.xAxis = res.traffic_series.xAxis
@@ -1154,7 +1154,7 @@ export default {
         end: this.endTime,
         instance_id: this.instance_id,
       }).then((resp) => {
-        let res = resp.data;
+        let res = resp.data.data;
         this.loading3 = false
         //流量
         this.trafficeSeries.xAxis = res.traffic_series.xAxis
