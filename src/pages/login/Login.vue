@@ -117,7 +117,7 @@ export default {
                 ? result.data
                 : result
             const routesConfig =
-              routesRes && routesRes.data && routesRes.data.items ? routesRes.data.items : []
+              routesRes && routesRes.data && routesRes.data ? routesRes.data : []
             loadRoutes(routesConfig)
             this.$router.push('/dashboard/workplace')
             this.$message.success(loginRes.message || '登录成功', 1)
