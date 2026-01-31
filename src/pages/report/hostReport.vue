@@ -578,7 +578,7 @@ export default {
         .then((resp) => {
           let res = resp.data
           if (res.code == 200) {
-            const reportData = res.data.items || {}
+            const reportData = res.data || {}
             this.formData.name = reportData.name || ''
             this.formData.hoststype = reportData.hoststype || ''
             this.formData.emails = reportData.emails || ''
