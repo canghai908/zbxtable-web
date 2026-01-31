@@ -195,11 +195,12 @@ export default {
   i18n: require('./i18n'),
   data() {
     return {
-      loading1: false,
       triggerList: [],
+      loading1: false,
       loading2: false,
-      info: '',
       loading3: false,
+      info: '',
+
       ptitle: this.$t('bandwidth'),
       edata: {
         name_one: '--',
@@ -228,8 +229,8 @@ export default {
   created() {
     this.initTrigger()
     this.initInfo()
-    this.edataInfo()
-    this.initMock()
+    this.initEgress()
+    this.initTop()
   },
   methods: {
     initTrigger() {
@@ -246,17 +247,17 @@ export default {
       indexInfo()
         .then((resp) => {
           let res = resp.data
-          this.info = res.data.items
+          this.info = res.data
         })
         .finally(() => {
           this.loading2 = true
         })
     },
-    edataInfo() {
+    initEgress() {
       indexEgress()
         .then((resp) => {
           let res = resp.data
-          this.edata = res.data.items
+          this.edata = res.data
           this.ptitle =
             this.ptitle + '(' + this.$t('polling_date') + this.edata.date + ')'
         })
@@ -264,10 +265,11 @@ export default {
           this.loading3 = true
         })
     },
-    initMock() {
+    initTop() {
       indexRestop({ host_type: 'VM_WIN', metrics_type: 'CPU', top_num: '5' })
         .then((resp) => {
           let res = resp.data
+          console.log(res)
           let arr = res.data.top_list || []
           arr.sort((a, b) => {
             return b.score - a.score

@@ -305,7 +305,7 @@ export default {
       listZabbixInstances().then((resp) => {
         let res = resp.data
         if (res.code == 200) {
-          // 注意：后端返回的是 res.data 直接是数组，不是 res.data.items
+          // 后端返回格式：{code: 200, message: "ok", data: [...]}
           const allItems = Array.isArray(res.data) ? res.data : []
           this.instanceList = allItems.filter(item => item.enabled)
           if (this.instanceList.length > 0 && !this.selectedInstance) {

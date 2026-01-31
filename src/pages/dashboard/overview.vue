@@ -144,16 +144,15 @@ export default {
       indexOverview().then((resp) => {
         let res = resp.data
         if (res.code == 200) {
-          this.win = res.data.items.vm_win || []
+          this.win = res.data.vm_win || []
 	  this.winTitle = this.$t('num_windows_hosts') + this.win.length;
-          this.lin = res.data.items.vm_lin || []
+          this.lin = res.data.vm_lin || []
 	  this.linTitle = this.$t('num_linux_hosts') + this.lin.length;
-          this.net = res.data.items.hw_net || []
+          this.net = res.data.hw_net || []
           this.netTitle = this.$t('num_networking_hosts') + this.net.length;
-          this.srv = res.data.items.hw_srv || []
+          this.srv = res.data.hw_srv || []
           this.srvTitle = this.$t('num_hardware_hosts') + this.srv.length;
         }
-        console.log(this.win)
       }).finally(() => { this.loading = false })
     },
   },

@@ -170,7 +170,7 @@ export default {
       inventoryTree().then((resp) => {
         let res = resp.data
         if (res.code == 200) {
-          this.treeData = res.data.items
+          this.treeData = res.data
         }
       })
     },
