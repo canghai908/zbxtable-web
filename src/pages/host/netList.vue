@@ -234,7 +234,7 @@ export default {
       })
     },
     seeDetail(v) {
-      this.$router.push('/net/detail?id=' + v.hostid)
+      this.$router.push('/net/detail?id=' + v.hostid + '&instance_id=' + v.instance_id)
     },
     resetData() {
       if (this.hosts || this.interfaces || this.available || this.model) {

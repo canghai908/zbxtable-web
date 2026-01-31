@@ -33,6 +33,15 @@
             formatter: (val) => `${val}次`
           }]" />
       </v-chart>
+      
+      <!-- 添加主机名和实例标签列表 -->
+      <div class="host-list">
+        <div v-for="(item, index) in displayList" :key="index" class="host-item">
+          <span class="host-name">{{ item.hostname }}</span>
+          <a-tag v-if="item.instanceName" color="orange" class="instance-tag">{{ item.instanceName }}</a-tag>
+          <span class="host-count">{{ item.value }}次</span>
+        </div>
+      </div>
     </div>
 
     <!-- 添加悬浮提示 -->
@@ -60,6 +69,7 @@ export default {
   data () {
     return {
       data: [],
+      displayList: [],
       show: 0,
       height: 380,
       scale: [
@@ -92,14 +102,33 @@ export default {
       if(this.mock && this.mock.length) {
         this.show = 1;
         let list = [];
+        let displayList = [];
         this.mock.forEach((v, i) => {
+          // 解析主机名和实例名 格式: "主机名 [实例名]"
+          const match = v.match(/^(.+?)\s*\[(.+?)\]$/);
+          let hostname = v;
+          let instanceName = '';
+          
+          if (match) {
+            hostname = match[1].trim();
+            instanceName = match[2].trim();
+          }
+          
           list.push({
-            name: v,
+            name: hostname, // 图表只显示主机名
+            value: this.numList[i] || 0
+          });
+          
+          displayList.push({
+            hostname: hostname,
+            instanceName: instanceName,
             value: this.numList[i] || 0
           });
         });
         list.sort((a, b) => b.value - a.value);
+        displayList.sort((a, b) => b.value - a.value);
         this.data = list;
+        this.displayList = displayList;
       } else {
         this.show = 2;
       }
@@ -153,6 +182,44 @@ export default {
           margin-right: 8px;
         }
       }
+    }
+  }
+}
+
+.host-list {
+  margin-top: 20px;
+  padding: 10px;
+  background: #fafafa;
+  border-radius: 4px;
+  
+  .host-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    .host-name {
+      flex: 1;
+      font-size: 14px;
+      color: #333;
+      font-weight: 500;
+    }
+    
+    .instance-tag {
+      margin: 0 8px;
+    }
+    
+    .host-count {
+      font-size: 14px;
+      color: #666;
+      font-weight: 500;
     }
   }
 }

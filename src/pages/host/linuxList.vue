@@ -306,7 +306,7 @@ export default {
       })
     },
     seeDetail(v) {
-      this.$router.push('/host/lindetail?id=' + v.hostid + '&type=1')
+      this.$router.push('/host/lindetail?id=' + v.hostid + '&instance_id=' + v.instance_id + '&type=1')
     },
     seeGraph(v) {
       hostGraph(v.hostid, {

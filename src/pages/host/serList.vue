@@ -230,7 +230,7 @@ export default {
       })
     },
     seeDetail(v) {
-      this.$router.push('/server/detail?id=' + v.hostid)
+      this.$router.push('/server/detail?id=' + v.hostid + '&instance_id=' + v.instance_id)
     },
     resetData() {
       if (this.hosts) {

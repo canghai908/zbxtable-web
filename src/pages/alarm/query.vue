@@ -7,7 +7,14 @@
       <a-form-model-item label="IP">
         <a-input v-model.trim="hostIp" placeholder="主机IP" />
       </a-form-model-item>
-      <!-- 实例筛选已取消：统一跟随顶部“当前 Zabbix 连接” -->
+      <a-form-model-item label="选择实例">
+        <a-select v-model="selectedInstance" placeholder="全部实例" allowClear style="width: 200px">
+          <a-select-option value="">全部实例</a-select-option>
+          <a-select-option v-for="item in instanceList" :key="item.tenant_id" :value="item.tenant_id">
+            {{ item.name }}
+          </a-select-option>
+        </a-select>
+      </a-form-model-item>
       <a-form-model-item label="告警类型">
         <a-select optionFilterProp="label" style="width:100px" v-model="status" option-label-prop="label" @change="handleStatusChange">
           <a-select-option v-for="(item, index) in statuslist" :key="index" :value="item.id" :label="item.value" :title="item.value">
@@ -95,6 +102,7 @@
 <script>
 import PageLayout from "@/layouts/PageLayout";
 import { alarm, alarmExport, eventLogGet, alarmDeepseekAnalysis } from "@/services/admin";
+import { listZabbixInstances } from '@/services/zabbix'
 import { parseTimeFun } from "@/utils/formatter";
 import { reduce } from "lodash";
 import moment from "moment";
@@ -168,6 +176,8 @@ export default {
       page: 1,
       pageSize: 10,
       loading: false,
+      instanceList: [],
+      selectedInstance: '',
       status: "",
       level: "",
       statuslist: [
@@ -242,9 +252,21 @@ export default {
       moment(qtime, "YYYY-MM-DD HH:mm:ss"),
       moment(ntime, "YYYY-MM-DD HH:mm:ss"),
     ];
+    this.loadInstances();
     this.init();
   },
   methods: {
+    loadInstances() {
+      listZabbixInstances().then((resp) => {
+        let res = resp.data
+        if (res.code == 200) {
+          const allItems = Array.isArray(res.data) ? res.data : []
+          this.instanceList = allItems.filter(item => item.enabled)
+        }
+      }).catch(err => {
+        console.error('加载实例列表失败:', err)
+      })
+    },
     init() {
       this.loading = true;
       let req = {
@@ -255,6 +277,9 @@ export default {
         order: "desc",  // 使用 order 参数来指定降序排列
         order_by: "id"  // 按 ID 降序，确保最新数据在最前
       };
+      if (this.selectedInstance) {
+        req.tenant_id = this.selectedInstance;
+      }
       if (this.beginTime) {
         req.begin = this.beginTime;
         req.end = this.endTime;
@@ -292,6 +317,7 @@ export default {
           hosts: this.hosts,
           status: this.status, level: this.level,
           host_ip: this.hostIp,
+          tenant_id: this.selectedInstance,
         },
         {
           responseType: "arraybuffer",
@@ -330,6 +356,7 @@ export default {
       this.status = "";
       this.level = "";
       this.hostIp = "";
+      this.selectedInstance = "";
       this.init();
     },
     getEvent(exp, record) {

@@ -59,6 +59,7 @@ export default {
   data() {
     return {
       id: "",
+      instance_id: "",
       detail: "",
     };
   },
@@ -66,11 +67,12 @@ export default {
     this.dates = new Date().getTime();
     this.dater = parseTimeFun(this.dates);
     this.id = this.$route.query.id || "";
+    this.instance_id = this.$route.query.instance_id || "";
     this.init();
   },
   methods: {
     init() {
-      hostDetail(this.id).then((resp) => {
+      hostDetail(this.id, this.instance_id).then((resp) => {
         let res = resp.data;
         this.detail = res;
       });

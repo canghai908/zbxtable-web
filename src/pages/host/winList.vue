@@ -258,7 +258,7 @@ export default {
       })
     },
     seeDetail(v) {
-      this.$router.push('/host/windetail?id=' + v.hostid + '&type=2')
+      this.$router.push('/host/windetail?id=' + v.hostid + '&instance_id=' + v.instance_id + '&type=2')
     },
     seeGraph(v) {
       hostGraph(v.hostid, {

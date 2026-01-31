@@ -97,7 +97,8 @@
           <a-col>
             <a-form-model class="home-search" layout="inline" style="width: 80%; height: 10%;margin:0 auto;" :colon='false'>
               <a-form-model-item label="时间">
-                <a-range-picker format="YYYY-MM-DD HH:mm:ss" :show-time="{ format: 'HH:mm', defaultValue:[moment('00:00:00', 'HH:mm:ss'),moment('23:59:59', 'HH:mm:ss')]}" v-model="timeValue" @change="changeCreationTime" :getCalendarContainer="triggerNode=>{return triggerNode.parentNode || document.body}" />
+                <a-range-picker format="YYYY-MM-DD HH:mm:ss" :show-time="{ format: 'HH:mm', defaultValue:[moment('00:00:00', 'HH:mm:ss'),moment('23:59:59', 'HH:mm:ss')]}" v-model="timeValue"
+                  @change="changeCreationTime" :getCalendarContainer="triggerNode=>{return triggerNode.parentNode || document.body}" />
               </a-form-model-item>
               <a-form-model-item>
                 <a-button :style="{ marginRight: '10px' }" type="primary" @click="trafficeQuery">查询</a-button>
@@ -117,7 +118,8 @@
             </a-row>
             <a-row>
               <a-col>
-                <a-table :loading="loading3" style="width: 90%;margin:0 auto;" :columns="trafficeColumns" :data-source="trafficeSeries.list" :pagination="false" :rowKey="(record) => { return record.name}">
+                <a-table :loading="loading3" style="width: 90%;margin:0 auto;" :columns="trafficeColumns" :data-source="trafficeSeries.list" :pagination="false"
+                  :rowKey="(record) => { return record.name}">
                   <div slot="name" slot-scope="record">{{record.name }}</div>
                   <div slot="min" slot-scope="record">{{record.min | TrafficTBytes}}</div>
                   <div slot="max" slot-scope="record">{{record.max | TrafficTBytes}}</div>
@@ -135,7 +137,8 @@
                 <div id="discardedChart" style="width: 900px; height: 300px;"></div>
               </a-col>
               <a-col>
-                <a-table :loading="loading3" style="width: 90%; height: 10%;margin:0 auto;" :columns="discardedColumns" :data-source="diescardedSeries.list" :pagination="false" :rowKey="(record) => { return record.name}">
+                <a-table :loading="loading3" style="width: 90%; height: 10%;margin:0 auto;" :columns="discardedColumns" :data-source="diescardedSeries.list" :pagination="false"
+                  :rowKey="(record) => { return record.name}">
                   <div slot="name" slot-scope="record">{{record.name }}</div>
                   <div slot="min" slot-scope="record">{{record.min }}</div>
                   <div slot="max" slot-scope="record">{{record.max}}</div>
@@ -155,7 +158,8 @@
                 <div id="errorsChart" style="width: 700px; height: 300px;"></div>
               </a-col>
               <a-col>
-                <a-table :loading="loading3" style="width: 90%;margin:0 auto;" :columns="discardedColumns" :data-source="errorsSeries.list" :pagination="false" :rowKey="(record) => { return record.name}">
+                <a-table :loading="loading3" style="width: 90%;margin:0 auto;" :columns="discardedColumns" :data-source="errorsSeries.list" :pagination="false"
+                  :rowKey="(record) => { return record.name}">
                   <div slot="name" slot-scope="record">{{record.name }}</div>
                   <div slot="min" slot-scope="record">{{record.min }}</div>
                   <div slot="max" slot-scope="record">{{record.max}}</div>
@@ -171,7 +175,8 @@
                 <div id="operationalChart" style="width: 700px; height: 300px;"></div>
               </a-col>
               <a-col>
-                <a-table :loading="loading3" style="width: 90%;margin:0 auto;" :columns="discardedColumns" :data-source="operationalSeries.list" :pagination="false" :rowKey="(record) => { return record.name}">
+                <a-table :loading="loading3" style="width: 90%;margin:0 auto;" :columns="discardedColumns" :data-source="operationalSeries.list" :pagination="false"
+                  :rowKey="(record) => { return record.name}">
                   <div slot="name" slot-scope="record">{{record.name }}</div>
                   <div slot="min" slot-scope="record">{{record.min }}</div>
                   <div slot="max" slot-scope="record">{{record.max}}</div>
@@ -211,6 +216,7 @@ export default {
     return {
       moment,
       id: "",
+      instance_id: "",
       detail: '',
       cpuList: [],
       memoryList: [],
@@ -329,6 +335,7 @@ export default {
     ];
     this.dater = parseTimeFun(this.dates);
     this.id = this.$route.query.id || "";
+    this.instance_id = this.$route.query.instance_id || "";
     this.init();
   },
   filters: {
@@ -390,15 +397,15 @@ export default {
   },
   methods: {
     init() {
-      hostDetail(this.id).then((resp) => {
+      hostDetail(this.id, this.instance_id).then((resp) => {
         let res = resp.data;
-        this.detail = res;
+        this.detail = res.data;
       }).finally(() => {
         this.initBaseChart();
         this.loading1 = false;
       });
       this.loading2 = true
-      linMonList(this.id).then((resp) => {
+      linMonList(this.id, this.instance_id).then((resp) => {
         let res = resp.data
         if (res.code == 200) {
           this.FileSystemlist = res.data.items.filesystem || []
@@ -429,7 +436,14 @@ export default {
       this.visible = false
     },
     initBaseChart() {
+      // 检查 detail 数据是否已加载
+      if (!this.detail || !this.detail.cpu_utilization || !this.detail.memory_utilization) {
+        console.warn('Detail data not loaded yet, skipping chart initialization')
+        return
+      }
+      
       //cpu
+      const cpuValue = parseFloat(this.detail.cpu_utilization.split(" ")[0]) || 0
       this.myChart = echarts.init(document.getElementById('liquidCPU'));
       this.myChart.setOption(
         {
@@ -438,7 +452,7 @@ export default {
               type: 'liquidFill',
               radius: '85%',
               center: ['50%', '50%'],
-              data: [this.detail.cpu_utilization.split(" ")[0] / 100],
+              data: [cpuValue / 100],
               backgroundStyle: {
                 color: {
                   type: 'linear',
@@ -496,7 +510,7 @@ export default {
               label: {
                 normal: {
 
-                  formatter: this.detail.cpu_utilization.split(" ")[0] + "%",
+                  formatter: cpuValue + "%",
                   textStyle: {
                     fontSize: 35
                   }
@@ -508,6 +522,7 @@ export default {
         true
       );
       //memory
+      const memValue = parseFloat(this.detail.memory_utilization.split(" ")[0]) || 0
       this.myChart = echarts.init(document.getElementById('liquidMem'));
       this.myChart.setOption(
         {
@@ -516,7 +531,7 @@ export default {
               type: 'liquidFill',
               radius: '85%',
               center: ['50%', '50%'],
-              data: [this.detail.memory_utilization.split(" ")[0] / 100],
+              data: [memValue / 100],
               backgroundStyle: {
                 color: {
                   type: 'linear',
@@ -573,7 +588,7 @@ export default {
               },
               label: {
                 normal: {
-                  formatter: this.detail.memory_utilization.split(" ")[0] + "%",
+                  formatter: memValue + "%",
                   textStyle: {
                     fontSize: 35
                   }
@@ -585,6 +600,7 @@ export default {
         true
       )
       //pingloss
+      const pingLossValue = this.detail.ping_loss ? parseFloat(this.detail.ping_loss.split(" ")[0]) || 0 : 0
       this.myChart = echarts.init(document.getElementById('liquidPingloss'));
       this.myChart.setOption(
         {
@@ -593,7 +609,7 @@ export default {
               type: 'gauge',
               radius: '85%',
               center: ['50%', '50%'],
-              data: [this.detail.ping_loss.split(" ")[0]],
+              data: [pingLossValue],
               detail: { // 中间数据
                 valueAnimation: true,
                 formatter: '{value}%', // 数据值的样式
@@ -1096,6 +1112,7 @@ export default {
         out_errors_value_type: this.record.out_errors_itemid,
         begin: this.beginTime,
         end: this.endTime,
+        instance_id: this.instance_id, // 添加实例ID
       }).then((resp) => {
         let res = resp.data;
         this.loading3 = false
@@ -1152,6 +1169,7 @@ export default {
         out_errors_value_type: record.out_errors_itemid,
         begin: this.beginTime,
         end: this.endTime,
+        instance_id: this.instance_id, // 添加实例ID
       }).then((resp) => {
         let res = resp.data;
         this.loading3 = false

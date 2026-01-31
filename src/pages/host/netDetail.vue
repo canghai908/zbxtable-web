@@ -444,6 +444,7 @@ export default {
     ]
     this.dater = parseTimeFun(this.dates)
     this.id = this.$route.query.id || ''
+    this.instance_id = this.$route.query.instance_id || ''
     this.init()
   },
   filters: {
@@ -526,7 +527,7 @@ export default {
   },
   methods: {
     init() {
-      hostDetail(this.id)
+      hostDetail(this.id, this.instance_id)
         .then((resp) => {
           let res = resp.data
           this.detail = res
@@ -777,7 +778,8 @@ export default {
         out_errors_itemid: this.record.out_errors_itemid,
         out_errors_value_type: this.record.out_errors_itemid,
         begin: this.beginTime,
-        end: this.endTime
+        end: this.endTime,
+        instance_id: this.instance_id,
       }).then((resp) => {
         let res = resp.data
         this.loading3 = false
@@ -1419,7 +1421,8 @@ export default {
         out_errors_itemid: record.out_errors_itemid,
         out_errors_value_type: record.out_errors_itemid,
         begin: this.beginTime,
-        end: this.endTime
+        end: this.endTime,
+        instance_id: this.instance_id,
       }).then((resp) => {
         let res = resp.data
         this.loading3 = false

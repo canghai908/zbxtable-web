@@ -44,8 +44,9 @@ export async function hostExport(params, config) {
 export async function inventoryExport(params, config) {
 	return request(INVENTORY_EXPORT, METHOD.POST, params, config)
 }
-export async function hostDetail(id) {
-	return request(HOST_LIST + '/' + id, METHOD.GET)
+export async function hostDetail(id, instance_id) {
+	const params = instance_id ? { instance_id } : {}
+	return request(HOST_LIST + '/' + id, METHOD.GET, params)
 }
 export async function hostGraph(id, params) {
 	return request(HOST_LIST + '/graph/' + id, METHOD.POST, params)
@@ -122,11 +123,13 @@ export async function netInterfaceList(id) {
 export async function netInterfaceData(params) {
 	return request(HOST_LIST + '/interface/data', METHOD.POST, params)
 }
-export async function winMonList(id) {
-	return request(HOST_LIST + '/winmon/' + id, METHOD.GE)
+export async function winMonList(id, instance_id) {
+	const params = instance_id ? { instance_id } : {}
+	return request(HOST_LIST + '/winmon/' + id, METHOD.GET, params)
 }
-export async function linMonList(id) {
-	return request(HOST_LIST + '/linmon/' + id, METHOD.GE)
+export async function linMonList(id, instance_id) {
+	const params = instance_id ? { instance_id } : {}
+	return request(HOST_LIST + '/linmon/' + id, METHOD.GET, params)
 }
 export async function indexOverview() {
 	return request(INDEX__OVERVIEW, METHOD.GET)
