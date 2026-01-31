@@ -185,20 +185,9 @@ const options = {
           component: BlankView,
           children: [
             {
-              path: "traffic",
-              name: "流量报表",
-              component: () => import("@/pages/report/index"),
-            },
-            {
-              path: "hostReport",
-              name: "主机报表",
-              component: () => import("@/pages/report/hostReport"),
-            },
-            {
               path: "host",
               name: "主机报表",
-              meta: { highlight: "/report", invisible: true },
-              component: () => import("@/pages/report/index"),
+              component: () => import("@/pages/report/host"),
             },
           ],
         },

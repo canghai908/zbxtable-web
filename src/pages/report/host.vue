@@ -2,7 +2,7 @@
   <page-layout :noTitle="true">
     <a-alert message="多实例主机报表说明" type="info" show-icon closable style="margin-bottom: 16px;">
       <template slot="description">
-        系统已支持多实例数据聚合。在配置主机报表时，可以为每个主机选择不同的实例。一个报表可以包含来自不同实例的主机数据。
+        系统已支持多实例数据聚合。在配置主机报表时,一个报表可以包含来自不同实例的主机指标数据。
       </template>
     </a-alert>
     
