@@ -42,4 +42,5 @@ module.exports = {
 	AI: '/v1/ai',
 	API_WS: '/ws',
 	ZABBIX: '/v1/zabbix',
+	METRIC_MAPPING: '/v1/metric_mapping',
 }

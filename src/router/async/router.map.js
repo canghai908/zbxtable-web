@@ -170,6 +170,9 @@ const routerMap = {
 	version: {
 		component: () => import('@/pages/system/version'),
 	},
+	metricMapping: {
+		component: () => import('@/pages/system/metricMapping'),
+	},
 
 	form: {
 		name: '表单页',

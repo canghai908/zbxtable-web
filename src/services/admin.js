@@ -32,6 +32,7 @@ import {
 	INVENTORY_EXPORT,
 	REPORT,
 	ZABBIX,
+	METRIC_MAPPING,
 } from '@/services/api'
 import { request, METHOD } from '@/utils/request'
 // import { INDEX_VERSION, INVENTORY_EXPORT, REPORT } from "./api";
@@ -291,6 +292,27 @@ export async function alarmDeepseekAnalysis(params) {
 		}
 	})
 }
+export async function metricMappingList(params) {
+	return request(METRIC_MAPPING, METHOD.GET, params)
+}
+export async function metricMappingGet(id) {
+	return request(METRIC_MAPPING + '/' + id, METHOD.GET)
+}
+export async function metricMappingCreate(params) {
+	return request(METRIC_MAPPING, METHOD.POST, params)
+}
+export async function metricMappingUpdate(id, params) {
+	return request(METRIC_MAPPING + '/' + id, METHOD.PUT, params)
+}
+export async function metricMappingDelete(id) {
+	return request(METRIC_MAPPING + '/' + id, METHOD.DELETE)
+}
+export async function metricMappingExecute(id) {
+	return request(METRIC_MAPPING + '/' + id + '/execute', METHOD.POST)
+}
+export async function metricMappingHistory(params) {
+	return request(METRIC_MAPPING + '/history', METHOD.GET, params)
+}
 export default {
 	hostList,
 	hostDetail,
@@ -363,4 +385,11 @@ export default {
 	groupMemberPut,
 	groupDelete,
 	alarmDeepseekAnalysis,
+	metricMappingList,
+	metricMappingGet,
+	metricMappingCreate,
+	metricMappingUpdate,
+	metricMappingDelete,
+	metricMappingExecute,
+	metricMappingHistory,
 }
