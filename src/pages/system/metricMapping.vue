@@ -2,7 +2,7 @@
   <page-layout>
     <div slot="headerContent">
       <div class="header-section">
-        <h2>指标映射配置</h2>
+        
         <div class="header-actions">
           <a-button type="primary" @click="showCreateDialog">新建映射配置</a-button>
         </div>
@@ -10,8 +10,8 @@
     </div>
 
     <a-table :loading="loading" :columns="columns" :data-source="mappings" :pagination="false" :rowKey="record => record.id">
-      <span slot="instance_id" slot-scope="text">
-        <a-tag color="blue">实例 {{ text }}</a-tag>
+      <span slot="instance_id" slot-scope="text, record">
+        <a-tag color="blue">{{ getInstanceName(text) }}</a-tag>
       </span>
       <span slot="system_type" slot-scope="text">
         <a-tag :color="getSystemTypeColor(text)">{{ getSystemTypeName(text) }}</a-tag>
@@ -55,10 +55,6 @@
           </a-select>
         </a-form-model-item>
 
-        <a-form-model-item label="配置名称" prop="mapping_name">
-          <a-input v-model="form.mapping_name" placeholder="请输入配置名称" />
-        </a-form-model-item>
-
         <a-form-model-item label="主机组" prop="host_group_ids">
           <a-select v-model="selectedGroups" mode="multiple" placeholder="请选择主机组" @change="updateGroupIds">
             <a-select-option v-for="group in hostGroups" :key="group.groupid" :value="group.groupid">
@@ -72,8 +68,8 @@
         <a-row :gutter="16">
           <a-col :span="12">
             <a-form-model-item label="运行时间" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
-              <a-select placeholder="选择模板" @change="val => handleTemplateChange(val, 'uptime')">
-                <a-select-option v-for="tpl in templateList" :key="tpl.templateid" :value="tpl.templateid">
+              <a-select show-search option-filter-prop="label" placeholder="选择模板" @change="val => handleTemplateChange(val, 'uptime')">
+                <a-select-option v-for="tpl in templateList" :key="tpl.templateid" :value="tpl.templateid" :label="tpl.name">
                   {{ tpl.name }}
                 </a-select-option>
               </a-select>
@@ -81,8 +77,8 @@
           </a-col>
           <a-col :span="12">
             <a-form-model-item label="监控项" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
-              <a-select mode="multiple" v-model="selectedItems.uptime" placeholder="选择监控项" @change="val => handleItemChange(val, 'uptime')">
-                <a-select-option v-for="item in itemLists.uptime" :key="item.itemid" :value="item.itemid">
+              <a-select show-search option-filter-prop="label" v-model="selectedItems.uptime" placeholder="选择监控项" @change="val => handleItemChange(val, 'uptime')">
+                <a-select-option v-for="item in itemLists.uptime" :key="item.itemid" :value="item.itemid" :label="item.name">
                   {{ item.name }}
                 </a-select-option>
               </a-select>
@@ -93,8 +89,8 @@
         <a-row :gutter="16" v-if="form.system_type === 'linux' || form.system_type === 'windows'">
           <a-col :span="12">
             <a-form-model-item label="CPU核心数" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
-              <a-select placeholder="选择模板" @change="val => handleTemplateChange(val, 'cpu_core')">
-                <a-select-option v-for="tpl in templateList" :key="tpl.templateid" :value="tpl.templateid">
+              <a-select show-search option-filter-prop="label" placeholder="选择模板" @change="val => handleTemplateChange(val, 'cpu_core')">
+                <a-select-option v-for="tpl in templateList" :key="tpl.templateid" :value="tpl.templateid" :label="tpl.name">
                   {{ tpl.name }}
                 </a-select-option>
               </a-select>
@@ -102,8 +98,8 @@
           </a-col>
           <a-col :span="12">
             <a-form-model-item label="监控项" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
-              <a-select mode="multiple" v-model="selectedItems.cpu_core" placeholder="选择监控项" @change="val => handleItemChange(val, 'cpu_core')">
-                <a-select-option v-for="item in itemLists.cpu_core" :key="item.itemid" :value="item.itemid">
+              <a-select show-search option-filter-prop="label" v-model="selectedItems.cpu_core" placeholder="选择监控项" @change="val => handleItemChange(val, 'cpu_core')">
+                <a-select-option v-for="item in itemLists.cpu_core" :key="item.itemid" :value="item.itemid" :label="item.name">
                   {{ item.name }}
                 </a-select-option>
               </a-select>
@@ -114,8 +110,8 @@
         <a-row :gutter="16">
           <a-col :span="12">
             <a-form-model-item label="CPU使用率" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
-              <a-select placeholder="选择模板" @change="val => handleTemplateChange(val, 'cpu_utilization')">
-                <a-select-option v-for="tpl in templateList" :key="tpl.templateid" :value="tpl.templateid">
+              <a-select show-search option-filter-prop="label" placeholder="选择模板" @change="val => handleTemplateChange(val, 'cpu_utilization')">
+                <a-select-option v-for="tpl in templateList" :key="tpl.templateid" :value="tpl.templateid" :label="tpl.name">
                   {{ tpl.name }}
                 </a-select-option>
               </a-select>
@@ -123,8 +119,8 @@
           </a-col>
           <a-col :span="12">
             <a-form-model-item label="监控项" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
-              <a-select mode="multiple" v-model="selectedItems.cpu_utilization" placeholder="选择监控项" @change="val => handleItemChange(val, 'cpu_utilization')">
-                <a-select-option v-for="item in itemLists.cpu_utilization" :key="item.itemid" :value="item.itemid">
+              <a-select show-search option-filter-prop="label" v-model="selectedItems.cpu_utilization" placeholder="选择监控项" @change="val => handleItemChange(val, 'cpu_utilization')">
+                <a-select-option v-for="item in itemLists.cpu_utilization" :key="item.itemid" :value="item.itemid" :label="item.name">
                   {{ item.name }}
                 </a-select-option>
               </a-select>
@@ -135,8 +131,8 @@
         <a-row :gutter="16">
           <a-col :span="12">
             <a-form-model-item label="内存使用率" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
-              <a-select placeholder="选择模板" @change="val => handleTemplateChange(val, 'memory_utilization')">
-                <a-select-option v-for="tpl in templateList" :key="tpl.templateid" :value="tpl.templateid">
+              <a-select show-search option-filter-prop="label" placeholder="选择模板" @change="val => handleTemplateChange(val, 'memory_utilization')">
+                <a-select-option v-for="tpl in templateList" :key="tpl.templateid" :value="tpl.templateid" :label="tpl.name">
                   {{ tpl.name }}
                 </a-select-option>
               </a-select>
@@ -144,8 +140,8 @@
           </a-col>
           <a-col :span="12">
             <a-form-model-item label="监控项" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
-              <a-select mode="multiple" v-model="selectedItems.memory_utilization" placeholder="选择监控项" @change="val => handleItemChange(val, 'memory_utilization')">
-                <a-select-option v-for="item in itemLists.memory_utilization" :key="item.itemid" :value="item.itemid">
+              <a-select show-search option-filter-prop="label" v-model="selectedItems.memory_utilization" placeholder="选择监控项" @change="val => handleItemChange(val, 'memory_utilization')">
+                <a-select-option v-for="item in itemLists.memory_utilization" :key="item.itemid" :value="item.itemid" :label="item.name">
                   {{ item.name }}
                 </a-select-option>
               </a-select>
@@ -156,8 +152,8 @@
         <a-row :gutter="16">
           <a-col :span="12">
             <a-form-model-item label="内存总量" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
-              <a-select placeholder="选择模板" @change="val => handleTemplateChange(val, 'memory_total')">
-                <a-select-option v-for="tpl in templateList" :key="tpl.templateid" :value="tpl.templateid">
+              <a-select show-search option-filter-prop="label" placeholder="选择模板" @change="val => handleTemplateChange(val, 'memory_total')">
+                <a-select-option v-for="tpl in templateList" :key="tpl.templateid" :value="tpl.templateid" :label="tpl.name">
                   {{ tpl.name }}
                 </a-select-option>
               </a-select>
@@ -165,8 +161,8 @@
           </a-col>
           <a-col :span="12">
             <a-form-model-item label="监控项" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
-              <a-select mode="multiple" v-model="selectedItems.memory_total" placeholder="选择监控项" @change="val => handleItemChange(val, 'memory_total')">
-                <a-select-option v-for="item in itemLists.memory_total" :key="item.itemid" :value="item.itemid">
+              <a-select show-search option-filter-prop="label" v-model="selectedItems.memory_total" placeholder="选择监控项" @change="val => handleItemChange(val, 'memory_total')">
+                <a-select-option v-for="item in itemLists.memory_total" :key="item.itemid" :value="item.itemid" :label="item.name">
                   {{ item.name }}
                 </a-select-option>
               </a-select>
@@ -177,8 +173,8 @@
         <a-row :gutter="16">
           <a-col :span="12">
             <a-form-model-item label="内存已用" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
-              <a-select placeholder="选择模板" @change="val => handleTemplateChange(val, 'memory_used')">
-                <a-select-option v-for="tpl in templateList" :key="tpl.templateid" :value="tpl.templateid">
+              <a-select show-search option-filter-prop="label" placeholder="选择模板" @change="val => handleTemplateChange(val, 'memory_used')">
+                <a-select-option v-for="tpl in templateList" :key="tpl.templateid" :value="tpl.templateid" :label="tpl.name">
                   {{ tpl.name }}
                 </a-select-option>
               </a-select>
@@ -186,8 +182,8 @@
           </a-col>
           <a-col :span="12">
             <a-form-model-item label="监控项" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
-              <a-select mode="multiple" v-model="selectedItems.memory_used" placeholder="选择监控项" @change="val => handleItemChange(val, 'memory_used')">
-                <a-select-option v-for="item in itemLists.memory_used" :key="item.itemid" :value="item.itemid">
+              <a-select show-search option-filter-prop="label" v-model="selectedItems.memory_used" placeholder="选择监控项" @change="val => handleItemChange(val, 'memory_used')">
+                <a-select-option v-for="item in itemLists.memory_used" :key="item.itemid" :value="item.itemid" :label="item.name">
                   {{ item.name }}
                 </a-select-option>
               </a-select>
@@ -198,8 +194,8 @@
         <a-row :gutter="16" v-if="form.system_type === 'network' || form.system_type === 'server'">
           <a-col :span="12">
             <a-form-model-item label="设备型号" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
-              <a-select placeholder="选择模板" @change="val => handleTemplateChange(val, 'model')">
-                <a-select-option v-for="tpl in templateList" :key="tpl.templateid" :value="tpl.templateid">
+              <a-select show-search option-filter-prop="label" placeholder="选择模板" @change="val => handleTemplateChange(val, 'model')">
+                <a-select-option v-for="tpl in templateList" :key="tpl.templateid" :value="tpl.templateid" :label="tpl.name">
                   {{ tpl.name }}
                 </a-select-option>
               </a-select>
@@ -207,8 +203,8 @@
           </a-col>
           <a-col :span="12">
             <a-form-model-item label="监控项" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
-              <a-select mode="multiple" v-model="selectedItems.model" placeholder="选择监控项" @change="val => handleItemChange(val, 'model')">
-                <a-select-option v-for="item in itemLists.model" :key="item.itemid" :value="item.itemid">
+              <a-select show-search option-filter-prop="label" v-model="selectedItems.model" placeholder="选择监控项" @change="val => handleItemChange(val, 'model')">
+                <a-select-option v-for="item in itemLists.model" :key="item.itemid" :value="item.itemid" :label="item.name">
                   {{ item.name }}
                 </a-select-option>
               </a-select>
@@ -217,8 +213,8 @@
         </a-row>
 
         <a-form-model-item label="ICMP模板">
-          <a-select v-model="metricConfig.ping_template_id" placeholder="选择ICMP Ping模板">
-            <a-select-option v-for="tpl in templateList" :key="tpl.templateid" :value="tpl.templateid">
+          <a-select v-model="metricConfig.ping_template_id" show-search option-filter-prop="label" placeholder="选择ICMP Ping模板">
+            <a-select-option v-for="tpl in templateList" :key="tpl.templateid" :value="tpl.templateid" :label="tpl.name">
               {{ tpl.name }}
             </a-select-option>
           </a-select>
@@ -297,18 +293,17 @@ export default {
         model: []
       },
       selectedItems: {
-        uptime: [],
-        cpu_core: [],
-        cpu_utilization: [],
-        memory_utilization: [],
-        memory_total: [],
-        memory_used: [],
-        model: []
+        uptime: '',
+        cpu_core: '',
+        cpu_utilization: '',
+        memory_utilization: '',
+        memory_total: '',
+        memory_used: '',
+        model: ''
       },
       columns: [
         { title: 'ID', dataIndex: 'id', width: 80 },
-        { title: '实例ID', dataIndex: 'instance_id', width: 100, scopedSlots: { customRender: 'instance_id' } },
-        { title: '配置名称', dataIndex: 'mapping_name', width: 200 },
+        { title: '实例名称', dataIndex: 'instance_id', width: 200, scopedSlots: { customRender: 'instance_id' } },
         { title: '系统类型', dataIndex: 'system_type', width: 120, scopedSlots: { customRender: 'system_type' } },
         { title: '自动初始化', dataIndex: 'auto_init', width: 120, scopedSlots: { customRender: 'auto_init' } },
         { title: '状态', dataIndex: 'status', width: 120, scopedSlots: { customRender: 'status' } },
@@ -321,7 +316,6 @@ export default {
         id: '',
         instance_id: '',
         system_type: '',
-        mapping_name: '',
         host_group_ids: '',
         metric_config: '',
         auto_init: 0,
@@ -347,8 +341,7 @@ export default {
       initOnNewHostSwitch: false,
       rules: {
         instance_id: [{ required: true, message: '请选择实例', trigger: 'change' }],
-        system_type: [{ required: true, message: '请选择系统类型', trigger: 'change' }],
-        mapping_name: [{ required: true, message: '请输入配置名称', trigger: 'blur' }]
+        system_type: [{ required: true, message: '请选择系统类型', trigger: 'change' }]
       },
       historyDialogVisible: false,
       historyLoading: false,
@@ -413,11 +406,18 @@ export default {
         if (resp.data.code === 200) {
           this.hostGroups = resp.data.data.items || []
         }
+      }).catch(err => {
+        console.error('获取主机组列表失败:', err)
+        this.$message.error('获取主机组列表失败')
       })
       templateList(instanceId).then(resp => {
         if (resp.data.code === 200) {
-          this.templateList = resp.data.data.items || []
+          // 后端返回格式：{code: 200, message: "ok", data: [...]}
+          this.templateList = resp.data.data || []
         }
+      }).catch(err => {
+        console.error('获取模板列表失败:', err)
+        this.$message.error('获取模板列表失败')
       })
     },
     handleSystemTypeChange(type) {
@@ -436,12 +436,21 @@ export default {
       }
       templateGetItemList(templateId, this.form.instance_id).then(resp => {
         if (resp.data.code === 200) {
-          this.itemLists[metricType] = resp.data.data.items[0].items || []
+          // 后端返回格式：{code: 200, message: "ok", data: {items: [{items: [...]}]}}
+          const items = resp.data.data || []
+          if (items.length > 0 && items[0].items) {
+            this.itemLists[metricType] = items[0].items
+          } else {
+            this.itemLists[metricType] = []
+          }
         }
+      }).catch(err => {
+        console.error('获取监控项列表失败:', err)
+        this.$message.error('获取监控项列表失败')
       })
     },
-    handleItemChange(itemIds, metricType) {
-      this.metricConfig.metrics[metricType] = itemIds.join(',')
+    handleItemChange(itemId, metricType) {
+      this.metricConfig.metrics[metricType] = itemId
     },
     showCreateDialog() {
       this.resetForm()
@@ -460,7 +469,8 @@ export default {
               Object.assign(this.metricConfig, config)
               Object.keys(this.metricConfig.metrics).forEach(key => {
                 if (this.metricConfig.metrics[key]) {
-                  this.selectedItems[key] = this.metricConfig.metrics[key].split(',')
+                  // 单选，直接赋值
+                  this.selectedItems[key] = this.metricConfig.metrics[key]
                 }
               })
             } catch (e) {
@@ -486,6 +496,7 @@ export default {
     submitForm() {
       this.$refs.formRef.validate(valid => {
         if (!valid) return false
+        
         this.form.metric_config = JSON.stringify(this.metricConfig)
         const apiCall = this.form.id ? metricMappingUpdate(this.form.id, this.form) : metricMappingCreate(this.form)
         apiCall.then(resp => {
@@ -512,7 +523,6 @@ export default {
         id: '',
         instance_id: '',
         system_type: '',
-        mapping_name: '',
         host_group_ids: '',
         metric_config: '',
         auto_init: 0,
@@ -534,13 +544,13 @@ export default {
         ping_template_id: ''
       }
       this.selectedItems = {
-        uptime: [],
-        cpu_core: [],
-        cpu_utilization: [],
-        memory_utilization: [],
-        memory_total: [],
-        memory_used: [],
-        model: []
+        uptime: '',
+        cpu_core: '',
+        cpu_utilization: '',
+        memory_utilization: '',
+        memory_total: '',
+        memory_used: '',
+        model: ''
       }
       this.selectedGroups = []
       this.autoInitSwitch = false
@@ -634,6 +644,10 @@ export default {
     getSystemTypeName(type) {
       const map = { linux: 'Linux', windows: 'Windows', network: '网络设备', server: '服务器' }
       return map[type] || type
+    },
+    getInstanceName(instanceId) {
+      const instance = this.instances.find(i => i.id === instanceId)
+      return instance ? instance.name : `实例 ${instanceId}`
     },
     getSystemTypeColor(type) {
       const map = { linux: 'green', windows: 'blue', network: 'orange', server: 'purple' }

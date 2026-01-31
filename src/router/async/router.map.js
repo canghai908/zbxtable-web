@@ -148,9 +148,6 @@ const routerMap = {
 	systemGroups: {
 		component: () => import('@/pages/system/groups'),
 	},
-	sysInit: {
-		component: () => import('@/pages/system/init'),
-	},
 	systemBandwidth: {
 		component: () => import('@/pages/system/bandwidth'),
 	},

@@ -237,16 +237,6 @@ const options = {
               component: () => import("@/pages/system/users"),
             },
             {
-              path: "groups",
-              name: "组织管理",
-              component: () => import("@/pages/system/init"),
-            },
-            {
-              path: "init",
-              name: "指标映射",
-              component: () => import("@/pages/system/init"),
-            },
-            {
               path: "bandwidth",
               name: "出口配置",
               component: () => import("@/pages/system/bandwidth"),
