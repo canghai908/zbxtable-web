@@ -247,12 +247,23 @@ export default {
         const res = await egressConfigList()
         const biz = (res && res.data) ? res.data : res
         if (biz && biz.code === 200) {
-          this.dataSource = (biz.data || []).map(item => ({
+          const items = biz.data || []
+          this.dataSource = items.map(item => ({
             ...item,
             editable: false,
             hostList: [],
             itemList: [],
           }))
+          
+          // 为每个配置加载主机和监控项名称
+          for (let item of this.dataSource) {
+            if (item.zid) {
+              await this.loadHostList(item)
+            }
+            if (item.host_id && item.zid) {
+              await this.loadItemList(item)
+            }
+          }
         }
       } catch (e) {
         console.error('加载出口配置失败', e)
@@ -410,23 +421,26 @@ export default {
       }
     },
     getInstanceName(zid) {
-      const instance = this.instanceList.find(item => item.zid === zid)
+      if (!zid) return '未知'
+      const instance = this.instanceList.find(item => item.id === zid)
       return instance ? instance.name : zid
     },
     getHostName(record) {
+      if (!record.host_id) return '未选择'
       if (!record.hostList || record.hostList.length === 0) {
-        return record.host_id
+        return record.host_id || '未知'
       }
       const host = record.hostList.find(item => item.hostid === record.host_id)
-      return host ? host.name : record.host_id
+      return host ? host.name : (record.host_id || '未知')
     },
     getItemName(record, type) {
       const itemId = type === 'in' ? record.in_item_id : record.out_item_id
+      if (!itemId) return '未选择'
       if (!record.itemList || record.itemList.length === 0) {
-        return itemId
+        return itemId || '未知'
       }
       const item = record.itemList.find(i => i.itemid === itemId)
-      return item ? item.name : itemId
+      return item ? item.name : (itemId || '未知')
     },
   }
 }

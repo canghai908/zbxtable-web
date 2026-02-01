@@ -10,7 +10,6 @@
       <a-form-model-item label="搜索">
         <a-input v-model.trim="name" placeholder="策略名称" />
       </a-form-model-item>
-      <!-- 租户筛选已取消：统一跟随顶部“当前 Zabbix 连接” -->
       <a-form-model-item>
         <a-button type="primary" @click="init">查询</a-button>
         <a-button style="margin-left: 10px;" @click="resetData">重置</a-button>
@@ -209,7 +208,7 @@ export default {
         { title: "ID", dataIndex: "id", align: "left" },
         { title: "名称", dataIndex: "name", align: "left" },
         {
-          title: "实例", dataIndex: "zid", align: "left", customRender: (value) => {
+          title: "实例", dataIndex: "z_ids", align: "left", customRender: (value) => {
             // 直接展示规则中配置的实例字符串（支持多实例用逗号分隔）
             const text = (value || '').toString()
             return { children: text, attrs: {} }
@@ -395,7 +394,7 @@ export default {
           const item = res.data
           this.editRule.name = item.name || ""
           this.editRule.m_type = item.m_type || "1"
-          this.editRule.zid = item.zid ? item.zid.split(",") : []
+          this.editRule.z_ids = item.z_ids ? item.z_ids.split(",") : []
           this.editRule.conditions = item.conditions ? JSON.parse(item.conditions) : [{ r_type: "", r_func: "", r_value: "" }]
           this.editRule.s_time = moment(item.s_time || "00:00", "HH:mm")
           this.editRule.e_time = moment(item.e_time || "23:59", "HH:mm")
@@ -482,7 +481,7 @@ export default {
         this.$message.warning("请填写名称")
         return
       }
-      if (!this.editRule.zid || this.editRule.zid.length === 0) {
+      if (!this.editRule.z_ids || this.editRule.z_ids.length === 0) {
         this.$message.warning("请选择实例")
         return
       }
