@@ -35,26 +35,8 @@
               </a-card>
             </a-col>
             <a-col :lg="24" :md="24" style="margin-top: 14px;">
-              <a-card :title=ptitle :headStyle="{background: '#FAFBFC'}" :bodyStyle="{height: '220px'}" size="small" :loading="!loading3">
-                <div class="homeNet beauty-scroll">
-                  <div class="homeNet1">
-                    <div class="homeNet2"><span>{{edata.name_one}}</span></div>
-                    <div class="homeNet3">
-                      <p>In:<span>{{edata.in_one}}</span></p>
-                      <p>Out:<span>{{edata.out_one}}</span></p>
-                    </div>
-                    <div class="homeNet4"><img src="../../assets/img/nbg.png" alt=""></div>
-                  </div>
-                  <div class="homeNetL"></div>
-                  <div class="homeNet1">
-                    <div class="homeNet2"><span>{{edata.name_two}}</span></div>
-                    <div class="homeNet3">
-                      <p>In:<span>{{edata.in_two}}</span></p>
-                      <p>Out:<span>{{edata.out_two}}</span></p>
-                    </div>
-                    <div class="homeNet4"><img src="../../assets/img/nbg.png" alt=""></div>
-                  </div>
-                </div>
+              <a-card :title="$t('bandwidth')" :headStyle="{background: '#FAFBFC'}" :bodyStyle="{height: '220px', padding: '12px'}" size="small" :loading="!loading3">
+                <egress-bandwidth :data="egressData" />
               </a-card>
             </a-col>
           </a-row>
@@ -190,6 +172,8 @@ import {
 import { parseTimeFun } from '@/utils/formatter'
 import pie from '@/components/gcharts/pie'
 import legent from '@/components/gcharts/legent'
+import EgressBandwidth from '@/components/egress/EgressBandwidth'
+
 export default {
   name: 'index',
   i18n: require('./i18n'),
@@ -200,17 +184,8 @@ export default {
       loading2: false,
       loading3: false,
       info: '',
-
-      ptitle: this.$t('bandwidth'),
-      edata: {
-        name_one: '--',
-        in_one: '--',
-        out_one: '--',
-        name_two: '',
-        in_two: '--',
-        out_tw0: '--',
-        date: '--'
-      },
+      egressData: [], // 改为数组，支持多个出口
+      refreshTimer: null, // 定时刷新
       loading4: false,
       winC: [],
       loading5: false,
@@ -224,13 +199,24 @@ export default {
   components: {
     PageLayout,
     pie,
-    legent
+    legent,
+    EgressBandwidth
   },
   created() {
     this.initTrigger()
     this.initInfo()
     this.initEgress()
     this.initTop()
+    // 每30秒刷新一次出口数据
+    this.refreshTimer = setInterval(() => {
+      this.initEgress()
+    }, 30000)
+  },
+  beforeDestroy() {
+    // 清除定时器
+    if (this.refreshTimer) {
+      clearInterval(this.refreshTimer)
+    }
   },
   methods: {
     initTrigger() {
@@ -257,9 +243,33 @@ export default {
       indexEgress()
         .then((resp) => {
           let res = resp.data
-          this.edata = res.data
-          this.ptitle =
-            this.ptitle + '(' + this.$t('polling_date') + this.edata.date + ')'
+          // 检查返回的数据格式
+          if (res.data && Array.isArray(res.data)) {
+            // 新格式：数组
+            this.egressData = res.data
+          } else if (res.data && typeof res.data === 'object') {
+            // 旧格式：对象，转换为数组格式（向后兼容）
+            this.egressData = [
+              {
+                id: 1,
+                name: res.data.name_one || '出口1',
+                in_value: res.data.in_one || '0',
+                out_value: res.data.out_one || '0'
+              },
+              {
+                id: 2,
+                name: res.data.name_two || '出口2',
+                in_value: res.data.in_two || '0',
+                out_value: res.data.out_two || '0'
+              }
+            ].filter(item => item.name && item.name !== '--')
+          } else {
+            this.egressData = []
+          }
+        })
+        .catch((err) => {
+          console.error('获取出口数据失败:', err)
+          this.egressData = []
         })
         .finally(() => {
           this.loading3 = true
@@ -570,90 +580,6 @@ export default {
     text-align: center;
     border-radius: 6px;
     background-color: #34aa44;
-  }
-}
-.homeNet {
-  height: 196px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-}
-.homeNetL {
-  width: 1px;
-  height: 160px;
-  top: 18px;
-  position: absolute;
-  left: 150px;
-  background-color: #e7e9ed;
-}
-.homeNet1 {
-  height: 80px;
-  width: 100%;
-  display: inline-flex;
-  align-items: center;
-  margin: 10px 0;
-}
-.homeNet2 {
-  flex: 0 0 180px;
-  padding-left: 20px;
-  display: inline-flex;
-  align-items: center;
-  img {
-    width: 50px;
-    height: 50px;
-  }
-  span {
-    margin-left: 6px;
-    font-size: 15px;
-    line-height: 15px;
-    font-weight: 600;
-  }
-}
-.homeNet3 {
-  flex: 0 0 160px;
-  height: 70px;
-  background-color: #fafbfc;
-  display: inline-flex;
-  flex-direction: column;
-  justify-content: center;
-  padding-left: 10px;
-  p {
-    height: 30px;
-    padding: 12px 0;
-    display: inline-flex;
-    align-items: center;
-    font-size: 15px;
-    margin: 0;
-    span {
-      font-size: 18px;
-      font-weight: 600;
-      margin-left: 4px;
-    }
-  }
-  p:first-child {
-    color: #6a7088;
-    span {
-      color: #38ba24;
-    }
-  }
-  p:last-child {
-    color: #632929;
-    span {
-      color: #442196;
-    }
-  }
-}
-.homeNet4 {
-  flex: 1;
-  height: 70px;
-  overflow: hidden;
-  margin-right: 10px;
-  img {
-    height: 70px;
-    width: auto;
   }
 }
 </style>

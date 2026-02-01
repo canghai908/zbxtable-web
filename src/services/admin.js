@@ -153,6 +153,22 @@ export async function egressGet() {
 export async function egressUpdate(params) {
 	return request(SYSTEM_LIST + '/egress/', METHOD.PUT, params)
 }
+// 新的出口配置 API
+export async function egressConfigList() {
+	return request('/v1/egress/configs', METHOD.GET)
+}
+export async function egressConfigGet(id) {
+	return request('/v1/egress/configs/' + id, METHOD.GET)
+}
+export async function egressConfigAdd(params) {
+	return request('/v1/egress/configs', METHOD.POST, params)
+}
+export async function egressConfigUpdate(id, params) {
+	return request('/v1/egress/configs/' + id, METHOD.PUT, params)
+}
+export async function egressConfigDelete(id) {
+	return request('/v1/egress/configs/' + id, METHOD.DELETE)
+}
 export async function configGetList() {
 	return request(SYSTEM_LIST + '/config/', METHOD.GET)
 }
@@ -343,6 +359,11 @@ export default {
 	systemInit,
 	egressGet,
 	egressUpdate,
+	egressConfigList,
+	egressConfigGet,
+	egressConfigAdd,
+	egressConfigUpdate,
+	egressConfigDelete,
 	configGetList,
 	configGetOne,
 	configUpdate,

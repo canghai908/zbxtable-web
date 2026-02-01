@@ -7,7 +7,12 @@
           <a-tab-pane key="system" tab="系统配置">
             <a-form-model ref="systemForm" :model="systemForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
               <a-form-model-item v-for="item in systemConfigs" :key="item.id" :label="item.name">
-                <a-input v-model="systemForm[item.key]" :placeholder="item.comment" />
+                <a-select v-if="isBooleanConfig(item.key)" v-model="systemForm[item.key]" :placeholder="item.comment" style="width: 100%">
+                  <a-select-option v-for="opt in getBooleanOptions(item.key)" :key="opt.value" :value="opt.value">
+                    {{ opt.label }}
+                  </a-select-option>
+                </a-select>
+                <a-input v-else v-model="systemForm[item.key]" :placeholder="item.comment" />
                 <div class="config-hint">{{ item.comment }}</div>
               </a-form-model-item>
               <a-form-model-item :wrapper-col="{ span: 14, offset: 6 }">
@@ -20,7 +25,12 @@
           <a-tab-pane key="email" tab="邮件配置">
             <a-form-model ref="emailForm" :model="emailForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
               <a-form-model-item v-for="item in emailConfigs" :key="item.id" :label="item.name">
-                <a-input-password v-if="item.key === 'email_secret'" v-model="emailForm[item.key]" :placeholder="item.comment" />
+                <a-select v-if="isBooleanConfig(item.key)" v-model="emailForm[item.key]" :placeholder="item.comment" style="width: 100%">
+                  <a-select-option v-for="opt in getBooleanOptions(item.key)" :key="opt.value" :value="opt.value">
+                    {{ opt.label }}
+                  </a-select-option>
+                </a-select>
+                <a-input-password v-else-if="item.key === 'email_secret'" v-model="emailForm[item.key]" :placeholder="item.comment" />
                 <a-input v-else v-model="emailForm[item.key]" :placeholder="item.comment" />
                 <div class="config-hint">{{ item.comment }}</div>
               </a-form-model-item>
@@ -34,7 +44,12 @@
           <a-tab-pane key="wechat" tab="企业微信配置">
             <a-form-model ref="wechatForm" :model="wechatForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
               <a-form-model-item v-for="item in wechatConfigs" :key="item.id" :label="item.name">
-                <a-input-password v-if="item.key === 'wechat_secret'" v-model="wechatForm[item.key]" :placeholder="item.comment" />
+                <a-select v-if="isBooleanConfig(item.key)" v-model="wechatForm[item.key]" :placeholder="item.comment" style="width: 100%">
+                  <a-select-option v-for="opt in getBooleanOptions(item.key)" :key="opt.value" :value="opt.value">
+                    {{ opt.label }}
+                  </a-select-option>
+                </a-select>
+                <a-input-password v-else-if="item.key === 'wechat_secret'" v-model="wechatForm[item.key]" :placeholder="item.comment" />
                 <a-input v-else v-model="wechatForm[item.key]" :placeholder="item.comment" />
                 <div class="config-hint">{{ item.comment }}</div>
               </a-form-model-item>
@@ -48,7 +63,12 @@
           <a-tab-pane key="ollama" tab="Ollama AI 配置">
             <a-form-model ref="ollamaForm" :model="ollamaForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
               <a-form-model-item v-for="item in ollamaConfigs" :key="item.id" :label="item.name">
-                <a-input v-model="ollamaForm[item.key]" :placeholder="item.comment" />
+                <a-select v-if="isBooleanConfig(item.key)" v-model="ollamaForm[item.key]" :placeholder="item.comment" style="width: 100%">
+                  <a-select-option v-for="opt in getBooleanOptions(item.key)" :key="opt.value" :value="opt.value">
+                    {{ opt.label }}
+                  </a-select-option>
+                </a-select>
+                <a-input v-else v-model="ollamaForm[item.key]" :placeholder="item.comment" />
                 <div class="config-hint">{{ item.comment }}</div>
               </a-form-model-item>
               <a-form-model-item :wrapper-col="{ span: 14, offset: 6 }">
@@ -116,6 +136,24 @@ export default {
     this.init()
   },
   methods: {
+    isBooleanConfig(key) {
+      // 判断是否为布尔类型的配置项（开启/关闭）
+      const booleanKeys = ['zbx_dash', 'sync_inventory', 'wechat_enabled', 'email_isSSl']
+      return booleanKeys.includes(key)
+    },
+    getBooleanOptions(key) {
+      // email_isSSl 使用 true/false，其他使用 1/0
+      if (key === 'email_isSSl') {
+        return [
+          { label: '开启', value: 'true' },
+          { label: '关闭', value: 'false' }
+        ]
+      }
+      return [
+        { label: '开启', value: '1' },
+        { label: '关闭', value: '0' }
+      ]
+    },
     init() {
       this.loading = true
       configGetList()
