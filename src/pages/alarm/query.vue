@@ -10,7 +10,7 @@
       <a-form-model-item label="选择实例">
         <a-select v-model="selectedInstance" placeholder="全部实例" allowClear style="width: 200px">
           <a-select-option value="">全部实例</a-select-option>
-          <a-select-option v-for="item in instanceList" :key="item.zid" :value="item.zid">
+          <a-select-option v-for="item in instanceList" :key="item.id" :value="item.id">
             {{ item.name }}
           </a-select-option>
         </a-select>
@@ -52,7 +52,7 @@
           </span>
         </a-table>
         <div slot="instance_name" slot-scope="record">
-          <a-tag color="orange">{{record.instance_name || record.tenant_name || '未知'}}</a-tag>
+          <a-tag color="orange">{{getInstanceName(record.zid)}}</a-tag>
         </div>
         <div slot="level" slot-scope="record">
           <a-tag v-if="record.level==0" color="#97AAB3">{{record.level | levelFilter}}</a-tag>
@@ -177,6 +177,7 @@ export default {
       pageSize: 10,
       loading: false,
       instanceList: [],
+      instanceMap: {},
       selectedInstance: '',
       status: "",
       level: "",
@@ -262,10 +263,19 @@ export default {
         if (res.code == 200) {
           const allItems = Array.isArray(res.data) ? res.data : []
           this.instanceList = allItems.filter(item => item.enabled)
+          // 创建 ZID 到实例名称的映射
+          this.instanceMap = {}
+          this.instanceList.forEach(item => {
+            this.instanceMap[item.id] = item.name
+          })
         }
       }).catch(err => {
         console.error('加载实例列表失败:', err)
       })
+    },
+    getInstanceName(zid) {
+      if (!zid) return '未知'
+      return this.instanceMap[zid] || '未知'
     },
     init() {
       this.loading = true;

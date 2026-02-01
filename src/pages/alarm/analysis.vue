@@ -5,7 +5,7 @@
         <a-form-model-item label="选择实例">
           <a-select v-model="selectedInstance" placeholder="全部实例" allowClear style="width: 200px">
             <a-select-option value="">全部实例</a-select-option>
-            <a-select-option v-for="item in instanceList" :key="item.zid" :value="item.zid">
+            <a-select-option v-for="item in instanceList" :key="item.id" :value="item.id">
               {{ item.name }}
             </a-select-option>
           </a-select>
