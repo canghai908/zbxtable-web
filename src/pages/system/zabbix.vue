@@ -651,9 +651,9 @@ export default {
             this.addLog('success', '✓ Webhook 配置创建成功')
             
             this.currentStep = 2
-            this.addLog('info', '[步骤 3/3] 生成认证 Token...')
+            this.addLog('info', '[步骤 3/3] 生成认证 X-Token...')
             await this.sleep(500)
-            this.addLog('success', '✓ Token 生成成功')
+            this.addLog('success', '✓ X-Token 生成成功')
               
             this.addLog('success', '✓ Webhook 配置安装完成！')
             this.addLog('info', 'Webhook 已自动配置，无需额外操作')
