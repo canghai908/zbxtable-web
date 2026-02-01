@@ -38,8 +38,8 @@
           <a-input v-model.trim="editRule.name" placeholder="请输入规则名称" />
         </a-form-model-item>
         <a-form-model-item label="实例" required>
-          <a-select v-model="editRule.zid" mode="multiple" style="width: 100%" placeholder="选择告警实例">
-            <a-select-option v-for="(item, index) in instanceList" :key="index" :value="item.id" :label="item.name" :title="item.name">
+          <a-select v-model="editRule.z_ids" mode="multiple" style="width: 100%" placeholder="选择告警实例">
+            <a-select-option v-for="(item, index) in instanceList" :key="index" :value="item.id.toString()" :label="item.name" :title="item.name">
               {{ item.name }}
             </a-select-option>
           </a-select>
@@ -192,7 +192,7 @@ export default {
       editingId: null,
       editRule: {
         name: "",
-        zid: [],
+        z_ids: [],
         m_type: "1",
         conditions: [{ r_type: "", r_func: "", r_value: "" }],
         s_week: ["0", "1", "2", "3", "4", "5", "6"],
@@ -209,9 +209,13 @@ export default {
         { title: "名称", dataIndex: "name", align: "left" },
         {
           title: "实例", dataIndex: "z_ids", align: "left", customRender: (value) => {
-            // 直接展示规则中配置的实例字符串（支持多实例用逗号分隔）
-            const text = (value || '').toString()
-            return { children: text, attrs: {} }
+            if (!value) return '未选择'
+            const ids = value.toString().split(',')
+            const names = ids.map(id => {
+              const instance = this.instanceList.find(item => item.id.toString() === id.trim())
+              return instance ? instance.name : id
+            })
+            return { children: names.join(', '), attrs: {} }
           },
         },
         { title: "分发条件", dataIndex: "conditions", align: "left" },
@@ -314,7 +318,7 @@ export default {
     resetEditRule() {
       this.editRule = {
         name: "",
-        zid: [],
+        z_ids: [],
         m_type: "1",
         conditions: [{ r_type: "", r_func: "", r_value: "" }],
         s_week: ["0", "1", "2", "3", "4", "5", "6"],
@@ -488,12 +492,20 @@ export default {
       this.modalLoading = true
       try {
         const payload = JSON.parse(JSON.stringify(this.editRule))
-        // 与原新增/编辑页面保持一致的字段格式
+        // 将实例ID数组转换为逗号分隔的字符串
+        payload.z_ids = Array.isArray(payload.z_ids) ? payload.z_ids.join(",") : payload.z_ids
+        // 将其他数组字段也转换为逗号分隔的字符串
+        payload.s_week = Array.isArray(payload.s_week) ? payload.s_week.join(",") : payload.s_week
+        payload.channel = Array.isArray(payload.channel) ? payload.channel.join(",") : payload.channel
+        payload.user_ids = Array.isArray(payload.user_ids) ? payload.user_ids.join(",") : payload.user_ids
+        payload.group_ids = Array.isArray(payload.group_ids) ? payload.group_ids.join(",") : payload.group_ids
+        // 转换条件为JSON字符串
+        payload.conditions = JSON.stringify(payload.conditions)
+        // 转换时间格式
         payload.status = payload.status ? "0" : "1"
         payload.s_time = this.editRule.s_time ? this.editRule.s_time.format("HH:mm") : "00:00"
         payload.e_time = this.editRule.e_time ? this.editRule.e_time.format("HH:mm") : "23:59"
-        // 保持原有的 m_type，编辑时使用从后端获取的值，新增时默认为 "1"
-        // 不要硬编码覆盖，避免将默认规则(m_type=2)错误更新为普通规则(m_type=1)
+        // 保持原有的 m_type
         payload.m_type = this.editRule.m_type || "1"
 
         let resp
