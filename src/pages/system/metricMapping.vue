@@ -2,7 +2,7 @@
   <page-layout>
     <div slot="headerContent">
       <div class="header-section">
-        
+
         <div class="header-actions">
           <a-button type="primary" @click="showCreateDialog">新建映射配置</a-button>
         </div>
@@ -404,7 +404,7 @@ export default {
       this.hostGroups = []
       hostgroupList(zid).then(resp => {
         if (resp.data.code === 200) {
-          this.hostGroups = resp.data.data.items || []
+          this.hostGroups = resp.data.data || []
         }
       }).catch(err => {
         console.error('获取主机组列表失败:', err)

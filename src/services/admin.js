@@ -178,14 +178,14 @@ export async function configGetOne(id) {
 export async function configUpdate(id, params) {
 	return request(SYSTEM_LIST + '/config/' + id, METHOD.PUT, params)
 }
-export async function hostgroupList(instanceId) {
-	return request(HOST_GROUP + '/all', METHOD.GET, { instance_id: instanceId })
+export async function hostgroupList(id) {
+	return request(HOST_GROUP, METHOD.GET, { zid: id })
 }
-export async function templateList(instanceId) {
-	return request(TEMPLATE_lIST + '/list', METHOD.GET, { instance_id: instanceId })
+export async function templateList(id) {
+	return request(TEMPLATE_lIST, METHOD.GET, { zid: id })
 }
-export async function templateGetItemList(id, instanceId) {
-	return request(TEMPLATE_lIST + '/item/' + id, METHOD.GET, { instance_id: instanceId })
+export async function templateGetItemList(id, zid) {
+	return request(TEMPLATE_lIST + '/item/' + id, METHOD.GET, { zid: zid })
 }
 export async function baseVersion() {
 	return request(INDEX_VERSION, METHOD.GET)

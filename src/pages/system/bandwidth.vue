@@ -17,6 +17,7 @@
           :data-source="dataSource" 
           :loading="loading"
           :pagination="false"
+          :scroll="{ x: 1200 }"
           rowKey="id"
         >
           <span slot="name" slot-scope="text, record">
@@ -39,7 +40,7 @@
               show-search
               option-filter-prop="children"
             >
-              <a-select-option v-for="item in instanceList" :key="item.zid" :value="item.zid">
+              <a-select-option v-for="item in instanceList" :key="item.id" :value="item.id">
                 {{ item.name }}
               </a-select-option>
             </a-select>
@@ -61,11 +62,14 @@
                 v-for="item in record.hostList || []" 
                 :key="item.hostid" 
                 :value="item.hostid"
+                :title="item.name"
               >
                 {{ item.name }}
               </a-select-option>
             </a-select>
-            <span v-else>{{ getHostName(record) }}</span>
+            <a-tooltip v-else :title="getHostName(record)" placement="topLeft">
+              <span class="item-name-text">{{ getHostName(record) }}</span>
+            </a-tooltip>
           </span>
 
           <span slot="in_item" slot-scope="text, record">
@@ -77,16 +81,20 @@
               show-search
               option-filter-prop="children"
               :disabled="!record.host_id"
+              :dropdown-style="{ maxWidth: '500px' }"
             >
               <a-select-option 
                 v-for="item in record.itemList || []" 
                 :key="item.itemid" 
                 :value="item.itemid"
+                :title="item.name"
               >
                 {{ item.name }}
               </a-select-option>
             </a-select>
-            <span v-else>{{ getItemName(record, 'in') }}</span>
+            <a-tooltip v-else :title="getItemName(record, 'in')" placement="topLeft">
+              <span class="item-name-text">{{ getItemName(record, 'in') }}</span>
+            </a-tooltip>
           </span>
 
           <span slot="out_item" slot-scope="text, record">
@@ -98,16 +106,20 @@
               show-search
               option-filter-prop="children"
               :disabled="!record.host_id"
+              :dropdown-style="{ maxWidth: '500px' }"
             >
               <a-select-option 
                 v-for="item in record.itemList || []" 
                 :key="item.itemid" 
                 :value="item.itemid"
+                :title="item.name"
               >
                 {{ item.name }}
               </a-select-option>
             </a-select>
-            <span v-else>{{ getItemName(record, 'out') }}</span>
+            <a-tooltip v-else :title="getItemName(record, 'out')" placement="topLeft">
+              <span class="item-name-text">{{ getItemName(record, 'out') }}</span>
+            </a-tooltip>
           </span>
 
           <span slot="status" slot-scope="text">
@@ -163,14 +175,14 @@ export default {
           title: this.$t('egress_name'),
           dataIndex: 'name',
           key: 'name',
-          width: '15%',
+          width: '12%',
           scopedSlots: { customRender: 'name' },
         },
         {
           title: this.$t('instance'),
           dataIndex: 'zid',
           key: 'zid',
-          width: '15%',
+          width: '12%',
           scopedSlots: { customRender: 'instance' },
         },
         {
@@ -184,27 +196,29 @@ export default {
           title: this.$t('in_traffic_item'),
           dataIndex: 'in_item_id',
           key: 'in_item_id',
-          width: '18%',
+          width: '20%',
+          ellipsis: true,
           scopedSlots: { customRender: 'in_item' },
         },
         {
           title: this.$t('out_traffic_item'),
           dataIndex: 'out_item_id',
           key: 'out_item_id',
-          width: '18%',
+          width: '20%',
+          ellipsis: true,
           scopedSlots: { customRender: 'out_item' },
         },
         {
           title: this.$t('status'),
           dataIndex: 'status',
           key: 'status',
-          width: '10%',
+          width: '8%',
           scopedSlots: { customRender: 'status' },
         },
         {
           title: this.$t('action'),
           key: 'action',
-          width: '10%',
+          width: '13%',
           scopedSlots: { customRender: 'action' },
         },
       ],
@@ -421,5 +435,28 @@ export default {
 <style lang="less" scoped>
 .card {
   margin-bottom: 24px;
+}
+
+.item-name-text {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+</style>
+
+<style lang="less">
+// 全局样式，用于下拉选项
+.ant-select-dropdown {
+  .ant-select-dropdown-menu-item {
+    white-space: normal;
+    word-break: break-all;
+    line-height: 1.5;
+    padding: 8px 12px;
+    min-height: 32px;
+    height: auto;
+  }
 }
 </style>
