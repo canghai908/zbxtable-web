@@ -7,6 +7,9 @@
       </div>
 
       <a-table :loading="loading" :columns="columns" :data-source="list" :rowKey="r => r.id">
+        <template slot="instance_id" slot-scope="text, record">
+          <a-tag color="cyan">{{ text }}</a-tag>
+        </template>
         <template slot="enabled" slot-scope="text, record">
           <a-tag v-if="record.enabled" color="blue">启用</a-tag>
           <a-tag v-else color="red">禁用</a-tag>
@@ -52,7 +55,7 @@
           </template>
         </template>
         <template slot="operation" slot-scope="text, record">
-          <a-button type="link" size="small" @click="test(record)">测试</a-button>
+          <a-button type="link" size="small" @click="test(record)">测试连接</a-button>
           <a-divider type="vertical" />
           <a-button type="link" size="small" @click="toggleEnabled(record)">{{ record.enabled ? '禁用' : '启用' }}</a-button>
           <a-divider type="vertical" />
@@ -98,7 +101,7 @@
               </a-button>
               <a-divider type="vertical" />
               <a-button type="link" size="small" @click="handleReinstallWebhook(record)">
-                <a-icon type="reload" /> 重新安装
+                <a-icon type="reload" /> 重新
               </a-button>
               <a-divider type="vertical" />
               <a-popconfirm title="确定要卸载 Webhook 配置吗？这将删除 Zabbix 中的相关配置。" okText="确定" cancelText="取消" @confirm="handleUninstallWebhook(record)">
@@ -436,7 +439,7 @@ export default {
       webhookInfo: null,
       columns: [
         { title: 'ID', dataIndex: 'id', key: 'id', width: 60 },
-        { title: '实例标识', dataIndex: 'instance_id', key: 'instance_id', width: 120 },
+        { title: '实例标识', dataIndex: 'instance_id', key: 'instance_id', width: 120, scopedSlots: { customRender: 'instance_id' } },
         { title: 'Zabbix 信息', key: 'zabbix', scopedSlots: { customRender: 'zabbix' }, width: 250 },
         { title: '版本', key: 'version', scopedSlots: { customRender: 'version' }, width: 100 },
         { title: '连接', key: 'conn', scopedSlots: { customRender: 'conn' }, width: 100 },
