@@ -34,10 +34,10 @@
           <a-form-model-item :label="$t('title')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="name" :required="true">
             <a-input v-model.trim="rule.name" :placeholder="$t('titleInput')" />
           </a-form-model-item>
-          <a-form-model-item :label="$t('tenant_id')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="tenant_id" :required="true">
-            <a-select v-model="rule.tenant_id" mode="multiple" style="width: 100%" placeholder="选择告警实例" @change="handleTenantChange">
-              <a-select-option v-for="(item, index) in tenantlist" :key="index" :value="item.tenant_id" :label="item.tenant_id" :title="item.tenant_id">
-                {{ item.tenant_id }}
+          <a-form-model-item :label="$t('zid')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="zid" :required="true">
+            <a-select v-model="rule.zid" mode="multiple" style="width: 100%" placeholder="选择告警实例" @change="handleTenantChange">
+              <a-select-option v-for="(item, index) in tenantlist" :key="index" :value="item.zid" :label="item.zid" :title="item.zid">
+                {{ item.zid }}
               </a-select-option>
             </a-select>
           </a-form-model-item>
@@ -121,10 +121,10 @@
           <a-form-model-item :label="$t('title')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="name" :required="true">
             <a-input v-model.trim="rule.name" :placeholder="$t('titleInput')" />
           </a-form-model-item>
-          <a-form-model-item :label="$t('tenant_id')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="tenant_id">
-            <a-select v-model="rule.tenant_id" mode="multiple" style="width: 100%" placeholder="选择告警实例" @change="handleTenantChange" :required="true">
-              <a-select-option v-for="(item, index) in tenantlist" :key="index" :value="item.tenant_id" :label="item.tenant_id" :title="item.tenant_id">
-                {{ item.tenant_id }}
+          <a-form-model-item :label="$t('zid')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="zid">
+            <a-select v-model="rule.zid" mode="multiple" style="width: 100%" placeholder="选择告警实例" @change="handleTenantChange" :required="true">
+              <a-select-option v-for="(item, index) in tenantlist" :key="index" :value="item.zid" :label="item.zid" :title="item.zid">
+                {{ item.zid }}
               </a-select-option>
             </a-select>
           </a-form-model-item>
@@ -233,7 +233,7 @@ export default {
       level: "",
       rule: {
         name: "",
-        tenant_id: [],
+        zid: [],
         m_type: "3",
         conditions: [],
         s_week: ['0', '1', '2', '3', '4', '5', '6'],
@@ -267,12 +267,12 @@ export default {
         { title: "ID", dataIndex: "id", align: "center" },
         { title: "策略名称", dataIndex: "name", align: "left" },
         {
-          title: "实例", dataIndex: "tenant_id", align: "left", customRender: (value, row, index) => {
+          title: "实例", dataIndex: "zid", align: "left", customRender: (value, row, index) => {
             let allist = []
             value.split(",").forEach(items => {
               this.tenantlist.forEach(tid => {
-                if (items == tid.tenant_id) {
-                  allist.push(tid.tenant_id);
+                if (items == tid.zid) {
+                  allist.push(tid.zid);
                 }
               });
 
@@ -350,12 +350,12 @@ export default {
     this.init();
     this.hostid = this.$route.query.hostid || ""
     this.host = this.$route.query.host || ""
-    this.tenant_id = this.$route.query.tenantid || ""
+    this.zid = this.$route.query.tenantid || ""
     this.message = this.$route.query.message || ""
     if (this.hostid != "") {
       this.rule = {
         name: this.host + " muted " + this.message,
-        tenant_id: this.tenant_id,
+        zid: this.zid,
         channel: '',
         conditions: [{
           "r_type": "host",
@@ -430,7 +430,7 @@ export default {
       this.visible = true;
       this.rule = {
         name: "",
-        tenant_id: [],
+        zid: [],
         m_type: "3",
         conditions: [
           { r_type: "", r_func: "", r_value: "", }
@@ -448,8 +448,8 @@ export default {
       this.visibleEdit = true;
       let lten = []
       let lchan = []
-      if (record.tenant_id != "") {
-        lten = record.tenant_id.split(",")
+      if (record.zid != "") {
+        lten = record.zid.split(",")
       }
       if (record.channel != "") {
         lchan = record.channel.split(",")
@@ -457,7 +457,7 @@ export default {
       this.rule = {
         id: record.id,
         name: record.name,
-        tenant_id: lten,
+        zid: lten,
         channel: lchan,
         conditions: record.conditions ? JSON.parse(record.conditions) : [],
         s_time: parseTimeFun(record.s_time),

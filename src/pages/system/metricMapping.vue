@@ -10,7 +10,7 @@
     </div>
 
     <a-table :loading="loading" :columns="columns" :data-source="mappings" :pagination="false" :rowKey="record => record.id">
-      <span slot="instance_id" slot-scope="text, record">
+      <span slot="zid" slot-scope="text, record">
         <a-tag color="blue">{{ getInstanceName(text) }}</a-tag>
       </span>
       <span slot="system_type" slot-scope="text">
@@ -38,8 +38,8 @@
 
     <a-modal :title="dialogTitle" :visible="dialogVisible" width="900px" @ok="submitForm" @cancel="handleCancel">
       <a-form-model ref="formRef" :model="form" :rules="rules" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
-        <a-form-model-item label="实例" prop="instance_id">
-          <a-select v-model="form.instance_id" placeholder="请选择实例" @change="handleInstanceChange">
+        <a-form-model-item label="实例" prop="zid">
+          <a-select v-model="form.zid" placeholder="请选择实例" @change="handleInstanceChange">
             <a-select-option v-for="instance in instances" :key="instance.id" :value="instance.id">
               {{ instance.name }}
             </a-select-option>
@@ -259,7 +259,7 @@
 
 <script>
 import PageLayout from '@/layouts/PageLayout'
-import { listZabbixInstances } from '@/services/zabbix'
+import { listZabbixInstance } from '@/services/zabbix'
 import { 
   hostgroupList, 
   templateList, 
@@ -303,7 +303,7 @@ export default {
       },
       columns: [
         { title: 'ID', dataIndex: 'id', width: 80 },
-        { title: '实例名称', dataIndex: 'instance_id', width: 200, scopedSlots: { customRender: 'instance_id' } },
+        { title: '实例名称', dataIndex: 'zid', width: 200, scopedSlots: { customRender: 'zid' } },
         { title: '系统类型', dataIndex: 'system_type', width: 120, scopedSlots: { customRender: 'system_type' } },
         { title: '自动初始化', dataIndex: 'auto_init', width: 120, scopedSlots: { customRender: 'auto_init' } },
         { title: '状态', dataIndex: 'status', width: 120, scopedSlots: { customRender: 'status' } },
@@ -314,7 +314,7 @@ export default {
       dialogTitle: '新建映射配置',
       form: {
         id: '',
-        instance_id: '',
+        zid: '',
         system_type: '',
         host_group_ids: '',
         metric_config: '',
@@ -340,7 +340,7 @@ export default {
       autoInitSwitch: false,
       initOnNewHostSwitch: false,
       rules: {
-        instance_id: [{ required: true, message: '请选择实例', trigger: 'change' }],
+        zid: [{ required: true, message: '请选择实例', trigger: 'change' }],
         system_type: [{ required: true, message: '请选择系统类型', trigger: 'change' }]
       },
       historyDialogVisible: false,
@@ -372,7 +372,7 @@ export default {
   },
   methods: {
     fetchInstances() {
-      listZabbixInstances().then(resp => {
+      listZabbixInstance().then(resp => {
         const res = resp.data
         if (res.code === 200) {
           console.log(res.data)
@@ -398,11 +398,11 @@ export default {
         this.loading = false
       })
     },
-    handleInstanceChange(instanceId) {
-      if (!instanceId) return
+    handleInstanceChange(zid) {
+      if (!zid) return
       this.templateList = []
       this.hostGroups = []
-      hostgroupList(instanceId).then(resp => {
+      hostgroupList(zid).then(resp => {
         if (resp.data.code === 200) {
           this.hostGroups = resp.data.data.items || []
         }
@@ -410,7 +410,7 @@ export default {
         console.error('获取主机组列表失败:', err)
         this.$message.error('获取主机组列表失败')
       })
-      templateList(instanceId).then(resp => {
+      templateList(zid).then(resp => {
         if (resp.data.code === 200) {
           // 后端返回格式：{code: 200, message: "ok", data: [...]}
           this.templateList = resp.data.data || []
@@ -430,11 +430,11 @@ export default {
       this.metricConfig.host_type = typeMap[type] || ''
     },
     handleTemplateChange(templateId, metricType) {
-      if (!this.form.instance_id) {
+      if (!this.form.zid) {
         this.$message.warning('请先选择实例')
         return
       }
-      templateGetItemList(templateId, this.form.instance_id).then(resp => {
+      templateGetItemList(templateId, this.form.zid).then(resp => {
         if (resp.data.code === 200) {
           // 后端返回格式：{code: 200, message: "ok", data: {items: [{items: [...]}]}}
           const items = resp.data.data || []
@@ -482,7 +482,7 @@ export default {
           }
           this.autoInitSwitch = data.auto_init === 1
           this.initOnNewHostSwitch = data.init_on_new_host === 1
-          this.handleInstanceChange(data.instance_id)
+          this.handleInstanceChange(data.zid)
           this.dialogTitle = '编辑映射配置'
           this.dialogVisible = true
         } else {
@@ -521,7 +521,7 @@ export default {
     resetForm() {
       this.form = {
         id: '',
-        instance_id: '',
+        zid: '',
         system_type: '',
         host_group_ids: '',
         metric_config: '',
@@ -645,9 +645,9 @@ export default {
       const map = { linux: 'Linux', windows: 'Windows', network: '网络设备', server: '服务器' }
       return map[type] || type
     },
-    getInstanceName(instanceId) {
-      const instance = this.instances.find(i => i.id === instanceId)
-      return instance ? instance.name : `实例 ${instanceId}`
+    getInstanceName(zid) {
+      const instance = this.instances.find(i => i.id === zid)
+      return instance ? instance.name : `实例 ${zid}`
     },
     getSystemTypeColor(type) {
       const map = { linux: 'green', windows: 'blue', network: 'orange', server: 'purple' }

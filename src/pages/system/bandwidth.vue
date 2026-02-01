@@ -32,14 +32,14 @@
           <span slot="instance" slot-scope="text, record">
             <a-select 
               v-if="record.editable"
-              v-model="record.tenant_id"
+              v-model="record.zid"
               :placeholder="$t('select_instance')"
               @change="() => handleInstanceChange(record)"
               style="width: 100%"
               show-search
               option-filter-prop="children"
             >
-              <a-select-option v-for="item in instanceList" :key="item.tenant_id" :value="item.tenant_id">
+              <a-select-option v-for="item in instanceList" :key="item.zid" :value="item.zid">
                 {{ item.name }}
               </a-select-option>
             </a-select>
@@ -55,7 +55,7 @@
               style="width: 100%"
               show-search
               option-filter-prop="children"
-              :disabled="!record.tenant_id"
+              :disabled="!record.zid"
             >
               <a-select-option 
                 v-for="item in record.hostList || []" 
@@ -147,7 +147,7 @@ import {
   hostSearch,
   itemListTraffic
 } from "@/services/admin";
-import { listZabbixInstances } from "@/services/zabbix";
+import { listZabbixInstance } from "@/services/zabbix";
 
 export default {
   name: 'BandwidthConfig',
@@ -168,8 +168,8 @@ export default {
         },
         {
           title: this.$t('instance'),
-          dataIndex: 'tenant_id',
-          key: 'tenant_id',
+          dataIndex: 'zid',
+          key: 'zid',
           width: '15%',
           scopedSlots: { customRender: 'instance' },
         },
@@ -217,7 +217,7 @@ export default {
   methods: {
     async loadInstances() {
       try {
-        const res = await listZabbixInstances()
+        const res = await listZabbixInstance()
         const biz = (res && res.data) ? res.data : res
         if (biz && biz.code === 200) {
           this.instanceList = biz.data || []
@@ -251,7 +251,7 @@ export default {
       const newData = {
         id: `new_${Date.now()}`,
         name: '',
-        tenant_id: undefined,
+        zid: undefined,
         host_id: undefined,
         in_item_id: undefined,
         out_item_id: undefined,
@@ -270,7 +270,7 @@ export default {
         target.editable = true
         target._backup = { ...target }
         // 加载主机和监控项列表
-        if (target.tenant_id) {
+        if (target.zid) {
           this.loadHostList(target)
         }
         if (target.host_id) {
@@ -291,7 +291,7 @@ export default {
       }
     },
     async handleSave(record) {
-      if (!record.name || !record.tenant_id || !record.host_id || !record.in_item_id || !record.out_item_id) {
+      if (!record.name || !record.zid || !record.host_id || !record.in_item_id || !record.out_item_id) {
         this.$message.warning('请填写完整信息')
         return
       }
@@ -300,7 +300,7 @@ export default {
       try {
         const params = {
           name: record.name,
-          tenant_id: record.tenant_id,
+          zid: record.zid,
           host_id: record.host_id,
           in_item_id: record.in_item_id,
           out_item_id: record.out_item_id,
@@ -358,7 +358,7 @@ export default {
       record.out_item_id = undefined
       record.hostList = []
       record.itemList = []
-      if (record.tenant_id) {
+      if (record.zid) {
         await this.loadHostList(record)
       }
     },
@@ -372,7 +372,7 @@ export default {
     },
     async loadHostList(record) {
       try {
-        const res = await hostSearch({ tenant_id: record.tenant_id })
+        const res = await hostSearch({ zid: record.zid })
         const biz = (res && res.data) ? res.data : res
         if (biz && biz.code === 200) {
           record.hostList = biz.data.items || []
@@ -385,7 +385,7 @@ export default {
       try {
         const res = await itemListTraffic({ 
           hostid: record.host_id,
-          tenant_id: record.tenant_id 
+          zid: record.zid 
         })
         const biz = (res && res.data) ? res.data : res
         if (biz && biz.code === 200) {
@@ -395,9 +395,9 @@ export default {
         console.error('加载监控项列表失败', e)
       }
     },
-    getInstanceName(tenantId) {
-      const instance = this.instanceList.find(item => item.tenant_id === tenantId)
-      return instance ? instance.name : tenantId
+    getInstanceName(zid) {
+      const instance = this.instanceList.find(item => item.zid === zid)
+      return instance ? instance.name : zid
     },
     getHostName(record) {
       if (!record.hostList || record.hostList.length === 0) {

@@ -5,7 +5,7 @@
         <a-form-model-item label="选择实例">
           <a-select v-model="selectedInstance" placeholder="全部实例" allowClear style="width: 200px">
             <a-select-option value="">全部实例</a-select-option>
-            <a-select-option v-for="item in instanceList" :key="item.tenant_id" :value="item.tenant_id">
+            <a-select-option v-for="item in instanceList" :key="item.zid" :value="item.zid">
               {{ item.name }}
             </a-select-option>
           </a-select>
@@ -42,7 +42,7 @@ import PageLayout from "@/layouts/PageLayout";
 import ePie from "./ePie";
 import eLine from "./eLine";
 import { alarmAnalysis, alarmExport } from "@/services/admin";
-import { listZabbixInstances } from '@/services/zabbix'
+import { listZabbixInstance } from '@/services/zabbix'
 import { parseTimeFun } from "@/utils/formatter";
 import moment from "moment";
 import "moment/locale/zh-cn";
@@ -82,7 +82,7 @@ export default {
   },
   methods: {
     loadInstances() {
-      listZabbixInstances().then((resp) => {
+      listZabbixInstance().then((resp) => {
         let res = resp.data
         if (res.code == 200) {
           const allItems = Array.isArray(res.data) ? res.data : []
@@ -101,7 +101,7 @@ export default {
         end: this.endTime
       };
       if (this.selectedInstance) {
-        params.instance_id = this.selectedInstance;
+        params.zid = this.selectedInstance;
       }
       alarmAnalysis(params)
         .then((resp) => {
@@ -122,7 +122,7 @@ export default {
         end: this.endTime
       };
       if (this.selectedInstance) {
-        params.instance_id = this.selectedInstance;
+        params.zid = this.selectedInstance;
       }
       alarmExport(
         params,

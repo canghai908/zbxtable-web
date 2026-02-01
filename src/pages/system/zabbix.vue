@@ -14,7 +14,7 @@
         <template slot="zabbix" slot-scope="text, record">
           <div>
             <div><strong>{{ record.name }}</strong></div>
-            <div style="font-size: 12px; color: #999;">{{ record.web_url }}</div>
+            <div style="font-size: 12px; color: #999;">{{ record.url }}</div>
           </div>
         </template>
         <template slot="version" slot-scope="text, record">
@@ -120,14 +120,14 @@
     <!-- 编辑/新增对话框 -->
     <a-modal :title="editingId ? '编辑实例' : '新增实例'" :visible="visible" @ok="save" @cancel="visible=false" :confirmLoading="saving" :okButtonProps="{ disabled: !testOk }">
       <a-form-model :model="form" :label-col="{span: 7}" :wrapper-col="{span: 15}">
-        <a-form-model-item label="实例 ID" required>
-          <a-input v-model="form.tenant_id" placeholder="例如：instance-001" :disabled="!!editingId" />
+        <a-form-model-item label="实例标识" required>
+          <a-input v-model="form.instance_id" placeholder="例如：zabbix-001" :disabled="!!editingId" />
         </a-form-model-item>
-        <a-form-model-item label="名称" required>
+        <a-form-model-item label="可见名称" required>
           <a-input v-model="form.name" placeholder="例如：生产环境" />
         </a-form-model-item>
         <a-form-model-item label="Zabbix URL" required>
-          <a-input v-model="form.web_url" placeholder="http://zabbix.example.com" />
+          <a-input v-model="form.url" placeholder="http://zabbix.example.com" />
         </a-form-model-item>
         <a-form-model-item label="用户名">
           <a-input v-model="form.user" placeholder="可选（Token优先）" />
@@ -138,13 +138,13 @@
         <a-form-model-item label="Zabbix Token">
           <a-input v-model="form.token" placeholder="Zabbix API Token（可选）" />
         </a-form-model-item>
-        <a-form-model-item label="通知方式">
+        <a-form-model-item label="告警接收方式">
           <a-radio-group v-model="form.notify_method">
             <a-radio value="webhook">Webhook</a-radio>
             <a-radio value="msagent">MS-Agent</a-radio>
           </a-radio-group>
           <div style="margin-top: 6px; color:#999; font-size:12px;">
-            Webhook: 直接通过 Zabbix Webhook 发送告警（需 Zabbix 4.4+）<br />
+            Webhook: 通过 Zabbix Webhook 发送告警（需 Zabbix 4.4+）<br />
             MS-Agent: 需要在 Zabbix Server 上安装 ms-agent 服务
           </div>
         </a-form-model-item>
@@ -176,7 +176,7 @@
               <li>User Group: ZbxTable Webhook Group</li>
               <li>User: zbxtable-webhook（自动生成强密码）</li>
               <li>Action: ZbxTable Webhook（包含告警和恢复操作）</li>
-              <li>Token: 自动生成唯一 Token</li>
+              <li>Token: 自动生成唯一 Webhook Token</li>
               <li>Webhook URL: 自动配置回调地址</li>
             </ul>
             <ul v-else style="margin: 8px 0; padding-left: 20px;">
@@ -276,10 +276,10 @@
               <a-button size="small" icon="copy" @click="copyToClipboard(webhookInfo.webhook_url, 'Webhook URL')">复制</a-button>
             </div>
           </a-descriptions-item>
-          <a-descriptions-item label="实例 ID">
+          <a-descriptions-item label="实例标识">
             <div style="display: flex; align-items: center; gap: 8px;">
-              <code style="flex: 1;">{{ webhookInfo.tenant_id }}</code>
-              <a-button size="small" icon="copy" @click="copyToClipboard(webhookInfo.tenant_id, '实例 ID')">复制</a-button>
+              <code style="flex: 1;">{{ webhookInfo.instance_id }}</code>
+              <a-button size="small" icon="copy" @click="copyToClipboard(webhookInfo.instance_id, '实例标识')">复制</a-button>
             </div>
           </a-descriptions-item>
           <a-descriptions-item label="认证 Token">
@@ -304,7 +304,7 @@
           <template slot="description">
             <div style="color: #666; font-size: 13px;">
               <div>• Zabbix 触发告警时，会自动通过 Webhook 将告警信息发送到 ZbxTable</div>
-              <div>• Webhook 脚本已内置实例 ID 和 Token，无需手动配置</div>
+              <div>• Webhook 脚本已内置实例标识 和 Token，无需手动配置</div>
               <div>• 告警数据会自动路由到对应的实例</div>
               <div>• 相比 MS-Agent，Webhook 方式无需在服务器上安装额外服务</div>
             </div>
@@ -381,13 +381,13 @@
 <script>
 import PageLayout from '@/layouts/PageLayout'
 import { 
-  listZabbixTenants, 
-  createZabbixTenant, 
-  updateZabbixTenant, 
-  deleteZabbixTenant, 
-  testZabbixTenantConfig, 
-  testZabbixTenant, 
-  setZabbixTenantEnabled,
+  listZabbixInstance, 
+  createZabbixInstance, 
+  updateZabbixInstance, 
+  deleteZabbixInstance, 
+  testZabbixInstanceConfig, 
+  testZabbixInstance, 
+  setZabbixInstanceEnabled,
   installMSAgent, 
   getMSAgentScript, 
   installWebhook, 
@@ -397,7 +397,7 @@ import {
 } from '@/services/zabbix'
 
 export default {
-  name: 'SystemZabbixTenant',
+  name: 'SystemZabbixInstance',
   components: { PageLayout },
   data () {
     return {
@@ -423,9 +423,9 @@ export default {
       list: [],
       scriptData: null,
       form: { 
-        tenant_id: '', 
+        instance_id: '', 
         name: '',
-        web_url: '',
+        url: '',
         user: '',
         pass: '',
         token: '',
@@ -436,11 +436,11 @@ export default {
       webhookInfo: null,
       columns: [
         { title: 'ID', dataIndex: 'id', key: 'id', width: 60 },
-        { title: '实例 ID', dataIndex: 'tenant_id', key: 'tenant_id', width: 120 },
+        { title: '实例标识', dataIndex: 'instance_id', key: 'instance_id', width: 120 },
         { title: 'Zabbix 信息', key: 'zabbix', scopedSlots: { customRender: 'zabbix' }, width: 250 },
         { title: '版本', key: 'version', scopedSlots: { customRender: 'version' }, width: 100 },
         { title: '连接', key: 'conn', scopedSlots: { customRender: 'conn' }, width: 100 },
-        { title: '通知方式', key: 'notify_method', scopedSlots: { customRender: 'notify_method' }, width: 130 },
+        { title: '告警接收', key: 'notify_method', scopedSlots: { customRender: 'notify_method' }, width: 130 },
         { title: '安装状态', key: 'install_status', scopedSlots: { customRender: 'install_status' }, width: 120 },
         { title: '启用', key: 'enabled', scopedSlots: { customRender: 'enabled' }, width: 80 },
         { title: '操作', key: 'operation', scopedSlots: { customRender: 'operation' }, width: 600 }
@@ -454,7 +454,7 @@ export default {
     async load () {
       this.loading = true
       try {
-        const res = await listZabbixTenants()
+        const res = await listZabbixInstance()
         const biz = (res && res.data) ? res.data : res
         if (biz && biz.code === 200) this.list = biz.data || []
       } finally {
@@ -464,9 +464,9 @@ export default {
     openCreate () {
       this.editingId = null
       this.form = { 
-        tenant_id: '', 
+        instance_id: '', 
         name: '',
-        web_url: '',
+        url: '',
         user: '',
         pass: '',
         token: '',
@@ -478,11 +478,12 @@ export default {
       this.visible = true
     },
     openEdit (record) {
+      console.log(record.id)
       this.editingId = record.id
       this.form = {
-        tenant_id: record.tenant_id || '',
+        instance_id: record.instance_id || '',
         name: record.name || '',
-        web_url: record.web_url || '',
+        url: record.url || '',
         user: record.user || '',
         pass: record.pass || '',
         token: record.token || '',
@@ -494,7 +495,7 @@ export default {
       this.visible = true
     },
     async testConnection () {
-      if (!this.form.web_url) {
+      if (!this.form.url) {
         this.$message.warning('请先填写 Zabbix URL')
         return
       }
@@ -502,7 +503,7 @@ export default {
       this.testOk = false
       this.testMsg = ''
       try {
-        const res = await testZabbixTenantConfig(this.form)
+        const res = await testZabbixInstanceConfig(this.form)
         const biz = (res && res.data) ? res.data : res
         if (biz && biz.code === 200) {
           this.testOk = true
@@ -516,8 +517,8 @@ export default {
       }
     },
     async save () {
-      if (!this.form.tenant_id || !this.form.name || !this.form.web_url) {
-        this.$message.warning('请填写实例 ID、名称和 Zabbix URL')
+      if (!this.form.instance_id || !this.form.name || !this.form.url) {
+        this.$message.warning('请填写实例标识、名称和 Zabbix URL')
         return
       }
       if (!this.testOk) {
@@ -527,10 +528,11 @@ export default {
       this.saving = true
       try {
         let res
+        console.log(this.editingId)
         if (this.editingId) {
-          res = await updateZabbixTenant(this.editingId, this.form)
+          res = await updateZabbixInstance(this.editingId, this.form)
         } else {
-          res = await createZabbixTenant(this.form)
+          res = await createZabbixInstance(this.form)
         }
         const biz = (res && res.data) ? res.data : res
         if (biz && biz.code === 200) {
@@ -545,7 +547,7 @@ export default {
       }
     },
     async test (record) {
-      const res = await testZabbixTenant(record.id)
+      const res = await testZabbixInstance(record.id)
       const biz = (res && res.data) ? res.data : res
       if (biz && biz.code === 200) {
         this.$message.success(`连接成功，版本：${biz.data.version || '-'}`)
@@ -557,7 +559,7 @@ export default {
     },
     async toggleEnabled (record) {
       const target = !record.enabled
-      const res = await setZabbixTenantEnabled(record.id, target)
+      const res = await setZabbixInstanceEnabled(record.id, target)
       const biz = (res && res.data) ? res.data : res
       if (biz && biz.code === 200) {
         this.$message.success(target ? '已启用' : '已禁用')
@@ -567,7 +569,7 @@ export default {
       }
     },
     async remove (record) {
-      const res = await deleteZabbixTenant(record.id)
+      const res = await deleteZabbixInstance(record.id)
       const biz = (res && res.data) ? res.data : res
       if (biz && biz.code === 200) {
         this.$message.success('已删除')
@@ -618,18 +620,17 @@ export default {
         if (this.currentInstallType === 'webhook') {
           // Webhook 安装流程
           this.addLog('info', '开始安装 Webhook 配置...')
-          this.addLog('info', `实例: ${this.currentRecord.tenant_id}`)
-          this.addLog('info', `Zabbix: ${this.currentRecord.name} (${this.currentRecord.web_url})`)
-          this.addLog('info', '---')
+          this.addLog('info', `实例: ${this.currentRecord.instance_id}`)
+          this.addLog('info', `Zabbix: ${this.currentRecord.name} (${this.currentRecord.url})`)
           
           await this.sleep(500)
           this.currentStep = 0
-          this.addLog('info', '[步骤 1/4] 连接 Zabbix API...')
+          this.addLog('info', '[步骤 1/3] 连接 Zabbix API...')
           await this.sleep(500)
           this.addLog('success', '✓ Zabbix API 连接成功')
           
           this.currentStep = 1
-          this.addLog('info', '[步骤 2/4] 创建 Webhook 配置...')
+          this.addLog('info', '[步骤 2/3] 创建 Webhook 配置...')
           await this.sleep(300)
           this.addLog('info', '  - 创建 Media Type: ZbxTable')
           await this.sleep(300)
@@ -650,16 +651,10 @@ export default {
             this.addLog('success', '✓ Webhook 配置创建成功')
             
             this.currentStep = 2
-            this.addLog('info', '[步骤 3/4] 生成认证 Token...')
+            this.addLog('info', '[步骤 3/3] 生成认证 Token...')
             await this.sleep(500)
             this.addLog('success', '✓ Token 生成成功')
-            
-            this.currentStep = 3
-            this.addLog('info', '[步骤 4/4] 更新实例绑定...')
-            await this.sleep(500)
-            this.addLog('success', '✓ 实例绑定更新成功')
-            
-            this.addLog('info', '---')
+              
             this.addLog('success', '✓ Webhook 配置安装完成！')
             this.addLog('info', 'Webhook 已自动配置，无需额外操作')
             
@@ -673,18 +668,17 @@ export default {
         } else {
           // MS-Agent 安装流程
           this.addLog('info', '开始安装 MS-Agent 配置...')
-          this.addLog('info', `实例: ${this.currentRecord.tenant_id}`)
-          this.addLog('info', `Zabbix: ${this.currentRecord.name} (${this.currentRecord.web_url})`)
-          this.addLog('info', '---')
+          this.addLog('info', `实例: ${this.currentRecord.instance_id}`)
+          this.addLog('info', `Zabbix: ${this.currentRecord.name} (${this.currentRecord.url})`)
           
           await this.sleep(500)
           this.currentStep = 0
-          this.addLog('info', '[步骤 1/4] 连接 Zabbix API...')
+          this.addLog('info', '[步骤 1/3] 连接 Zabbix API...')
           await this.sleep(500)
           this.addLog('success', '✓ Zabbix API 连接成功')
           
           this.currentStep = 1
-          this.addLog('info', '[步骤 2/4] 创建 Zabbix 配置...')
+          this.addLog('info', '[步骤 2/3] 创建 Zabbix 配置...')
           await this.sleep(300)
           this.addLog('info', '  - 创建 Media Type: MS-Agent')
           await this.sleep(300)
@@ -703,16 +697,10 @@ export default {
             this.addLog('success', '✓ Zabbix 配置创建成功')
             
             this.currentStep = 2
-            this.addLog('info', '[步骤 3/4] 生成认证 Token...')
+            this.addLog('info', '[步骤 3/3] 生成认证 Token...')
             await this.sleep(500)
             this.addLog('success', '✓ Token 生成成功')
             
-            this.currentStep = 3
-            this.addLog('info', '[步骤 4/4] 更新实例绑定...')
-            await this.sleep(500)
-            this.addLog('success', '✓ 实例绑定更新成功')
-            
-            this.addLog('info', '---')
             this.addLog('success', '✓ MS-Agent 配置安装完成！')
             this.addLog('info', '正在获取安装脚本...')
             

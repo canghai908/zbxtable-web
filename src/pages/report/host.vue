@@ -113,9 +113,9 @@
           <div v-for="(config, index) in formData.hostConfigs" :key="index" style="margin-bottom: 16px; padding: 16px; border: 1px solid #d9d9d9; border-radius: 4px;">
             <a-row :gutter="16" style="margin-bottom: 8px;" v-if="instanceList.length > 1">
               <a-col :span="22">
-                <a-select v-model="config.instance_id" placeholder="请选择实例" @change="(value) => handleInstanceChange(value, index)" style="width: 100%">
-                  <a-select-option v-for="item in instanceList" :key="item.tenant_id" :value="item.tenant_id">
-                    {{ item.name }} ({{ item.tenant_id }})
+                <a-select v-model="config.zid" placeholder="请选择实例" @change="(value) => handleInstanceChange(value, index)" style="width: 100%">
+                  <a-select-option v-for="item in instanceList" :key="item.zid" :value="item.zid">
+                    {{ item.name }} ({{ item.zid }})
                   </a-select-option>
                 </a-select>
               </a-col>
@@ -123,7 +123,7 @@
             <a-row :gutter="16">
               <a-col :span="10">
                 <a-select v-model="config.host_id" show-search :placeholder="$t('select_host')" @popupScroll="handleHostPopupScrollForConfig(index)"
-                  @search="(value) => handleHostSearchForConfig(value, index)" option-filter-prop="label" @change="handleHostChange(config, index)" style="width: 100%" :disabled="!config.instance_id">
+                  @search="(value) => handleHostSearchForConfig(value, index)" option-filter-prop="label" @change="handleHostChange(config, index)" style="width: 100%" :disabled="!config.zid">
                   <a-select-option v-for="(host, idx) in configHostsList[index]" :key="idx" :title="host.name" :label="host.name" :value="host.hostid">
                     {{ host.name }}
                   </a-select-option>
@@ -181,7 +181,7 @@
 const selectSize = 30
 import PageLayout from '@/layouts/PageLayout'
 import { reportList, reportDelete, deleteTopology, reportStatusUpdate, taskLogList, taskLogDelete, reportCheckNow, reportAdd, reportGet, reportPut, hostList, itemList } from '@/services/admin'
-import { listZabbixInstances } from '@/services/zabbix'
+import { listZabbixInstance } from '@/services/zabbix'
 import moment from 'moment'
 
 const debounce = (func, delay = 60) => {
@@ -231,7 +231,7 @@ export default {
         reportMode: 'realtime', // 默认实时报表
         hostConfigs: [
           {
-            instance_id: undefined,
+            zid: undefined,
             host_id: '',
             item_ids: []
           }
@@ -275,7 +275,7 @@ export default {
                 return
               }
               for (let config of value) {
-                if (!config.instance_id) {
+                if (!config.zid) {
                   callback(new Error('请为每个主机配置选择实例'))
                   return
                 }
@@ -415,14 +415,14 @@ export default {
   methods: {
     async loadInstances() {
       try {
-        const res = await listZabbixInstances()
+        const res = await listZabbixInstance()
         const biz = (res && res.data) ? res.data : res
         if (biz && biz.code === 200) {
           this.instanceList = biz.data || []
           // 如果只有一个实例，自动为第一个主机配置选中
           if (this.instanceList.length === 1 && this.formData.hostConfigs.length > 0) {
-            this.formData.hostConfigs[0].instance_id = this.instanceList[0].tenant_id
-            this.handleInstanceChange(this.instanceList[0].tenant_id, 0)
+            this.formData.hostConfigs[0].zid = this.instanceList[0].zid
+            this.handleInstanceChange(this.instanceList[0].zid, 0)
           }
         }
       } catch (e) {
@@ -431,7 +431,7 @@ export default {
     },
     handleInstanceChange(value, index) {
       // 设置该配置的实例ID
-      this.$set(this.formData.hostConfigs[index], 'instance_id', value)
+      this.$set(this.formData.hostConfigs[index], 'zid', value)
       // 清空该配置的主机和监控项
       this.$set(this.formData.hostConfigs[index], 'host_id', '')
       this.$set(this.formData.hostConfigs[index], 'item_ids', [])
@@ -443,7 +443,7 @@ export default {
         let params = {
           page: 1,
           limit: 10000,
-          instance_id: value
+          zid: value
         }
         hostList(params).then((resp) => {
           let res = resp.data
@@ -540,13 +540,13 @@ export default {
       this.formModalVisible = true
     },
     resetFormData() {
-      const defaultInstanceId = this.instanceList.length === 1 ? this.instanceList[0].tenant_id : undefined
+      const defaultInstanceId = this.instanceList.length === 1 ? this.instanceList[0].zid : undefined
       this.formData = {
         name: '',
         reportMode: 'realtime', // 默认实时报表
         hostConfigs: [
           {
-            instance_id: defaultInstanceId,
+            zid: defaultInstanceId,
             host_id: '',
             item_ids: []
           }
@@ -606,19 +606,19 @@ export default {
                 const hostConfigs = JSON.parse(reportData.host_ids)
                 if (Array.isArray(hostConfigs) && hostConfigs.length > 0) {
                   this.formData.hostConfigs = hostConfigs.map((config, idx) => ({
-                    instance_id: config.instance_id ? String(config.instance_id) : undefined,
+                    zid: config.zid ? String(config.zid) : undefined,
                     host_id: config.host_id ? String(config.host_id) : '',
                     item_ids: (config.item_ids || []).map(id => String(id))
                   }))
                   
                   // 为每个配置加载对应的主机列表和items
                   this.formData.hostConfigs.forEach((config, index) => {
-                    if (config.instance_id) {
+                    if (config.zid) {
                       // 加载该实例的主机列表
                       let params = {
                         page: 1,
                         limit: 10000,
-                        instance_id: config.instance_id
+                        zid: config.zid
                       }
                       hostList(params).then((resp) => {
                         let res = resp.data
@@ -654,7 +654,7 @@ export default {
           const hostIds = JSON.stringify(this.formData.hostConfigs.map(c => ({
             host_id: c.host_id,
             item_ids: c.item_ids,
-            instance_id: c.instance_id
+            zid: c.zid
           })))
           const itemIds = JSON.stringify(this.formData.hostConfigs.flatMap(c => c.item_ids))
           
@@ -728,14 +728,14 @@ export default {
         return
       }
       
-      if (!config.instance_id) {
+      if (!config.zid) {
         this.$message.warning('请先选择实例')
         return
       }
       
       let params = {
         hostid: config.host_id,
-        instance_id: config.instance_id
+        zid: config.zid
       }
       itemList(params).then((resp) => {
         let res = resp.data
@@ -759,10 +759,10 @@ export default {
     },
     addHostConfig() {
       const newIndex = this.formData.hostConfigs.length
-      const defaultInstanceId = this.instanceList.length === 1 ? this.instanceList[0].tenant_id : undefined
+      const defaultInstanceId = this.instanceList.length === 1 ? this.instanceList[0].zid : undefined
       
       this.formData.hostConfigs.push({
-        instance_id: defaultInstanceId,
+        zid: defaultInstanceId,
         host_id: '',
         item_ids: []
       })

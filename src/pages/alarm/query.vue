@@ -10,7 +10,7 @@
       <a-form-model-item label="选择实例">
         <a-select v-model="selectedInstance" placeholder="全部实例" allowClear style="width: 200px">
           <a-select-option value="">全部实例</a-select-option>
-          <a-select-option v-for="item in instanceList" :key="item.tenant_id" :value="item.tenant_id">
+          <a-select-option v-for="item in instanceList" :key="item.zid" :value="item.zid">
             {{ item.name }}
           </a-select-option>
         </a-select>
@@ -102,7 +102,7 @@
 <script>
 import PageLayout from "@/layouts/PageLayout";
 import { alarm, alarmExport, eventLogGet, alarmDeepseekAnalysis } from "@/services/admin";
-import { listZabbixInstances } from '@/services/zabbix'
+import { listZabbixInstance } from '@/services/zabbix'
 import { parseTimeFun } from "@/utils/formatter";
 import { reduce } from "lodash";
 import moment from "moment";
@@ -257,7 +257,7 @@ export default {
   },
   methods: {
     loadInstances() {
-      listZabbixInstances().then((resp) => {
+      listZabbixInstance().then((resp) => {
         let res = resp.data
         if (res.code == 200) {
           const allItems = Array.isArray(res.data) ? res.data : []
@@ -278,7 +278,7 @@ export default {
         order_by: "id"  // 按 ID 降序，确保最新数据在最前
       };
       if (this.selectedInstance) {
-        req.tenant_id = this.selectedInstance;
+        req.zid = this.selectedInstance;
       }
       if (this.beginTime) {
         req.begin = this.beginTime;
@@ -306,7 +306,7 @@ export default {
     },
     addMutes(record) {
       console.log(record)
-      this.$router.push("/alarm/mutes?hostid=" + record.host_id + '&tenantid=' + record.tenant_id +
+      this.$router.push("/alarm/mutes?hostid=" + record.host_id + '&tenantid=' + record.zid +
         '&host=' + record.host + '&message=' + record.message)
     },
     //导出excel
@@ -317,7 +317,7 @@ export default {
           hosts: this.hosts,
           status: this.status, level: this.level,
           host_ip: this.hostIp,
-          tenant_id: this.selectedInstance,
+          zid: this.selectedInstance,
         },
         {
           responseType: "arraybuffer",

@@ -17,7 +17,7 @@ module.exports = {
       date: "生效时间",
       date2: "开始-结束",
       customerInput: "请描述你服务的客户，内部客户直接 @姓名／工号",
-      tenant_id: "Zabbix实例",
+      zid: "Zabbix实例",
       channels: "通知渠道",
       user: "通知用户",
       memberInput: "请选择接收人",

@@ -216,7 +216,7 @@ export default {
     return {
       moment,
       id: "",
-      instance_id: "",
+      zid: "",
       detail: '',
       cpuList: [],
       memoryList: [],
@@ -335,7 +335,7 @@ export default {
     ];
     this.dater = parseTimeFun(this.dates);
     this.id = this.$route.query.id || "";
-    this.instance_id = this.$route.query.instance_id || "";
+    this.zid = this.$route.query.zid || "";
     this.init();
   },
   filters: {
@@ -397,7 +397,7 @@ export default {
   },
   methods: {
     init() {
-      hostDetail(this.id, this.instance_id).then((resp) => {
+      hostDetail(this.id, this.zid).then((resp) => {
         let res = resp.data;
         this.detail = res.data;
       }).finally(() => {
@@ -405,7 +405,7 @@ export default {
         this.loading1 = false;
       });
       this.loading2 = true
-      linMonList(this.id, this.instance_id).then((resp) => {
+      linMonList(this.id, this.zid).then((resp) => {
         let res = resp.data
         if (res.code == 200) {
           this.FileSystemlist = res.data.items.filesystem || []
@@ -1112,7 +1112,7 @@ export default {
         out_errors_value_type: this.record.out_errors_itemid,
         begin: this.beginTime,
         end: this.endTime,
-        instance_id: this.instance_id, // 添加实例ID
+        zid: this.zid, // 添加实例ID
       }).then((resp) => {
         let res = resp.data;
         this.loading3 = false
@@ -1169,7 +1169,7 @@ export default {
         out_errors_value_type: record.out_errors_itemid,
         begin: this.beginTime,
         end: this.endTime,
-        instance_id: this.instance_id, // 添加实例ID
+        zid: this.zid, // 添加实例ID
       }).then((resp) => {
         let res = resp.data.data;
         this.loading3 = false
