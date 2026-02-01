@@ -76,6 +76,58 @@
               </a-form-model-item>
             </a-form-model>
           </a-tab-pane>
+
+          <!-- 安全配置 -->
+          <a-tab-pane key="security" tab="安全配置">
+            <a-form-model ref="securityForm" :model="securityForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
+              <a-form-model-item v-for="item in securityConfigs" :key="item.id" :label="item.name">
+                <a-input 
+                  :value="getDisplayValue(item.key)" 
+                  :placeholder="item.comment" 
+                  disabled
+                  style="font-family: 'Courier New', monospace; background-color: #f5f5f5;">
+                  <template slot="suffix">
+                    <a-tooltip :title="isKeyVisible ? '隐藏密钥' : '显示完整密钥'">
+                      <a-icon 
+                        :type="isKeyVisible ? 'eye-invisible' : 'eye'" 
+                        style="cursor: pointer; color: #1890ff;" 
+                        @click="toggleKeyVisibility" />
+                    </a-tooltip>
+                  </template>
+                </a-input>
+                <div class="config-hint">
+                  <a-icon type="lock" style="color: #faad14;" /> {{ item.comment }}
+                </div>
+                <a-alert 
+                  v-if="item.key === 'encryption_key'" 
+                  message="安全提示" 
+                  type="warning" 
+                  show-icon 
+                  style="margin-top: 12px;">
+                  <template slot="description">
+                    <div style="font-size: 12px; line-height: 1.6;">
+                      <div>• 此密钥用于加密存储 Zabbix 密码和 Token 等敏感信息</div>
+                      <div>• 系统初始化时自动生成，不可通过界面修改</div>
+                      <div>• 请妥善保管此密钥，丢失将导致已加密数据无法解密</div>
+                      <div>• 建议定期备份数据库，包含此密钥配置</div>
+                      <div style="margin-top: 8px;">
+                        <a-button 
+                          size="small" 
+                          icon="copy" 
+                          @click="copyEncryptionKey"
+                          :disabled="!isKeyVisible">
+                          复制密钥
+                        </a-button>
+                        <span v-if="!isKeyVisible" style="margin-left: 8px; color: #999; font-size: 11px;">
+                          需要先显示完整密钥才能复制
+                        </span>
+                      </div>
+                    </div>
+                  </template>
+                </a-alert>
+              </a-form-model-item>
+            </a-form-model>
+          </a-tab-pane>
         </a-tabs>
       </a-card>
     </div>
@@ -99,7 +151,9 @@ export default {
       emailForm: {},
       wechatForm: {},
       ollamaForm: {},
-      saveLoading: false
+      securityForm: {},
+      saveLoading: false,
+      isKeyVisible: false  // 控制密钥是否可见
     }
   },
   computed: {
@@ -124,6 +178,11 @@ export default {
     ollamaConfigs() {
       return this.list.filter(item => 
         item.key && item.key.startsWith('ollama_')
+      )
+    },
+    securityConfigs() {
+      return this.list.filter(item => 
+        item.key === 'encryption_key'
       )
     }
   },
@@ -182,6 +241,9 @@ export default {
       this.ollamaConfigs.forEach(item => {
         this.$set(this.ollamaForm, item.key, item.value)
       })
+      this.securityConfigs.forEach(item => {
+        this.$set(this.securityForm, item.key, item.value)
+      })
     },
     async saveCategory(category) {
       this.saveLoading = true
@@ -221,6 +283,56 @@ export default {
       } finally {
         this.saveLoading = false
       }
+    },
+    // 获取显示的值（加密密钥部分隐藏）
+    getDisplayValue(key) {
+      if (key === 'encryption_key') {
+        const value = this.securityForm[key] || ''
+        if (!value) return ''
+        
+        // 如果密钥可见，显示完整内容
+        if (this.isKeyVisible) {
+          return value
+        }
+        
+        // 否则只显示前8个和后8个字符，中间用星号代替
+        if (value.length <= 16) {
+          // 如果密钥太短，显示前后各4个字符
+          const showChars = Math.floor(value.length / 4)
+          return value.substring(0, showChars) + '***' + value.substring(value.length - showChars)
+        }
+        
+        return value.substring(0, 8) + '************************' + value.substring(value.length - 8)
+      }
+      return this.securityForm[key] || ''
+    },
+    // 切换密钥可见性
+    toggleKeyVisibility() {
+      this.isKeyVisible = !this.isKeyVisible
+    },
+    // 复制加密密钥
+    copyEncryptionKey() {
+      const key = this.securityForm['encryption_key']
+      if (!key) {
+        this.$message.warning('密钥为空')
+        return
+      }
+      
+      const textarea = document.createElement('textarea')
+      textarea.value = key
+      textarea.style.position = 'fixed'
+      textarea.style.opacity = '0'
+      document.body.appendChild(textarea)
+      textarea.select()
+      
+      try {
+        document.execCommand('copy')
+        this.$message.success('加密密钥已复制到剪贴板')
+      } catch (err) {
+        this.$message.error('复制失败，请手动复制')
+      }
+      
+      document.body.removeChild(textarea)
     }
   }
 }

@@ -759,8 +759,8 @@ export default {
         item_ids: []
       })
       
-      this.$set(this.configHostsList, newIndex, [])
-      this.$set(this.configHostsFilterList, newIndex, [])
+        this.$set(this.configHostsList, newIndex, [])
+        this.$set(this.configHostsFilterList, newIndex, [])
       this.$set(this.curItemsList, newIndex, [])
     },
     removeHostConfig(index) {

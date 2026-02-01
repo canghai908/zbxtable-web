@@ -145,10 +145,16 @@
           <a-input v-model="form.user" placeholder="可选（Token优先）" />
         </a-form-model-item>
         <a-form-model-item label="密码">
-          <a-input-password v-model="form.pass" placeholder="可选（Token优先）" />
+          <a-input-password v-model="form.pass" :placeholder="editingId ? '留空则保持原配置不变' : '可选（Token优先）'" />
+          <div v-if="editingId" style="margin-top: 4px; color: #999; font-size: 12px;">
+            <a-icon type="info-circle" /> 编辑时不显示已配置的密码，留空则保持原配置
+          </div>
         </a-form-model-item>
         <a-form-model-item label="Zabbix Token">
-          <a-input v-model="form.token" placeholder="Zabbix API Token（可选）" />
+          <a-input v-model="form.token" :placeholder="editingId ? '留空则保持原配置不变' : 'Zabbix API Token（可选）'" />
+          <div v-if="editingId" style="margin-top: 4px; color: #999; font-size: 12px;">
+            <a-icon type="info-circle" /> 编辑时不显示已配置的Token，留空则保持原配置
+          </div>
         </a-form-model-item>
         <a-form-model-item label="告警接收方式">
           <a-radio-group v-model="form.notify_method">
