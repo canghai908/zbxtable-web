@@ -24,15 +24,12 @@
             <span class="value">{{ formatTraffic(egress.out_value) }}</span>
           </div>
         </div>
-        <div :ref="`chart_${egress.id}`" class="egress-chart"></div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import * as echarts from 'echarts'
-
 export default {
   name: 'EgressBandwidth',
   props: {
@@ -44,9 +41,7 @@ export default {
   data() {
     return {
       egressList: [],
-      charts: {},
       updateTime: '--',
-      historyData: {}, // 存储历史数据用于绘制趋势图
     }
   },
   watch: {
@@ -55,161 +50,13 @@ export default {
         if (newData && newData.length > 0) {
           this.egressList = newData
           this.updateTime = this.formatTime(new Date())
-          this.$nextTick(() => {
-            this.initCharts()
-            this.updateHistoryData()
-          })
         }
       },
       immediate: true,
       deep: true
     }
   },
-  beforeDestroy() {
-    // 销毁所有图表
-    Object.values(this.charts).forEach(chart => {
-      if (chart) {
-        chart.dispose()
-      }
-    })
-  },
   methods: {
-    initCharts() {
-      this.egressList.forEach(egress => {
-        const chartRef = this.$refs[`chart_${egress.id}`]
-        if (chartRef && chartRef[0]) {
-          // 如果图表已存在，先销毁
-          if (this.charts[egress.id]) {
-            this.charts[egress.id].dispose()
-          }
-          
-          // 创建新图表
-          const chart = echarts.init(chartRef[0])
-          this.charts[egress.id] = chart
-          
-          // 设置图表配置
-          this.updateChart(egress.id)
-        }
-      })
-    },
-    updateChart(egressId) {
-      const chart = this.charts[egressId]
-      if (!chart) return
-      
-      const history = this.historyData[egressId] || { times: [], inValues: [], outValues: [] }
-      
-      const option = {
-        tooltip: {
-          trigger: 'axis',
-          backgroundColor: 'rgba(255, 255, 255, 0.95)',
-          borderColor: '#ccc',
-          borderWidth: 1,
-          textStyle: {
-            color: '#333'
-          },
-          formatter: (params) => {
-            let result = `${params[0].axisValue}<br/>`
-            params.forEach(item => {
-              result += `${item.marker}${item.seriesName}: ${this.formatTraffic(item.value)}<br/>`
-            })
-            return result
-          }
-        },
-        legend: {
-          data: ['入流量', '出流量'],
-          bottom: 0,
-          textStyle: {
-            fontSize: 12
-          }
-        },
-        grid: {
-          left: '3%',
-          right: '4%',
-          bottom: '15%',
-          top: '10%',
-          containLabel: true
-        },
-        xAxis: {
-          type: 'category',
-          boundaryGap: false,
-          data: history.times,
-          axisLabel: {
-            fontSize: 10
-          }
-        },
-        yAxis: {
-          type: 'value',
-          axisLabel: {
-            formatter: (value) => this.formatTraffic(value),
-            fontSize: 10
-          }
-        },
-        series: [
-          {
-            name: '入流量',
-            type: 'line',
-            smooth: true,
-            data: history.inValues,
-            itemStyle: {
-              color: '#5470c6'
-            },
-            areaStyle: {
-              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                { offset: 0, color: 'rgba(84, 112, 198, 0.3)' },
-                { offset: 1, color: 'rgba(84, 112, 198, 0.05)' }
-              ])
-            }
-          },
-          {
-            name: '出流量',
-            type: 'line',
-            smooth: true,
-            data: history.outValues,
-            itemStyle: {
-              color: '#91cc75'
-            },
-            areaStyle: {
-              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                { offset: 0, color: 'rgba(145, 204, 117, 0.3)' },
-                { offset: 1, color: 'rgba(145, 204, 117, 0.05)' }
-              ])
-            }
-          }
-        ]
-      }
-      
-      chart.setOption(option)
-    },
-    updateHistoryData() {
-      const now = this.formatTime(new Date(), 'HH:mm:ss')
-      
-      this.egressList.forEach(egress => {
-        if (!this.historyData[egress.id]) {
-          this.historyData[egress.id] = {
-            times: [],
-            inValues: [],
-            outValues: []
-          }
-        }
-        
-        const history = this.historyData[egress.id]
-        
-        // 添加新数据
-        history.times.push(now)
-        history.inValues.push(parseFloat(egress.in_value) || 0)
-        history.outValues.push(parseFloat(egress.out_value) || 0)
-        
-        // 只保留最近20个数据点
-        if (history.times.length > 20) {
-          history.times.shift()
-          history.inValues.shift()
-          history.outValues.shift()
-        }
-        
-        // 更新图表
-        this.updateChart(egress.id)
-      })
-    },
     formatTraffic(bytes) {
       if (!bytes || bytes === 0) return '0 B/s'
       const value = parseFloat(bytes)
@@ -248,20 +95,20 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 200px;
+  height: 80px;
 }
 
 .egress-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 8px;
 }
 
 .egress-item {
-  flex: 0 0 calc(50% - 8px);
+  flex: 0 0 calc(50% - 4px);
   background: #fafbfc;
-  border-radius: 8px;
-  padding: 16px;
+  border-radius: 6px;
+  padding: 8px;
   box-sizing: border-box;
   
   &.full-width {
@@ -273,33 +120,32 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   
   .egress-name {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
     color: #333;
   }
   
   .egress-time {
-    font-size: 12px;
+    font-size: 11px;
     color: #999;
   }
 }
 
 .egress-stats {
   display: flex;
-  gap: 16px;
-  margin-bottom: 12px;
+  gap: 8px;
 }
 
 .stat-item {
   flex: 1;
-  padding: 12px;
+  padding: 10px 12px;
   border-radius: 6px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   
   &.in {
     background: rgba(84, 112, 198, 0.1);
@@ -326,18 +172,13 @@ export default {
   }
   
   .label {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
   }
   
   .value {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
   }
-}
-
-.egress-chart {
-  width: 100%;
-  height: 200px;
 }
 </style>

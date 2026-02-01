@@ -111,18 +111,18 @@
         </template>
         <a-form-model-item :label="$t('host_selection')" prop="hostConfigs">
           <div v-for="(config, index) in formData.hostConfigs" :key="index" style="margin-bottom: 16px; padding: 16px; border: 1px solid #d9d9d9; border-radius: 4px;">
-            <a-row :gutter="16" style="margin-bottom: 8px;" v-if="instanceList.length > 1">
+            <a-row :gutter="16" style="margin-bottom: 8px;">
               <a-col :span="22">
-                <a-select v-model="config.zid" placeholder="请选择实例" @change="(value) => handleInstanceChange(value, index)" style="width: 100%">
-                  <a-select-option v-for="item in instanceList" :key="item.zid" :value="item.zid">
-                    {{ item.name }} ({{ item.zid }})
+                <a-select v-model="config.zid" placeholder="请先选择实例" @change="(value) => handleInstanceChange(value, index)" style="width: 100%" show-search option-filter-prop="children">
+                  <a-select-option v-for="item in instanceList" :key="item.id" :value="item.id">
+                    {{ item.name }}
                   </a-select-option>
                 </a-select>
               </a-col>
             </a-row>
             <a-row :gutter="16">
               <a-col :span="10">
-                <a-select v-model="config.host_id" show-search :placeholder="$t('select_host')" @popupScroll="handleHostPopupScrollForConfig(index)"
+                <a-select v-model="config.host_id" show-search :placeholder="config.zid ? $t('select_host') : '请先选择实例'" @popupScroll="handleHostPopupScrollForConfig(index)"
                   @search="(value) => handleHostSearchForConfig(value, index)" option-filter-prop="label" @change="handleHostChange(config, index)" style="width: 100%" :disabled="!config.zid">
                   <a-select-option v-for="(host, idx) in configHostsList[index]" :key="idx" :title="host.name" :label="host.name" :value="host.hostid">
                     {{ host.name }}
@@ -130,7 +130,7 @@
                 </a-select>
               </a-col>
               <a-col :span="12">
-                <a-select mode="multiple" show-search v-model="config.item_ids" :placeholder="$t('select_items')" @popupScroll="() => handleItemPopupScroll(index)"
+                <a-select mode="multiple" show-search v-model="config.item_ids" :placeholder="config.host_id ? $t('select_items') : '请先选择主机'" @popupScroll="() => handleItemPopupScroll(index)"
                   @search="(value) => handleItemSearch(value, index)" option-filter-prop="label" style="width: 100%" :disabled="!config.host_id">
                   <a-select-option v-for="(item, idx) in curItemsList[index]" :key="idx" :label="item.name" :title="item.name" :value="item.itemid">
                     {{ item.name }}
@@ -419,11 +419,6 @@ export default {
         const biz = (res && res.data) ? res.data : res
         if (biz && biz.code === 200) {
           this.instanceList = biz.data || []
-          // 如果只有一个实例，自动为第一个主机配置选中
-          if (this.instanceList.length === 1 && this.formData.hostConfigs.length > 0) {
-            this.formData.hostConfigs[0].zid = this.instanceList[0].zid
-            this.handleInstanceChange(this.instanceList[0].zid, 0)
-          }
         }
       } catch (e) {
         console.error('加载实例列表失败', e)
@@ -453,6 +448,9 @@ export default {
             this.$set(this.configHostsFilterList, index, hosts)
             this.$set(this.configHostsList, index, hosts.slice(0, selectSize))
           }
+        }).catch(err => {
+          console.error('加载主机列表失败:', err)
+          this.$message.error('加载主机列表失败')
         })
       } else {
         this.$set(this.configHostsList, index, [])
@@ -540,13 +538,12 @@ export default {
       this.formModalVisible = true
     },
     resetFormData() {
-      const defaultInstanceId = this.instanceList.length === 1 ? this.instanceList[0].zid : undefined
       this.formData = {
         name: '',
         reportMode: 'realtime', // 默认实时报表
         hostConfigs: [
           {
-            zid: defaultInstanceId,
+            zid: undefined,
             host_id: '',
             item_ids: []
           }
@@ -566,10 +563,6 @@ export default {
       this.itemsFilterList = {}
       if (this.$refs.formModal) {
         this.$refs.formModal.resetFields()
-      }
-      // 如果只有一个实例，自动加载主机列表
-      if (defaultInstanceId) {
-        this.handleInstanceChange(defaultInstanceId, 0)
       }
     },
     loadFormData(id) {
@@ -606,7 +599,7 @@ export default {
                 const hostConfigs = JSON.parse(reportData.host_ids)
                 if (Array.isArray(hostConfigs) && hostConfigs.length > 0) {
                   this.formData.hostConfigs = hostConfigs.map((config, idx) => ({
-                    zid: config.zid ? String(config.zid) : undefined,
+                    zid: config.zid ? Number(config.zid) : undefined,
                     host_id: config.host_id ? String(config.host_id) : '',
                     item_ids: (config.item_ids || []).map(id => String(id))
                   }))
@@ -759,21 +752,15 @@ export default {
     },
     addHostConfig() {
       const newIndex = this.formData.hostConfigs.length
-      const defaultInstanceId = this.instanceList.length === 1 ? this.instanceList[0].zid : undefined
       
       this.formData.hostConfigs.push({
-        zid: defaultInstanceId,
+        zid: undefined,
         host_id: '',
         item_ids: []
       })
       
-      // 如果只有一个实例，自动加载主机列表
-      if (defaultInstanceId) {
-        this.handleInstanceChange(defaultInstanceId, newIndex)
-      } else {
-        this.$set(this.configHostsList, newIndex, [])
-        this.$set(this.configHostsFilterList, newIndex, [])
-      }
+      this.$set(this.configHostsList, newIndex, [])
+      this.$set(this.configHostsFilterList, newIndex, [])
       this.$set(this.curItemsList, newIndex, [])
     },
     removeHostConfig(index) {
