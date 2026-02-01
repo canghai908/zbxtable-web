@@ -23,6 +23,15 @@
         <template slot="version" slot-scope="text, record">
           <span>{{ record.version || '-' }}</span>
         </template>
+        <template slot="auth_methods" slot-scope="text, record">
+          <div v-if="record.auth_methods && record.auth_methods.length > 0">
+            <a-tag v-for="method in record.auth_methods" :key="method" :color="method === 'password' ? 'green' : 'purple'" style="margin-bottom: 4px;">
+              <a-icon :type="method === 'password' ? 'lock' : 'key'" />
+              {{ method === 'password' ? '密码' : 'Token' }}
+            </a-tag>
+          </div>
+          <span v-else style="color: #999;">-</span>
+        </template>
         <template slot="conn" slot-scope="text, record">
           <a-tag v-if="record.enabled && record.last_test_ok" color="green">已连接</a-tag>
           <a-tag v-else-if="record.enabled && !record.last_test_ok" color="orange">未验证</a-tag>
@@ -442,6 +451,7 @@ export default {
         { title: '实例标识', dataIndex: 'instance_id', key: 'instance_id', width: 120, scopedSlots: { customRender: 'instance_id' } },
         { title: 'Zabbix 信息', key: 'zabbix', scopedSlots: { customRender: 'zabbix' }, width: 250 },
         { title: '版本', key: 'version', scopedSlots: { customRender: 'version' }, width: 100 },
+        { title: '认证方式', key: 'auth_methods', scopedSlots: { customRender: 'auth_methods' }, width: 120 },
         { title: '连接', key: 'conn', scopedSlots: { customRender: 'conn' }, width: 100 },
         { title: '告警接收', key: 'notify_method', scopedSlots: { customRender: 'notify_method' }, width: 130 },
         { title: '安装状态', key: 'install_status', scopedSlots: { customRender: 'install_status' }, width: 120 },
