@@ -583,8 +583,8 @@ export default {
           let res = resp.data
           if (res.code == 200) {
             // 注意：这里的 nodes 和 edges 字段名称与后端返回的对应
-            let nodes = JSON.parse(res.data.items.nodes)
-            let edges = JSON.parse(res.data.items.edges)
+            let nodes = JSON.parse(res.data.nodes)
+            let edges = JSON.parse(res.data.edges)
             
             // 确保所有节点都有 shape 属性
             nodes = nodes.map(node => {
@@ -614,22 +614,22 @@ export default {
             X6Data.nodes = nodes
             X6Data.edges = edges
             this.X6Data = X6Data
-            this.form.name = res.data.items.topology
-            this.form.updateTime = res.data.items.updated_at ? this.formatTime(res.data.items.updated_at) : ''
+            this.form.name = res.data.topology
+            this.form.updateTime = res.data.updated_at ? this.formatTime(res.data.updated_at) : ''
             
             // 加载画布尺寸（仅用于背景图计算，不影响显示）
-            if (res.data.items.canvas_width && res.data.items.canvas_height) {
-              this.form.canvasWidth = res.data.items.canvas_width
-              this.form.canvasHeight = res.data.items.canvas_height
+            if (res.data.canvas_width && res.data.canvas_height) {
+              this.form.canvasWidth = res.data.canvas_width
+              this.form.canvasHeight = res.data.canvas_height
             }
             
             // 先加载节点和边
             this.graph.fromJSON(this.X6Data)
             
             // 然后加载背景图（在 fromJSON 之后）
-            if (res.data.items.background_image) {
+            if (res.data.background_image) {
               try {
-                const bgConfig = JSON.parse(res.data.items.background_image)
+                const bgConfig = JSON.parse(res.data.background_image)
                 const bgImage = bgConfig.image
                 const bgSize = bgConfig.size || 'cover'
                 const bgPosition = bgConfig.position || 'center'
