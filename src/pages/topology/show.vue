@@ -622,8 +622,10 @@ export default {
           let res = resp.data
           let X6Data = {}
           if (res.code == 200) {
-            let edges = JSON.parse(res.data.items.edges)
-            let nodes = JSON.parse(res.data.items.nodes)
+            // 适配新的响应格式：res.data 直接是拓扑对象
+            const topologyData = res.data
+            let edges = JSON.parse(topologyData.edges)
+            let nodes = JSON.parse(topologyData.nodes)
             
             // 确保所有节点都有 shape 属性
             nodes = nodes.map(node => {
@@ -645,23 +647,23 @@ export default {
             X6Data.edges = edges
             X6Data.nodes = nodes
             this.X6Data = X6Data
-            this.form.name = res.data.items.topology
-            this.form.status = res.data.items.status
-            this.form.updateTime = res.data.items.updated_at ? this.formatTime(res.data.items.updated_at) : ''
+            this.form.name = topologyData.topology
+            this.form.status = topologyData.status
+            this.form.updateTime = topologyData.updated_at ? this.formatTime(topologyData.updated_at) : ''
             
             // 加载画布尺寸（仅用于背景图计算，不影响显示）
-            if (res.data.items.canvas_width && res.data.items.canvas_height) {
-              this.form.canvasWidth = res.data.items.canvas_width
-              this.form.canvasHeight = res.data.items.canvas_height
+            if (topologyData.canvas_width && topologyData.canvas_height) {
+              this.form.canvasWidth = topologyData.canvas_width
+              this.form.canvasHeight = topologyData.canvas_height
             }
             
             // 先加载节点和边
             this.graph.fromJSON(this.X6Data)
             
             // 然后加载背景图（在 fromJSON 之后）
-            if (res.data.items.background_image) {
+            if (topologyData.background_image) {
               try {
-                const bgConfig = JSON.parse(res.data.items.background_image)
+                const bgConfig = JSON.parse(topologyData.background_image)
                 const bgImage = bgConfig.image
                 const bgSize = bgConfig.size || 'cover'
                 const bgPosition = bgConfig.position || 'center'
@@ -747,7 +749,12 @@ export default {
               this.graph.centerContent()
               this.graph.zoomToFit({ padding: 100, maxScale: 1 })
             })
+          } else {
+            this.$message.error(res.message || '获取拓扑详情失败')
           }
+        }).catch((err) => {
+          this.$message.error('获取拓扑详情失败')
+          console.error(err)
         })
       }
     }

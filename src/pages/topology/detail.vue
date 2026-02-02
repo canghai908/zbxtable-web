@@ -982,22 +982,32 @@ export default {
         updateTopology(this.id, params).then((resp) => {
           let res = resp.data
           if (res.code == 200) {
-            this.$message.success(res.message)
+            this.$message.success(res.message || '更新成功')
             this.isReading = true
+          } else {
+            this.$message.error(res.message || '更新失败')
           }
+        }).catch((err) => {
+          this.$message.error('更新失败')
+          console.error(err)
         })
       } else {
         createTopology(params).then((resp) => {
           let res = resp.data
           if (res.code == 200) {
-            this.$message.success(res.message)
+            this.$message.success(res.message || '创建成功')
             this.isReading = true
             // 创建成功后，获取ID并更新路由
             if (res.data && res.data.id) {
               this.id = res.data.id
               this.$router.replace({ query: { id: this.id } })
             }
+          } else {
+            this.$message.error(res.message || '创建失败')
           }
+        }).catch((err) => {
+          this.$message.error('创建失败')
+          console.error(err)
         })
       }
     },
@@ -1008,8 +1018,10 @@ export default {
           let res = resp.data
           let X6Data = {}
           if (res.code == 200) {
-            let edges = JSON.parse(res.data.items.edges)
-            let nodes = JSON.parse(res.data.items.nodes)
+            // 适配新的响应格式：res.data 直接是拓扑对象
+            const topologyData = res.data
+            let edges = JSON.parse(topologyData.edges)
+            let nodes = JSON.parse(topologyData.nodes)
             
             // 确保所有节点都有 shape 属性
             nodes = nodes.map(node => {
@@ -1038,13 +1050,13 @@ export default {
             X6Data.edges = edges
             X6Data.nodes = nodes
             this.X6Data = X6Data
-            this.form.name = res.data.items.topology
-            this.form.status = res.data.items.status
+            this.form.name = topologyData.topology
+            this.form.status = topologyData.status
             
             // 加载画布尺寸
-            if (res.data.items.canvas_width && res.data.items.canvas_height) {
-              this.form.canvasWidth = res.data.items.canvas_width
-              this.form.canvasHeight = res.data.items.canvas_height
+            if (topologyData.canvas_width && topologyData.canvas_height) {
+              this.form.canvasWidth = topologyData.canvas_width
+              this.form.canvasHeight = topologyData.canvas_height
               // 设置预设值
               const sizeKey = `${this.form.canvasWidth}x${this.form.canvasHeight}`
               const presets = ['1920x1080', '2560x1440', '3000x2000', '3840x2160', '4096x2160']
@@ -1057,10 +1069,10 @@ export default {
             this.graph.fromJSON(this.X6Data)
             
             // 然后加载背景图（在 fromJSON 之后，避免被清除）
-            if (res.data.items.background_image) {
+            if (topologyData.background_image) {
               try {
-                this.form.backgroundImage = res.data.items.background_image
-                const bgConfig = JSON.parse(res.data.items.background_image)
+                this.form.backgroundImage = topologyData.background_image
+                const bgConfig = JSON.parse(topologyData.background_image)
                 this.backgroundImage = bgConfig.image
                 this.backgroundSize = bgConfig.size || 'cover'
                 this.backgroundPosition = bgConfig.position || 'center'
@@ -1087,7 +1099,12 @@ export default {
               this.graph.centerContent()
               this.graph.zoomToFit({ padding: 100, maxScale: 1 })
             })
+          } else {
+            this.$message.error(res.message || '获取拓扑详情失败')
           }
+        }).catch((err) => {
+          this.$message.error('获取拓扑详情失败')
+          console.error(err)
         })
       }
     }

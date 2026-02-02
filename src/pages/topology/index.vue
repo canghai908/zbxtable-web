@@ -85,7 +85,12 @@ export default {
           this.pagination.current = this.page
           this.pagination.pageSize = this.pageSize
           this.list = res.data.items || []
+        } else {
+          this.$message.error(res.message || '获取拓扑列表失败')
         }
+      }).catch((err) => {
+        this.$message.error('获取拓扑列表失败')
+        console.error(err)
       }).finally(() => { this.loading = false })
     },
     resetData() {
@@ -109,28 +114,42 @@ export default {
       deleteTopology(record.id).then((resp) => {
         let res = resp.data
         if (res.code == 200) {
-          this.$message.success(res.message)
+          this.$message.success(res.message || '删除成功')
           this.init()
+        } else {
+          this.$message.error(res.message || '删除失败')
         }
+      }).catch((err) => {
+        this.$message.error('删除失败')
+        console.error(err)
       })
     },
     deleteData(record) {
       deleteTopology(record.id).then((resp) => {
         let res = resp.data
         if (res.code == 200) {
-          this.$message.success(res.message)
+          this.$message.success(res.message || '删除成功')
           this.init()
+        } else {
+          this.$message.error(res.message || '删除失败')
         }
+      }).catch((err) => {
+        this.$message.error('删除失败')
+        console.error(err)
       })
-
     },
     deployTopo(record) {
       deployTopology(record).then((resp) => {
         let res = resp.data
         if (res.code == 200) {
-          this.$message.success(res.message)
+          this.$message.success(res.message || '操作成功')
           this.init()
+        } else {
+          this.$message.error(res.message || '操作失败')
         }
+      }).catch((err) => {
+        this.$message.error('操作失败')
+        console.error(err)
       })
     },
     newPage() {
