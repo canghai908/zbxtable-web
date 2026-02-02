@@ -10,6 +10,7 @@
                   <a-popover :title="$t('title_device_info')" placement="topLeft">
                     <template slot="content">
                       <p>{{ $t('label_hostname') }}: {{ item.name }}</p>
+                      <p v-if="item.instance_name">{{ $t('label_instance_name') }}: {{ item.instance_name }}</p>
                       <p>{{ $t('label_IP') }}:{{ item.interfaces }}</p>
                       <p>{{ $t('label_cpu_usage') }}: {{ item.cpu_utilization }}</p>
                       <p>{{ $t('label_memory_usage') }}: {{ item.memory_utilization }}</p>
@@ -35,6 +36,7 @@
                   <a-popover :title="$t('title_device_info')" placement="topLeft">
                     <template slot="content">
                       <p>{{ $t('label_hostname') }}: {{ item.name }}</p>
+                      <p v-if="item.instance_name">{{ $t('label_instance_name') }}: {{ item.instance_name }}</p>
                       <p>{{ $t('label_IP') }}:{{ item.interfaces }}</p>
                       <p>{{ $t('label_cpu_usage') }}: {{ item.cpu_utilization }}</p>
                       <p>{{ $t('label_memory_usage') }}: {{ item.memory_utilization }}</p>
@@ -59,6 +61,7 @@
                   <a-popover :title="$t('title_device_info')" placement="topLeft">
                     <template slot="content">
                       <p>{{ $t('label_hostname') }}: {{ item.name }}</p>
+                      <p v-if="item.instance_name">{{ $t('label_instance_name') }}: {{ item.instance_name }}</p>
                       <p>{{ $t('label_IP') }}:{{ item.interfaces }}</p>
                       <p>{{ $t('label_cpu_usage') }}: {{ item.cpu_utilization }}</p>
                       <p>{{ $t('label_memory_usage') }}: {{ item.memory_utilization }}</p>
@@ -83,6 +86,7 @@
                   <a-popover :title="$t('title_device_info')" placement="topLeft">
                     <template slot="content">
                       <p>{{ $t('label_hostname') }}: {{ item.name }}</p>
+                      <p v-if="item.instance_name">{{ $t('label_instance_name') }}: {{ item.instance_name }}</p>
                       <p>{{ $t('label_IP') }}:{{ item.interfaces }}</p>
                       <p>{{ $t('label_cpu_usage') }}: {{ item.cpu_utilization }}</p>
                       <p>{{ $t('label_memory_usage') }}: {{ item.memory_utilization }}</p>

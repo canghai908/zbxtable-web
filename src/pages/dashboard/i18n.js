@@ -50,6 +50,7 @@ module.exports = {
 
 			title_device_info: '设备信息',
 			label_hostname: '名称',
+			label_instance_name: '实例名称',
 			label_IP: '设备IP',
 			label_cpu_usage: 'CPU',
 			label_memory_usage: '内存',
@@ -111,6 +112,7 @@ module.exports = {
 
 			title_device_info: 'Host info',
 			label_hostname: 'Hostname',
+			label_instance_name: 'Instance Name',
 			label_IP: 'IP address',
 			label_cpu_usage: 'CPU usage',
 			label_memory_usage: 'Memory usage',
