@@ -339,15 +339,15 @@ export default {
               this.drawerTextNode.fontColor = val.attr('label/fill') || '#333333'
             } else {
               // 普通节点
-              this.drawerNode.ZID = val.store.data.attrs.label.ZID || undefined
-              this.drawerNode.HostType = val.store.data.attrs.label.HostType || ''
-              this.drawerNode.HostValue = val.store.data.attrs.label.HostValue || ''
-              this.drawerNode.HostName = val.store.data.attrs.label.text || ''
-              this.drawerNode.HostID = val.store.data.attrs.label.HostID || undefined
-              
-              // 如果有实例ID，加载对应的主机列表
-              if (this.drawerNode.ZID && this.drawerNode.HostType) {
-                this.loadHostsByInstance(this.drawerNode.ZID, this.drawerNode.HostType)
+            this.drawerNode.ZID = val.store.data.attrs.label.ZID || undefined
+            this.drawerNode.HostType = val.store.data.attrs.label.HostType || ''
+            this.drawerNode.HostValue = val.store.data.attrs.label.HostValue || ''
+            this.drawerNode.HostName = val.store.data.attrs.label.text || ''
+            this.drawerNode.HostID = val.store.data.attrs.label.HostID || undefined
+            
+            // 如果有实例ID，加载对应的主机列表
+            if (this.drawerNode.ZID && this.drawerNode.HostType) {
+              this.loadHostsByInstance(this.drawerNode.ZID, this.drawerNode.HostType)
               }
             }
           } else {

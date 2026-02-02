@@ -268,6 +268,8 @@ export default {
         name: '',
         gridType: 1,
         updateTime: '',
+        canvasWidth: 3000,
+        canvasHeight: 2000,
       },
       connection: null,
       isWebSocket: false,//判断是否链接成功！
@@ -305,13 +307,7 @@ export default {
           global: true,
         },
         scroller: {//拖动
-          enabled: true,
-          pageVisible: true,
-          pageBreak: false,
-          pannable: true,
-          autoResize: true,
-          pageWidth: 3000, // 定义虚拟画布宽度
-          pageHeight: 2000, // 定义虚拟画布高度
+          enabled: false, // 禁用 scroller，避免出现滚动条
         },
         // minimap: {//小地图
         //   enabled: true,
@@ -466,7 +462,7 @@ export default {
     websocketonopen() { //连接建立之后执行send方法发送数据
       this.isWebSocket = true;
       this.websock.send("success")
-      this.$message.success("Websocket链接成功")
+      this.$message.success("WebSocket已连接")
 
     },
     websocketonclose() {//断开
@@ -510,9 +506,97 @@ export default {
       X6Data.edges = edges
       X6Data.nodes = nodes
       this.X6Data = X6Data
-      this.graph.fromJSON(this.X6Data)
       this.form.name = redata.topology
       this.form.updateTime = redata.updated_at ? this.formatTime(redata.updated_at) : ''
+      
+      // 先加载节点和边
+      this.graph.fromJSON(this.X6Data)
+      
+      // 然后加载背景图（在 fromJSON 之后）
+      if (redata.background_image) {
+        try {
+          const bgConfig = JSON.parse(redata.background_image)
+          const bgImage = bgConfig.image
+          const bgSize = bgConfig.size || 'cover'
+          const bgPosition = bgConfig.position || 'center'
+          const bgOpacity = (bgConfig.opacity || 100) / 100
+          const naturalWidth = bgConfig.naturalWidth || 0
+          const naturalHeight = bgConfig.naturalHeight || 0
+          
+          // 移除旧的背景图
+          const oldBg = this.graph.getCellById('canvas-background')
+          if (oldBg) {
+            this.graph.removeCell(oldBg)
+          }
+          
+          if (naturalWidth && naturalHeight) {
+            // 计算背景图的位置和尺寸
+            let bgWidth, bgHeight, bgX, bgY
+            
+            if (bgSize === 'cover') {
+              const canvasRatio = this.form.canvasWidth / this.form.canvasHeight
+              const imageRatio = naturalWidth / naturalHeight
+              
+              if (imageRatio > canvasRatio) {
+                bgHeight = this.form.canvasHeight
+                bgWidth = bgHeight * imageRatio
+              } else {
+                bgWidth = this.form.canvasWidth
+                bgHeight = bgWidth / imageRatio
+              }
+            } else if (bgSize === 'contain') {
+              const canvasRatio = this.form.canvasWidth / this.form.canvasHeight
+              const imageRatio = naturalWidth / naturalHeight
+              
+              if (imageRatio > canvasRatio) {
+                bgWidth = this.form.canvasWidth
+                bgHeight = bgWidth / imageRatio
+              } else {
+                bgHeight = this.form.canvasHeight
+                bgWidth = bgHeight * imageRatio
+              }
+            } else {
+              bgWidth = naturalWidth
+              bgHeight = naturalHeight
+            }
+            
+            // 计算位置
+            if (bgPosition === 'center') {
+              bgX = (this.form.canvasWidth - bgWidth) / 2
+              bgY = (this.form.canvasHeight - bgHeight) / 2
+            } else if (bgPosition === 'top') {
+              bgX = (this.form.canvasWidth - bgWidth) / 2
+              bgY = 0
+            } else if (bgPosition === 'bottom') {
+              bgX = (this.form.canvasWidth - bgWidth) / 2
+              bgY = this.form.canvasHeight - bgHeight
+            }
+            
+            // 添加背景图节点
+            this.graph.addNode({
+              id: 'canvas-background',
+              shape: 'image',
+              x: bgX,
+              y: bgY,
+              width: bgWidth,
+              height: bgHeight,
+              zIndex: -2,
+              imageUrl: bgImage,
+              attrs: {
+                image: {
+                  opacity: bgOpacity,
+                },
+              },
+              selectable: false,
+              movable: false,
+              resizable: false,
+              rotatable: false,
+            })
+          }
+        } catch (e) {
+          console.error('解析背景图配置失败', e)
+        }
+      }
       
       // 强制重绘以确保文本正确渲染
       this.$nextTick(() => {
@@ -558,10 +642,98 @@ export default {
             X6Data.edges = edges
             X6Data.nodes = nodes
             this.X6Data = X6Data
-            this.graph.fromJSON(this.X6Data)
             this.form.name = res.data.items.topology
             this.form.status = res.data.items.status
             this.form.updateTime = res.data.items.updated_at ? this.formatTime(res.data.items.updated_at) : ''
+            
+            // 加载画布尺寸（仅用于背景图计算，不影响显示）
+            if (res.data.items.canvas_width && res.data.items.canvas_height) {
+              this.form.canvasWidth = res.data.items.canvas_width
+              this.form.canvasHeight = res.data.items.canvas_height
+            }
+            
+            // 先加载节点和边
+            this.graph.fromJSON(this.X6Data)
+            
+            // 然后加载背景图（在 fromJSON 之后）
+            if (res.data.items.background_image) {
+              try {
+                const bgConfig = JSON.parse(res.data.items.background_image)
+                const bgImage = bgConfig.image
+                const bgSize = bgConfig.size || 'cover'
+                const bgPosition = bgConfig.position || 'center'
+                const bgOpacity = (bgConfig.opacity || 100) / 100
+                const naturalWidth = bgConfig.naturalWidth || 0
+                const naturalHeight = bgConfig.naturalHeight || 0
+                
+                if (naturalWidth && naturalHeight) {
+                  // 计算背景图的位置和尺寸
+                  let bgWidth, bgHeight, bgX, bgY
+                  
+                  if (bgSize === 'cover') {
+                    const canvasRatio = this.form.canvasWidth / this.form.canvasHeight
+                    const imageRatio = naturalWidth / naturalHeight
+                    
+                    if (imageRatio > canvasRatio) {
+                      bgHeight = this.form.canvasHeight
+                      bgWidth = bgHeight * imageRatio
+                    } else {
+                      bgWidth = this.form.canvasWidth
+                      bgHeight = bgWidth / imageRatio
+                    }
+                  } else if (bgSize === 'contain') {
+                    const canvasRatio = this.form.canvasWidth / this.form.canvasHeight
+                    const imageRatio = naturalWidth / naturalHeight
+                    
+                    if (imageRatio > canvasRatio) {
+                      bgWidth = this.form.canvasWidth
+                      bgHeight = bgWidth / imageRatio
+                    } else {
+                      bgHeight = this.form.canvasHeight
+                      bgWidth = bgHeight * imageRatio
+                    }
+                  } else {
+                    bgWidth = naturalWidth
+                    bgHeight = naturalHeight
+                  }
+                  
+                  // 计算位置
+                  if (bgPosition === 'center') {
+                    bgX = (this.form.canvasWidth - bgWidth) / 2
+                    bgY = (this.form.canvasHeight - bgHeight) / 2
+                  } else if (bgPosition === 'top') {
+                    bgX = (this.form.canvasWidth - bgWidth) / 2
+                    bgY = 0
+                  } else if (bgPosition === 'bottom') {
+                    bgX = (this.form.canvasWidth - bgWidth) / 2
+                    bgY = this.form.canvasHeight - bgHeight
+                  }
+                  
+                  // 添加背景图节点
+                  this.graph.addNode({
+                    id: 'canvas-background',
+                    shape: 'image',
+                    x: bgX,
+                    y: bgY,
+                    width: bgWidth,
+                    height: bgHeight,
+                    zIndex: -2,
+                    imageUrl: bgImage,
+                    attrs: {
+                      image: {
+                        opacity: bgOpacity,
+                      },
+                    },
+                    selectable: false,
+                    movable: false,
+                    resizable: false,
+                    rotatable: false,
+                  })
+                }
+              } catch (e) {
+                console.error('解析背景图配置失败', e)
+              }
+            }
             
             // 强制重绘以确保文本正确渲染，并重新居中和缩放
             this.$nextTick(() => {
@@ -669,35 +841,16 @@ export default {
 // 画布区域
 .tuopu {
   position: relative;
-  overflow: hidden;
-  background: #ffffff; // 改为白色背景
+  overflow: hidden; // 隐藏溢出，防止滚动条
+  background: #ffffff;
 }
 
 // 防止节点文本被画布边界裁剪
 ::v-deep #containerChart {
+  overflow: hidden !important; // 强制隐藏滚动条
+  
   .x6-graph-scroller {
-    overflow: auto !important;
-  }
-  
-  // 美化滚动条
-  .x6-graph-scroller::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-  }
-  
-  .x6-graph-scroller::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.05);
-    border-radius: 5px;
-  }
-  
-  .x6-graph-scroller::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 5px;
-    transition: background 0.3s;
-    
-    &:hover {
-      background: rgba(0, 0, 0, 0.3);
-    }
+    overflow: hidden !important; // 强制隐藏滚动条
   }
 }
 
