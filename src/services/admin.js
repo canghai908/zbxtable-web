@@ -105,7 +105,7 @@ export async function deleteTopology(id) {
 	return request(TOPOLOGY_LIST + '/' + id, METHOD.DELETE)
 }
 export async function deployTopology(params) {
-	return request(TOPOLOGY_LIST + '/deploy', METHOD.POST, params)
+	return request(TOPOLOGY_LIST + '/status', METHOD.POST, params)
 }
 export async function itemList(params) {
 	return request(ITEM_LIST, METHOD.GET, params)

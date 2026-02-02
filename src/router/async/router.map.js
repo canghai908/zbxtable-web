@@ -113,6 +113,11 @@ const routerMap = {
 	topologyShow: {
 		component: () => import('@/pages/topology/show'),
 	},
+	topologyPublic: {
+		authority: '*',
+		path: '/public/topology',
+		component: () => import('@/pages/topology/public'),
+	},
 	//report
 	report: {
 		component: view.blank,

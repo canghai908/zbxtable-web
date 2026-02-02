@@ -5,6 +5,11 @@ import {parseRoutes} from '@/utils/routerUtil'
 const routesConfig = [
   'install',
   'login',
+  {
+    router: 'topologyPublic',
+    path: '/public/topology',
+    name: '公开拓扑'
+  },
   'root',
   {
     router: 'exp404',

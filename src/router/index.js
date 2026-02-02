@@ -6,15 +6,15 @@ Vue.use(Router)
 
 // 不需要登录拦截的路由配置
 const loginIgnore = {
-  names: ['404', '403', '安装'],      //根据路由名称匹配
-  paths: ['/login', '/install'],   //根据路由fullPath匹配
+  names: ['404', '403', '安装', '公开拓扑'],      //根据路由名称匹配
+  paths: ['/login', '/install', '/public/topology'],   //根据路由fullPath匹配
   /**
    * 判断路由是否包含在该配置中
    * @param route vue-router 的 route 对象
    * @returns {boolean}
    */
   includes(route) {
-    return this.names.includes(route.name) || this.paths.includes(route.path)
+    return this.names.includes(route.name) || this.paths.includes(route.path) || route.path.startsWith('/public/')
   }
 }
 

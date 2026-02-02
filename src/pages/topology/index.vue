@@ -29,6 +29,10 @@
         <div slot="operation" slot-scope="record">
           <a-button class="pd20 paddingleft0" type="link" size="small" v-if="record.status==0" @click="deployTopo(record)">发布</a-button>
           <a-button class="pd20 paddingleft0" type="link" size="small" v-else @click="deployTopo(record)">撤回</a-button>
+          <a-button class="pd20 paddingleft0" type="link" size="small" v-if="record.status==1" @click="copyPublicLink(record)">
+            <a-icon type="link" />
+            公开链接
+          </a-button>
           <a-button class="pd20 paddingleft0" type="link" size="small" @click="seeDetail(record)">编辑</a-button>
           <a-button class="pd20 paddingleft0" type="link" size="small" @click="showTopo(record)">预览</a-button>
           <a-popconfirm title="确定要删除吗?" ok-text="确定" cancel-text="取消" @confirm="confirm(record)">
@@ -131,6 +135,33 @@ export default {
     },
     newPage() {
       this.$router.push("/topology/detail")
+    },
+    copyPublicLink(record) {
+      const publicUrl = `${window.location.origin}/#/public/topology?id=${record.id}`
+      
+      // 复制到剪贴板
+      const textarea = document.createElement('textarea')
+      textarea.value = publicUrl
+      textarea.style.position = 'fixed'
+      textarea.style.opacity = '0'
+      document.body.appendChild(textarea)
+      textarea.select()
+      
+      try {
+        document.execCommand('copy')
+        this.$message.success('公开链接已复制到剪贴板')
+        
+        // 显示链接
+        this.$info({
+          title: '公开访问链接',
+          content: publicUrl,
+          okText: '关闭'
+        })
+      } catch (err) {
+        this.$message.error('复制失败，请手动复制')
+      } finally {
+        document.body.removeChild(textarea)
+      }
     }
   },
 }

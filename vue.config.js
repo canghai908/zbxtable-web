@@ -34,15 +34,43 @@ module.exports = {
         target: process.env.VUE_APP_API_BASE_URL || "http://localhost:8085",
         changeOrigin: true,
       },
+      "/pb/ws": {
+        // 公开 WebSocket 代理（必须在 /public 之前，更具体的路径优先匹配）
+        target: process.env.VUE_APP_API_BASE_URL || "http://localhost:8085",
+        changeOrigin: true,
+        ws: true, // 开启 WebSocket 代理
+        logLevel: 'debug', // 添加调试日志
+        // WebSocket 特定配置
+        onProxyReqWs: (proxyReq, req, socket, options, head) => {
+          console.log('[WS Proxy] Proxying WebSocket request to:', options.target);
+        },
+        onError: (err, req, res) => {
+          console.error('[WS Proxy] Error:', err.message);
+        },
+      },
+      "/public": {
+        // 公开 API 代理
+        target: "http://localhost:8085",
+        changeOrigin: true,
+      },
       "/install": {
         // 安装相关 API 代理到后端
         target: process.env.VUE_APP_API_BASE_URL || "http://localhost:8085",
         changeOrigin: true,
       },
       "/ws": {
-        target: process.env.VUE_APP_WS_BASE_URL || "http://localhost:8085",
+        // 认证 WebSocket 代理
+        target: process.env.VUE_APP_API_BASE_URL || "http://localhost:8085",
         changeOrigin: true, //是否允许跨域
         ws: true, //开启ws, 如果是http代理此处可以不用设置
+        logLevel: 'debug', // 添加调试日志
+        // WebSocket 特定配置
+        onProxyReqWs: (proxyReq, req, socket, options, head) => {
+          console.log('[WS Proxy] Proxying WebSocket request to:', options.target);
+        },
+        onError: (err, req, res) => {
+          console.error('[WS Proxy] Error:', err.message);
+        },
       },
     },
   },
