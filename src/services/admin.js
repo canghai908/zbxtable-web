@@ -143,10 +143,10 @@ export async function systemInfo(id) {
 	return request(SYSTEM_LIST + '/' + id, METHOD.GET)
 }
 export async function systemUpdate(id, params, instanceId) {
-	return request(SYSTEM_LIST + '/' + id, METHOD.PUT, { ...params, instance_id: instanceId })
+	return request(SYSTEM_LIST + '/' + id, METHOD.PUT, { ...params, instance: instanceId })
 }
 export async function systemInit(id, instanceId) {
-	return request(SYSTEM_LIST + '/init/' + id, METHOD.POST, { instance_id: instanceId })
+	return request(SYSTEM_LIST + '/init/' + id, METHOD.POST, { instance: instanceId })
 }
 export async function egressGet() {
 	return request(SYSTEM_LIST + '/egress/', METHOD.GET)

@@ -7,7 +7,7 @@
       </div>
 
       <a-table :loading="loading" :columns="columns" :data-source="list" :rowKey="r => r.id">
-        <template slot="instance_id" slot-scope="text, record">
+        <template slot="instance" slot-scope="text, record">
           <a-tag color="cyan">{{ text }}</a-tag>
         </template>
         <template slot="enabled" slot-scope="text, record">
@@ -133,7 +133,7 @@
     <a-modal :title="editingId ? '编辑实例' : '新增实例'" :visible="visible" @ok="save" @cancel="visible=false" :confirmLoading="saving" :okButtonProps="{ disabled: !testOk }">
       <a-form-model :model="form" :label-col="{span: 7}" :wrapper-col="{span: 15}">
         <a-form-model-item label="实例标识" required>
-          <a-input v-model="form.instance_id" placeholder="例如：zabbix-001" :disabled="!!editingId" />
+          <a-input v-model="form.instance" placeholder="例如：zabbix-001" :disabled="!!editingId" />
         </a-form-model-item>
         <a-form-model-item label="可见名称" required>
           <a-input v-model="form.name" placeholder="例如：生产环境" />
@@ -296,8 +296,8 @@
           </a-descriptions-item>
           <a-descriptions-item label="实例标识">
             <div style="display: flex; align-items: center; gap: 8px;">
-              <code style="flex: 1;">{{ webhookInfo.instance_id }}</code>
-              <a-button size="small" icon="copy" @click="copyToClipboard(webhookInfo.instance_id, '实例标识')">复制</a-button>
+              <code style="flex: 1;">{{ webhookInfo.instance }}</code>
+              <a-button size="small" icon="copy" @click="copyToClipboard(webhookInfo.instance, '实例标识')">复制</a-button>
             </div>
           </a-descriptions-item>
           <a-descriptions-item label="认证 Token">
@@ -441,7 +441,7 @@ export default {
       list: [],
       scriptData: null,
       form: { 
-        instance_id: '', 
+        instance: '', 
         name: '',
         url: '',
         user: '',
@@ -454,7 +454,7 @@ export default {
       webhookInfo: null,
       columns: [
         { title: 'ID', dataIndex: 'id', key: 'id', width: 60 },
-        { title: '实例标识', dataIndex: 'instance_id', key: 'instance_id', width: 120, scopedSlots: { customRender: 'instance_id' } },
+        { title: '实例标识', dataIndex: 'instance', key: 'instance', width: 120, scopedSlots: { customRender: 'instance' } },
         { title: 'Zabbix 信息', key: 'zabbix', scopedSlots: { customRender: 'zabbix' }, width: 250 },
         { title: '版本', key: 'version', scopedSlots: { customRender: 'version' }, width: 100 },
         { title: '认证方式', key: 'auth_methods', scopedSlots: { customRender: 'auth_methods' }, width: 120 },
@@ -483,7 +483,7 @@ export default {
     openCreate () {
       this.editingId = null
       this.form = { 
-        instance_id: '', 
+        instance: '', 
         name: '',
         url: '',
         user: '',
@@ -500,7 +500,7 @@ export default {
       console.log(record.id)
       this.editingId = record.id
       this.form = {
-        instance_id: record.instance_id || '',
+        instance: record.instance || '',
         name: record.name || '',
         url: record.url || '',
         user: record.user || '',
@@ -536,7 +536,7 @@ export default {
       }
     },
     async save () {
-      if (!this.form.instance_id || !this.form.name || !this.form.url) {
+      if (!this.form.instance || !this.form.name || !this.form.url) {
         this.$message.warning('请填写实例标识、名称和 Zabbix URL')
         return
       }
@@ -639,7 +639,7 @@ export default {
         if (this.currentInstallType === 'webhook') {
           // Webhook 安装流程
           this.addLog('info', '开始安装 Webhook 配置...')
-          this.addLog('info', `实例: ${this.currentRecord.instance_id}`)
+          this.addLog('info', `实例: ${this.currentRecord.instance}`)
           this.addLog('info', `Zabbix: ${this.currentRecord.name} (${this.currentRecord.url})`)
           
           await this.sleep(500)
@@ -687,7 +687,7 @@ export default {
         } else {
           // MS-Agent 安装流程
           this.addLog('info', '开始安装 MS-Agent 配置...')
-          this.addLog('info', `实例: ${this.currentRecord.instance_id}`)
+          this.addLog('info', `实例: ${this.currentRecord.instance}`)
           this.addLog('info', `Zabbix: ${this.currentRecord.name} (${this.currentRecord.url})`)
           
           await this.sleep(500)
