@@ -6,8 +6,8 @@ const routesConfig = [
   'install',
   'login',
   {
-    router: 'topologyPublic',
-    path: '/public/topology',
+    router: 'topologyShare',
+    path: '/share/topology',
     name: '公开拓扑'
   },
   'root',

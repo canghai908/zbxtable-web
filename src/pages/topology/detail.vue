@@ -442,6 +442,23 @@ export default {
           if (res.code == 200) {
             let edges = JSON.parse(res.data.items.edges)
             let nodes = JSON.parse(res.data.items.nodes)
+            
+            // 确保所有节点都有 shape 属性
+            nodes = nodes.map(node => {
+              if (!node.shape) {
+                node.shape = 'custom-image'
+              }
+              return node
+            })
+            
+            // 确保所有边都有 shape 属性
+            edges = edges.map(edge => {
+              if (!edge.shape) {
+                edge.shape = 'edge'
+              }
+              return edge
+            })
+            
             X6Data.cells = []
             X6Data.edges = edges
             X6Data.nodes = nodes

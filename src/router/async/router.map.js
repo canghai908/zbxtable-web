@@ -113,10 +113,10 @@ const routerMap = {
 	topologyShow: {
 		component: () => import('@/pages/topology/show'),
 	},
-	topologyPublic: {
+	topologyShare: {
 		authority: '*',
-		path: '/public/topology',
-		component: () => import('@/pages/topology/public'),
+		path: '/share/topology',
+		component: () => import('@/pages/topology/share'),
 	},
 	//report
 	report: {

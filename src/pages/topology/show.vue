@@ -46,7 +46,132 @@ import '@antv/x6-vue-shape'
 import { Graph, Shape, DataUri } from '@antv/x6'
 import { startDragToGraph } from './Graph/methods.js'
 import { topologyDetail } from '@/services/admin'
-import { API_WS } from "@/services/api";
+import { API_WS } from "@/services/api"
+
+// 定义端口配置
+const ports = {
+  groups: {
+    top: {
+      position: "top",
+      attrs: {
+        circle: {
+          r: 4,
+          magnet: true,
+          stroke: "#2D8CF0",
+          strokeWidth: 2,
+          fill: "#fff",
+        },
+      },
+    },
+    bottom: {
+      position: "bottom",
+      attrs: {
+        circle: {
+          r: 4,
+          magnet: true,
+          stroke: "#2D8CF0",
+          strokeWidth: 2,
+          fill: "#fff",
+        },
+      },
+    },
+    left: {
+      position: "left",
+      attrs: {
+        circle: {
+          r: 4,
+          magnet: true,
+          stroke: "#2D8CF0",
+          strokeWidth: 2,
+          fill: "#fff",
+        },
+      },
+    },
+    right: {
+      position: "right",
+      attrs: {
+        circle: {
+          r: 4,
+          magnet: true,
+          stroke: "#2D8CF0",
+          strokeWidth: 2,
+          fill: "#fff",
+        },
+      },
+    },
+  },
+  items: [
+    {
+      id: "port1",
+      group: "top",
+    },
+    {
+      id: "port2",
+      group: "bottom",
+    },
+    {
+      id: "port3",
+      group: "left",
+    },
+    {
+      id: "port4",
+      group: "right",
+    },
+  ],
+}
+
+// 注册自定义节点类型
+Graph.registerNode(
+  "custom-image",
+  {
+    inherit: "rect",
+    width: 60,
+    height: 60,
+    markup: [
+      {
+        tagName: "rect",
+        selector: "body",
+      },
+      {
+        tagName: "image",
+      },
+      {
+        tagName: "text",
+        selector: "label",
+      },
+    ],
+    attrs: {
+      body: {
+        rx: 0,
+        ry: 0,
+        stroke: "rgba(95,149,255,0.00)",
+        strokeWidth: 1,
+        fill: "rgba(95,149,255,0.00)",
+      },
+      image: {
+        width: 60,
+        height: 60,
+        refX: 0,
+        refY: 0,
+      },
+      label: {
+        refX: 0.5,
+        refY: 80,
+        textAnchor: "middle",
+        textVerticalAnchor: "bottom",
+        fontSize: 14,
+        fill: "#000",
+        textWrap: {
+          width: 120,
+          height: 40,
+          ellipsis: true,
+        },
+      },
+    },
+    ports: { ...ports },
+  },
+  true
+);
 
 export default {
   name: 'tuopu',
@@ -265,14 +390,16 @@ export default {
     initWebSocket() { //初始化websocket
       //init topo
       this.tuopuDetail(this.id)
-      let url = new URL(this.url, window.location.href)
-      if (url.protocol == "http:") {
-        url.protocol = url.protocol.replace('http:', 'ws')
-      } else {
-        url.protocol = url.protocol.replace('https:', 'wss')
-      }
+      
+      // 构建 WebSocket URL - 使用统一的 /wsapi/auth 路径
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+      const wsUrl = `${protocol}//${window.location.host}${API_WS}/${this.id}`
+      
+      console.log('=== WebSocket Connection (Auth) ===')
+      console.log('WebSocket URL:', wsUrl)
+      
       //init websocket
-      this.websock = new WebSocket(url.origin + API_WS + "/" + this.id);
+      this.websock = new WebSocket(wsUrl);
       this.websock.onmessage = this.websocketonmessage;
       this.websock.onopen = this.websocketonopen;
       this.websock.onerror = this.websocketonerror;
@@ -297,6 +424,23 @@ export default {
       let X6Data = {}
       let edges = JSON.parse(redata.nodes)
       let nodes = JSON.parse(redata.edges)
+      
+      // 确保所有节点都有 shape 属性
+      nodes = nodes.map(node => {
+        if (!node.shape) {
+          node.shape = 'custom-image'
+        }
+        return node
+      })
+      
+      // 确保所有边都有 shape 属性
+      edges = edges.map(edge => {
+        if (!edge.shape) {
+          edge.shape = 'edge'
+        }
+        return edge
+      })
+      
       X6Data.cells = []
       X6Data.edges = edges
       X6Data.nodes = nodes
@@ -327,6 +471,23 @@ export default {
           if (res.code == 200) {
             let edges = JSON.parse(res.data.items.edges)
             let nodes = JSON.parse(res.data.items.nodes)
+            
+            // 确保所有节点都有 shape 属性
+            nodes = nodes.map(node => {
+              if (!node.shape) {
+                node.shape = 'custom-image'
+              }
+              return node
+            })
+            
+            // 确保所有边都有 shape 属性
+            edges = edges.map(edge => {
+              if (!edge.shape) {
+                edge.shape = 'edge'
+              }
+              return edge
+            })
+            
             X6Data.cells = []
             X6Data.edges = edges
             X6Data.nodes = nodes

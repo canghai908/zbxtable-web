@@ -43,6 +43,131 @@ const publicAxios = axios.create({
   withCredentials: false, // 不发送 cookies
 })
 
+// 定义端口配置
+const ports = {
+  groups: {
+    top: {
+      position: "top",
+      attrs: {
+        circle: {
+          r: 4,
+          magnet: true,
+          stroke: "#2D8CF0",
+          strokeWidth: 2,
+          fill: "#fff",
+        },
+      },
+    },
+    bottom: {
+      position: "bottom",
+      attrs: {
+        circle: {
+          r: 4,
+          magnet: true,
+          stroke: "#2D8CF0",
+          strokeWidth: 2,
+          fill: "#fff",
+        },
+      },
+    },
+    left: {
+      position: "left",
+      attrs: {
+        circle: {
+          r: 4,
+          magnet: true,
+          stroke: "#2D8CF0",
+          strokeWidth: 2,
+          fill: "#fff",
+        },
+      },
+    },
+    right: {
+      position: "right",
+      attrs: {
+        circle: {
+          r: 4,
+          magnet: true,
+          stroke: "#2D8CF0",
+          strokeWidth: 2,
+          fill: "#fff",
+        },
+      },
+    },
+  },
+  items: [
+    {
+      id: "port1",
+      group: "top",
+    },
+    {
+      id: "port2",
+      group: "bottom",
+    },
+    {
+      id: "port3",
+      group: "left",
+    },
+    {
+      id: "port4",
+      group: "right",
+    },
+  ],
+}
+
+// 注册自定义节点类型
+Graph.registerNode(
+  "custom-image",
+  {
+    inherit: "rect",
+    width: 60,
+    height: 60,
+    markup: [
+      {
+        tagName: "rect",
+        selector: "body",
+      },
+      {
+        tagName: "image",
+      },
+      {
+        tagName: "text",
+        selector: "label",
+      },
+    ],
+    attrs: {
+      body: {
+        rx: 0,
+        ry: 0,
+        stroke: "rgba(95,149,255,0.00)",
+        strokeWidth: 1,
+        fill: "rgba(95,149,255,0.00)",
+      },
+      image: {
+        width: 60,
+        height: 60,
+        refX: 0,
+        refY: 0,
+      },
+      label: {
+        refX: 0.5,
+        refY: 80,
+        textAnchor: "middle",
+        textVerticalAnchor: "bottom",
+        fontSize: 14,
+        fill: "#000",
+        textWrap: {
+          width: 120,
+          height: 40,
+          ellipsis: true,
+        },
+      },
+    },
+    ports: { ...ports },
+  },
+  true
+)
+
 export default {
   name: 'PublicTopology',
   data() {
@@ -58,6 +183,7 @@ export default {
       connection: null,
       isWebSocket: false,
       websock: null,
+      wsInitialized: false, // 防止重复初始化
     }
   },
   created() {
@@ -74,8 +200,11 @@ export default {
     })
   },
   beforeDestroy() {
+    console.log('Component beforeDestroy - closing WebSocket')
+    this.wsInitialized = false
     if (this.websock) {
       this.websock.close()
+      this.websock = null
     }
   },
   methods: {
@@ -176,12 +305,25 @@ export default {
     },
     
     initWebSocket() {
-      // 构建 WebSocket URL
-      // 自动从浏览器地址获取，支持开发和生产环境
+      // 防止重复初始化
+      if (this.wsInitialized) {
+        console.warn('WebSocket already initialized, skipping...')
+        return
+      }
+      
+      // 如果已有连接，先关闭
+      if (this.websock) {
+        console.log('Closing existing WebSocket connection...')
+        this.websock.close()
+        this.websock = null
+      }
+      
+      this.wsInitialized = true
+      
+      // 构建 WebSocket URL - 使用统一的 /ws/public 路径（共享）
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-      const host = window.location.host
-     // const wsUrl = `${protocol}//${host}/public/ws/${this.id}`
-      const wsUrl = `${protocol}//${host}/pb/ws/${this.id}`
+      const wsUrl = `${protocol}//${window.location.host}/ws/pub/${this.id}`
+      
       console.log('=== WebSocket Connection Debug ===')
       console.log('Environment:', process.env.NODE_ENV)
       console.log('Current location:', window.location.href)
@@ -243,6 +385,23 @@ export default {
       // 注意：这里的 nodes 和 edges 字段名称与后端返回的对应
       let nodes = JSON.parse(redata.nodes)
       let edges = JSON.parse(redata.edges)
+      
+      // 确��所有节点都有 shape 属性
+      nodes = nodes.map(node => {
+        if (!node.shape) {
+          node.shape = 'custom-image'
+        }
+        return node
+      })
+      
+      // 确保所有边都有 shape 属性
+      edges = edges.map(edge => {
+        if (!edge.shape) {
+          edge.shape = 'edge'
+        }
+        return edge
+      })
+      
       X6Data.cells = []
       X6Data.nodes = nodes
       X6Data.edges = edges
@@ -273,6 +432,23 @@ export default {
             // 注意：这里的 nodes 和 edges 字段名称与后端返回的对应
             let nodes = JSON.parse(res.data.items.nodes)
             let edges = JSON.parse(res.data.items.edges)
+            
+            // 确保所有节点都有 shape 属性
+            nodes = nodes.map(node => {
+              if (!node.shape) {
+                node.shape = 'custom-image'
+              }
+              return node
+            })
+            
+            // 确保所有边都有 shape 属性
+            edges = edges.map(edge => {
+              if (!edge.shape) {
+                edge.shape = 'edge'
+              }
+              return edge
+            })
+            
             let X6Data = {}
             X6Data.cells = []
             X6Data.nodes = nodes

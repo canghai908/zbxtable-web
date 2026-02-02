@@ -18,8 +18,8 @@
         <span slot="id" slot-scope="record">{{record.id}}</span>
         <div slot="topology" slot-scope="record">{{record.topology}}</div>
         <div slot="status" slot-scope="record">
-          <a-badge v-if="record.status == 1" status="success" text="已发布" />
-          <a-badge v-else-if="record.status == 0" status="error" text="未发布" />
+          <a-badge v-if="record.status == 1" status="success" text="已共享" />
+          <a-badge v-else-if="record.status == 0" status="default" text="未共享" />
           <a-badge v-else status="default" text="未知" />
         </div>
         <div slot="created_at" slot-scope="record">
@@ -27,11 +27,11 @@
         <div slot="updated_at" slot-scope="record">
           {{ new Date(+new Date(record.created_at) + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '') || '--' }}</div>
         <div slot="operation" slot-scope="record">
-          <a-button class="pd20 paddingleft0" type="link" size="small" v-if="record.status==0" @click="deployTopo(record)">发布</a-button>
-          <a-button class="pd20 paddingleft0" type="link" size="small" v-else @click="deployTopo(record)">撤回</a-button>
-          <a-button class="pd20 paddingleft0" type="link" size="small" v-if="record.status==1" @click="copyPublicLink(record)">
+          <a-button class="pd20 paddingleft0" type="link" size="small" v-if="record.status==0" @click="deployTopo(record)">共享</a-button>
+          <a-button class="pd20 paddingleft0" type="link" size="small" v-else @click="deployTopo(record)">取消共享</a-button>
+          <a-button class="pd20 paddingleft0" type="link" size="small" v-if="record.status==1" @click="copyShareLink(record)">
             <a-icon type="link" />
-            公开链接
+            共享链接
           </a-button>
           <a-button class="pd20 paddingleft0" type="link" size="small" @click="seeDetail(record)">编辑</a-button>
           <a-button class="pd20 paddingleft0" type="link" size="small" @click="showTopo(record)">预览</a-button>
@@ -136,12 +136,12 @@ export default {
     newPage() {
       this.$router.push("/topology/detail")
     },
-    copyPublicLink(record) {
-      const publicUrl = `${window.location.origin}/#/public/topology?id=${record.id}`
+    copyShareLink(record) {
+      const shareUrl = `${window.location.origin}/#/share/topology?id=${record.id}`
       
       // 复制到剪贴板
       const textarea = document.createElement('textarea')
-      textarea.value = publicUrl
+      textarea.value = shareUrl
       textarea.style.position = 'fixed'
       textarea.style.opacity = '0'
       document.body.appendChild(textarea)
@@ -154,7 +154,7 @@ export default {
         // 显示链接
         this.$info({
           title: '公开访问链接',
-          content: publicUrl,
+          content: shareUrl,
           okText: '关闭'
         })
       } catch (err) {
