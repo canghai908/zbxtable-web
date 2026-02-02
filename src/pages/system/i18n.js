@@ -55,9 +55,8 @@ module.exports = {
 			pingsec: '延迟',
 			item: '指标',
 			placeholder_enter_bandwidth_name: '请输入名称',
-			zabbix_server_version: 'Zabbix版本',
 			zbxtable_version: '前端版本',
-			buildinfo: '后端版本信息',
+			buildinfo: '后端版本',
 			cancel_btn: '取消',
 			save_btn: '保存',
 			init_btn: '初始化',
@@ -188,8 +187,6 @@ module.exports = {
 			item_out: 'outgoing network traffic item',
 			host_select: 'Host',
 			placeholder_enter_bandwidth_name: 'Name',
-
-			zabbix_server_version: 'Zabbix server version',
 			zbxtable_version: 'Zbxtable version',
 			buildinfo: 'build info',
 

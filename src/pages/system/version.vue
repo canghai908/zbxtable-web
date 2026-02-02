@@ -2,7 +2,6 @@
   <page-layout :noTitle="true">
     <a-card :headStyle="{background: '#FAFBFC'}" size="small">
       <a-descriptions bordered>
-        <a-descriptions-item :label="$t('zabbix_server_version')" :span="3">{{ ZabbixVersion }}</a-descriptions-item>
         <a-descriptions-item :label="$t('zbxtable_version')" :span="3">{{ UIVersion }}</a-descriptions-item>
         <a-descriptions-item :label="$t('buildinfo')">
           Version:{{ BackVersion }}
@@ -111,7 +110,6 @@ export default {
   },
   data() {
     return {
-      ZabbixVersion: "",
       UIVersion: "",
       BackVersion: "",
       GitHash: "",
@@ -148,10 +146,11 @@ export default {
   methods: {
     getversion() {
       baseVersion().then((resp) => {
-        this.ZabbixVersion = resp.data.data.items.zabbixVersion
-        this.BackVersion = resp.data.data.items.version
-        this.GitHash = resp.data.data.items.gitHash
-        this.BuildTime = resp.data.data.items.buildTime
+        // 适应后端统一返回格式：resp.data.data
+        const data = resp.data.data
+        this.BackVersion = data.version || ''
+        this.GitHash = data.gitHash || ''
+        this.BuildTime = data.buildTime || ''
       });
     },
     
@@ -162,15 +161,15 @@ export default {
         .then((resp) => {
           const data = resp.data.data
           this.updateInfo = {
-            current_version: data.current_version,
-            latest_version: data.latest_version,
-            has_update: data.has_update,
-            update_url: data.update_url
+            current_version: data.currentVersion,
+            latest_version: data.latestVersion,
+            has_update: data.hasUpdate,
+            update_url: data.updateUrl
           }
           this.updateChecked = true
           
-          if (data.has_update) {
-            this.$message.success('发现新版本：' + data.latest_version)
+          if (data.hasUpdate) {
+            this.$message.success('发现新版本：' + data.latestVersion)
           } else {
             this.$message.info('当前已是最新版本')
           }
@@ -208,9 +207,9 @@ export default {
         .then((resp) => {
           const data = resp.data.data
           
-          if (data.success && data.need_restart) {
+          if (data.success && data.needRestart) {
             this.updateMessage = '更新成功！系统即将重启...'
-            this.countdown = data.restart_delay || 3
+            this.countdown = data.restartDelay || 3
             
             // 开始倒计时
             this.countdownTimer = setInterval(() => {
