@@ -6,6 +6,10 @@
         <div class="topology-title">
           <a-icon type="apartment" class="title-icon" />
           <h1>{{ form.name || '拓扑预览' }}</h1>
+          <span v-if="form.updateTime" class="update-time">
+            <a-icon type="clock-circle" />
+            更新时间: {{ form.updateTime }}
+          </span>
           <a-badge 
             :status="isWebSocket ? 'processing' : 'default'" 
             :text="isWebSocket ? '实时更新中' : '未连接'"
@@ -44,7 +48,6 @@ import PageLayout from '@/layouts/PageLayout'
 import insertCss from 'insert-css'
 import '@antv/x6-vue-shape'
 import { Graph, Shape, DataUri } from '@antv/x6'
-import { startDragToGraph } from './Graph/methods.js'
 import { topologyDetail } from '@/services/admin'
 import { API_WS } from "@/services/api"
 
@@ -263,7 +266,8 @@ export default {
       // },
       form: {
         name: '',
-        gridType: 1
+        gridType: 1,
+        updateTime: '',
       },
       connection: null,
       isWebSocket: false,//判断是否链接成功！
@@ -430,6 +434,17 @@ export default {
     backToList() {
       this.$router.push("/topology/list")
     },
+    formatTime(timeStr) {
+      if (!timeStr) return ''
+      const date = new Date(timeStr)
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      const hours = String(date.getHours()).padStart(2, '0')
+      const minutes = String(date.getMinutes()).padStart(2, '0')
+      const seconds = String(date.getSeconds()).padStart(2, '0')
+      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+    },
     initWebSocket() { //初始化websocket
       //init topo
       this.tuopuDetail(this.id)
@@ -497,6 +512,7 @@ export default {
       this.X6Data = X6Data
       this.graph.fromJSON(this.X6Data)
       this.form.name = redata.topology
+      this.form.updateTime = redata.updated_at ? this.formatTime(redata.updated_at) : ''
       
       // 强制重绘以确保文本正确渲染
       this.$nextTick(() => {
@@ -545,6 +561,7 @@ export default {
             this.graph.fromJSON(this.X6Data)
             this.form.name = res.data.items.topology
             this.form.status = res.data.items.status
+            this.form.updateTime = res.data.items.updated_at ? this.formatTime(res.data.items.updated_at) : ''
             
             // 强制重绘以确保文本正确渲染，并重新居中和缩放
             this.$nextTick(() => {
@@ -598,6 +615,23 @@ export default {
     color: #fff;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     letter-spacing: 0.5px;
+  }
+  
+  .update-time {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 13px;
+    font-weight: 400;
+    padding: 4px 12px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    
+    .anticon {
+      font-size: 12px;
+    }
   }
   
   .status-badge {

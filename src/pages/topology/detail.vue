@@ -392,13 +392,6 @@ export default {
         })
       })
       
-      // 双击文字节点进行编辑
-      this.graph.on('node:dblclick', ({ node }) => {
-        if (node.shape === 'text-node' && !this.isReading) {
-          _that.editTextNode(node)
-        }
-      })
-      
       // 监听画布点击事件，用于添加文字节点
       this.graph.on('blank:click', ({ x, y }) => {
         if (_that.isAddingTextNode) {
@@ -476,54 +469,7 @@ export default {
       // 延迟选中节点
       this.$nextTick(() => {
         this.graph.select(textNode)
-        this.$message.success('文字节点已添加，双击可编辑内容')
-      })
-    },
-    
-    editTextNode(node) {
-      const currentText = node.attr('label/text') || '双击编辑文字'
-      
-      // 创建一个简单的输入对话框
-      let inputValue = currentText
-      
-      this.$confirm({
-        title: '编辑文字',
-        content: (h) => {
-          return h('a-textarea', {
-            props: {
-              rows: 4,
-              placeholder: '请输入文字内容',
-              defaultValue: currentText
-            },
-            on: {
-              input: (e) => {
-                inputValue = e.target.value
-              }
-            },
-            style: {
-              width: '100%'
-            }
-          })
-        },
-        okText: '确定',
-        cancelText: '取消',
-        onOk() {
-          if (inputValue && inputValue.trim()) {
-            node.attr('label/text', inputValue.trim())
-          }
-        },
-      })
-      
-      // 延迟聚焦到输入框
-      this.$nextTick(() => {
-        setTimeout(() => {
-          const textarea = document.querySelector('.ant-modal textarea')
-          if (textarea) {
-            textarea.value = currentText
-            textarea.focus()
-            textarea.select()
-          }
-        }, 100)
+        this.$message.success('文字节点已添加，点击节点可在右侧面板编辑')
       })
     },
     
@@ -532,9 +478,14 @@ export default {
     },
     
     deleteNode() {
-      const cell = this.graph.getSelectedCells()
-      this.graph.clearCells(cell)
-      this.type = 'grid'
+      const cells = this.graph.getSelectedCells()
+      if (cells && cells.length > 0) {
+        this.graph.removeCells(cells)
+        this.type = 'grid'
+        this.$message.success(`已删除 ${cells.length} 个元素`)
+      } else {
+        this.$message.warn('请先选中要删除的元素')
+      }
     },
     
     saveData() {

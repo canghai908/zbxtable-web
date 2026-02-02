@@ -21,6 +21,15 @@
       <div class="drawer_wrap">
         <!-- 文字节点设置 -->
         <a-form v-if="isTextNode" :model="drawerTextNode" :label-col="labelCol" :wrapper-col="wrapperCol">
+          <a-form-item label="文字内容">
+            <a-textarea 
+              v-model="drawerTextNode.text" 
+              :rows="4"
+              placeholder="请输入文字内容"
+              @change="handleTextChange"
+            />
+          </a-form-item>
+          
           <a-form-item label="字体大小">
             <a-slider 
               v-model="drawerTextNode.fontSize" 
@@ -58,10 +67,13 @@
                 color: drawerTextNode.fontColor,
                 padding: '10px',
                 border: '1px dashed #d9d9d9',
-                borderRadius: '4px'
+                borderRadius: '4px',
+                minHeight: '60px',
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word'
               }"
             >
-              {{ selectCell.attr('label/text') || '双击编辑文字' }}
+              {{ drawerTextNode.text || '请输入文字内容' }}
             </div>
           </a-form-item>
           
@@ -269,6 +281,7 @@ export default {
         HostID: undefined,
       },
       drawerTextNode: {
+        text: '',
         fontSize: 14,
         fontWeight: 'normal',
         fontColor: '#333333',
@@ -320,6 +333,7 @@ export default {
             
             if (this.isTextNode) {
               // 文字节点
+              this.drawerTextNode.text = val.attr('label/text') || ''
               this.drawerTextNode.fontSize = val.attr('label/fontSize') || 14
               this.drawerTextNode.fontWeight = val.attr('label/fontWeight') || 'normal'
               this.drawerTextNode.fontColor = val.attr('label/fill') || '#333333'
@@ -606,6 +620,11 @@ export default {
     }),
     
     // 文字节点样式控制
+    handleTextChange(e) {
+      const text = e.target.value
+      this.selectCell.attr('label/text', text)
+    },
+    
     handleFontSizeChange(value) {
       this.selectCell.attr('label/fontSize', value)
     },
