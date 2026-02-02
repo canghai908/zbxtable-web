@@ -124,10 +124,12 @@ export default {
         },
         scroller: {//拖动
           enabled: true,
-          pageVisible: false,
-          pageBreak: true,
+          pageVisible: true,
+          pageBreak: false,
           pannable: true,
           autoResize: true,
+          pageWidth: 3000, // 定义虚拟画布宽度
+          pageHeight: 2000, // 定义虚拟画布高度
         },
         // minimap: {//小地图
         //   enabled: true,
@@ -291,11 +293,20 @@ export default {
       this.X6Data = X6Data
       this.graph.fromJSON(this.X6Data)
       this.form.name = redata.topology
-      const container = document.getElementById('containerChart')
-      const ports = container.querySelectorAll(
-        '.x6-port-body'
-      )
-      this.showPorts(ports, false)
+      
+      // 强制重绘以确保文本正确渲染
+      this.$nextTick(() => {
+        this.graph.getNodes().forEach(node => {
+          node.attr('label/text', node.attr('label/text'))
+        })
+        const container = document.getElementById('containerChart')
+        const ports = container.querySelectorAll('.x6-port-body')
+        this.showPorts(ports, false)
+        // 保持居中和缩放，使用较大的padding确保文本不被裁剪
+        this.graph.centerContent()
+        this.graph.zoomToFit({ padding: 100, maxScale: 1 })
+      })
+      
       this.websock.send("success");
     },
     tuopuDetail() {
@@ -313,6 +324,16 @@ export default {
             this.graph.fromJSON(this.X6Data)
             this.form.name = res.data.items.topology
             this.form.status = res.data.items.status
+            
+            // 强制重绘以确保文本正确渲染，并重新居中和缩放
+            this.$nextTick(() => {
+              this.graph.getNodes().forEach(node => {
+                node.attr('label/text', node.attr('label/text'))
+              })
+              // 居中并自动缩放以适应画布，使用较大的padding确保文本不被裁剪
+              this.graph.centerContent()
+              this.graph.zoomToFit({ padding: 100, maxScale: 1 })
+            })
           }
         })
       }
@@ -331,5 +352,15 @@ export default {
   bottom: 20px;
   right: 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+.tuopu {
+  position: relative;
+  overflow: hidden;
+}
+// 防止节点文本被画布边界裁剪
+::v-deep #containerChart {
+  .x6-graph-scroller {
+    overflow: auto !important;
+  }
 }
 </style>

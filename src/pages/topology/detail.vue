@@ -1,96 +1,124 @@
 <template>
   <page-layout :noTitle="true">
-    <div class="tuopu" :style="`height: ${minHeight}px;`">
-      <div id="containerChart" :style="`height: ${minHeight}px;`"></div>
-      <!-- //<div id="minimapContainer" /> // minimap -->
-      <div class="mini-map-container" id="minimapContainer"></div>
-      <RightDrawer v-if="!isReading" class="right_drawer" :drawerType="type" :selectCell="selectCell" :form="form" :graph="graph" @deleteNode="deleteNode">
-      </RightDrawer>
-      <div class="operating">
-        <div class="btn-group">
-          <a-tooltip placement="bottom">
-            <template slot="title"> cloud </template>
-            <div class="btn btn-cloud" @mousedown="startDrag('cloud',$event)">
-              <img src="@/assets/img/cloud.png" alt="">
-            </div>
-          </a-tooltip>
-          <a-tooltip placement="bottom">
-            <template slot="title"> core </template>
-            <div class="btn btn-core" @mousedown="startDrag('core',$event)">
-              <img src="@/assets/img/core.png" alt="">
-            </div>
-          </a-tooltip>
-          <a-tooltip placement="bottom">
-            <template slot="title"> switch </template>
-            <div class="btn btn-switch" @mousedown="startDrag('switch',$event)">
-              <img src="@/assets/img/switch.png" alt="">
-            </div>
-          </a-tooltip>
-          <a-tooltip placement="bottom">
-            <template slot="title"> server </template>
-            <div class="btn btn-server" @mousedown="startDrag('server',$event)">
-              <img src="@/assets/img/server.png" alt="">
-            </div>
-          </a-tooltip>
-          <a-tooltip placement="bottom">
-            <template slot="title"> firewalld </template>
-            <div class="btn btn-firewalld" @mousedown="startDrag('firewalld',$event)">
-              <img src="@/assets/img/firewalld.png" alt="">
-            </div>
-          </a-tooltip>
+    <div class="topology-header">
+      <div class="header-row">
+        <div class="topology-info">
+          <h2>{{ isReading ? '查看拓扑' : (id ? '编辑拓扑' : '新建拓扑') }}</h2>
+          <a-input 
+            v-model="form.name" 
+            placeholder="请输入拓扑图名称" 
+            style="width: 300px;"
+            :disabled="isReading"
+          />
         </div>
-        <div class="btn-group">
-          <a-tooltip placement="bottom">
-            <template slot="title">连线</template>
-            <div :class="['btn', currentArrow === 1 ? 'currentArrow' : '']" @mousedown="changeEdgeType('normal')">
-              <a-icon type="arrow-up" class="arrow-up" />
-            </div>
-          </a-tooltip>
-          <!-- <a-tooltip placement="bottom">
-            <template slot="title"> 直角箭头 </template>
-            <div :class="['btn', currentArrow === 2 ? 'currentArrow' : '']"
-              @mousedown="changeEdgeType('manhattan')">
-              <a-icon type="enter"
-                class="arrow-enter" />
-            </div>
-          </a-tooltip>
-          <a-tooltip placement="bottom">
-            <template slot="title"> 双向箭头 </template>
-            <div :class="['btn', currentArrow === 3 ? 'currentArrow' : '']"
-              @mousedown="changeEdgeType()">
-              <a-icon type="swap" />
-            </div>
-          </a-tooltip> -->
-        </div>
-        <div class="btn-group">
-          <a-tooltip placement="bottom" v-if="isReading">
-            <template slot="title"> 编辑 </template>
-            <div class="btn" @mousedown="editNode()">
-              <a-icon type="edit" class="operate_icon" />
-            </div>
-          </a-tooltip>
-          <a-tooltip placement="bottom" v-else>
-            <div class="btn">
-              <a-popconfirm title="确定要删除吗?" ok-text="确定" cancel-text="取消" @confirm="deleteNode()" @cancel="cancel">
-                <template slot="title">删除</template>
-                <a-icon type="delete" class="operate_icon" />
-              </a-popconfirm>
-            </div>
-          </a-tooltip>
-          <a-tooltip placement="bottom">
-            <template slot="title"> 保存 </template>
-            <div class="btn" @mousedown="saveData()">
-              <a-icon type="save" class="operate_icon" />
-            </div>
-          </a-tooltip>
-          <a-tooltip placement="bottom">
-            <template slot="title"> 返回 </template>
-            <div class="btn" @mousedown="backToList()">
-              <a-icon type="rollback" class="operate_icon" />
-            </div>
-          </a-tooltip>
+        <div class="topology-actions">
+          <a-button v-if="isReading" type="primary" @click="editNode">
+            <a-icon type="edit" /> 编辑
+          </a-button>
+          <a-button v-else type="primary" @click="saveData">
+            <a-icon type="save" /> 保存
+          </a-button>
+          <a-button @click="backToList">
+            <a-icon type="rollback" /> 返回
+          </a-button>
         </div>
       </div>
+      
+      <!-- 工具栏 - 横向布局 -->
+      <div class="toolbar-container" v-if="!isReading">
+        <div class="toolbar-section">
+          <div class="section-label">节点工具</div>
+          <div class="tool-buttons">
+            <a-tooltip placement="bottom">
+              <template slot="title">云服务</template>
+              <div class="tool-btn" @mousedown="startDrag('cloud',$event)">
+                <img src="@/assets/img/cloud.png" alt="云服务">
+                <span>云</span>
+              </div>
+            </a-tooltip>
+            <a-tooltip placement="bottom">
+              <template slot="title">核心设备</template>
+              <div class="tool-btn" @mousedown="startDrag('core',$event)">
+                <img src="@/assets/img/core.png" alt="核心">
+                <span>核心</span>
+              </div>
+            </a-tooltip>
+            <a-tooltip placement="bottom">
+              <template slot="title">交换机</template>
+              <div class="tool-btn" @mousedown="startDrag('switch',$event)">
+                <img src="@/assets/img/switch.png" alt="交换机">
+                <span>交换机</span>
+              </div>
+            </a-tooltip>
+            <a-tooltip placement="bottom">
+              <template slot="title">服务器</template>
+              <div class="tool-btn" @mousedown="startDrag('server',$event)">
+                <img src="@/assets/img/server.png" alt="服务器">
+                <span>服务器</span>
+              </div>
+            </a-tooltip>
+            <a-tooltip placement="bottom">
+              <template slot="title">防火墙</template>
+              <div class="tool-btn" @mousedown="startDrag('firewalld',$event)">
+                <img src="@/assets/img/firewalld.png" alt="防火墙">
+                <span>防火墙</span>
+              </div>
+            </a-tooltip>
+          </div>
+        </div>
+        
+        <div class="toolbar-divider"></div>
+        
+        <div class="toolbar-section">
+          <div class="section-label">连线工具</div>
+          <div class="tool-buttons">
+            <a-tooltip placement="bottom">
+              <template slot="title">连线</template>
+              <div :class="['tool-btn', currentArrow === 1 ? 'active' : '']" @click="changeEdgeType('normal')">
+                <a-icon type="arrow-up" class="arrow-icon" />
+                <span>连线</span>
+              </div>
+            </a-tooltip>
+          </div>
+        </div>
+        
+        <div class="toolbar-divider"></div>
+        
+        <div class="toolbar-section">
+          <div class="section-label">操作</div>
+          <div class="tool-buttons">
+            <a-tooltip placement="bottom">
+              <template slot="title">删除选中</template>
+              <a-popconfirm 
+                title="确定要删除选中的元素吗?" 
+                ok-text="确定" 
+                cancel-text="取消" 
+                @confirm="deleteNode()"
+              >
+                <div class="tool-btn">
+                  <a-icon type="delete" class="icon-large" />
+                  <span>删除</span>
+                </div>
+              </a-popconfirm>
+            </a-tooltip>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tuopu" :style="`height: ${minHeight}px;`">
+      <div id="containerChart" :style="`height: ${minHeight}px;`"></div>
+      <div class="mini-map-container" id="minimapContainer"></div>
+      
+      <RightDrawer 
+        v-if="!isReading && type !== 'grid'" 
+        class="right_drawer" 
+        :drawerType="type" 
+        :selectCell="selectCell" 
+        :form="form" 
+        :graph="graph" 
+        @deleteNode="deleteNode"
+      />
     </div>
   </page-layout>
 </template>
@@ -103,9 +131,7 @@ import '@antv/x6-vue-shape'
 import { Graph, Shape, FunctionExt } from '@antv/x6'
 import { startDragToGraph } from './Graph/methods.js'
 import { createTopology, topologyDetail, updateTopology } from '@/services/admin'
-// updateTopology
-// import { x6Data } from './save.js'
-// const data = {}
+
 export default {
   name: 'tuopu',
   components: {
@@ -114,22 +140,16 @@ export default {
   },
   data() {
     return {
-      isReading: true,
+      isReading: false, // 默认为编辑模式
       id: '',
       title: "核心拓扑",
-      minHeight: window.innerHeight - 64 - 140,
+      minHeight: window.innerHeight - 64 - 80,
       graph: '',
       type: 'grid',
       selectCell: null,
-      connectEdgeType: {  //连线方式
-        router: {
-          name: ''
-        }
+      connectEdgeType: {
+        router: { name: '' }
       },
-      // backgroundOptions: {
-      //   color: 'rgb(41, 50, 54)',
-      //   opacity: '1'
-      // },
       sourceMarker: {
         name: 'path',
         size: 12,
@@ -140,13 +160,13 @@ export default {
       },
       X6Data: {},
       currentArrow: 1,
-      grid: { // 网格设置
-        size: 10,      // 网格大小 10px
-        visible: true, // 渲染网格背景
+      grid: {
+        size: 10,
+        visible: true,
         type: 'mesh',
         args: {
           color: '#D0D0D0',
-          thickness: 1, // 网格线宽度/网格点大小
+          thickness: 1,
           factor: 10
         }
       },
@@ -159,8 +179,13 @@ export default {
   },
   created() {
     this.id = this.$route.query.id || ""
-    this.tuopuDetail()
-    this.$route.query.id ? this.isReading = true : this.isReading = false
+    // 如果有ID，则为查看模式；否则为编辑模式
+    if (this.$route.query.id) {
+      this.isReading = true
+      this.tuopuDetail()
+    } else {
+      this.isReading = false
+    }
   },
   mounted() {
     this.$nextTick(() => {
@@ -177,31 +202,26 @@ export default {
         height: '100%',
         background: _that.backgroundOptions,
         grid: _that.grid,
-        resizing: { // 调整节点宽高
+        resizing: {
           enabled: true,
           orthogonal: false
         },
         clipboard: {
           enabled: true,
         },
-        keyboard: {//键盘
+        keyboard: {
           enabled: true,
           global: true,
         },
-        scroller: {//拖动
+        scroller: {
           enabled: true,
-          pageVisible: false,
-          pageBreak: true,
-          pannable: true
+          pageVisible: true,
+          pageBreak: false,
+          pannable: true,
+          pageWidth: 3000, // 定义虚拟画布宽度
+          pageHeight: 2000, // 定义虚拟画布高度
         },
-        // minimap: {//小地图
-        //   enabled: true,
-        //   width: 200,
-        //   height: 160,
-        //   padding: 10,
-        //   container: minimapContainer
-        // },
-        selecting: {//允许选定
+        selecting: {
           enabled: true,
           showNodeSelectionBox: true,
         },
@@ -220,6 +240,7 @@ export default {
             return new Shape.Edge({
               attrs: {
                 line: {
+                  ZID: '',
                   HostType: '',
                   HostValue: '',
                   HostName: '',
@@ -256,6 +277,7 @@ export default {
           }
         }
       })
+      
       insertCss(`
         @keyframes ant-line {
           to {
@@ -263,11 +285,12 @@ export default {
           }
         }
       `)
-      // this.graph.fromJSON(this.X6Data)
+      
       this.graph.history.redo()
       this.graph.history.undo()
       this.graph.enablePanning()
       this.graph.enableMouseWheel()
+      
       this.graph.bindKey('ctrl+c', () => {
         const cells = this.graph.getSelectedCells()
         if (cells.length) {
@@ -275,6 +298,7 @@ export default {
         }
         return false
       })
+      
       this.graph.bindKey('ctrl+v', () => {
         if (!this.graph.isClipboardEmpty()) {
           const cells = this.graph.paste({ offset: 32 })
@@ -283,46 +307,43 @@ export default {
         }
         return false
       })
-      // 鼠标移入移出节点
+      
       this.graph.on('node:mouseenter', FunctionExt.debounce(() => {
         const container = document.getElementById('containerChart')
-        const ports = container.querySelectorAll(
-          '.x6-port-body'
-        )
+        const ports = container.querySelectorAll('.x6-port-body')
         this.showPorts(ports, true)
       }), 500)
+      
       this.graph.on('node:mouseleave', () => {
         const container = document.getElementById('containerChart')
-        const ports = container.querySelectorAll(
-          '.x6-port-body'
-        )
+        const ports = container.querySelectorAll('.x6-port-body')
         this.showPorts(ports, false)
       })
+      
       this.graph.on('blank:click', () => {
         this.type = 'grid'
       })
+      
       this.graph.on('cell:click', ({ cell }) => {
         this.type = cell.isNode() ? 'node' : 'edge'
       })
+      
       this.graph.on('selection:changed', (args) => {
         args.added.forEach(cell => {
           this.selectCell = cell
-          if (cell.isEdge()) {
-            cell.isEdge()
-
-          }
         })
         args.removed.forEach(cell => {
-          cell.isEdge()
           cell.removeTools()
         })
       })
     },
+    
     showPorts(ports, show) {
       for (let i = 0, len = ports.length; i < len; i = i + 1) {
         ports[i].style.visibility = show ? 'visible' : 'hidden'
       }
     },
+    
     startDrag(type, e) {
       if (this.isReading) {
         this.$message.warn('阅读模式不可编辑')
@@ -330,6 +351,7 @@ export default {
         startDragToGraph(this.graph, type, e)
       }
     },
+    
     changeEdgeType(e) {
       if (e == 'normal') {
         this.sourceMarker.name = 'path'
@@ -338,41 +360,40 @@ export default {
           router: { name: '' }
         }
         this.currentArrow = 1
-      } else if (e == 'manhattan') {
-        this.sourceMarker.name = ''
-        this.connectEdgeType = {
-          connector: 'normal',
-          router: { name: 'manhattan' }
-        }
-        this.currentArrow = 2
-      } else {
-        this.sourceMarker.name = 'classic'
-        this.currentArrow = 3
       }
     },
+    
     editNode() {
       this.isReading = false
     },
+    
     deleteNode() {
       const cell = this.graph.getSelectedCells()
       this.graph.clearCells(cell)
       this.type = 'grid'
     },
-    cancle() {
-    },
+    
     saveData() {
+      if (!this.form.name) {
+        this.$message.warn('请输入拓扑图名称')
+        return
+      }
+      
       this.$nextTick(() => {
         const getJson = this.graph.toJSON()
         this.handelData(getJson)
       })
     },
+    
     backToList() {
       this.$router.push("/topology/list")
     },
+    
     handelData(data) {
       const dataJson = data.cells
       const edges = []
       const nodes = []
+      
       dataJson.forEach((item) => {
         if (item.attrs.line) {
           edges.push(item)
@@ -381,13 +402,14 @@ export default {
           nodes.push(item)
         }
       })
-      // console.log('dataJson', dataJson)
+      
       let params = JSON.stringify({
         edges: JSON.stringify(edges),
         nodes: JSON.stringify(nodes),
         topology: this.form.name,
         status: this.form.status,
       })
+      
       if (this.id) {
         updateTopology(this.id, params).then((resp) => {
           let res = resp.data
@@ -402,11 +424,16 @@ export default {
           if (res.code == 200) {
             this.$message.success(res.message)
             this.isReading = true
+            // 创建成功后，获取ID并更新路由
+            if (res.data && res.data.id) {
+              this.id = res.data.id
+              this.$router.replace({ query: { id: this.id } })
+            }
           }
         })
       }
     },
-    // 获取拓扑图详情
+    
     tuopuDetail() {
       if (this.id) {
         topologyDetail(this.id).then((resp) => {
@@ -422,6 +449,16 @@ export default {
             this.graph.fromJSON(this.X6Data)
             this.form.name = res.data.items.topology
             this.form.status = res.data.items.status
+            
+            // 强制重绘以确保文本正确渲染，并重新居中和缩放
+            this.$nextTick(() => {
+              this.graph.getNodes().forEach(node => {
+                node.attr('label/text', node.attr('label/text'))
+              })
+              // 居中并自动缩放以适应画布，使用较大的padding确保文本不被裁剪
+              this.graph.centerContent()
+              this.graph.zoomToFit({ padding: 100, maxScale: 1 })
+            })
           }
         })
       }
@@ -431,14 +468,199 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.tuopu_bg {
-  width: 708px;
+.topology-header {
+  background: #fff;
+  border-bottom: 1px solid #e8e8e8;
+  padding: 0;
 }
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+}
+
+.topology-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  
+  h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+  }
+}
+
+.topology-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.toolbar-container {
+  display: flex;
+  align-items: center;
+  padding: 16px 24px;
+  background: linear-gradient(to bottom, #fafafa 0%, #f5f5f5 100%);
+  border-top: 1px solid #e8e8e8;
+  gap: 24px;
+}
+
+.toolbar-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-label {
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
+  white-space: nowrap;
+  padding-right: 8px;
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2px;
+    height: 16px;
+    background: #d9d9d9;
+  }
+}
+
+.tool-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.tool-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #fff;
+  border: 2px solid #e8e8e8;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(24, 144, 255, 0.1) 0%, rgba(24, 144, 255, 0) 100%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  
+  &:hover {
+    border-color: #1890ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+    
+    &::before {
+      opacity: 1;
+    }
+    
+    span {
+      color: #1890ff;
+    }
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  img {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 4px;
+    position: relative;
+    z-index: 1;
+  }
+  
+  span {
+    font-size: 12px;
+    color: #666;
+    transition: color 0.3s;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .arrow-icon {
+    font-size: 24px;
+    margin-bottom: 4px;
+    transform: rotate(45deg);
+    position: relative;
+    z-index: 1;
+  }
+  
+  .icon-large {
+    font-size: 24px;
+    margin-bottom: 4px;
+    position: relative;
+    z-index: 1;
+  }
+  
+  &.active {
+    background: linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%);
+    border-color: #1890ff;
+    box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
+    
+    span {
+      color: #1890ff;
+      font-weight: 500;
+    }
+  }
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 48px;
+  background: linear-gradient(to bottom, transparent 0%, #d9d9d9 20%, #d9d9d9 80%, transparent 100%);
+}
+
+.tuopu {
+  position: relative;
+  background: #f5f5f5;
+}
+
+// 防止节点文本被画布边界裁剪
+::v-deep #containerChart {
+  .x6-graph-scroller {
+    overflow: auto !important;
+  }
+}
+
 .mini-map-container {
   position: fixed;
   z-index: 999;
   bottom: 20px;
   right: 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.right_drawer {
+  position: fixed;
+  right: 0;
+  top: 144px;
+  width: 320px;
+  height: calc(100vh - 144px);
+  background: #fff;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
 }
 </style>

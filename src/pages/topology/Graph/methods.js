@@ -46,6 +46,11 @@ Graph.registerNode(
         textVerticalAnchor: "bottom",
         fontSize: 14,
         fill: "#000",
+        textWrap: {
+          width: 120,
+          height: 40,
+          ellipsis: true,
+        },
       },
     },
     ports: { ...ports },
