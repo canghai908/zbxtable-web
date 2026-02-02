@@ -33,6 +33,7 @@ import {
 	REPORT,
 	ZABBIX,
 	METRIC_MAPPING,
+	SYSTEM_UPDATE,
 } from '@/services/api'
 import { request, METHOD } from '@/utils/request'
 // import { INDEX_VERSION, INVENTORY_EXPORT, REPORT } from "./api";
@@ -323,6 +324,20 @@ export async function metricMappingExecute(id) {
 export async function metricMappingHistory(params) {
 	return request(METRIC_MAPPING + '/history', METHOD.GET, params)
 }
+
+// 系统更新相关 API
+export async function systemVersion() {
+	return request(SYSTEM_UPDATE + '/version', METHOD.GET)
+}
+
+export async function systemCheckUpdate() {
+	return request(SYSTEM_UPDATE + '/check-update', METHOD.GET)
+}
+
+export async function systemDoUpdate() {
+	return request(SYSTEM_UPDATE + '/update', METHOD.POST)
+}
+
 export default {
 	hostList,
 	hostDetail,
@@ -407,4 +422,7 @@ export default {
 	metricMappingDelete,
 	metricMappingExecute,
 	metricMappingHistory,
+	systemVersion,
+	systemCheckUpdate,
+	systemDoUpdate,
 }

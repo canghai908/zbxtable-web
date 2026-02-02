@@ -43,4 +43,5 @@ module.exports = {
 	API_WS: '/ws',
 	ZABBIX: '/v1/zabbix',
 	METRIC_MAPPING: '/v1/metric_mapping',
+	SYSTEM_UPDATE: '/v1/system',
 }
