@@ -228,8 +228,8 @@ export default {
       form: {
         name: '',
         updateTime: '',
-        canvasWidth: 3000,
-        canvasHeight: 2000,
+        canvasWidth: 1920,
+        canvasHeight: 1080,
       },
       connection: null,
       isWebSocket: false,
@@ -281,11 +281,12 @@ export default {
           enabled: false, // 禁用 scroller，避免出现滚动条
         },
         selecting: {
-          enabled: true,
-          showNodeSelectionBox: true,
+          enabled: false, // 禁用选择
+          showNodeSelectionBox: false,
         },
         snapline: true,
         interacting: {
+          nodeMovable: false, // 禁止移动节点
           edgeLabelMovable: false,
           vertexMovable: false,
           edgeMovable: false

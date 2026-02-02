@@ -367,8 +367,8 @@ export default {
         gridType: 1,
         status: '',
         backgroundImage: '',
-        canvasWidth: 3000,
-        canvasHeight: 2000,
+        canvasWidth: 1920,
+        canvasHeight: 1080,
       },
       isAddingTextNode: false, // 标记是否正在添加文字节点
       backgroundModalVisible: false, // 背景图设置弹窗
@@ -378,10 +378,10 @@ export default {
       backgroundRepeat: 'no-repeat', // 背景重复
       backgroundOpacity: 100, // 背景透明度
       imageNaturalSize: { width: 0, height: 0 }, // 图片原始尺寸
-      canvasSizePreset: '3000x2000', // 画布尺寸预设
+      canvasSizePreset: '1920x1080', // 画布尺寸预设
       canvasSizeModalVisible: false, // 自定义画布尺寸弹窗
-      customCanvasWidth: 3000,
-      customCanvasHeight: 2000
+      customCanvasWidth: 1920,
+      customCanvasHeight: 1080
     }
   },
   created() {
@@ -455,6 +455,8 @@ export default {
                   FlowID: '',
                   TriggerDesc: '',
                   TriggerID: '',
+                  stroke: '#FF6B00', // 橙色，在背景图上更明显
+                  strokeWidth: 3, // 加粗线条
                   sourceMarker: _that.sourceMarker,
                   targetMarker: _that.sourceMarker,
                 }
@@ -936,9 +938,6 @@ export default {
         this.$message.warn('请输入拓扑图名称')
         return
       }
-      
-      console.log('保存时的 ID:', this.id)
-      console.log('路由参数 ID:', this.$route.query.id)
       
       this.$nextTick(() => {
         const getJson = this.graph.toJSON()

@@ -268,8 +268,8 @@ export default {
         name: '',
         gridType: 1,
         updateTime: '',
-        canvasWidth: 3000,
-        canvasHeight: 2000,
+        canvasWidth: 1920,
+        canvasHeight: 1080,
       },
       connection: null,
       isWebSocket: false,//判断是否链接成功！
@@ -317,11 +317,12 @@ export default {
         //   container: minimapContainer
         // },
         selecting: {//允许选定
-          enabled: true,
-          showNodeSelectionBox: true,
+          enabled: false, // 禁用选择
+          showNodeSelectionBox: false,
         },
         snapline: true,
         interacting: {
+          nodeMovable: false, // 禁止移动节点
           edgeLabelMovable: false,
           vertexMovable: false,
           edgeMovable: false
@@ -343,6 +344,8 @@ export default {
                   FlowID: '',
                   TriggerDesc: '',
                   TriggerID: '',
+                  stroke: '#FF6B00', // 橙色，在背景图上更明显
+                  strokeWidth: 3, // 加粗线条
                   sourceMarker: _that.sourceMarker,
                   targetMarker: _that.sourceMarker,
                 }
