@@ -5,7 +5,7 @@
       <div class="header-content">
         <div class="topology-title">
           <a-icon type="apartment" class="title-icon" />
-          <h1>{{ form.name || '拓扑预览' }}</h1>
+          <h1>共享拓扑{{ form.name ? ' - ' + form.name : '' }}</h1>
           <a-badge :status="isWebSocket ? 'processing' : 'default'" :text="isWebSocket ? '实时更新中' : '未连接'" class="status-badge" />
         </div>
         <div class="header-actions">

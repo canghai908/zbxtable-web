@@ -8,7 +8,7 @@ const routesConfig = [
   {
     router: 'topologyShare',
     path: '/share/topology',
-    name: '公开拓扑'
+    name: '共享拓扑'
   },
   'root',
   {
