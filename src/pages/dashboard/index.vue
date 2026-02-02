@@ -280,7 +280,7 @@ export default {
         .then((resp) => {
           let res = resp.data
           console.log(res)
-          let arr = res.data.top_list || []
+          let arr = res.data || []
           arr.sort((a, b) => {
             return b.score - a.score
           })
@@ -292,7 +292,7 @@ export default {
       indexRestop({ host_type: 'VM_WIN', metrics_type: 'MEM', top_num: '5' })
         .then((resp) => {
           let res = resp.data
-          let arr = res.data.top_list || []
+          let arr = res.data || []
           arr.sort((a, b) => {
             return b.score - a.score
           })
@@ -304,7 +304,7 @@ export default {
       indexRestop({ host_type: 'VM_LIN', metrics_type: 'CPU', top_num: '5' })
         .then((resp) => {
           let res = resp.data
-          let arr = res.data.top_list || []
+          let arr = res.data || []
           arr.sort((a, b) => {
             return b.score - a.score
           })
@@ -316,7 +316,7 @@ export default {
       indexRestop({ host_type: 'VM_LIN', metrics_type: 'MEM', top_num: '5' })
         .then((resp) => {
           let res = resp.data
-          let arr = res.data.top_list || []
+          let arr = res.data || []
           arr.sort((a, b) => {
             return b.score - a.score
           })

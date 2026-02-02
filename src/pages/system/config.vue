@@ -16,7 +16,7 @@
                 <div class="config-hint">{{ item.comment }}</div>
               </a-form-model-item>
               <a-form-model-item :wrapper-col="{ span: 14, offset: 6 }">
-                <a-button type="primary" @click="saveCategory('system')" :loading="saveLoading">保存系统配置</a-button>
+                <a-button type="primary" @click="saveCategory('system')" :loading="saveLoading">保存</a-button>
               </a-form-model-item>
             </a-form-model>
           </a-tab-pane>
@@ -35,7 +35,7 @@
                 <div class="config-hint">{{ item.comment }}</div>
               </a-form-model-item>
               <a-form-model-item :wrapper-col="{ span: 14, offset: 6 }">
-                <a-button type="primary" @click="saveCategory('email')" :loading="saveLoading">保存邮件配置</a-button>
+                <a-button type="primary" @click="saveCategory('email')" :loading="saveLoading">保存</a-button>
               </a-form-model-item>
             </a-form-model>
           </a-tab-pane>
@@ -54,7 +54,7 @@
                 <div class="config-hint">{{ item.comment }}</div>
               </a-form-model-item>
               <a-form-model-item :wrapper-col="{ span: 14, offset: 6 }">
-                <a-button type="primary" @click="saveCategory('wechat')" :loading="saveLoading">保存企业微信配置</a-button>
+                <a-button type="primary" @click="saveCategory('wechat')" :loading="saveLoading">保存</a-button>
               </a-form-model-item>
             </a-form-model>
           </a-tab-pane>
@@ -72,7 +72,7 @@
                 <div class="config-hint">{{ item.comment }}</div>
               </a-form-model-item>
               <a-form-model-item :wrapper-col="{ span: 14, offset: 6 }">
-                <a-button type="primary" @click="saveCategory('ollama')" :loading="saveLoading">保存 Ollama 配置</a-button>
+                <a-button type="primary" @click="saveCategory('ollama')" :loading="saveLoading">保存</a-button>
               </a-form-model-item>
             </a-form-model>
           </a-tab-pane>
