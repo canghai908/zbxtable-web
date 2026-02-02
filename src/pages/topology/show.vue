@@ -1,31 +1,40 @@
 <template>
   <page-layout :noTitle="true">
-    <div class="tuopu" :style="`height: ${minHeight}px;`">
-      <div id="containerChart" :style="`height: ${minHeight}px;`"></div>
-      <div class="mini-map-container" id="minimapContainer">
+    <!-- 顶部标题栏 -->
+    <div class="topology-header">
+      <div class="header-content">
+        <div class="topology-title">
+          <a-icon type="apartment" class="title-icon" />
+          <h1>{{ form.name || '拓扑预览' }}</h1>
+          <a-badge 
+            :status="isWebSocket ? 'processing' : 'default'" 
+            :text="isWebSocket ? '实时更新中' : '未连接'"
+            class="status-badge"
+          />
       </div>
-      <div class="operating">
-        <div class="btn-group">
-          <a-tooltip placement="bottom" v-if="isReading">
-            <template slot="title">导出PNG</template>
-            <div class="btn" @mousedown="saveToPNG()">
-              <a-icon type="file-image" class="operate_icon" />
-            </div>
-          </a-tooltip>
-          <a-tooltip placement="bottom">
-            <template slot="title">导出SVG</template>
-            <div class="btn" @mousedown="saveToSVG()">
-              <a-icon type="save" class="operate_icon" />
-            </div>
-          </a-tooltip>
-          <a-tooltip placement="bottom">
-            <template slot="title"> 返回 </template>
-            <div class="btn" @mousedown="backToList()">
-              <a-icon type="rollback" class="operate_icon" />
-            </div>
-          </a-tooltip>
+        <div class="header-actions">
+          <a-button-group>
+            <a-button @click="saveToPNG()">
+              <a-icon type="file-image" />
+              导出PNG
+            </a-button>
+            <a-button @click="saveToSVG()">
+              <a-icon type="save" />
+              导出SVG
+            </a-button>
+          </a-button-group>
+          <a-button @click="backToList()" style="margin-left: 12px;">
+            <a-icon type="rollback" />
+            返回列表
+          </a-button>
         </div>
       </div>
+    </div>
+
+    <!-- 画布区域 -->
+    <div class="tuopu" :style="`height: ${canvasHeight}px;`">
+      <div id="containerChart" :style="`height: ${canvasHeight}px;`"></div>
+      <div class="mini-map-container" id="minimapContainer"></div>
     </div>
   </page-layout>
 </template>
@@ -50,6 +59,7 @@ export default {
       id: '',
       title: "核心拓扑",
       minHeight: window.innerHeight,
+      canvasHeight: window.innerHeight - 80, // 减去标题栏高度
       graph: '',
       type: 'grid',
       selectCell: null,
@@ -299,9 +309,9 @@ export default {
         this.graph.getNodes().forEach(node => {
           node.attr('label/text', node.attr('label/text'))
         })
-        const container = document.getElementById('containerChart')
+      const container = document.getElementById('containerChart')
         const ports = container.querySelectorAll('.x6-port-body')
-        this.showPorts(ports, false)
+      this.showPorts(ports, false)
         // 保持居中和缩放，使用较大的padding确保文本不被裁剪
         this.graph.centerContent()
         this.graph.zoomToFit({ padding: 100, maxScale: 1 })
@@ -343,24 +353,118 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.tuopu_bg {
-  width: 708px;
+// 顶部标题栏
+.topology-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  position: relative;
+  z-index: 100;
 }
-.mini-map-container {
-  position: fixed;
-  z-index: 999;
-  bottom: 20px;
-  right: 20px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 32px;
+  max-width: 100%;
 }
+
+.topology-title {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  
+  .title-icon {
+    font-size: 32px;
+    color: #fff;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  }
+  
+  h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    letter-spacing: 0.5px;
+  }
+  
+  .status-badge {
+    ::v-deep .ant-badge-status-text {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 13px;
+      font-weight: 500;
+    }
+    
+    ::v-deep .ant-badge-status-dot {
+      width: 8px;
+      height: 8px;
+}
+  }
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  
+  .ant-btn {
+    height: 36px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+  }
+}
+
+// 画布区域
 .tuopu {
   position: relative;
   overflow: hidden;
+  background: linear-gradient(to bottom, #f8f9fa 0%, #e9ecef 100%);
 }
+
 // 防止节点文本被画布边界裁剪
 ::v-deep #containerChart {
   .x6-graph-scroller {
     overflow: auto !important;
   }
+  
+  // 美化滚动条
+  .x6-graph-scroller::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  
+  .x6-graph-scroller::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 5px;
+  }
+  
+  .x6-graph-scroller::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    transition: background 0.3s;
+    
+    &:hover {
+      background: rgba(0, 0, 0, 0.3);
+    }
+  }
+}
+
+// 小地图容器
+.mini-map-container {
+  position: fixed;
+  z-index: 999;
+  bottom: 24px;
+  right: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.8);
 }
 </style>

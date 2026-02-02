@@ -29,41 +29,41 @@
         <div class="toolbar-section">
           <div class="section-label">节点工具</div>
           <div class="tool-buttons">
-            <a-tooltip placement="bottom">
+          <a-tooltip placement="bottom">
               <template slot="title">云服务</template>
               <div class="tool-btn" @mousedown="startDrag('cloud',$event)">
                 <img src="@/assets/img/cloud.png" alt="云服务">
                 <span>云</span>
-              </div>
-            </a-tooltip>
-            <a-tooltip placement="bottom">
+            </div>
+          </a-tooltip>
+          <a-tooltip placement="bottom">
               <template slot="title">核心设备</template>
               <div class="tool-btn" @mousedown="startDrag('core',$event)">
                 <img src="@/assets/img/core.png" alt="核心">
                 <span>核心</span>
-              </div>
-            </a-tooltip>
-            <a-tooltip placement="bottom">
+            </div>
+          </a-tooltip>
+          <a-tooltip placement="bottom">
               <template slot="title">交换机</template>
               <div class="tool-btn" @mousedown="startDrag('switch',$event)">
                 <img src="@/assets/img/switch.png" alt="交换机">
                 <span>交换机</span>
-              </div>
-            </a-tooltip>
-            <a-tooltip placement="bottom">
+            </div>
+          </a-tooltip>
+          <a-tooltip placement="bottom">
               <template slot="title">服务器</template>
               <div class="tool-btn" @mousedown="startDrag('server',$event)">
                 <img src="@/assets/img/server.png" alt="服务器">
                 <span>服务器</span>
-              </div>
-            </a-tooltip>
-            <a-tooltip placement="bottom">
+            </div>
+          </a-tooltip>
+          <a-tooltip placement="bottom">
               <template slot="title">防火墙</template>
               <div class="tool-btn" @mousedown="startDrag('firewalld',$event)">
                 <img src="@/assets/img/firewalld.png" alt="防火墙">
                 <span>防火墙</span>
-              </div>
-            </a-tooltip>
+            </div>
+          </a-tooltip>
           </div>
         </div>
         
@@ -72,14 +72,14 @@
         <div class="toolbar-section">
           <div class="section-label">连线工具</div>
           <div class="tool-buttons">
-            <a-tooltip placement="bottom">
-              <template slot="title">连线</template>
+          <a-tooltip placement="bottom">
+            <template slot="title">连线</template>
               <div :class="['tool-btn', currentArrow === 1 ? 'active' : '']" @click="changeEdgeType('normal')">
                 <a-icon type="arrow-up" class="arrow-icon" />
                 <span>连线</span>
-              </div>
-            </a-tooltip>
-          </div>
+            </div>
+          </a-tooltip>
+            </div>
         </div>
         
         <div class="toolbar-divider"></div>
@@ -98,10 +98,10 @@
                 <div class="tool-btn">
                   <a-icon type="delete" class="icon-large" />
                   <span>删除</span>
-                </div>
+            </div>
               </a-popconfirm>
-            </a-tooltip>
-          </div>
+          </a-tooltip>
+            </div>
         </div>
       </div>
     </div>
@@ -182,7 +182,7 @@ export default {
     // 如果有ID，则为查看模式；否则为编辑模式
     if (this.$route.query.id) {
       this.isReading = true
-      this.tuopuDetail()
+    this.tuopuDetail()
     } else {
       this.isReading = false
     }
@@ -623,7 +623,7 @@ export default {
     span {
       color: #1890ff;
       font-weight: 500;
-    }
+}
   }
 }
 
