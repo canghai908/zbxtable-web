@@ -70,16 +70,16 @@
         <div class="toolbar-divider"></div>
         
         <div class="toolbar-section">
-          <div class="section-label">连线工具</div>
+          <div class="section-label">文字工具</div>
           <div class="tool-buttons">
-          <a-tooltip placement="bottom">
-            <template slot="title">连线</template>
-              <div :class="['tool-btn', currentArrow === 1 ? 'active' : '']" @click="changeEdgeType('normal')">
-                <a-icon type="arrow-up" class="arrow-icon" />
-                <span>连线</span>
-            </div>
-          </a-tooltip>
-            </div>
+            <a-tooltip placement="bottom">
+              <template slot="title">添加文字</template>
+              <div class="tool-btn" @click="addTextNode">
+                <a-icon type="font-size" class="icon-large" />
+                <span>文字</span>
+              </div>
+            </a-tooltip>
+          </div>
         </div>
         
         <div class="toolbar-divider"></div>
@@ -132,6 +132,50 @@ import { Graph, Shape, FunctionExt } from '@antv/x6'
 import { startDragToGraph } from './Graph/methods.js'
 import { createTopology, topologyDetail, updateTopology } from '@/services/admin'
 
+// 注册文字节点类型
+Graph.registerNode(
+  'text-node',
+  {
+    inherit: 'rect',
+    width: 200,
+    height: 60,
+    markup: [
+      {
+        tagName: 'rect',
+        selector: 'body',
+      },
+      {
+        tagName: 'text',
+        selector: 'label',
+      },
+    ],
+    attrs: {
+      body: {
+        fill: 'transparent',  // 背景透明
+        stroke: 'transparent', // 边框透明
+        strokeWidth: 1,
+        rx: 4,
+        ry: 4,
+      },
+      label: {
+        text: '双击编辑文字',
+        fill: '#333333',
+        fontSize: 14,
+        textAnchor: 'middle',
+        textVerticalAnchor: 'middle',
+        refX: '50%',
+        refY: '50%',
+        textWrap: {
+          width: -20,
+          height: -20,
+          ellipsis: true,
+        },
+      },
+    },
+  },
+  true
+)
+
 export default {
   name: 'tuopu',
   components: {
@@ -159,7 +203,6 @@ export default {
         size: 12,
       },
       X6Data: {},
-      currentArrow: 1,
       grid: {
         size: 10,
         visible: true,
@@ -175,6 +218,7 @@ export default {
         gridType: 1,
         status: '',
       },
+      isAddingTextNode: false, // 标记是否正在添加文字节点
     }
   },
   created() {
@@ -195,7 +239,6 @@ export default {
   methods: {
     initX6() {
       var _that = this
-      const minimapContainer = document.getElementById('minimapContainer')
       this.graph = new Graph({
         container: document.getElementById('containerChart'),
         width: '100%',
@@ -331,10 +374,41 @@ export default {
       this.graph.on('selection:changed', (args) => {
         args.added.forEach(cell => {
           this.selectCell = cell
+          // 如果是文字节点，选中时显示边框
+          if (cell.shape === 'text-node') {
+            cell.attr('body/stroke', '#1890ff')
+            cell.attr('body/strokeWidth', 2)
+            cell.attr('body/fill', 'rgba(24, 144, 255, 0.05)')
+          }
         })
         args.removed.forEach(cell => {
           cell.removeTools()
+          // 如果是文字节点，取消选中时隐藏边框
+          if (cell.shape === 'text-node') {
+            cell.attr('body/stroke', 'transparent')
+            cell.attr('body/strokeWidth', 1)
+            cell.attr('body/fill', 'transparent')
+          }
         })
+      })
+      
+      // 双击文字节点进行编辑
+      this.graph.on('node:dblclick', ({ node }) => {
+        if (node.shape === 'text-node' && !this.isReading) {
+          _that.editTextNode(node)
+        }
+      })
+      
+      // 监听画布点击事件，用于添加文字节点
+      this.graph.on('blank:click', ({ x, y }) => {
+        if (_that.isAddingTextNode) {
+          _that.createTextNodeAt(x, y)
+          _that.isAddingTextNode = false
+          // 恢复鼠标样式
+          document.getElementById('containerChart').style.cursor = 'default'
+        } else {
+          _that.type = 'grid'
+        }
       })
     },
     
@@ -352,15 +426,105 @@ export default {
       }
     },
     
-    changeEdgeType(e) {
-      if (e == 'normal') {
-        this.sourceMarker.name = 'path'
-        this.connectEdgeType = {
-          connector: 'normal',
-          router: { name: '' }
-        }
-        this.currentArrow = 1
+    addTextNode() {
+      if (this.isReading) {
+        this.$message.warn('阅读模式不可编辑')
+        return
       }
+      
+      // 设置添加文字节点模式
+      this.isAddingTextNode = true
+      
+      // 改变鼠标样式，提示用户点击画布
+      document.getElementById('containerChart').style.cursor = 'crosshair'
+      
+      this.$message.info('请在画布上点击以放置文字节点')
+    },
+    
+    createTextNodeAt(x, y) {
+      const textNode = this.graph.addNode({
+        shape: 'text-node',
+        x: x - 100, // 节点宽度的一半
+        y: y - 30,  // 节点高度的一半
+        width: 200,
+        height: 60,
+        attrs: {
+          body: {
+            fill: 'transparent',  // 背景透明
+            stroke: 'transparent', // 边框透明
+            strokeWidth: 1,
+            rx: 4,
+            ry: 4,
+          },
+          label: {
+            text: '双击编辑文字',
+            fill: '#333333',
+            fontSize: 14,
+            textAnchor: 'middle',
+            textVerticalAnchor: 'middle',
+            refX: '50%',
+            refY: '50%',
+            textWrap: {
+              width: -20,
+              height: -20,
+              ellipsis: true,
+            },
+          },
+        },
+      })
+      
+      // 延迟选中节点
+      this.$nextTick(() => {
+        this.graph.select(textNode)
+        this.$message.success('文字节点已添加，双击可编辑内容')
+      })
+    },
+    
+    editTextNode(node) {
+      const currentText = node.attr('label/text') || '双击编辑文字'
+      
+      // 创建一个简单的输入对话框
+      let inputValue = currentText
+      
+      this.$confirm({
+        title: '编辑文字',
+        content: (h) => {
+          return h('a-textarea', {
+            props: {
+              rows: 4,
+              placeholder: '请输入文字内容',
+              defaultValue: currentText
+            },
+            on: {
+              input: (e) => {
+                inputValue = e.target.value
+              }
+            },
+            style: {
+              width: '100%'
+            }
+          })
+        },
+        okText: '确定',
+        cancelText: '取消',
+        onOk() {
+          if (inputValue && inputValue.trim()) {
+            node.attr('label/text', inputValue.trim())
+          }
+        },
+      })
+      
+      // 延迟聚焦到输入框
+      this.$nextTick(() => {
+        setTimeout(() => {
+          const textarea = document.querySelector('.ant-modal textarea')
+          if (textarea) {
+            textarea.value = currentText
+            textarea.focus()
+            textarea.select()
+          }
+        }, 100)
+      })
     },
     
     editNode() {
@@ -398,7 +562,7 @@ export default {
         if (item.attrs.line) {
           edges.push(item)
         }
-        if (item.attrs.image) {
+        if (item.attrs.image || item.shape === 'text-node') {
           nodes.push(item)
         }
       })
@@ -446,7 +610,14 @@ export default {
             // 确保所有节点都有 shape 属性
             nodes = nodes.map(node => {
               if (!node.shape) {
-                node.shape = 'custom-image'
+                // 根据节点属性判断类型
+                if (node.attrs && node.attrs.image) {
+                  node.shape = 'custom-image'
+                } else if (node.attrs && node.attrs.label && !node.attrs.image) {
+                  node.shape = 'text-node'
+                } else {
+                  node.shape = 'custom-image'
+                }
               }
               return node
             })
@@ -652,7 +823,7 @@ export default {
 
 .tuopu {
   position: relative;
-  background: #f5f5f5;
+  background: #ffffff; // 改为白色背景
 }
 
 // 防止节点文本被画布边界裁剪

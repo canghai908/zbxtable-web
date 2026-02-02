@@ -43,6 +43,50 @@ const publicAxios = axios.create({
   withCredentials: false, // 不发送 cookies
 })
 
+// 注册文字节点类型
+Graph.registerNode(
+  'text-node',
+  {
+    inherit: 'rect',
+    width: 200,
+    height: 60,
+    markup: [
+      {
+        tagName: 'rect',
+        selector: 'body',
+      },
+      {
+        tagName: 'text',
+        selector: 'label',
+      },
+    ],
+    attrs: {
+      body: {
+        fill: 'transparent',  // 背景透明
+        stroke: 'transparent', // 边框透明
+        strokeWidth: 1,
+        rx: 4,
+        ry: 4,
+      },
+      label: {
+        text: '双击编辑文字',
+        fill: '#333333',
+        fontSize: 14,
+        textAnchor: 'middle',
+        textVerticalAnchor: 'middle',
+        refX: '50%',
+        refY: '50%',
+        textWrap: {
+          width: -20,
+          height: -20,
+          ellipsis: true,
+        },
+      },
+    },
+  },
+  true
+)
+
 // 定义端口配置
 const ports = {
   groups: {
@@ -386,10 +430,17 @@ export default {
       let nodes = JSON.parse(redata.nodes)
       let edges = JSON.parse(redata.edges)
       
-      // 确��所有节点都有 shape 属性
+      // 确保所有节点都有 shape 属性
       nodes = nodes.map(node => {
         if (!node.shape) {
+          // 根据节点属性判断类型
+          if (node.attrs && node.attrs.image) {
+            node.shape = 'custom-image'
+          } else if (node.attrs && node.attrs.label && !node.attrs.image) {
+            node.shape = 'text-node'
+          } else {
           node.shape = 'custom-image'
+          }
         }
         return node
       })
@@ -436,7 +487,14 @@ export default {
             // 确保所有节点都有 shape 属性
             nodes = nodes.map(node => {
               if (!node.shape) {
+                // 根据节点属性判断类型
+                if (node.attrs && node.attrs.image) {
+                  node.shape = 'custom-image'
+                } else if (node.attrs && node.attrs.label && !node.attrs.image) {
+                  node.shape = 'text-node'
+                } else {
                 node.shape = 'custom-image'
+                }
               }
               return node
             })
@@ -561,7 +619,7 @@ export default {
 .tuopu {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(to bottom, #f8f9fa 0%, #e9ecef 100%);
+  background: #ffffff; // 改为白色背景
 }
 
 // 防止节点文本被画布边界裁剪

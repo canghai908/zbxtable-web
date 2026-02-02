@@ -17,9 +17,63 @@
 
     <!-- 节点设置 -->
     <div v-if="drawerType === 'node'">
-      <div class="drawer_title">节点设置</div>
+      <div class="drawer_title">{{ isTextNode ? '文字节点设置' : '节点设置' }}</div>
       <div class="drawer_wrap">
-        <a-form :model="drawerNode" :label-col="labelCol" :wrapper-col="wrapperCol">
+        <!-- 文字节点设置 -->
+        <a-form v-if="isTextNode" :model="drawerTextNode" :label-col="labelCol" :wrapper-col="wrapperCol">
+          <a-form-item label="字体大小">
+            <a-slider 
+              v-model="drawerTextNode.fontSize" 
+              :min="12" 
+              :max="48" 
+              :marks="{ 12: '12px', 24: '24px', 36: '36px', 48: '48px' }"
+              @change="handleFontSizeChange"
+            />
+            <span style="margin-left: 10px;">{{ drawerTextNode.fontSize }}px</span>
+          </a-form-item>
+          
+          <a-form-item label="字体粗细">
+            <a-radio-group v-model="drawerTextNode.fontWeight" @change="handleFontWeightChange">
+              <a-radio-button value="normal">正常</a-radio-button>
+              <a-radio-button value="bold">加粗</a-radio-button>
+              <a-radio-button value="bolder">特粗</a-radio-button>
+            </a-radio-group>
+          </a-form-item>
+          
+          <a-form-item label="字体颜色">
+            <a-input 
+              v-model="drawerTextNode.fontColor" 
+              type="color" 
+              style="width: 60px; height: 32px; padding: 2px;"
+              @change="handleFontColorChange"
+            />
+            <span style="margin-left: 10px;">{{ drawerTextNode.fontColor }}</span>
+          </a-form-item>
+          
+          <a-form-item label="预览">
+            <div 
+              :style="{
+                fontSize: drawerTextNode.fontSize + 'px',
+                fontWeight: drawerTextNode.fontWeight,
+                color: drawerTextNode.fontColor,
+                padding: '10px',
+                border: '1px dashed #d9d9d9',
+                borderRadius: '4px'
+              }"
+            >
+              {{ selectCell.attr('label/text') || '双击编辑文字' }}
+            </div>
+          </a-form-item>
+          
+          <a-form-item label="功能">
+            <a-button type="danger" ghost @click="deleteNode">
+              删除
+            </a-button>
+          </a-form-item>
+        </a-form>
+        
+        <!-- 普通节点设置 -->
+        <a-form v-else :model="drawerNode" :label-col="labelCol" :wrapper-col="wrapperCol">
           <a-form-item label="Zabbix实例">
             <a-select 
               v-model="drawerNode.ZID" 
@@ -190,7 +244,7 @@
 </template>
 
 <script>
-import { hostList, itemList, triggerList, itemTopoTraffic } from "@/services/admin"
+import { hostList, triggerList, itemTopoTraffic } from "@/services/admin"
 import { listZabbixInstance } from "@/services/zabbix"
 
 const selectSize = 30
@@ -206,12 +260,18 @@ export default {
   data() {
     return {
       zabbixInstances: [], // Zabbix实例列表
+      isTextNode: false, // 是否是文字节点
       drawerNode: {
         ZID: undefined,
         HostType: '',
         HostValue: '',
         HostName: '',
         HostID: undefined,
+      },
+      drawerTextNode: {
+        fontSize: 14,
+        fontWeight: 'normal',
+        fontColor: '#333333',
       },
       drawerEdge: {
         ZID: undefined,
@@ -255,16 +315,26 @@ export default {
       handler(val) {
         if (val) {
           if (val.isNode()) {
-            // 节点
-            this.drawerNode.ZID = val.store.data.attrs.label.ZID || undefined
-            this.drawerNode.HostType = val.store.data.attrs.label.HostType || ''
-            this.drawerNode.HostValue = val.store.data.attrs.label.HostValue || ''
-            this.drawerNode.HostName = val.store.data.attrs.label.text || ''
-            this.drawerNode.HostID = val.store.data.attrs.label.HostID || undefined
+            // 检查是否是文字节点
+            this.isTextNode = val.shape === 'text-node'
             
-            // 如果有实例ID，加载对应的主机列表
-            if (this.drawerNode.ZID && this.drawerNode.HostType) {
-              this.loadHostsByInstance(this.drawerNode.ZID, this.drawerNode.HostType)
+            if (this.isTextNode) {
+              // 文字节点
+              this.drawerTextNode.fontSize = val.attr('label/fontSize') || 14
+              this.drawerTextNode.fontWeight = val.attr('label/fontWeight') || 'normal'
+              this.drawerTextNode.fontColor = val.attr('label/fill') || '#333333'
+            } else {
+              // 普通节点
+              this.drawerNode.ZID = val.store.data.attrs.label.ZID || undefined
+              this.drawerNode.HostType = val.store.data.attrs.label.HostType || ''
+              this.drawerNode.HostValue = val.store.data.attrs.label.HostValue || ''
+              this.drawerNode.HostName = val.store.data.attrs.label.text || ''
+              this.drawerNode.HostID = val.store.data.attrs.label.HostID || undefined
+              
+              // 如果有实例ID，加载对应的主机列表
+              if (this.drawerNode.ZID && this.drawerNode.HostType) {
+                this.loadHostsByInstance(this.drawerNode.ZID, this.drawerNode.HostType)
+              }
             }
           } else {
             // 边
@@ -534,6 +604,19 @@ export default {
       });
       this.curTriggerItemList = this.triggerItemFilterList.slice(0, selectSize);
     }),
+    
+    // 文字节点样式控制
+    handleFontSizeChange(value) {
+      this.selectCell.attr('label/fontSize', value)
+    },
+    
+    handleFontWeightChange(e) {
+      this.selectCell.attr('label/fontWeight', e.target.value)
+    },
+    
+    handleFontColorChange(e) {
+      this.selectCell.attr('label/fill', e.target.value)
+    },
   }
 }
 </script>
