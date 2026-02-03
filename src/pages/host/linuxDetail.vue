@@ -1,33 +1,103 @@
 <template>
   <page-layout :title="detail.name">
     <div slot="headerContent" class="linux-detail">
-      <detail-list size="small" :col="3">
-        <detail-list-item term="主机ID">{{detail.hostid}}</detail-list-item>
-        <detail-list-item term="CPU核心数">{{detail.number_of_cores}}</detail-list-item>
-        <detail-list-item term="类型">{{detail.model || "--"}}</detail-list-item>
-        <detail-list-item term="总内存">{{detail.memory_total || "--"}}</detail-list-item>
-        <detail-list-item term="内核版本">{{detail.os || "--"}}</detail-list-item>
-        <detail-list-item term="运行时长">{{detail.uptime || "--"}}</detail-list-item>
-        <detail-list-item term="备注">{{detail.vendor || "--"}}</detail-list-item>
-      </detail-list>
+      <a-card :bodyStyle="{padding: '16px 24px'}" style="margin-bottom: 16px;">
+        <!-- 第一行 -->
+        <a-row :gutter="[32, 12]" style="margin-bottom: 12px;">
+          <a-col :xl="4" :lg="6" :md="8" :sm="12" :xs="24">
+            <div class="info-item">
+              <span class="info-label" :style="{color: $themeColor}">主机ID</span>
+              <span class="info-value">{{detail.hostid}}</span>
+            </div>
+          </a-col>
+          <a-col :xl="4" :lg="6" :md="8" :sm="12" :xs="24">
+            <div class="info-item">
+              <span class="info-label" :style="{color: $themeColor}">实例名称</span>
+              <span class="info-value">
+                <a-tag :color="$themeColor">{{detail.instance_name || "未知"}}</a-tag>
+              </span>
+            </div>
+          </a-col>
+          <a-col :xl="4" :lg="6" :md="8" :sm="12" :xs="24">
+            <div class="info-item">
+              <span class="info-label" :style="{color: $themeColor}">CPU核心数</span>
+              <span class="info-value">{{detail.number_of_cores}}</span>
+            </div>
+          </a-col>
+          <a-col :xl="4" :lg="6" :md="8" :sm="12" :xs="24">
+            <div class="info-item">
+              <span class="info-label" :style="{color: $themeColor}">类型</span>
+              <span class="info-value">{{detail.model || "--"}}</span>
+            </div>
+          </a-col>
+          <a-col :xl="4" :lg="6" :md="8" :sm="12" :xs="24">
+            <div class="info-item">
+              <span class="info-label" :style="{color: $themeColor}">总内存</span>
+              <span class="info-value">{{detail.memory_total || "--"}}</span>
+            </div>
+          </a-col>
+          <a-col :xl="4" :lg="6" :md="8" :sm="12" :xs="24">
+            <div class="info-item">
+              <span class="info-label" :style="{color: $themeColor}">运行时长</span>
+              <span class="info-value">{{detail.uptime || "--"}}</span>
+            </div>
+          </a-col>
+        </a-row>
+        <!-- 第二行 -->
+        <a-row :gutter="[32, 12]">
+          <a-col :xl="12" :lg="14" :md="16" :sm="24" :xs="24">
+            <div class="info-item">
+              <span class="info-label" :style="{color: $themeColor}">内核版本</span>
+              <span class="info-value">{{detail.os || "--"}}</span>
+            </div>
+          </a-col>
+          <a-col :xl="12" :lg="10" :md="8" :sm="24" :xs="24">
+            <div class="info-item">
+              <span class="info-label" :style="{color: $themeColor}">备注</span>
+              <span class="info-value">{{detail.vendor || "--"}}</span>
+            </div>
+          </a-col>
+        </a-row>
+      </a-card>
       <a-tabs :tabBarStyle="{textAlign: 'left', width: '100%'}" style="padding: 0px 2px;">
         <a-tab-pane tab="运行信息" key="1">
-          <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="!detail">
+          <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd', padding: '24px'}" :loading="!detail">
+            <!-- 第一行：CPU、内存、网络丢包、网络延时 -->
+            <a-row :gutter="[16, 16]" style="margin-bottom: 24px;">
+              <a-col :xl="6" :lg="12" :md="12" :sm="24">
+                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '0'}" title="CPU使用率">
+                  <div id="liquidCPU" style="width: 100%; height: 280px; max-width: 300px; margin: 0 auto;"></div>
+                </a-card>
+              </a-col>
+              <a-col :xl="6" :lg="12" :md="12" :sm="24">
+                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '0'}" title="内存使用率">
+                  <div id="liquidMem" style="width: 100%; height: 280px; max-width: 300px; margin: 0 auto;"></div>
+                </a-card>
+              </a-col>
+              <a-col :xl="6" :lg="12" :md="12" :sm="24">
+                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '0'}" title="网络丢包">
+                  <div id="liquidPingloss" style="width: 100%; height: 280px; max-width: 300px; margin: 0 auto;"></div>
+                </a-card>
+              </a-col>
+              <a-col :xl="6" :lg="12" :md="12" :sm="24">
+                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '0'}" title="网络延时">
+                  <div id="liquidPingsec" class="text-pingsec">{{ detail.ping_sec | dataFormat}}</div>
+                </a-card>
+              </a-col>
+            </a-row>
+            
+            <!-- 第二行：磁盘使用率表格 -->
             <a-row :gutter="16">
-              <a-col :xl="{ span: 5 }" :lg="{ span: 12 }">
-                <a-card hoverable :headStyle="$cardHeadStyle" :bodyStyle="{padding: '0'}" title="CPU使用率">
-                  <div id="liquidCPU" style="width: 300px; height: 300px;margin:0 auto;"></div>
-                </a-card>
-              </a-col>
-              <a-col :xl="{ span: 5 }" :lg="{ span: 12 }">
-                <a-card hoverable :headStyle="$cardHeadStyle" :bodyStyle="{padding: '0'}" title="内存使用率">
-                  <div id="liquidMem" style="width: 300px; height: 300px;margin:0 auto;"></div>
-                </a-card>
-              </a-col>
-              <a-col :xl="{ span: 14 }" :lg="{ span: 12 }" style="height: 650px;margin:0 auto;">
-                <a-col :xl="{ span: 24 }" :lg="{ span: 12 }">
-                  <!-- <a-card hoverable :headStyle="{textAlign: 'center', width: '100%', background: '#FAFBFC'}" :bodyStyle="{padding: '0'}" title="磁盘使用率"> -->
-                  <a-table :loading="loading2" :columns="columns" :data-source="FileSystemlist" :pagination=false :scroll="{ y: 600, }" :rowKey="(record) => { return record.id;}">
+              <a-col :span="24">
+                <a-card hoverable :headStyle="$cardHeadStyle" :bodyStyle="{padding: '12px'}" title="磁盘使用率">
+                  <a-table 
+                    :loading="loading2" 
+                    :columns="columns" 
+                    :data-source="FileSystemlist" 
+                    :pagination="false" 
+                    :scroll="{ y: 400 }" 
+                    :rowKey="(record) => { return record.id;}"
+                    size="middle">
                     <div slot="name" slot-scope="record">{{record.name}}</div>
                     <div slot="total_space" slot-scope="record">{{record.total_space | formatBytes}}</div>
                     <div slot="used_space" slot-scope="record">{{record.used_space | formatBytes}}</div>
@@ -39,30 +109,22 @@
                     </div>
                     <span slot="lastclock" slot-scope="record">{{record.lastclock| dateFormat }}</span>
                   </a-table>
-                </a-col>
-              </a-col>
-            </a-row>
-            <a-row :gutter="16">
-              <!--pingloss-->
-              <a-col :xl="{ span: 5 }" :lg="{ span: 12 }" class="pingloss">
-                <a-card hoverable :headStyle="$cardHeadStyle" :bodyStyle="{padding: '0'}" title="网络丢包">
-                  <div id="liquidPingloss" style="width: 300px; height: 300px;margin:0 auto;"></div>
-                </a-card>
-              </a-col>
-              <!--pingsec-->
-              <a-col :xl="{ span: 5 }" :lg="{ span: 12 }" class="pingsec">
-                <a-card hoverable :headStyle="$cardHeadStyle" :bodyStyle="{padding: '0'}" title="网络延时">
-                  <div id="liquidPingsec" class="text-pingsec">{{ detail.ping_sec | dataFormat}}</div>
                 </a-card>
               </a-col>
             </a-row>
           </a-card>
-          <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="!detail">
+          <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd', padding: '24px'}" :loading="!detail" style="margin-top: 16px;">
             <a-row :gutter="16">
-              <a-col :xl="{ span: 24 }" :lg="{ span: 24 }">
-                <a-col :xl="{ span: 24 }" :lg="{ span: 24 }">
-                  <!-- <a-card hoverable :headStyle="{textAlign: 'center', width: '100%', background: '#FAFBFC'}" :bodyStyle="{padding: '0'}" title="磁盘使用率"> -->
-                  <a-table :loading="loading2" :columns="columns2" :data-source="Interfacelist" :pagination=false :scroll="{ y: 300, }" :rowKey="(record) => { return record.id;}">
+              <a-col :span="24">
+                <a-card hoverable :headStyle="$cardHeadStyle" :bodyStyle="{padding: '12px'}" title="网络接口">
+                  <a-table 
+                    :loading="loading2" 
+                    :columns="columns2" 
+                    :data-source="Interfacelist" 
+                    :pagination="false" 
+                    :scroll="{ y: 400 }" 
+                    :rowKey="(record) => { return record.id;}"
+                    size="middle">
                     <span slot="operational_status" slot-scope="record">
                       <template slot="title">
                         {{record.operational_status||'--'}}
@@ -82,11 +144,11 @@
                     <div slot="outstatus" slot-scope="record">{{record.out_discarded}}/{{record.out_errors}}</div>
                     <div slot="speed" slot-scope="record">{{record.speed | SpeedToSize}}</div>
                     <div slot="operation" slot-scope="record">
-                      <a-button type="primary" @click="seeDetail(record)">详情</a-button>
+                      <a-button type="primary" size="small" @click="seeDetail(record)">详情</a-button>
                     </div>
                     <span slot="lastclock" slot-scope="record">{{record.lastclock | dateFormat }}</span>
                   </a-table>
-                </a-col>
+                </a-card>
               </a-col>
             </a-row>
           </a-card>
@@ -1302,28 +1364,63 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.linux-charts {
+.info-item {
   display: flex;
-  margin-top: 20px;
   flex-direction: column;
-  position: relative;
-  z-index: 9;
+  gap: 6px;
+  
+  .info-label {
+    font-size: 13px;
+    opacity: 0.65;
+    font-weight: normal;
+    white-space: nowrap;
+  }
+  
+  .info-value {
+    font-size: 15px;
+    font-weight: 500;
+    word-break: break-word;
+    line-height: 1.4;
+  }
 }
-.pingloss {
-  margin-top: -280px;
-}
-.pingsec {
-  margin-top: -280px;
-}
+
 .text-pingsec {
-  width: 300px;
-  height: 300px;
+  width: 100%;
+  height: 280px;
+  max-width: 300px;
   margin: 0 auto;
-  font-size: 100px;
+  font-size: 80px;
   color: #1ed80d;
   font-weight: 600;
-  flex: auto;
-  justify-content: space-between;
-  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  word-break: break-all;
+  padding: 20px;
+}
+
+// 响应式调整
+@media (max-width: 1200px) {
+  .text-pingsec {
+    font-size: 60px;
+  }
+}
+
+@media (max-width: 768px) {
+  .text-pingsec {
+    font-size: 50px;
+    height: 200px;
+  }
+  
+  .info-item {
+    .info-label {
+      font-size: 13px;
+    }
+    
+    .info-value {
+      font-size: 15px;
+    }
+  }
 }
 </style>
