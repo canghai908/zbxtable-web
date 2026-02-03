@@ -7,7 +7,7 @@
       </div>
 
       <a-table :loading="loading" :columns="columns" :data-source="list" :rowKey="r => r.id">
-        <template slot="instance" slot-scope="text, record">
+        <template slot="instance" slot-scope="text">
           <a-tag :color="$themeColor">{{ text }}</a-tag>
         </template>
         <template slot="enabled" slot-scope="text, record">
