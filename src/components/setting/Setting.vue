@@ -5,7 +5,7 @@
       <a-button @click="resetSetting" type="dashed" icon="redo" style="float: right">{{$t('reset')}}</a-button>
     </setting-item>
     <setting-item>
-      <a-button @click="saveToServer" type="primary" icon="cloud-upload" block :loading="saving">保存到服务器</a-button>
+      <a-button @click="saveToServer" type="primary" icon="cloud-upload" block :loading="saving">设置为默认</a-button>
       <a-alert v-if="lastSaveTime" type="success" :message="`上次保存: ${lastSaveTime}`" style="margin-top: 8px" />
     </setting-item>
     <setting-item :title="$t('theme.title')">
@@ -85,8 +85,8 @@
         </a-list-item>
       </a-list>
     </setting-item>
-    <a-alert v-if="isDev" style="max-width: 240px; margin: -16px 0 8px; word-break: break-all" type="warning" :message="$t('alert')">
-    </a-alert>
+    <!-- <a-alert v-if="isDev" style="max-width: 240px; margin: -16px 0 8px; word-break: break-all" type="warning" :message="$t('alert')">
+    </a-alert> -->
     <a-button v-if="isDev" id="copyBtn" :data-clipboard-text="copyConfig" @click="copyCode" style="width: 100%" icon="copy">{{$t('copy')}}</a-button>
   </div>
 </template>
