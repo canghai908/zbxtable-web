@@ -23,6 +23,26 @@ Vue.config.productionTip = false;
 Vue.use(Viser);
 Vue.use(Plugins);
 
+// 添加全局 mixin 来处理主题颜色
+Vue.mixin({
+  computed: {
+    $themeColor() {
+      return this.$store?.state?.setting?.theme?.color || '#1890ff';
+    },
+    $cardHeadStyle() {
+      const color = this.$themeColor;
+      const r = parseInt(color.slice(1, 3), 16);
+      const g = parseInt(color.slice(3, 5), 16);
+      const b = parseInt(color.slice(5, 7), 16);
+      return {
+        background: `rgba(${r}, ${g}, ${b}, 0.08)`,
+        color: color,
+        fontWeight: 600
+      };
+    }
+  }
+});
+
 bootstrap({ router, store, i18n, message: Vue.prototype.$message });
 window.loginNoAuth = function () {
   Vue.prototype.$message.warning("登录已失效，请重新登录");

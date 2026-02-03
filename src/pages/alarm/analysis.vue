@@ -23,12 +23,12 @@
       </a-form-model>
       <a-row style="margin: 20px -12px">
         <a-col style="padding: 0 12px" :xl="12" :lg="12" :md="24" :sm="24" :xs="24" v-if="nameList && nameList.length">
-          <a-card hoverable :headStyle="{textAlign: 'center', width: '100%', background: '#FAFBFC'}" :bodyStyle="{padding: '0'}" title="历史告警TOP10">
+          <a-card hoverable :headStyle="$cardHeadStyle" :bodyStyle="{padding: '0'}" title="历史告警TOP10">
             <e-line :mock="nameList" :numList="numList" />
           </a-card>
         </a-col>
         <a-col style="padding: 0 12px" :xl="12" :lg="12" :md="24" :sm="24" :xs="24" v-if="list && list.length">
-          <a-card hoverable :headStyle="{textAlign: 'center', width: '100%', background: '#FAFBFC'}" :bodyStyle="{padding: '0'}" title="告警分类TOP">
+          <a-card hoverable :headStyle="$cardHeadStyle" :bodyStyle="{padding: '0'}" title="告警分类TOP">
             <e-pie :mock="list" />
           </a-card>
         </a-col>

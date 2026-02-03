@@ -2,7 +2,7 @@
   <page-layout :noTitle="true">
     <a-row style="margin: 0 -12px">
       <a-col style="padding: 0 12px" :xl="12" :lg="24" :md="24" :sm="24" :xs="24">
-        <a-card title="告警列表" :headStyle="{background: '#ecf8ff'}" size="small">
+        <a-card title="告警列表" :headStyle="$cardHeadStyle" size="small">
           <div class="homeMain beauty-scroll">
             <a-timeline>
               <a-timeline-item v-for="(v, i) in triggerList" :key="i" :color="v.severity == 3 ? '#ff0000': (v.severity == 2 ? '#F56C6C': '#E6A23C')">
@@ -16,7 +16,7 @@
         </a-card>
       </a-col>
       <a-col style="padding: 0 12px" :xl="4" :lg="8" :md="24" :sm="24" :xs="24">
-        <a-card title="设备统计" :headStyle="{background: '#ecf8ff'}" size="small">
+        <a-card title="设备统计" :headStyle="$cardHeadStyle" size="small">
           <div class="homeMain homeList">
             <div class="homeItem"><div>Linux主机:</div><span>{{info.lin_count}}台</span></div>
             <div class="homeItem"><div>Window主机:</div><span>{{info.win_count}}台</span></div>
@@ -26,7 +26,7 @@
         </a-card>
       </a-col>
       <a-col style="padding: 0 12px" :xl="8" :lg="16" :md="24" :sm="24" :xs="24">
-        <a-card title="出入口流量" :headStyle="{background: '#ecf8ff'}" size="small">
+        <a-card title="出入口流量" :headStyle="$cardHeadStyle" size="small">
           <div class="homeMain beauty-scroll">
             <div class="home_net">
               <div class="home_net1">
@@ -48,7 +48,7 @@
     </a-row>
     <a-row style="margin: 20px -12px 0">
       <a-col style="padding: 0 12px" :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
-        <a-card title="Windows TOP5" :headStyle="{background: '#ecf8ff'}" size="small">
+        <a-card title="Windows TOP5" :headStyle="$cardHeadStyle" size="small">
           <div class="home_line">
             <div style="flex: 0 0 50%" v-if="winC && winC.length">
               <h3>CPU使用率</h3>
@@ -64,7 +64,7 @@
     </a-row>
     <a-row style="margin: 20px -12px">
       <a-col style="padding: 0 12px" :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
-        <a-card title="Linux操作系统 TOP5" :headStyle="{background: '#ecf8ff'}" size="small">
+        <a-card title="Linux操作系统 TOP5" :headStyle="$cardHeadStyle" size="small">
           <div class="home_line">
             <div style="flex: 0 0 50%" v-if="linC && linC.length">
               <h3>CPU使用率</h3>

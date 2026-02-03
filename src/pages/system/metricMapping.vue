@@ -11,7 +11,7 @@
 
     <a-table :loading="loading" :columns="columns" :data-source="mappings" :pagination="false" :rowKey="record => record.id">
       <span slot="zid" slot-scope="text, record">
-        <a-tag color="blue">{{ getInstanceName(text) }}</a-tag>
+        <a-tag :color="$themeColor">{{ getInstanceName(text) }}</a-tag>
       </span>
       <span slot="system_type" slot-scope="text">
         <a-tag :color="getSystemTypeColor(text)">{{ getSystemTypeName(text) }}</a-tag>

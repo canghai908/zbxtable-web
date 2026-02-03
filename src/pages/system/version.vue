@@ -1,6 +1,6 @@
 <template>
   <page-layout :noTitle="true">
-    <a-card :headStyle="{background: '#FAFBFC'}" size="small">
+    <a-card :headStyle="$cardHeadStyle" size="small">
       <a-descriptions bordered>
         <a-descriptions-item :label="$t('zbxtable_version')" :span="3">{{ UIVersion }}</a-descriptions-item>
         <a-descriptions-item :label="$t('buildinfo')">

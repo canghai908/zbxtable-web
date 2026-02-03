@@ -23,7 +23,7 @@
         <span slot="hostid" slot-scope="record">{{record.hostid}}</span>
         <div slot="name" slot-scope="record">{{record.name}}</div>
         <div slot="instance_name" slot-scope="record">
-          <a-tag color="blue">{{record.instance_name || '未知'}}</a-tag>
+          <a-tag :color="$themeColor">{{record.instance_name || '未知'}}</a-tag>
         </div>
         <div slot="os" slot-scope="record">{{record.os}}</div>
         <div slot="interfaces" slot-scope="record">{{record.interfaces}}</div>

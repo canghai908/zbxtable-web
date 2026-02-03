@@ -4,7 +4,7 @@
       <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}">
         <a-row :gutter="16">
           <a-col :xl="{ span: 4 }" :lg="{ span: 24 }">
-	    <a-card :title="$t('overview')" :headStyle="{ background: '#FAFBFC' }" size="small">
+	    <a-card :title="$t('overview')" :headStyle="$cardHeadStyle" size="small">
               <div>
                 <a-tree :showLine=false show-icon :tree-data="treeData" :default-expand-all="autoExpandParent" :replace-fields="replaceFields" @select="onSelect" v-if="treeData">
                 </a-tree>
@@ -14,7 +14,7 @@
           <a-col :xl="{ span: 20 }" :lg="{ span: 24 }">
             <a-row>
               <a-col :lg="24" :md="24">
-		<a-card :title="$t('information')" :headStyle="{ background: '#FAFBFC' }" :bodyStyle="{ height: '350px' }" size="small">
+		<a-card :title="$t('information')" :headStyle="$cardHeadStyle" :bodyStyle="{ height: '350px' }" size="small">
                   <template #extra>
                     <!-- <a-button type="primary" style="margin-left: 10px;" @click="inventoryexport">导入资产</a-button> -->
 		    <a-button type="info" style="margin-left: 10px;" @click="inventoryexport">{{ $t('export_btn') }}</a-button>
@@ -24,7 +24,7 @@
                     <span slot="hostid" slot-scope="record">{{record.hostid}}</span>
                     <span slot="name" slot-scope="record">{{record.name}}</span>
                     <span slot="instance_name" slot-scope="record">
-                      <a-tag color="blue">{{record.instance_name || '未知'}}</a-tag>
+                      <a-tag :color="$themeColor">{{record.instance_name || '未知'}}</a-tag>
                     </span>
                     <span slot="interfaces" slot-scope="record">{{record.interfaces}}</span>
                     <span slot="uptime" slot-scope="record">{{record.uptime}}</span>

@@ -38,7 +38,7 @@
       <div class="host-list">
         <div v-for="(item, index) in displayList" :key="index" class="host-item">
           <span class="host-name">{{ item.hostname }}</span>
-          <a-tag v-if="item.instanceName" color="orange" class="instance-tag">{{ item.instanceName }}</a-tag>
+          <a-tag v-if="item.instanceName" :color="$themeColor" class="instance-tag">{{ item.instanceName }}</a-tag>
           <span class="host-count">{{ item.value }}次</span>
         </div>
       </div>

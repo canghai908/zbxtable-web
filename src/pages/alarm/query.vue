@@ -52,7 +52,7 @@
           </span>
         </a-table>
         <div slot="instance_name" slot-scope="record">
-          <a-tag color="orange">{{getInstanceName(record.zid)}}</a-tag>
+          <a-tag :color="themeColor">{{getInstanceName(record.zid)}}</a-tag>
         </div>
         <div slot="level" slot-scope="record">
           <a-tag v-if="record.level==0" color="#97AAB3">{{record.level | levelFilter}}</a-tag>
@@ -110,6 +110,7 @@ import "moment/locale/zh-cn";
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import hljs from 'highlight.js';  // 添加代码高亮库
+import themeMixin from '@/mixins/themeMixin'
 
 // 配置 marked 选项
 marked.setOptions({
@@ -168,6 +169,7 @@ function processThinkTags(text) {
 
 export default {
   name: "LinuxList",
+  mixins: [themeMixin],
   components: {
     PageLayout,
   },

@@ -146,7 +146,7 @@
               </h3>
               <a-descriptions bordered :column="1" size="small">
                 <a-descriptions-item label="HTTP 端口">
-                  <a-tag color="blue">{{ systemForm.httpport }}</a-tag>
+                  <a-tag :color="$themeColor">{{ systemForm.httpport }}</a-tag>
                 </a-descriptions-item>
                 <a-descriptions-item label="运行模式">
                   <a-tag :color="systemForm.runmode === 'prod' ? 'green' : 'orange'">

@@ -8,10 +8,10 @@
 
       <a-table :loading="loading" :columns="columns" :data-source="list" :rowKey="r => r.id">
         <template slot="instance" slot-scope="text, record">
-          <a-tag color="cyan">{{ text }}</a-tag>
+          <a-tag :color="$themeColor">{{ text }}</a-tag>
         </template>
         <template slot="enabled" slot-scope="text, record">
-          <a-tag v-if="record.enabled" color="blue">启用</a-tag>
+          <a-tag v-if="record.enabled" :color="$themeColor">启用</a-tag>
           <a-tag v-else color="red">禁用</a-tag>
         </template>
         <template slot="zabbix" slot-scope="text, record">
