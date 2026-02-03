@@ -46,7 +46,7 @@
                 </div>
               </a-card>
             </a-col>
-            <a-col :lg="24" :md="24" style="margin-top: 14px;">
+            <a-col :lg="24" :md="24" style="margin-top: 8px;">
               <a-card :title="$t('bandwidth')" :headStyle="cardHeadStyle" :bodyStyle="{height: '220px', padding: '12px'}" size="small" :loading="!loading3">
                 <egress-bandwidth :data="egressData" />
               </a-card>
@@ -55,7 +55,7 @@
         </a-col>
       </a-row>
     </a-card>
-    <div style="width: 100%;height: 20px;"></div>
+    <div style="width: 100%;height: 12px;"></div>
     <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="!loading4 && !loading5">
       <a-row :gutter="16">
         <a-col :xl="{ span: 12 }" :lg="{ span: 24 }">
@@ -112,7 +112,7 @@
         </a-col>
       </a-row>
     </a-card>
-    <div style="width: 100%;height: 20px;"></div>
+    <div style="width: 100%;height: 12px;"></div>
     <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="!loading6 && !loading7">
       <a-row :gutter="16">
         <a-col :xl="{ span: 12 }" :lg="{ span: 24 }">
@@ -420,6 +420,7 @@ export default {
   width: 100%;
   padding: 20px 30px 20px;
   border-bottom: 1px solid #ddd;
+  overflow: hidden;
 }
 .homeLeItem1 {
   width: 100%;
@@ -429,6 +430,7 @@ export default {
 }
 .homeLeLeft {
   flex: 0 0 40%;
+  min-width: 0;
 }
 .homeLeLeft1 {
   width: 90%;
@@ -465,6 +467,8 @@ export default {
 .homeLeRight {
   flex: 0 0 60%;
   height: 38px;
+  min-width: 0;
+  overflow: hidden;
 }
 .homeLegent2 {
   width: 100%;
@@ -473,6 +477,7 @@ export default {
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  overflow: hidden;
 }
 .homeLeItem {
   flex: 0 0 48%;
@@ -482,6 +487,7 @@ export default {
   align-items: center;
   margin-bottom: 23px;
   height: 66px;
+  min-width: 0;
 }
 .homeLeTop {
   width: 100%;
@@ -525,10 +531,11 @@ export default {
 .homeLeBot {
   width: 100%;
   height: 20px;
+  overflow: hidden;
 }
 .homeH2 {
   width: 100%;
-  line-height: 100px;
+  line-height: 60px;
   font-size: 28px;
   color: #000;
   font-weight: 600;
