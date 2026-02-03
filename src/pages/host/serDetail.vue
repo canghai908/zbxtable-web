@@ -18,22 +18,22 @@
           <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="!detail">
             <a-row :gutter="16">
               <a-col :xl="{ span: 6 }" :lg="{ span: 12 }">
-                <a-card hoverable :headStyle="{textAlign: 'center', width: '100%', background: '#FAFBFC'}" :bodyStyle="{padding: '0'}" title="CPU数量">
+                <a-card hoverable :headStyle="$cardHeadStyle" :bodyStyle="{padding: '0'}" title="CPU数量">
                   <div class="ser-detail"><b>{{detail.os || "--"}}</b><span>核</span></div>
                 </a-card>
               </a-col>
               <a-col :xl="{ span: 6 }" :lg="{ span: 12 }">
-                <a-card hoverable :headStyle="{textAlign: 'center', width: '100%', background: '#FAFBFC'}" :bodyStyle="{padding: '0'}" title="总内存">
+                <a-card hoverable :headStyle="$cardHeadStyle" :bodyStyle="{padding: '0'}" title="总内存">
                   <div class="ser-detail"><b>{{detail.os || "--"}}</b><span>G</span></div>
                 </a-card>
               </a-col>
               <a-col :xl="{ span: 6 }" :lg="{ span: 12 }">
-                <a-card hoverable :headStyle="{textAlign: 'center', width: '100%', background: '#FAFBFC'}" :bodyStyle="{padding: '0'}" title="总存储">
+                <a-card hoverable :headStyle="$cardHeadStyle" :bodyStyle="{padding: '0'}" title="总存储">
                   <div class="ser-detail"><b>{{detail.os || "--"}}</b><span>T</span></div>
                 </a-card>
               </a-col>
               <a-col :xl="{ span: 6 }" :lg="{ span: 12 }">
-                <a-card hoverable :headStyle="{textAlign: 'center', width: '100%', background: '#FAFBFC'}" :bodyStyle="{padding: '0'}" title="操作系统">
+                <a-card hoverable :headStyle="$cardHeadStyle" :bodyStyle="{padding: '0'}" title="操作系统">
                   <div class="ser-detail"><b>{{detail.os || "--"}}</b></div>
                 </a-card>
               </a-col>
@@ -42,8 +42,6 @@
         </a-tab-pane>
       </a-tabs>
     </div>
-    <img slot="extra" src="@/assets/img/extraBg.png" alt="" class="extraBg">
-
   </page-layout>
 </template>
 
@@ -91,16 +89,6 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.extraBg {
-  width: 195px;
-  position: absolute;
-  right: 20px;
-  top: 50px;
-  z-index: 8;
-  img {
-    width: 100%;
-  }
-}
 .ser-detail {
   width: 100%;
   height: 90px;

@@ -285,7 +285,15 @@
     <!-- Webhook 配置信息对话框 -->
     <a-modal title="Webhook 配置信息" :visible="webhookInfoVisible" @cancel="webhookInfoVisible=false" :footer="null" width="800px">
       <div v-if="webhookInfo">
-        <a-alert message="配置说明" description="Webhook 已在 Zabbix 中自动配置完成，无需额外操作。以下是配置详情：" type="success" show-icon style="margin-bottom: 16px;" />
+        <div :style="{ padding: '12px 16px', background: hexToRgba($themeColor, 0.1), border: `1px solid ${hexToRgba($themeColor, 0.3)}`, borderRadius: '4px', marginBottom: '16px' }">
+          <div :style="{ display: 'flex', alignItems: 'center', marginBottom: '8px' }">
+            <a-icon type="check-circle" :style="{ fontSize: '16px', color: $themeColor, marginRight: '8px' }" />
+            <strong :style="{ color: $themeColor }">配置说明</strong>
+          </div>
+          <div style="color: #666; font-size: 13px;">
+            Webhook 已在 Zabbix 中自动配置完成，无需额外操作。以下是配置详情：
+          </div>
+        </div>
 
         <a-descriptions bordered :column="1">
           <a-descriptions-item label="Webhook URL">
@@ -313,24 +321,26 @@
             <code>{{ webhookInfo.content_type }}</code>
           </a-descriptions-item>
           <a-descriptions-item label="请求头">
-            <pre style="background: #f5f5f5; padding: 8px; border-radius: 4px; margin: 0;">{{ webhookInfo.headers }}</pre>
+            <pre :style="{ background: hexToRgba($themeColor, 0.08), padding: '8px', borderRadius: '4px', margin: 0, border: `1px solid ${hexToRgba($themeColor, 0.2)}` }">{{ webhookInfo.headers }}</pre>
             <a-button size="small" icon="copy" style="margin-top: 8px;" @click="copyToClipboard(webhookInfo.headers, '请求头')">复制</a-button>
           </a-descriptions-item>
         </a-descriptions>
 
-        <a-alert message="工作原理" type="info" show-icon style="margin-top: 16px;">
-          <template slot="description">
+        <div :style="{ padding: '12px 16px', background: hexToRgba($themeColor, 0.08), border: `1px solid ${hexToRgba($themeColor, 0.25)}`, borderRadius: '4px', marginTop: '16px' }">
+          <div :style="{ display: 'flex', alignItems: 'center', marginBottom: '8px' }">
+            <a-icon type="info-circle" :style="{ fontSize: '16px', color: $themeColor, marginRight: '8px' }" />
+            <strong :style="{ color: $themeColor }">工作原理</strong>
+          </div>
             <div style="color: #666; font-size: 13px;">
               <div>• Zabbix 触发告警时，会自动通过 Webhook 将告警信息发送到 ZbxTable</div>
               <div>• Webhook 脚本已内置实例标识 和 Token，无需手动配置</div>
               <div>• 告警数据会自动路由到对应的实例</div>
               <div>• 相比 MS-Agent，Webhook 方式无需在服务器上安装额外服务</div>
             </div>
-          </template>
-        </a-alert>
+        </div>
 
-        <div style="margin-top: 16px; padding: 12px; background: #fafafa; border-radius: 4px;">
-          <h4 style="margin-bottom: 8px;">验证方法</h4>
+        <div :style="{ marginTop: '16px', padding: '12px', background: hexToRgba($themeColor, 0.05), borderRadius: '4px', border: `1px solid ${hexToRgba($themeColor, 0.2)}` }">
+          <h4 :style="{ marginBottom: '8px', color: $themeColor }">验证方法</h4>
           <div style="color: #666; font-size: 13px;">
             <div>1. 在 Zabbix 中查看 Media Type: <strong>ZbxTable</strong></div>
             <div>2. 在 Zabbix 中查看 Action: <strong>ZbxTable Webhook</strong></div>
@@ -470,6 +480,13 @@ export default {
     this.load()
   },
   methods: {
+    hexToRgba(hex, alpha = 1) {
+      if (!hex) return `rgba(24, 144, 255, ${alpha})`
+      const r = parseInt(hex.slice(1, 3), 16)
+      const g = parseInt(hex.slice(3, 5), 16)
+      const b = parseInt(hex.slice(5, 7), 16)
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`
+    },
     async load () {
       this.loading = true
       try {

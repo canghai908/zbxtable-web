@@ -15,12 +15,12 @@
           <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="!detail">
             <a-row :gutter="16">
               <a-col :xl="{ span: 5 }" :lg="{ span: 12 }">
-                <a-card hoverable :headStyle="{textAlign: 'center', width: '100%', background: '#FAFBFC'}" :bodyStyle="{padding: '0'}" title="CPU使用率">
+                <a-card hoverable :headStyle="$cardHeadStyle" :bodyStyle="{padding: '0'}" title="CPU使用率">
                   <div id="liquidCPU" style="width: 300px; height: 300px;margin:0 auto;"></div>
                 </a-card>
               </a-col>
               <a-col :xl="{ span: 5 }" :lg="{ span: 12 }">
-                <a-card hoverable :headStyle="{textAlign: 'center', width: '100%', background: '#FAFBFC'}" :bodyStyle="{padding: '0'}" title="内存使用率">
+                <a-card hoverable :headStyle="$cardHeadStyle" :bodyStyle="{padding: '0'}" title="内存使用率">
                   <div id="liquidMem" style="width: 300px; height: 300px;margin:0 auto;"></div>
                 </a-card>
               </a-col>
@@ -45,13 +45,13 @@
             <a-row :gutter="16">
               <!--pingloss-->
               <a-col :xl="{ span: 5 }" :lg="{ span: 12 }" class="pingloss">
-                <a-card hoverable :headStyle="{textAlign: 'center', width: '100%', background: '#FAFBFC'}" :bodyStyle="{padding: '0'}" title="网络丢包">
+                <a-card hoverable :headStyle="$cardHeadStyle" :bodyStyle="{padding: '0'}" title="网络丢包">
                   <div id="liquidPingloss" style="width: 300px; height: 300px;margin:0 auto;"></div>
                 </a-card>
               </a-col>
               <!--pingsec-->
               <a-col :xl="{ span: 5 }" :lg="{ span: 12 }" class="pingsec">
-                <a-card hoverable :headStyle="{textAlign: 'center', width: '100%', background: '#FAFBFC'}" :bodyStyle="{padding: '0'}" title="网络延时">
+                <a-card hoverable :headStyle="$cardHeadStyle" :bodyStyle="{padding: '0'}" title="网络延时">
                   <div id="liquidPingsec" class="text-pingsec">{{ detail.ping_sec | dataFormat}}</div>
                 </a-card>
               </a-col>
@@ -119,12 +119,12 @@
             <a-row>
               <a-col>
                 <a-table :loading="loading3" style="width: 90%;margin:0 auto;" :columns="trafficeColumns" :data-source="trafficeSeries.list" :pagination="false"
-                  :rowKey="(record) => { return record.name}">
-                  <div slot="name" slot-scope="record">{{record.name }}</div>
-                  <div slot="min" slot-scope="record">{{record.min | TrafficTBytes}}</div>
-                  <div slot="max" slot-scope="record">{{record.max | TrafficTBytes}}</div>
-                  <div slot="avg" slot-scope="record">{{record.avg | TrafficTBytes}}</div>
-                  <div slot="th_perc_avg" slot-scope="record">{{record.th_perc_avg | TrafficTBytes}}</div>
+                  :rowKey="(record) => { return record.name}" :customHeaderRow="() => ({ style: { color: $themeColor } })">
+                  <div slot="name" slot-scope="record" :style="{ color: $themeColor }">{{record.name }}</div>
+                  <div slot="min" slot-scope="record" :style="{ color: $themeColor }">{{record.min | TrafficTBytes}}</div>
+                  <div slot="max" slot-scope="record" :style="{ color: $themeColor }">{{record.max | TrafficTBytes}}</div>
+                  <div slot="avg" slot-scope="record" :style="{ color: $themeColor }">{{record.avg | TrafficTBytes}}</div>
+                  <div slot="th_perc_avg" slot-scope="record" :style="{ color: $themeColor }">{{record.th_perc_avg | TrafficTBytes}}</div>
                   <!-- <div slot="th_perc_val" slot-scope="record">{{record.th_perc_val | TrafficTBytes}}</div> -->
                 </a-table>
               </a-col>
@@ -134,15 +134,15 @@
           <a-col :span="12">
             <a-row>
               <a-col>
-                <div id="discardedChart" style="width: 900px; height: 300px;"></div>
+                <div id="discardedChart" style="width: 700px; height: 300px;"></div>
               </a-col>
               <a-col>
                 <a-table :loading="loading3" style="width: 90%; height: 10%;margin:0 auto;" :columns="discardedColumns" :data-source="diescardedSeries.list" :pagination="false"
-                  :rowKey="(record) => { return record.name}">
-                  <div slot="name" slot-scope="record">{{record.name }}</div>
-                  <div slot="min" slot-scope="record">{{record.min }}</div>
-                  <div slot="max" slot-scope="record">{{record.max}}</div>
-                  <div slot="avg" slot-scope="record">{{record.avg  }}</div>
+                  :rowKey="(record) => { return record.name}" :customHeaderRow="() => ({ style: { color: $themeColor } })">
+                  <div slot="name" slot-scope="record" :style="{ color: $themeColor }">{{record.name }}</div>
+                  <div slot="min" slot-scope="record" :style="{ color: $themeColor }">{{record.min }}</div>
+                  <div slot="max" slot-scope="record" :style="{ color: $themeColor }">{{record.max}}</div>
+                  <div slot="avg" slot-scope="record" :style="{ color: $themeColor }">{{record.avg  }}</div>
                 </a-table>
               </a-col>
             </a-row>
@@ -159,11 +159,11 @@
               </a-col>
               <a-col>
                 <a-table :loading="loading3" style="width: 90%;margin:0 auto;" :columns="discardedColumns" :data-source="errorsSeries.list" :pagination="false"
-                  :rowKey="(record) => { return record.name}">
-                  <div slot="name" slot-scope="record">{{record.name }}</div>
-                  <div slot="min" slot-scope="record">{{record.min }}</div>
-                  <div slot="max" slot-scope="record">{{record.max}}</div>
-                  <div slot="avg" slot-scope="record">{{record.avg  }}</div>
+                  :rowKey="(record) => { return record.name}" :customHeaderRow="() => ({ style: { color: $themeColor } })">
+                  <div slot="name" slot-scope="record" :style="{ color: $themeColor }">{{record.name }}</div>
+                  <div slot="min" slot-scope="record" :style="{ color: $themeColor }">{{record.min }}</div>
+                  <div slot="max" slot-scope="record" :style="{ color: $themeColor }">{{record.max}}</div>
+                  <div slot="avg" slot-scope="record" :style="{ color: $themeColor }">{{record.avg  }}</div>
                 </a-table>
               </a-col>
             </a-row>
@@ -176,11 +176,11 @@
               </a-col>
               <a-col>
                 <a-table :loading="loading3" style="width: 90%;margin:0 auto;" :columns="discardedColumns" :data-source="operationalSeries.list" :pagination="false"
-                  :rowKey="(record) => { return record.name}">
-                  <div slot="name" slot-scope="record">{{record.name }}</div>
-                  <div slot="min" slot-scope="record">{{record.min }}</div>
-                  <div slot="max" slot-scope="record">{{record.max}}</div>
-                  <div slot="avg" slot-scope="record">{{record.avg  }}</div>
+                  :rowKey="(record) => { return record.name}" :customHeaderRow="() => ({ style: { color: $themeColor } })">
+                  <div slot="name" slot-scope="record" :style="{ color: $themeColor }">{{record.name }}</div>
+                  <div slot="min" slot-scope="record" :style="{ color: $themeColor }">{{record.min }}</div>
+                  <div slot="max" slot-scope="record" :style="{ color: $themeColor }">{{record.max}}</div>
+                  <div slot="avg" slot-scope="record" :style="{ color: $themeColor }">{{record.avg  }}</div>
                 </a-table>
               </a-col>
             </a-row>
@@ -191,7 +191,6 @@
         </template>
       </a-modal>
     </div>
-    <img slot="extra" src="@/assets/img/extraBg.png" alt="" class="extraBg">
   </page-layout>
 
 </template>
@@ -630,7 +629,10 @@ export default {
       const option = {
         title: {
           text: this.trafficeSeries.title,
-          left: 'center'
+          left: 'center',
+          textStyle: {
+            color: this.$themeColor
+          }
         },
         toolbox: {
           feature: {
@@ -724,12 +726,26 @@ export default {
           icon: 'rect',
           right: '4%',
           orient: 'vertical',
+          textStyle: {
+            color: this.$themeColor
+          }
         },
-        xAxis: this.trafficeSeries.xAxis,
+        xAxis: {
+          ...this.trafficeSeries.xAxis,
+          axisLabel: {
+            color: this.$themeColor
+          },
+          axisLine: {
+            lineStyle: {
+              color: this.$themeColor
+            }
+          }
+        },
         yAxis: {
           type: 'value',
           scale: true,
           axisLabel: {
+            color: this.$themeColor,
             formatter: function (value) {
               if ((value / (1024 * 1024 * 1024)) > 1) {
                 return (value / (1024 * 1024 * 1024)).toFixed(2) + " GB";
@@ -740,6 +756,11 @@ export default {
               } else {
                 return value + " B";
               }
+            }
+          },
+          axisLine: {
+            lineStyle: {
+              color: this.$themeColor
             }
           }
         },
@@ -759,7 +780,10 @@ export default {
       const option = {
         title: {
           text: this.diescardedSeries.title,
-          left: 'center'
+          left: 'center',
+          textStyle: {
+            color: this.$themeColor
+          }
         },
         toolbox: {
           feature: {
@@ -843,8 +867,21 @@ export default {
           icon: 'rect',
           right: '4%',
           orient: 'vertical',
+          textStyle: {
+            color: this.$themeColor
+          }
         },
-        xAxis: this.diescardedSeries.xAxis,
+        xAxis: {
+          ...this.diescardedSeries.xAxis,
+          axisLabel: {
+            color: this.$themeColor
+          },
+          axisLine: {
+            lineStyle: {
+              color: this.$themeColor
+            }
+          }
+        },
         yAxis: {
           // name: 'bits per second(kb/s)',
           nameLocation: 'center',
@@ -855,6 +892,14 @@ export default {
           splitLine: {
             show: true
           },
+          axisLabel: {
+            color: this.$themeColor
+          },
+          axisLine: {
+            lineStyle: {
+              color: this.$themeColor
+            }
+          }
         },
         series: this.diescardedSeries.yAxis,
       }
@@ -872,7 +917,10 @@ export default {
       const option = {
         title: {
           text: this.errorsSeries.title,
-          left: 'center'
+          left: 'center',
+          textStyle: {
+            color: this.$themeColor
+          }
         },
         toolbox: {
           feature: {
@@ -956,8 +1004,21 @@ export default {
           icon: 'rect',
           right: '4%',
           orient: 'vertical',
+          textStyle: {
+            color: this.$themeColor
+          }
         },
-        xAxis: this.errorsSeries.xAxis,
+        xAxis: {
+          ...this.errorsSeries.xAxis,
+          axisLabel: {
+            color: this.$themeColor
+          },
+          axisLine: {
+            lineStyle: {
+              color: this.$themeColor
+            }
+          }
+        },
         yAxis: {
           // name: 'bits per second(kb/s)',
           nameLocation: 'center',
@@ -968,6 +1029,14 @@ export default {
           splitLine: {
             show: true
           },
+          axisLabel: {
+            color: this.$themeColor
+          },
+          axisLine: {
+            lineStyle: {
+              color: this.$themeColor
+            }
+          }
         },
         series: this.errorsSeries.yAxis,
       }
@@ -986,7 +1055,10 @@ export default {
       const option = {
         title: {
           text: this.operationalSeries.title,
-          left: 'center'
+          left: 'center',
+          textStyle: {
+            color: this.$themeColor
+          }
         },
         toolbox: {
           feature: {
@@ -1069,8 +1141,21 @@ export default {
           icon: 'rect',
           right: '4%',
           orient: 'vertical',
+          textStyle: {
+            color: this.$themeColor
+          }
         },
-        xAxis: this.operationalSeries.xAxis,
+        xAxis: {
+          ...this.operationalSeries.xAxis,
+          axisLabel: {
+            color: this.$themeColor
+          },
+          axisLine: {
+            lineStyle: {
+              color: this.$themeColor
+            }
+          }
+        },
         yAxis: {
           // name: 'bits per second(kb/s)',
           nameLocation: 'center',
@@ -1081,6 +1166,14 @@ export default {
           splitLine: {
             show: true
           },
+          axisLabel: {
+            color: this.$themeColor
+          },
+          axisLine: {
+            lineStyle: {
+              color: this.$themeColor
+            }
+          }
         },
         series: this.operationalSeries.yAxis,
       }
@@ -1209,16 +1302,6 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.extraBg {
-  width: 195px;
-  position: absolute;
-  right: 20px;
-  top: 50px;
-  z-index: 8;
-  img {
-    width: 100%;
-  }
-}
 .linux-charts {
   display: flex;
   margin-top: 20px;

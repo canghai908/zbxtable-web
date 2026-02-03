@@ -620,7 +620,7 @@ export default {
     
     .device-count {
       transform: scale(1.15);
-    }
+  }
   }
   
   .device-name {
