@@ -514,7 +514,6 @@ export default {
       this.visible = true
     },
     openEdit (record) {
-      console.log(record.id)
       this.editingId = record.id
       this.form = {
         instance: record.instance || '',
@@ -564,7 +563,6 @@ export default {
       this.saving = true
       try {
         let res
-        console.log(this.editingId)
         if (this.editingId) {
           res = await updateZabbixInstance(this.editingId, this.form)
         } else {
