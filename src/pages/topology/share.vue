@@ -1,7 +1,7 @@
 <template>
   <div class="public-topology-container">
     <!-- 顶部标题栏 -->
-    <div class="topology-header">
+    <div class="topology-header" :style="{ background: `linear-gradient(135deg, ${$themeColor} 0%, ${adjustColor($themeColor, -30)} 100%)` }">
       <div class="header-content">
         <div class="topology-title">
           <a-icon type="apartment" class="title-icon" />
@@ -259,6 +259,21 @@ export default {
     }
   },
   methods: {
+    adjustColor(color, amount) {
+      const hex = color.replace('#', '')
+      const r = parseInt(hex.substring(0, 2), 16)
+      const g = parseInt(hex.substring(2, 4), 16)
+      const b = parseInt(hex.substring(4, 6), 16)
+      
+      const newR = Math.max(0, Math.min(255, r + amount))
+      const newG = Math.max(0, Math.min(255, g + amount))
+      const newB = Math.max(0, Math.min(255, b + amount))
+      
+      return '#' + 
+        newR.toString(16).padStart(2, '0') + 
+        newG.toString(16).padStart(2, '0') + 
+        newB.toString(16).padStart(2, '0')
+    },
     initX6() {
       this.graph = new Graph({
         container: document.getElementById('containerChart'),
@@ -740,10 +755,10 @@ export default {
 
 // 顶部标题栏
 .topology-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   position: relative;
   z-index: 100;
+  transition: background 0.3s ease;
 }
 
 .header-content {
