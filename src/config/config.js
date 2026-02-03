@@ -4,7 +4,6 @@ module.exports = {
     color: "#13c2c2",
     mode: "dark",
   },
-  multiPage: true,
   asyncRoutes: true,
   animate: {
     name: "lightSpeed",
