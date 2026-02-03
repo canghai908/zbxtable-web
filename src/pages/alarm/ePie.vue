@@ -9,7 +9,7 @@
         <v-tooltip :showTitle="false" dataKey="item*percent" />
         <v-axis />
         <v-legend dataKey="item" position="left" />
-        <v-pie position="percent" color="item" :vStyle="pieStyle" :label="labelConfig" />
+        <v-pie position="percent" :color="pieColors" :vStyle="pieStyle" :label="labelConfig" />
         <v-coord type="theta" />
       </v-chart>
     </div>
@@ -18,10 +18,25 @@
 
 <script>
 const DataSet = require('@antv/data-set')
+import { mapState } from 'vuex'
 
 export default {
   name: 'LinuxPie',
   props: ["mock", "timer"],
+  computed: {
+    ...mapState('setting', ['theme']),
+    pieColors() {
+      const baseColor = this.theme.color || '#1890ff'
+      // 根据告警级别生成不同深浅的颜色
+      return ['item', [
+        this.adjustColor(baseColor, -40),  // 未分类 - 深色
+        this.adjustColor(baseColor, -20),  // 信息 - 较深
+        baseColor,                          // 一般 - 主题色
+        this.adjustColor(baseColor, 20),   // 严重 - 较浅
+        this.adjustColor(baseColor, 40),   // 灾难 - 浅色
+      ]]
+    }
+  },
   data () {
     return {
       mockData: "",
@@ -69,6 +84,24 @@ export default {
         case "5": res = "灾难"; break;
       }
       return res;
+    },
+    adjustColor(color, amount) {
+      // 将十六进制颜色转换为 RGB
+      const hex = color.replace('#', '')
+      const r = parseInt(hex.substring(0, 2), 16)
+      const g = parseInt(hex.substring(2, 4), 16)
+      const b = parseInt(hex.substring(4, 6), 16)
+      
+      // 调整亮度
+      const newR = Math.max(0, Math.min(255, r + amount))
+      const newG = Math.max(0, Math.min(255, g + amount))
+      const newB = Math.max(0, Math.min(255, b + amount))
+      
+      // 转换回十六进制
+      return '#' + 
+        newR.toString(16).padStart(2, '0') + 
+        newG.toString(16).padStart(2, '0') + 
+        newB.toString(16).padStart(2, '0')
     }
   }
 }

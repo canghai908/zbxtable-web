@@ -12,6 +12,7 @@
             textStyle: {
               fontSize: 12,
               textBaseline: 'middle',
+              fill: $themeColor
             },
             formatter: (text) => formatLongText(text, 15)
           }" :line="null" :grid="null" />
@@ -19,15 +20,16 @@
             textStyle: {
               fontSize: 12,
               textBaseline: 'top',
-              offset: 15
+              offset: 15,
+              fill: $themeColor
             },
             formatter: (val) => `${val}次`
           }" :line="null" :grid="null" />
-        <v-bar position="name*value" color="#1890ff" :label="['value', {
+        <v-bar position="name*value" :color="$themeColor" :label="['value', {
             position: 'right',
             offsetX: 5,
             textStyle: {
-              fill: '#666',
+              fill: $themeColor,
               fontSize: 12
             },
             formatter: (val) => `${val}次`
@@ -35,11 +37,11 @@
       </v-chart>
       
       <!-- 添加主机名和实例标签列表 -->
-      <div class="host-list">
-        <div v-for="(item, index) in displayList" :key="index" class="host-item">
-          <span class="host-name">{{ item.hostname }}</span>
+      <div class="host-list" :style="{ background: hexToRgba($themeColor, 0.05) }">
+        <div v-for="(item, index) in displayList" :key="index" class="host-item" :style="{ background: hexToRgba($themeColor, 0.02), borderLeft: `3px solid ${$themeColor}` }">
+          <span class="host-name" :style="{ color: $themeColor }">{{ item.hostname }}</span>
           <a-tag v-if="item.instanceName" :color="$themeColor" class="instance-tag">{{ item.instanceName }}</a-tag>
-          <span class="host-count">{{ item.value }}次</span>
+          <span class="host-count" :style="{ color: $themeColor }">{{ item.value }}次</span>
         </div>
       </div>
     </div>
@@ -138,6 +140,13 @@ export default {
         return text.substring(0, maxLength) + '...';
       }
       return text;
+    },
+    hexToRgba(hex, alpha = 1) {
+      if (!hex) return `rgba(24, 144, 255, ${alpha})`
+      const r = parseInt(hex.slice(1, 3), 16)
+      const g = parseInt(hex.slice(3, 5), 16)
+      const b = parseInt(hex.slice(5, 7), 16)
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`
     }
   }
 }
@@ -189,17 +198,17 @@ export default {
 .host-list {
   margin-top: 20px;
   padding: 10px;
-  background: #fafafa;
   border-radius: 4px;
+  transition: background 0.3s ease;
   
   .host-item {
     display: flex;
     align-items: center;
     padding: 8px 12px;
     margin-bottom: 8px;
-    background: white;
     border-radius: 4px;
     box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
     
     &:last-child {
       margin-bottom: 0;
@@ -208,8 +217,8 @@ export default {
     .host-name {
       flex: 1;
       font-size: 14px;
-      color: #333;
       font-weight: 500;
+      transition: color 0.3s ease;
     }
     
     .instance-tag {
@@ -218,8 +227,8 @@ export default {
     
     .host-count {
       font-size: 14px;
-      color: #666;
       font-weight: 500;
+      transition: color 0.3s ease;
     }
   }
 }
