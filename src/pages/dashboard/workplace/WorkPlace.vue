@@ -20,7 +20,7 @@
           <div class="homeMain homeList">
             <div class="homeItem"><div>Linux主机:</div><span>{{info.lin_count}}台</span></div>
             <div class="homeItem"><div>Window主机:</div><span>{{info.win_count}}台</span></div>
-            <div class="homeItem"><div>硬件服务器:</div><span>{{info.srv_count}}台</span></div>
+            <div class="homeItem"><div>物理机器:</div><span>{{info.srv_count}}台</span></div>
             <div class="homeItem"><div>网络设备:</div><span>{{info.net_count}}台</span></div>
           </div>
         </a-card>

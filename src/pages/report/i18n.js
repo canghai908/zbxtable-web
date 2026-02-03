@@ -65,7 +65,7 @@ module.exports = {
       message_task_edited:"修改成功",  
       windows_device:"Windows",
       linux_device:"Linux",
-      hardware_device:"硬件服务器",
+      hardware_device:"物理机器",
       network_device:"网络设备",
       save_btn:"提交",
       discard_btn:"返回",

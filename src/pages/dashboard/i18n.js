@@ -10,7 +10,7 @@ module.exports = {
 			severity_unknown: '未分类',
 			title_hosttypecount: '设备统计',
 			device_network_devices: '网络设备',
-			device_server_devices: '硬件服务器',
+			device_server_devices: '物理机器',
 			device_windows_hosts: 'Windows系统',
 			device_linux_hosts: 'Linux系统',
 			device_count: '台',

@@ -101,7 +101,7 @@
           <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd', padding: '12px'}" :loading="!detail">
             <a-row :gutter="[12, 12]">
               <a-col :span="24">
-                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '12px'}" title="网络接口列表">
+                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '12px'}" title="网卡列表">
                   <a-table :loading="loading2" :columns="columns" :data-source="list" @change="changePage" :pagination="pagination" :row-selection="{
         selectedRowKeys: selectedRowKeys,
         onChange: onSelectChange,

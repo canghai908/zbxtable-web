@@ -303,7 +303,7 @@ export default {
       HostTypeList: [
         { value: 'VM_WIN', label: 'Windows' },
         { value: 'VM_LIN', label: 'Linux' },
-        { value: 'HW_SRV', label: '硬件服务器' },
+        { value: 'HW_SRV', label: '物理机器' },
         { value: 'HW_NET', label: '网络设备' }
       ],
       HostsList: [],

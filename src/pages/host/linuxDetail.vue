@@ -86,10 +86,10 @@
               </a-col>
             </a-row>
             
-            <!-- 第二行：磁盘使用率表格 -->
+            <!-- 第二行：磁盘分区表格 -->
             <a-row :gutter="12">
               <a-col :span="24">
-                <a-card hoverable :headStyle="$cardHeadStyle" :bodyStyle="{padding: '12px'}" title="磁盘使用率">
+                <a-card hoverable :headStyle="$cardHeadStyle" :bodyStyle="{padding: '12px'}" title="磁盘分区">
                   <a-table 
                     :loading="loading2" 
                     :columns="columns" 
@@ -116,7 +116,7 @@
           <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd', padding: '16px'}" :loading="!detail" style="margin-top: 12px;">
             <a-row :gutter="12">
               <a-col :span="24">
-                <a-card hoverable :headStyle="$cardHeadStyle" :bodyStyle="{padding: '12px'}" title="网络接口">
+                <a-card hoverable :headStyle="$cardHeadStyle" :bodyStyle="{padding: '12px'}" title="网卡">
                   <a-table 
                     :loading="loading2" 
                     :columns="columns2" 

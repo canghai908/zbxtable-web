@@ -94,7 +94,7 @@
           <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd', padding: '12px'}" :loading="!detail">
             <a-row :gutter="[12, 12]">
               <a-col :span="24">
-                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '12px'}" title="网络接口">
+                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '12px'}" title="网卡">
                   <a-table :loading="loading2" :columns="columns2" :data-source="Interfacelist" :pagination=false :scroll="{ y: 400 }" :rowKey="(record) => { return record.id;}">
                     <span slot="operational_status" slot-scope="record">
                       <template slot="title">
