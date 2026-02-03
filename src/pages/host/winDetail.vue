@@ -1,32 +1,84 @@
 <template>
   <page-layout :title="detail.name">
     <div slot="headerContent" class="linux-detail">
-      <detail-list size="small" :col="3">
-        <detail-list-item term="主机ID">{{detail.hostid}}</detail-list-item>
-        <detail-list-item term="CPU核心数">{{detail.number_of_cores}}</detail-list-item>
-        <detail-list-item term="类型">{{detail.model || "--"}}</detail-list-item>
-        <detail-list-item term="总内存">{{detail.memory_total || "--"}}</detail-list-item>
-        <detail-list-item term="操作系统">{{detail.os || "--"}}</detail-list-item>
-        <detail-list-item term="运行时长">{{detail.uptime || "--"}}</detail-list-item>
-        <detail-list-item term="备注">{{detail.vendor || "--"}}</detail-list-item>
-      </detail-list>
+      <!-- 主机基本信息 -->
+      <a-card :headStyle="{...$cardHeadStyle, marginBottom: '12px'}" :bodyStyle="{padding: '12px'}" title="主机基本信息">
+        <a-row :gutter="[24, 8]">
+          <a-col :xl="6" :lg="8" :md="12" :sm="24">
+            <div class="info-item">
+              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">主机ID:</span>
+              <span class="info-value">{{detail.hostid}}</span>
+            </div>
+          </a-col>
+          <a-col :xl="6" :lg="8" :md="12" :sm="24">
+            <div class="info-item">
+              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">CPU核心数:</span>
+              <span class="info-value">{{detail.number_of_cores}}</span>
+            </div>
+          </a-col>
+          <a-col :xl="6" :lg="8" :md="12" :sm="24">
+            <div class="info-item">
+              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">类型:</span>
+              <span class="info-value">{{detail.model || "--"}}</span>
+            </div>
+          </a-col>
+          <a-col :xl="6" :lg="8" :md="12" :sm="24">
+            <div class="info-item">
+              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">总内存:</span>
+              <span class="info-value">{{detail.memory_total || "--"}}</span>
+            </div>
+          </a-col>
+        </a-row>
+        <a-row :gutter="[24, 8]">
+          <a-col :xl="6" :lg="8" :md="12" :sm="24">
+            <div class="info-item">
+              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">操作系统:</span>
+              <span class="info-value">{{detail.os || "--"}}</span>
+            </div>
+          </a-col>
+          <a-col :xl="6" :lg="8" :md="12" :sm="24">
+            <div class="info-item">
+              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">运行时长:</span>
+              <span class="info-value">{{detail.uptime || "--"}}</span>
+            </div>
+          </a-col>
+          <a-col :xl="12" :lg="16" :md="24" :sm="24">
+            <div class="info-item">
+              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">备注:</span>
+              <span class="info-value">{{detail.vendor || "--"}}</span>
+            </div>
+          </a-col>
+        </a-row>
+      </a-card>
       <a-tabs :tabBarStyle="{textAlign: 'center', width: '100%'}" style="padding: 0px 2px;">
         <a-tab-pane tab="运行信息" key="1">
-          <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="!detail">
-            <a-row :gutter="16">
+          <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd', padding: '12px'}" :loading="!detail">
+            <a-row :gutter="[12, 12]">
               <a-col :xl="{ span: 6 }" :lg="{ span: 12 }">
-                <a-card hoverable :headStyle="$cardHeadStyle" :bodyStyle="{padding: '0'}" title="CPU使用率">
+                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '0'}" title="CPU使用率">
                   <div id="liquidCPU" style="width: 300px; height: 300px;margin:0 auto;"></div>
                 </a-card>
               </a-col>
               <a-col :xl="{ span: 6 }" :lg="{ span: 12 }">
-                <a-card hoverable :headStyle="$cardHeadStyle" :bodyStyle="{padding: '0'}" title="内存使用率">
+                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '0'}" title="内存使用率">
                   <div id="liquidMem" style="width: 300px; height: 300px;margin:0 auto;"></div>
                 </a-card>
               </a-col>
-              <a-col :xl="{ span: 12 }" :lg="{ span: 12 }" style="height: 650px;margin:0 auto;">
-                <a-col :xl="{ span: 24 }" :lg="{ span: 12 }">
-                  <a-table :loading="loading2" :columns="columns" :data-source="FileSystemList" style="height:650px;margin:0 auto;" :pagination=false :scroll="{ y: 1000, }" :rowKey="(record) => { return record.id;}">
+              <a-col :xl="{ span: 6 }" :lg="{ span: 12 }">
+                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '0'}" title="网络丢包">
+                  <div id="liquidPingloss" style="width: 300px; height: 300px;margin:0 auto;"></div>
+                </a-card>
+              </a-col>
+              <a-col :xl="{ span: 6 }" :lg="{ span: 12 }">
+                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '0'}" title="网络延时">
+                  <div id="liquidPingsec" class="text-pingsec" :style="{color: themeColor}">{{detail.ping_sec | dataFormat}}</div>
+                </a-card>
+              </a-col>
+            </a-row>
+            <a-row :gutter="[12, 12]" style="margin-top: 12px;">
+              <a-col :span="24">
+                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '12px'}" title="磁盘使用情况">
+                  <a-table :loading="loading2" :columns="columns" :data-source="FileSystemList" :pagination=false :scroll="{ y: 400 }" :rowKey="(record) => { return record.id;}">
                     <div slot="name" slot-scope="record">{{record.name}}</div>
                     <div slot="total_space" slot-scope="record">{{record.total_space | formatBytes}}</div>
                     <div slot="used_space" slot-scope="record">{{record.used_space | formatBytes}}</div>
@@ -35,29 +87,15 @@
                     </div>
                     <span slot="lastclock" slot-scope="record">{{record.lastclock| dateFormat}}</span>
                   </a-table>
-                </a-col>
-              </a-col>
-            </a-row>
-            <a-row :gutter="16">
-              <!--pingloss-->
-              <a-col :xl="{ span: 6 }" :lg="{ span: 12 }" class="pingloss">
-                <a-card hoverable :headStyle="$cardHeadStyle" :bodyStyle="{padding: '0'}" title="网络丢包">
-                  <div id="liquidPingloss" style="width: 300px; height: 280px;margin:0 auto;"></div>
-                </a-card>
-              </a-col>
-              <!--pingsec-->
-              <a-col :xl="{ span: 6 }" :lg="{ span: 12 }" class="pingsec">
-                <a-card hoverable :headStyle="$cardHeadStyle" :bodyStyle="{padding: '0'}" title="网络延时">
-                  <div id="liquidPingsec" class="text-pingsec">{{detail.ping_sec | dataFormat}}</div>
                 </a-card>
               </a-col>
             </a-row>
           </a-card>
-          <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="!detail">
-            <a-row :gutter="16">
-              <a-col :xl="{ span: 24 }" :lg="{ span: 24 }">
-                <a-col :xl="{ span: 24 }" :lg="{ span: 24 }">
-                  <a-table :loading="loading2" :columns="columns2" :data-source="Interfacelist" :pagination=false :scroll="{ y: 300, }" :rowKey="(record) => { return record.id;}">
+          <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd', padding: '12px'}" :loading="!detail">
+            <a-row :gutter="[12, 12]">
+              <a-col :span="24">
+                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '12px'}" title="网络接口">
+                  <a-table :loading="loading2" :columns="columns2" :data-source="Interfacelist" :pagination=false :scroll="{ y: 400 }" :rowKey="(record) => { return record.id;}">
                     <span slot="operational_status" slot-scope="record">
                       <template slot="title">
                         {{record.operational_status||'--'}}
@@ -81,7 +119,7 @@
                     </div>
                     <span slot="lastclock" slot-scope="record">{{record.lastclock | dateFormat }}</span>
                   </a-table>
-                </a-col>
+                </a-card>
               </a-col>
             </a-row>
           </a-card>
@@ -189,8 +227,6 @@
 import PageLayout from "@/layouts/PageLayout";
 import DetailList from "@/components/tool/DetailList";
 const DetailListItem = DetailList.Item;
-// import HeadInfo from '../../components/tool/HeadInfo'
-// import linuxLine from '../../components/chart/linuxLine'
 import { hostDetail, winMonList, netInterfaceData } from "@/services/admin";
 import { parseTimeFun } from "@/utils/formatter";
 import moment from "moment";
@@ -198,9 +234,11 @@ import echarts from 'echarts';
 require('echarts-liquidfill');
 import FileSaver from "file-saver";
 import XLSX from "xlsx";
+import themeMixin from '@/mixins/themeMixin';
 
 export default {
-  name: "LinuxDetail",
+  name: "WinDetail",
+  mixins: [themeMixin],
   components: { PageLayout, DetailListItem, DetailList, },
   data() {
     return {
@@ -313,7 +351,20 @@ export default {
       loading1: false,
       loading2: false,
       loading3: false,
+      cpuChart: null,
+      memChart: null,
+      pingLossChart: null,
     };
+  },
+  watch: {
+    themeColor() {
+      // 当主题颜色变化时，重新渲染图表
+      this.$nextTick(() => {
+        if (this.detail && this.detail.cpu_utilization) {
+          this.initBaseChart()
+        }
+      })
+    }
   },
   created() {
     this.dates = new Date().getTime();
@@ -429,16 +480,39 @@ export default {
       this.visible = false
     },
     initBaseChart() {
+      // 检查 detail 数据是否已加载
+      if (!this.detail || !this.detail.cpu_utilization || !this.detail.memory_utilization) {
+        console.warn('Detail data not loaded yet, skipping chart initialization')
+        return
+      }
+      
+      // 将主题色转换为 RGB 值用于渐变
+      const themeColor = this.themeColor || '#1890ff'
+      const hexToRgb = (hex) => {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16)
+        } : { r: 24, g: 144, b: 255 };
+      }
+      const rgb = hexToRgb(themeColor)
+      
       //cpu
-      this.myChart = echarts.init(document.getElementById('liquidCPU'));
-      this.myChart.setOption(
+      const cpuValue = parseFloat(this.detail.cpu_utilization.split(" ")[0]) || 0
+      if (this.cpuChart) {
+        this.cpuChart.dispose()
+      }
+      this.cpuChart = echarts.init(document.getElementById('liquidCPU'));
+      this.cpuChart.setOption(
         {
           series: [
             {
               type: 'liquidFill',
               radius: '85%',
               center: ['50%', '50%'],
-              data: [this.detail.cpu_utilization.split(" ")[0] / 100],
+              data: [cpuValue / 100],
+              color: [themeColor],
               backgroundStyle: {
                 color: {
                   type: 'linear',
@@ -449,15 +523,15 @@ export default {
                   colorStops: [
                     {
                       offset: 1,
-                      color: 'rgba(168, 218, 247, 0.4)'
+                      color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)`
                     },
                     {
                       offset: 0.5,
-                      color: 'rgba(168, 218, 247, 0.5)'
+                      color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.15)`
                     },
                     {
                       offset: 0,
-                      color: 'rgba(168, 218, 247, 0.8)'
+                      color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2)`
                     }
                   ],
                   globalCoord: false
@@ -476,28 +550,29 @@ export default {
                     colorStops: [
                       {
                         offset: 0,
-                        color: 'rgba(81,142,215, 0)'
+                        color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0)`
                       },
                       {
                         offset: 0.5,
-                        color: 'rgba(53,142,215, 0.45)'
+                        color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.45)`
                       },
                       {
                         offset: 1,
-                        color: 'rgba(53,142,215, 0.6)'
+                        color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`
                       }
                     ],
                     globalCoord: false
                   },
-                  shadowColor: 'rgba(66,102,247, 0.55)',
+                  shadowColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.55)`,
                   shadowBlur: 10
                 }
               },
               label: {
                 normal: {
-                  formatter: this.detail.cpu_utilization.split(" ")[0] + "%",
+                  formatter: cpuValue + "%",
                   textStyle: {
-                    fontSize: 35
+                    fontSize: 35,
+                    color: themeColor
                   }
                 }
               }
@@ -507,15 +582,20 @@ export default {
         true
       );
       //memory
-      this.myChart = echarts.init(document.getElementById('liquidMem'));
-      this.myChart.setOption(
+      const memValue = parseFloat(this.detail.memory_utilization.split(" ")[0]) || 0
+      if (this.memChart) {
+        this.memChart.dispose()
+      }
+      this.memChart = echarts.init(document.getElementById('liquidMem'));
+      this.memChart.setOption(
         {
           series: [
             {
               type: 'liquidFill',
               radius: '85%',
               center: ['50%', '50%'],
-              data: [this.detail.memory_utilization.split(" ")[0] / 100],
+              data: [memValue / 100],
+              color: [themeColor],
               backgroundStyle: {
                 color: {
                   type: 'linear',
@@ -526,15 +606,15 @@ export default {
                   colorStops: [
                     {
                       offset: 1,
-                      color: 'rgba(168, 218, 247, 0.4)'
+                      color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)`
                     },
                     {
                       offset: 0.5,
-                      color: 'rgba(168, 218, 247, 0.5)'
+                      color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.15)`
                     },
                     {
                       offset: 0,
-                      color: 'rgba(168, 218, 247, 0.8)'
+                      color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2)`
                     }
                   ],
                   globalCoord: false
@@ -553,28 +633,29 @@ export default {
                     colorStops: [
                       {
                         offset: 0,
-                        color: 'rgba(81,142,215, 0)'
+                        color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0)`
                       },
                       {
                         offset: 0.5,
-                        color: 'rgba(53,142,215, 0.45)'
+                        color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.45)`
                       },
                       {
                         offset: 1,
-                        color: 'rgba(53,142,215, 0.6)'
+                        color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`
                       }
                     ],
                     globalCoord: false
                   },
-                  shadowColor: 'rgba(66,102,247, 0.55)',
+                  shadowColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.55)`,
                   shadowBlur: 10
                 }
               },
               label: {
                 normal: {
-                  formatter: this.detail.memory_utilization.split(" ")[0] + "%",
+                  formatter: memValue + "%",
                   textStyle: {
-                    fontSize: 35
+                    fontSize: 35,
+                    color: themeColor
                   }
                 }
               }
@@ -582,24 +663,63 @@ export default {
           ]
         },
         true
-      );
+      )
       //pingloss
-      this.myChart = echarts.init(document.getElementById('liquidPingloss'));
-      this.myChart.setOption(
+      const pingLossValue = this.detail.ping_loss ? parseFloat(this.detail.ping_loss.split(" ")[0]) || 0 : 0
+      if (this.pingLossChart) {
+        this.pingLossChart.dispose()
+      }
+      this.pingLossChart = echarts.init(document.getElementById('liquidPingloss'));
+      this.pingLossChart.setOption(
         {
           series: [
             {
               type: 'gauge',
               radius: '85%',
               center: ['50%', '50%'],
-              data: [this.detail.ping_loss.split(" ")[0]],
-              detail: { // 中间数据
+              data: [pingLossValue],
+              axisLine: {
+                lineStyle: {
+                  width: 20,
+                  color: [
+                    [0.3, '#67e0e3'],
+                    [0.7, themeColor],
+                    [1, '#fd666d']
+                  ]
+                }
+              },
+              pointer: {
+                itemStyle: {
+                  color: themeColor
+                }
+              },
+              axisTick: {
+                distance: -20,
+                length: 5,
+                lineStyle: {
+                  color: '#fff',
+                  width: 1
+                }
+              },
+              splitLine: {
+                distance: -20,
+                length: 20,
+                lineStyle: {
+                  color: '#fff',
+                  width: 2
+                }
+              },
+              axisLabel: {
+                color: themeColor,
+                distance: 15,
+                fontSize: 12
+              },
+              detail: {
                 valueAnimation: true,
-                formatter: '{value}%', // 数据值的样式
-                textStyle: {
-                  fontSize: 14
-                },
-                offsetCenter: [0, '80%'] // 中间值的位置
+                formatter: '{value}%',
+                color: themeColor,
+                fontSize: 20,
+                offsetCenter: [0, '70%']
               },
             }
           ]
@@ -1285,6 +1405,23 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.info-item {
+  display: flex;
+  align-items: center;
+  padding: 4px 0;
+  
+  .info-label {
+    font-weight: 500;
+    margin-right: 8px;
+    white-space: nowrap;
+  }
+  
+  .info-value {
+    flex: 1;
+    word-break: break-all;
+  }
+}
+
 .linux-charts {
   display: flex;
   margin-top: 20px;
@@ -1292,21 +1429,16 @@ export default {
   position: relative;
   z-index: 9;
 }
-.pingloss {
-  margin-top: -280px;
-}
-.pingsec {
-  margin-top: -280px;
-}
+
 .text-pingsec {
   width: 300px;
-  height: 280px;
+  height: 300px;
   margin: 0 auto;
   font-size: 100px;
-  color: #1ed80d;
   font-weight: 600;
-  flex: auto;
-  justify-content: space-between;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
 }
 </style>
