@@ -1,9 +1,9 @@
 <template>
   <page-layout :title="detail.name">
     <div slot="headerContent" class="linux-detail">
-      <a-card :bodyStyle="{padding: '16px 24px'}" style="margin-bottom: 16px;">
+      <a-card :bodyStyle="{padding: '12px 20px'}" style="margin-bottom: 12px;">
         <!-- 第一行 -->
-        <a-row :gutter="[32, 12]" style="margin-bottom: 12px;">
+        <a-row :gutter="[24, 8]" style="margin-bottom: 8px;">
           <a-col :xl="4" :lg="6" :md="8" :sm="12" :xs="24">
             <div class="info-item">
               <span class="info-label" :style="{color: $themeColor}">主机ID</span>
@@ -44,7 +44,7 @@
           </a-col>
         </a-row>
         <!-- 第二行 -->
-        <a-row :gutter="[32, 12]">
+        <a-row :gutter="[24, 8]">
           <a-col :xl="12" :lg="14" :md="16" :sm="24" :xs="24">
             <div class="info-item">
               <span class="info-label" :style="{color: $themeColor}">内核版本</span>
@@ -61,9 +61,9 @@
       </a-card>
       <a-tabs :tabBarStyle="{textAlign: 'left', width: '100%'}" style="padding: 0px 2px;">
         <a-tab-pane tab="运行信息" key="1">
-          <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd', padding: '24px'}" :loading="!detail">
+          <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd', padding: '16px'}" :loading="!detail">
             <!-- 第一行：CPU、内存、网络丢包、网络延时 -->
-            <a-row :gutter="[16, 16]" style="margin-bottom: 24px;">
+            <a-row :gutter="[12, 12]" style="margin-bottom: 16px;">
               <a-col :xl="6" :lg="12" :md="12" :sm="24">
                 <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '0'}" title="CPU使用率">
                   <div id="liquidCPU" style="width: 100%; height: 280px; max-width: 300px; margin: 0 auto;"></div>
@@ -87,7 +87,7 @@
             </a-row>
             
             <!-- 第二行：磁盘使用率表格 -->
-            <a-row :gutter="16">
+            <a-row :gutter="12">
               <a-col :span="24">
                 <a-card hoverable :headStyle="$cardHeadStyle" :bodyStyle="{padding: '12px'}" title="磁盘使用率">
                   <a-table 
@@ -113,8 +113,8 @@
               </a-col>
             </a-row>
           </a-card>
-          <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd', padding: '24px'}" :loading="!detail" style="margin-top: 16px;">
-            <a-row :gutter="16">
+          <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd', padding: '16px'}" :loading="!detail" style="margin-top: 12px;">
+            <a-row :gutter="12">
               <a-col :span="24">
                 <a-card hoverable :headStyle="$cardHeadStyle" :bodyStyle="{padding: '12px'}" title="网络接口">
                   <a-table 
@@ -1367,7 +1367,7 @@ export default {
 .info-item {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   
   .info-label {
     font-size: 13px;
@@ -1377,10 +1377,10 @@ export default {
   }
   
   .info-value {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500;
     word-break: break-word;
-    line-height: 1.4;
+    line-height: 1.3;
   }
 }
 
