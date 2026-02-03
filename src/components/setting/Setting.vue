@@ -4,6 +4,10 @@
       <a-button @click="saveSetting" type="primary" icon="save">{{$t('save')}}</a-button>
       <a-button @click="resetSetting" type="dashed" icon="redo" style="float: right">{{$t('reset')}}</a-button>
     </setting-item>
+    <setting-item>
+      <a-button @click="saveToServer" type="primary" icon="cloud-upload" block :loading="saving">保存到服务器</a-button>
+      <a-alert v-if="lastSaveTime" type="success" :message="`上次保存: ${lastSaveTime}`" style="margin-top: 8px" />
+    </setting-item>
     <setting-item :title="$t('theme.title')">
       <img-checkbox-group @change="values => setTheme({...theme, mode: values[0]})" :default-values="[theme.mode]">
         <img-checkbox :title="$t('theme.dark')" :img="theme_dark" value="dark" />
@@ -97,6 +101,7 @@ import { setting } from '@/config/default'
 import sysConfig from '@/config/config'
 import fastEqual from 'fast-deep-equal'
 import deepMerge from 'deepmerge'
+import { userPut } from '@/services/admin'
 import theme_dark from '@/assets/img/theme_dark.svg'
 import theme_light from '@/assets/img/theme_light.svg'
 import theme_night from '@/assets/img/theme_night.svg'
@@ -114,6 +119,8 @@ export default {
     return {
       copyConfig: 'Sorry, you have copied nothing O(∩_∩)O~',
       isDev: process.env.NODE_ENV === 'development',
+      saving: false,
+      lastSaveTime: '',
       theme_dark,
       theme_light,
       theme_night,
@@ -126,7 +133,15 @@ export default {
     directions() {
       return this.animates.find(item => item.name == this.animate.name).directions
     },
-    ...mapState('setting', ['theme', 'layout', 'animate', 'animates', 'palettes', 'multiPage', 'weekMode', 'fixedHeader', 'fixedSideBar', 'hideSetting', 'pageWidth'])
+    ...mapState('setting', ['theme', 'layout', 'animate', 'animates', 'palettes', 'multiPage', 'weekMode', 'fixedHeader', 'fixedSideBar', 'hideSetting', 'pageWidth']),
+    ...mapState('account', { currentUser: 'user' })
+  },
+  mounted() {
+    // 加载上次保存时间
+    const savedTime = localStorage.getItem('theme_last_save_time')
+    if (savedTime) {
+      this.lastSaveTime = savedTime
+    }
   },
   watch: {
     'animate.name': function (val) {
@@ -160,11 +175,55 @@ export default {
       localStorage.setItem(process.env.VUE_APP_SETTING_KEY, JSON.stringify(config))
       setTimeout(closeMessage, 800)
     },
+    async saveToServer() {
+      this.saving = true
+      try {
+        // 获取当前用户信息
+        const user = this.$store.getters['account/user']
+        if (!user || !user.id) {
+          throw new Error('用户信息不存在')
+        }
+        
+        const config = this.extractConfig(true)
+        
+        // 调用用户更新接口，只更新 theme 字段
+        const response = await userPut(user.id, {
+          theme: JSON.stringify(config)
+        })
+        
+        if (response.data && response.data.code === 200) {
+          const now = new Date().toLocaleString('zh-CN', { 
+            year: 'numeric', 
+            month: '2-digit', 
+            day: '2-digit',
+            hour: '2-digit', 
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false 
+          })
+          this.lastSaveTime = now
+          localStorage.setItem('theme_last_save_time', now)
+          
+          // 同时保存到本地
+          localStorage.setItem(process.env.VUE_APP_SETTING_KEY, JSON.stringify(config))
+          
+          this.$message.success('主题配置已保存到服务器')
+        } else {
+          throw new Error(response.data?.message || '保存失败')
+        }
+      } catch (error) {
+        console.error('保存主题配置失败:', error)
+        this.$message.error('保存到服务器失败: ' + (error.message || '网络错误'))
+      } finally {
+        this.saving = false
+      }
+    },
     resetSetting() {
       this.$confirm({
         title: '重置主题会刷新页面，当前页面内容不会保留，确认重置？',
         onOk() {
           localStorage.removeItem(process.env.VUE_APP_SETTING_KEY)
+          localStorage.removeItem('theme_last_save_time')
           window.location.reload()
         }
       })

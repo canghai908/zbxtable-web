@@ -68,6 +68,27 @@ export default {
   },
   methods: {
     ...mapMutations('account', ['setUser', 'setPermissions', 'setRoles']),
+    loadUserTheme(user) {
+      try {
+        // 从用户信息中读取主题配置
+        if (user && user.theme) {
+          let themeConfig
+          // 如果是字符串，需要解析
+          if (typeof user.theme === 'string') {
+            themeConfig = JSON.parse(user.theme)
+          } else {
+            themeConfig = user.theme
+          }
+          
+          // 保存到 localStorage，这样刷新页面时会自动加载
+          localStorage.setItem(process.env.VUE_APP_SETTING_KEY, JSON.stringify(themeConfig))
+          console.log('用户主题配置已加载:', themeConfig)
+        }
+      } catch (error) {
+        console.warn('加载用户主题配置失败，使用默认配置:', error)
+        // 加载失败不影响登录流程
+      }
+    },
     onSubmit(e) {
       e.preventDefault()
       this.form.validateFields((err) => {
@@ -120,6 +141,10 @@ export default {
         // this.setPermissions(premissions);
         this.setRoles(roles)
         setAuthorization({ token: loginRes && loginRes.data && loginRes.data.token })
+        
+        // 加载用户主题配置
+        this.loadUserTheme(user)
+        
         // 获取路由配置
         getRoutesConfig().then((result) => {
           try {
