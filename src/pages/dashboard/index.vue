@@ -3,7 +3,7 @@
     <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="!loading1 &&!loading2 && !loading3">
       <a-row :gutter="16">
         <a-col :xl="{ span: 12 }" :lg="{ span: 24 }">
-          <a-card :title="$t('title_problems')" :headStyle="{ background: '#FAFBFC' }" size="small" :loading="!loading1">
+          <a-card :title="$t('title_problems')" :headStyle="cardHeadStyle" size="small" :loading="!loading1">
             <div class="homeMain beauty-scroll">
               <a-timeline>
                 <a-timeline-item v-for="(v, i) in triggerList" :key="i">
@@ -13,7 +13,7 @@
                   <a-tag v-else-if="v.severity == 4" color="#E97659">{{ $t('severity_high') }}</a-tag>
                   <a-tag v-else-if="v.severity == 5" color="#f50000">{{ $t('severity_disaster') }}</a-tag>
                   <a-tag v-else color="#97AAB3">{{ $t('severity_unknown') }}</a-tag>
-                  <a-tag v-if="v.instance_name" color="#108ee9" style="margin-left: 4px;">{{ v.instance_name }}</a-tag>
+                  <a-tag v-if="v.instance_name" :color="theme.color" style="margin-left: 4px;">{{ v.instance_name }}</a-tag>
                   <!-- <a-icon slot="dot" type="minus-circle" v-else-if="v.severity == 2" :style="{ fontSize: '16px', color: '#F56C6C' }" />
                   <a-icon slot="dot" type="exclamation-circle" v-else :style="{ fontSize: '16px', color: '#E6A23C' }" /> -->
                   {{v.lastchange | parsetime}} <b>{{v.name}}</b> {{v.lasteventname}}
@@ -25,17 +25,29 @@
         <a-col :xl="{ span: 12 }" :lg="{ span: 24 }">
           <a-row>
             <a-col :lg="24" :md="24">
-              <a-card :title="$t('title_hosttypecount')" :headStyle="{background: '#FAFBFC'}" :bodyStyle="{height: '180px'}" size="small" :loading="!loading2">
-                <div class="homeHost beauty-scroll">
-                  <div class="homeHItem"><img src="../../assets/img/t1.png" alt=""><span>{{ $t('device_network_devices') }}</span><em>{{ info.net_count }} {{ $t('device_count') }}</em></div>
-                  <div class="homeHItem"><img src="../../assets/img/t2.png" alt=""><span>{{ $t('device_server_devices') }}</span><em>{{ info.srv_count }} {{ $t('device_count') }}</em></div>
-                  <div class="homeHItem"><img src="../../assets/img/t4.png" alt=""><span>{{ $t('device_windows_hosts') }}</span><em>{{ info.win_count }} {{ $t('device_count') }}</em></div>
-                  <div class="homeHItem"><img src="../../assets/img/t3.png" alt=""><span>{{ $t('device_linux_hosts') }}</span><em>{{ info.lin_count }} {{ $t('device_count') }}</em></div>
+              <a-card :title="$t('title_hosttypecount')" :headStyle="cardHeadStyle" :bodyStyle="{height: '180px'}" size="small" :loading="!loading2">
+                <div class="homeHost beauty-scroll" :style="cssVars">
+                  <div class="homeHItem">
+                    <span class="device-name">{{ $t('device_network_devices') }}</span>
+                    <em class="device-count">{{ info.net_count }}</em>
+                  </div>
+                  <div class="homeHItem">
+                    <span class="device-name">{{ $t('device_server_devices') }}</span>
+                    <em class="device-count">{{ info.srv_count }}</em>
+                  </div>
+                  <div class="homeHItem">
+                    <span class="device-name">{{ $t('device_windows_hosts') }}</span>
+                    <em class="device-count">{{ info.win_count }}</em>
+                  </div>
+                  <div class="homeHItem">
+                    <span class="device-name">{{ $t('device_linux_hosts') }}</span>
+                    <em class="device-count">{{ info.lin_count }}</em>
+                  </div>
                 </div>
               </a-card>
             </a-col>
             <a-col :lg="24" :md="24" style="margin-top: 14px;">
-              <a-card :title="$t('bandwidth')" :headStyle="{background: '#FAFBFC'}" :bodyStyle="{height: '220px', padding: '12px'}" size="small" :loading="!loading3">
+              <a-card :title="$t('bandwidth')" :headStyle="cardHeadStyle" :bodyStyle="{height: '220px', padding: '12px'}" size="small" :loading="!loading3">
                 <egress-bandwidth :data="egressData" />
               </a-card>
             </a-col>
@@ -47,8 +59,8 @@
     <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="!loading4 && !loading5">
       <a-row :gutter="16">
         <a-col :xl="{ span: 12 }" :lg="{ span: 24 }">
-          <h2 class="homeH2">{{ $t('windows_systems_title') }}</h2>
-          <a-card :title="$t('cpu_top5_title')" :headStyle="{ background: '#FAFBFC' }" size="small" :loading="!loading4">
+          <h2 class="homeH2" :style="{ color: theme.color }">{{ $t('windows_systems_title') }}</h2>
+          <a-card :title="$t('cpu_top5_title')" :headStyle="cardHeadStyle" size="small" :loading="!loading4">
             <div class="homePies">
               <div class="homePied" v-for="(v, i) in winC" :key="'1'+i">
                 <div class="homePie">
@@ -56,22 +68,22 @@
                 </div>
                 <div class="homePieN" :title="v.hostname + (v.instance_name ? ' [' + v.instance_name + ']' : '')">
                   <div>{{v.hostname}}</div>
-                  <a-tag v-if="v.instance_name" color="blue" class="instance-tag">{{v.instance_name}}</a-tag>
+                  <a-tag v-if="v.instance_name" :color="theme.color" class="instance-tag">{{v.instance_name}}</a-tag>
                 </div>
               </div>
             </div>
           </a-card>
         </a-col>
         <a-col :xl="{ span: 12 }" :lg="{ span: 24 }">
-          <a-card :title="$t('memory_top5_title')" :headStyle="{ background: '#FAFBFC' }" :bodyStyle="{ padding: 0 }" size="small" :loading="!loading5">
-            <div class="homeLegent" v-if="winM.length > 0">
+          <a-card :title="$t('memory_top5_title')" :headStyle="cardHeadStyle" :bodyStyle="{ padding: 0 }" size="small" :loading="!loading5">
+            <div class="homeLegent" v-if="winM.length > 0" :style="cssVars">
               <div class="homeLegent1">
                 <div class="homeLeItem1">
                   <div class="homeLeLeft">
                     <div class="homeLeLeft1"><img src="../../assets/img/top1.png" alt=""><span>{{winM[0].score}}%</span></div>
                     <div class="homeLeLeft2" :title="winM[0].hostname + (winM[0].instance_name ? ' [' + winM[0].instance_name + ']' : '')">
                       <div>{{winM[0].hostname}}</div>
-                      <a-tag v-if="winM[0].instance_name" color="blue" class="instance-tag-small">{{winM[0].instance_name}}</a-tag>
+                      <a-tag v-if="winM[0].instance_name" :color="theme.color" class="instance-tag-small">{{winM[0].instance_name}}</a-tag>
                     </div>
                   </div>
                   <div class="homeLeRight">
@@ -85,7 +97,7 @@
                     <div class="homeLeTop1"><img :src="require('../../assets/img/top'+(i+2)+'.png')" alt=""></div>
                     <div class="homeLeTop2" :title="v.hostname + (v.instance_name ? ' [' + v.instance_name + ']' : '')">
                       <div>{{v.hostname}}</div>
-                      <a-tag v-if="v.instance_name" color="blue" class="instance-tag-small">{{v.instance_name}}</a-tag>
+                      <a-tag v-if="v.instance_name" :color="theme.color" class="instance-tag-small">{{v.instance_name}}</a-tag>
                     </div>
                     <div class="homeLeTop3">{{v.score}}%</div>
                   </div>
@@ -104,8 +116,8 @@
     <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="!loading6 && !loading7">
       <a-row :gutter="16">
         <a-col :xl="{ span: 12 }" :lg="{ span: 24 }">
-          <h2 class="homeH2">{{ $t('linux_systems_title') }}</h2>
-          <a-card :title="$t('cpu_top5_title')" :headStyle="{ background: '#FAFBFC' }" size="small" :loading="!loading6">
+          <h2 class="homeH2" :style="{ color: theme.color }">{{ $t('linux_systems_title') }}</h2>
+          <a-card :title="$t('cpu_top5_title')" :headStyle="cardHeadStyle" size="small" :loading="!loading6">
             <div class="homePies">
               <div class="homePied" v-for="(v, i) in linC" :key="'2'+i">
                 <div class="homePie">
@@ -113,22 +125,22 @@
                 </div>
                 <div class="homePieN" :title="v.hostname + (v.instance_name ? ' [' + v.instance_name + ']' : '')">
                   <div>{{v.hostname}}</div>
-                  <a-tag v-if="v.instance_name" color="blue" class="instance-tag">{{v.instance_name}}</a-tag>
+                  <a-tag v-if="v.instance_name" :color="theme.color" class="instance-tag">{{v.instance_name}}</a-tag>
                 </div>
               </div>
             </div>
           </a-card>
         </a-col>
         <a-col :xl="{ span: 12 }" :lg="{ span: 24 }">
-          <a-card :title="$t('memory_top5_title')" :headStyle="{ background: '#FAFBFC' }" :bodyStyle="{ padding: 0 }" size="small" :loading="!loading5">
-            <div class="homeLegent" v-if="linM.length > 0">
+          <a-card :title="$t('memory_top5_title')" :headStyle="cardHeadStyle" :bodyStyle="{ padding: 0 }" size="small" :loading="!loading5">
+            <div class="homeLegent" v-if="linM.length > 0" :style="cssVars">
               <div class="homeLegent1">
                 <div class="homeLeItem1">
                   <div class="homeLeLeft">
                     <div class="homeLeLeft1"><img src="../../assets/img/top1.png" alt=""><span>{{linM[0].score}}%</span></div>
                     <div class="homeLeLeft2" :title="linM[0].hostname + (linM[0].instance_name ? ' [' + linM[0].instance_name + ']' : '')">
                       <div>{{linM[0].hostname}}</div>
-                      <a-tag v-if="linM[0].instance_name" color="blue" class="instance-tag-small">{{linM[0].instance_name}}</a-tag>
+                      <a-tag v-if="linM[0].instance_name" :color="theme.color" class="instance-tag-small">{{linM[0].instance_name}}</a-tag>
                     </div>
                   </div>
                   <div class="homeLeRight">
@@ -142,7 +154,7 @@
                     <div class="homeLeTop1"><img :src="require('../../assets/img/top'+(i+2)+'.png')" alt=""></div>
                     <div class="homeLeTop2" :title="v.hostname + (v.instance_name ? ' [' + v.instance_name + ']' : '')">
                       <div>{{v.hostname}}</div>
-                      <a-tag v-if="v.instance_name" color="blue" class="instance-tag-small">{{v.instance_name}}</a-tag>
+                      <a-tag v-if="v.instance_name" :color="theme.color" class="instance-tag-small">{{v.instance_name}}</a-tag>
                     </div>
                     <div class="homeLeTop3">{{v.score}}%</div>
                   </div>
@@ -173,6 +185,7 @@ import { parseTimeFun } from '@/utils/formatter'
 import pie from '@/components/gcharts/pie'
 import legent from '@/components/gcharts/legent'
 import EgressBandwidth from '@/components/egress/EgressBandwidth'
+import { mapState } from 'vuex'
 
 export default {
   name: 'index',
@@ -194,6 +207,24 @@ export default {
       linC: [],
       loading7: false,
       linM: []
+    }
+  },
+  computed: {
+    ...mapState('setting', ['theme']),
+    cardHeadStyle() {
+      // 使用主题颜色的浅色版本作为卡片标题背景
+      return {
+        background: this.hexToRgba(this.theme.color || '#1890ff', 0.08),
+        color: this.theme.color || '#1890ff',
+        fontWeight: 600
+      }
+    },
+    cssVars() {
+      return {
+        '--primary-color': this.theme.color || '#1890ff',
+        '--primary-bg': this.hexToRgba(this.theme.color || '#1890ff', 0.08),
+        '--primary-bg-hover': this.hexToRgba(this.theme.color || '#1890ff', 0.12)
+      }
     }
   },
   components: {
@@ -219,6 +250,12 @@ export default {
     }
   },
   methods: {
+    hexToRgba(hex, alpha = 1) {
+      const r = parseInt(hex.slice(1, 3), 16)
+      const g = parseInt(hex.slice(3, 5), 16)
+      const b = parseInt(hex.slice(5, 7), 16)
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`
+    },
     initTrigger() {
       indexTrigger()
         .then((resp) => {
@@ -409,7 +446,7 @@ export default {
     font-size: 16px;
     line-height: 16px;
     font-weight: 500;
-    color: #269414;
+    color: var(--primary-color);
     text-align: center;
   }
 }
@@ -483,7 +520,7 @@ export default {
   font-size: 16px;
   line-height: 16px;
   font-weight: 500;
-  color: #269414;
+  color: var(--primary-color);
 }
 .homeLeBot {
   width: 100%;
@@ -492,7 +529,7 @@ export default {
 .homeH2 {
   width: 100%;
   line-height: 100px;
-  font-size: 40px;
+  font-size: 28px;
   color: #000;
   font-weight: 600;
 }
@@ -546,40 +583,56 @@ export default {
   height: 156px;
   overflow: hidden;
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-between;
   align-items: center;
+  gap: 12px;
+  padding: 0 8px;
 }
 .homeHItem {
-  flex: 0 0 24%;
-  max-width: 150px;
-  height: 146px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  display: inline-flex;
+  flex: 1;
+  min-width: 0;
+  height: 140px;
+  border: 2px solid;
+  border-color: var(--primary-color);
+  border-radius: 12px;
+  display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  img {
-    width: 54%;
-    height: auto;
+  gap: 16px;
+  padding: 16px 12px;
+  background: var(--primary-bg);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    background: var(--primary-bg-hover);
+    
+    .device-count {
+      transform: scale(1.15);
+    }
   }
-  span {
+  
+  .device-name {
     font-size: 14px;
-    color: #999;
-    margin: 12px 0;
-    line-height: 14px;
-  }
-  em {
-    display: inline-block;
-    padding: 4px 0;
-    font-size: 12px;
-    line-height: 14px;
-    color: #fff;
-    font-style: normal;
-    width: 64%;
+    color: #666;
+    line-height: 1.4;
     text-align: center;
-    border-radius: 6px;
-    background-color: #34aa44;
+    font-weight: 500;
+    word-break: break-word;
+    max-width: 100%;
+  }
+  
+  .device-count {
+    font-size: 42px;
+    line-height: 1;
+    color: var(--primary-color);
+    font-style: normal;
+    font-weight: 700;
+    transition: transform 0.3s ease;
   }
 }
 </style>

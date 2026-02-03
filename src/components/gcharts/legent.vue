@@ -5,6 +5,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
   props: {
     height: { type: Number, default: 14 },
@@ -15,11 +16,35 @@ export default {
       mock: [],
       scale: [],
       padding:[0,0,0,0],
-      color:['sales', '#E2E7EE-#38BA24'],
       label:['sales',{offset: -2,textStyle: {fill: '#fff', shadowBlur: 2, shadowColor: 'rgba(0, 0, 0, .45)'}}],
       style:{ lineWidth: 2, stroke: '#fff'},
       showPage: false
     };
+  },
+  computed: {
+    ...mapState('setting', ['theme']),
+    color() {
+      const themeColor = this.theme.color || '#1890ff'
+      // 未使用部分用调整后的主题色（亮度+80），已使用部分用主题色
+      const lightColor = this.adjustColor(themeColor, 80)
+      return ['sales', `${lightColor}-${themeColor}`]
+    }
+  },
+  methods: {
+    hexToRgba(hex, alpha = 1) {
+      const r = parseInt(hex.slice(1, 3), 16)
+      const g = parseInt(hex.slice(3, 5), 16)
+      const b = parseInt(hex.slice(5, 7), 16)
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`
+    },
+    adjustColor(hex, amount) {
+      // 调整颜色亮度
+      const num = parseInt(hex.slice(1), 16)
+      const r = Math.min(255, Math.max(0, (num >> 16) + amount))
+      const g = Math.min(255, Math.max(0, ((num >> 8) & 0x00FF) + amount))
+      const b = Math.min(255, Math.max(0, (num & 0x0000FF) + amount))
+      return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`
+    }
   },
   created () {
     if((this.rate && this.rate > 0) || this.rate == 0) {

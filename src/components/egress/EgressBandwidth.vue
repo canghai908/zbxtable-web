@@ -9,17 +9,18 @@
         :key="egress.id"
         class="egress-item"
         :class="{ 'full-width': egressList.length === 1 }"
+        :style="egressItemStyle"
       >
         <div class="egress-header">
           <span class="egress-name">{{ egress.name }}</span>
           <span class="egress-time">{{ updateTime }}</span>
         </div>
         <div class="egress-stats">
-          <div class="stat-item in">
+          <div class="stat-item in" :style="inStyle">
             <span class="label">入流量</span>
             <span class="value">{{ formatTraffic(egress.in_value) }}</span>
           </div>
-          <div class="stat-item out">
+          <div class="stat-item out" :style="outStyle">
             <span class="label">出流量</span>
             <span class="value">{{ formatTraffic(egress.out_value) }}</span>
           </div>
@@ -30,6 +31,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 export default {
   name: 'EgressBandwidth',
   props: {
@@ -42,6 +45,30 @@ export default {
     return {
       egressList: [],
       updateTime: '--',
+    }
+  },
+  computed: {
+    ...mapState('setting', ['theme']),
+    themeColor() {
+      return this.theme.color || '#1890ff'
+    },
+    egressItemStyle() {
+      return {
+        '--egress-bg': this.hexToRgba(this.themeColor, 0.05),
+        '--egress-border': this.hexToRgba(this.themeColor, 0.2)
+      }
+    },
+    inStyle() {
+      return {
+        '--stat-bg': this.hexToRgba(this.themeColor, 0.1),
+        '--stat-color': this.themeColor
+      }
+    },
+    outStyle() {
+      return {
+        '--stat-bg': this.hexToRgba(this.adjustColor(this.themeColor, 30), 0.1),
+        '--stat-color': this.adjustColor(this.themeColor, 30)
+      }
     }
   },
   watch: {
@@ -57,6 +84,20 @@ export default {
     }
   },
   methods: {
+    hexToRgba(hex, alpha = 1) {
+      const r = parseInt(hex.slice(1, 3), 16)
+      const g = parseInt(hex.slice(3, 5), 16)
+      const b = parseInt(hex.slice(5, 7), 16)
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`
+    },
+    adjustColor(hex, amount) {
+      // 调整颜色亮度，用于生成第二个颜色
+      const num = parseInt(hex.slice(1), 16)
+      const r = Math.min(255, Math.max(0, (num >> 16) + amount))
+      const g = Math.min(255, Math.max(0, ((num >> 8) & 0x00FF) + amount))
+      const b = Math.min(255, Math.max(0, (num & 0x0000FF) + amount))
+      return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`
+    },
     formatTraffic(bytes) {
       if (!bytes || bytes === 0) return '0 B/s'
       const value = parseFloat(bytes)
@@ -106,7 +147,8 @@ export default {
 
 .egress-item {
   flex: 0 0 calc(50% - 4px);
-  background: #fafbfc;
+  background: var(--egress-bg);
+  border: 1px solid var(--egress-border);
   border-radius: 6px;
   padding: 8px;
   box-sizing: border-box;
@@ -146,39 +188,18 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  
-  &.in {
-    background: rgba(84, 112, 198, 0.1);
-    
-    .label {
-      color: #5470c6;
-    }
-    
-    .value {
-      color: #5470c6;
-    }
-  }
-  
-  &.out {
-    background: rgba(145, 204, 117, 0.1);
-    
-    .label {
-      color: #91cc75;
-    }
-    
-    .value {
-      color: #91cc75;
-    }
-  }
+  background: var(--stat-bg);
   
   .label {
     font-size: 11px;
     font-weight: 500;
+    color: var(--stat-color);
   }
   
   .value {
     font-size: 16px;
     font-weight: 600;
+    color: var(--stat-color);
   }
 }
 </style>
