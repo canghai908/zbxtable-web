@@ -19,7 +19,7 @@
     <a-divider />
     <setting-item :title="$t('navigate.title')">
       <img-checkbox-group @change="values => setLayout(values[0])" :default-values="[layout]">
-        <img-checkbox :title="$t('navigate.side')" :img="navigate.side" value="side" />
+        <img-checkbox :title="$t('navigate.side')" :img="navigate_side" value="side" />
         <img-checkbox :title="$t('navigate.head')" :img="navigate_head" value="head" />
         <img-checkbox :title="$t('navigate.mix')" :img="navigate_mix" value="mix" />
       </img-checkbox-group>

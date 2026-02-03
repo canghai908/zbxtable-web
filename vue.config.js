@@ -39,10 +39,6 @@ module.exports = {
         target: process.env.VUE_APP_API_BASE_URL || "http://localhost:8085",
         changeOrigin: true,
         ws: true, // 开启 WebSocket 代理
-        logLevel: 'debug',
-        onProxyReqWs: (proxyReq, req, socket, options, head) => {
-          console.log('[ws Proxy] Proxying WebSocket request to:', options.target);
-        },
       },
       "/public": {
         // 公开 API 代理
