@@ -81,7 +81,7 @@
               </a-col>
               <a-col :xl="6" :lg="12" :md="12" :sm="24">
                 <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '0'}" title="网络延时">
-                  <div id="liquidPingsec" class="text-pingsec">{{ detail.ping_sec | dataFormat}}</div>
+                  <div id="liquidPingsec" class="text-pingsec" :style="{color: $themeColor}">{{ detail.ping_sec | dataFormat}}</div>
                 </a-card>
               </a-col>
             </a-row>
@@ -268,10 +268,12 @@ import echarts from 'echarts';
 require('echarts-liquidfill');
 import FileSaver from "file-saver";
 import XLSX from "xlsx";
+import themeMixin from '@/mixins/themeMixin'
 
 
 export default {
   name: "LinuxDetail",
+  mixins: [themeMixin],
   components: { PageLayout, DetailListItem, DetailList, },
   data() {
     return {
@@ -382,7 +384,20 @@ export default {
       loading1: false,
       loading2: false,
       loading3: false,
+      cpuChart: null,
+      memChart: null,
+      pingLossChart: null,
     };
+  },
+  watch: {
+    themeColor() {
+      // 当主题颜色变化时，重新渲染图表
+      this.$nextTick(() => {
+        if (this.detail && this.detail.cpu_utilization) {
+          this.initBaseChart()
+        }
+      })
+    }
   },
   created() {
     this.dates = new Date().getTime();
@@ -503,10 +518,25 @@ export default {
         return
       }
       
+      // 将主题色转换为 RGB 值用于渐变
+      const themeColor = this.themeColor || '#1890ff'
+      const hexToRgb = (hex) => {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16)
+        } : { r: 24, g: 144, b: 255 };
+      }
+      const rgb = hexToRgb(themeColor)
+      
       //cpu
       const cpuValue = parseFloat(this.detail.cpu_utilization.split(" ")[0]) || 0
-      this.myChart = echarts.init(document.getElementById('liquidCPU'));
-      this.myChart.setOption(
+      if (this.cpuChart) {
+        this.cpuChart.dispose()
+      }
+      this.cpuChart = echarts.init(document.getElementById('liquidCPU'));
+      this.cpuChart.setOption(
         {
           series: [
             {
@@ -514,6 +544,7 @@ export default {
               radius: '85%',
               center: ['50%', '50%'],
               data: [cpuValue / 100],
+              color: [themeColor],
               backgroundStyle: {
                 color: {
                   type: 'linear',
@@ -524,15 +555,15 @@ export default {
                   colorStops: [
                     {
                       offset: 1,
-                      color: 'rgba(168, 218, 247, 0.4)'
+                      color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)`
                     },
                     {
                       offset: 0.5,
-                      color: 'rgba(168, 218, 247, 0.5)'
+                      color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.15)`
                     },
                     {
                       offset: 0,
-                      color: 'rgba(168, 218, 247, 0.8)'
+                      color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2)`
                     }
                   ],
                   globalCoord: false
@@ -551,29 +582,29 @@ export default {
                     colorStops: [
                       {
                         offset: 0,
-                        color: 'rgba(81,142,215, 0)'
+                        color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0)`
                       },
                       {
                         offset: 0.5,
-                        color: 'rgba(53,142,215, 0.45)'
+                        color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.45)`
                       },
                       {
                         offset: 1,
-                        color: 'rgba(53,142,215, 0.6)'
+                        color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`
                       }
                     ],
                     globalCoord: false
                   },
-                  shadowColor: 'rgba(66,102,247, 0.55)',
+                  shadowColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.55)`,
                   shadowBlur: 10
                 }
               },
               label: {
                 normal: {
-
                   formatter: cpuValue + "%",
                   textStyle: {
-                    fontSize: 35
+                    fontSize: 35,
+                    color: themeColor
                   }
                 }
               }
@@ -584,8 +615,11 @@ export default {
       );
       //memory
       const memValue = parseFloat(this.detail.memory_utilization.split(" ")[0]) || 0
-      this.myChart = echarts.init(document.getElementById('liquidMem'));
-      this.myChart.setOption(
+      if (this.memChart) {
+        this.memChart.dispose()
+      }
+      this.memChart = echarts.init(document.getElementById('liquidMem'));
+      this.memChart.setOption(
         {
           series: [
             {
@@ -593,6 +627,7 @@ export default {
               radius: '85%',
               center: ['50%', '50%'],
               data: [memValue / 100],
+              color: [themeColor],
               backgroundStyle: {
                 color: {
                   type: 'linear',
@@ -603,15 +638,15 @@ export default {
                   colorStops: [
                     {
                       offset: 1,
-                      color: 'rgba(168, 218, 247, 0.4)'
+                      color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)`
                     },
                     {
                       offset: 0.5,
-                      color: 'rgba(168, 218, 247, 0.5)'
+                      color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.15)`
                     },
                     {
                       offset: 0,
-                      color: 'rgba(168, 218, 247, 0.8)'
+                      color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2)`
                     }
                   ],
                   globalCoord: false
@@ -630,20 +665,20 @@ export default {
                     colorStops: [
                       {
                         offset: 0,
-                        color: 'rgba(81,142,215, 0)'
+                        color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0)`
                       },
                       {
                         offset: 0.5,
-                        color: 'rgba(53,142,215, 0.45)'
+                        color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.45)`
                       },
                       {
                         offset: 1,
-                        color: 'rgba(53,142,215, 0.6)'
+                        color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`
                       }
                     ],
                     globalCoord: false
                   },
-                  shadowColor: 'rgba(66,102,247, 0.55)',
+                  shadowColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.55)`,
                   shadowBlur: 10
                 }
               },
@@ -651,7 +686,8 @@ export default {
                 normal: {
                   formatter: memValue + "%",
                   textStyle: {
-                    fontSize: 35
+                    fontSize: 35,
+                    color: themeColor
                   }
                 }
               }
@@ -662,8 +698,11 @@ export default {
       )
       //pingloss
       const pingLossValue = this.detail.ping_loss ? parseFloat(this.detail.ping_loss.split(" ")[0]) || 0 : 0
-      this.myChart = echarts.init(document.getElementById('liquidPingloss'));
-      this.myChart.setOption(
+      if (this.pingLossChart) {
+        this.pingLossChart.dispose()
+      }
+      this.pingLossChart = echarts.init(document.getElementById('liquidPingloss'));
+      this.pingLossChart.setOption(
         {
           series: [
             {
@@ -671,13 +710,48 @@ export default {
               radius: '85%',
               center: ['50%', '50%'],
               data: [pingLossValue],
-              detail: { // 中间数据
+              axisLine: {
+                lineStyle: {
+                  width: 20,
+                  color: [
+                    [0.3, '#67e0e3'],
+                    [0.7, themeColor],
+                    [1, '#fd666d']
+                  ]
+                }
+              },
+              pointer: {
+                itemStyle: {
+                  color: themeColor
+                }
+              },
+              axisTick: {
+                distance: -20,
+                length: 5,
+                lineStyle: {
+                  color: '#fff',
+                  width: 1
+                }
+              },
+              splitLine: {
+                distance: -20,
+                length: 20,
+                lineStyle: {
+                  color: '#fff',
+                  width: 2
+                }
+              },
+              axisLabel: {
+                color: themeColor,
+                distance: 15,
+                fontSize: 12
+              },
+              detail: {
                 valueAnimation: true,
-                formatter: '{value}%', // 数据值的样式
-                textStyle: {
-                  fontSize: 14
-                },
-                offsetCenter: [0, '80%'] // 中间值的位置
+                formatter: '{value}%',
+                color: themeColor,
+                fontSize: 20,
+                offsetCenter: [0, '70%']
               },
             }
           ]
@@ -1374,14 +1448,14 @@ export default {
     opacity: 0.65;
     font-weight: normal;
     white-space: nowrap;
-  }
+}
   
   .info-value {
     font-size: 14px;
     font-weight: 500;
     word-break: break-word;
     line-height: 1.3;
-  }
+}
 }
 
 .text-pingsec {
@@ -1390,7 +1464,6 @@ export default {
   max-width: 300px;
   margin: 0 auto;
   font-size: 80px;
-  color: #1ed80d;
   font-weight: 600;
   display: flex;
   align-items: center;
