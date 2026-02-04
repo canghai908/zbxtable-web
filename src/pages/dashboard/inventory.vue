@@ -5,8 +5,23 @@
         <a-row :gutter="16">
           <a-col :xl="{ span: 4 }" :lg="{ span: 24 }">
 	    <a-card :title="$t('overview')" :headStyle="$cardHeadStyle" size="small">
-              <div>
-                <a-tree :showLine=false show-icon :tree-data="treeData" :default-expand-all="autoExpandParent" :replace-fields="replaceFields" @select="onSelect" v-if="treeData">
+              <div class="inventory-tree-wrapper">
+                <a-tree 
+                  :showLine=false 
+                  :tree-data="processedTreeData" 
+                  :default-expand-all="autoExpandParent" 
+                  :replace-fields="replaceFields" 
+                  :defaultSelectedKeys="[10]" 
+                  @select="onSelect" 
+                  v-if="treeData"
+                  class="inventory-tree"
+                >
+                  <template slot="title" slot-scope="node">
+                    <span class="tree-node-title">
+                      <a-icon :type="getNodeIcon(node.id)" :style="{ fontSize: '16px', color: getNodeColor(node.id), marginRight: '8px' }" />
+                      <span>{{ node.name }}</span>
+                    </span>
+                  </template>
                 </a-tree>
               </div>
             </a-card>
@@ -20,7 +35,7 @@
 		    <a-button type="info" style="margin-left: 10px;" @click="inventoryexport">{{ $t('export_btn') }}</a-button>
 
                   </template>
-                  <a-table :loading="loading" :columns="columns" :data-source="list" @change="changePage" :pagination="pagination" :rowKey="(record) => { return record.hostid;}">
+                  <a-table :loading="loading" :columns="columns" :data-source="list" @change="changePage" :pagination="pagination" :rowKey="(record) => { return `${record.zid || 0}-${record.hostid}`;}">
                     <span slot="hostid" slot-scope="record">{{record.hostid}}</span>
                     <span slot="name" slot-scope="record">{{record.name}}</span>
                     <span slot="instance_name" slot-scope="record">
@@ -116,6 +131,7 @@ export default {
         title: 'name',
         key: 'id',
       },
+      processedTreeData: [],
       autoExpandParent: true,
       page: 1,
       pageSize: 10,
@@ -164,14 +180,50 @@ export default {
   },
   created() {
     this.initree()
+    // 默认选中Linux操作系统节点并加载数据
+    this.$nextTick(() => {
+      this.onSelect([10])
+    })
   },
   methods: {
+    getNodeIcon(nodeId) {
+      const iconMap = {
+        10: 'desktop',        // Linux操作系统
+        11: 'windows',        // Windows操作系统
+        12: 'cluster',        // 网络设备
+        13: 'database',       // 服务器硬件
+      }
+      return iconMap[nodeId] || 'folder'
+    },
+    getNodeColor(nodeId) {
+      const colorMap = {
+        10: '#52c41a',        // Linux - 绿色
+        11: '#1890ff',        // Windows - 蓝色
+        12: '#faad14',        // 网络设备 - 橙色
+        13: '#722ed1',        // 服务器硬件 - 紫色
+      }
+      return colorMap[nodeId] || '#666'
+    },
     initree() {
       inventoryTree().then((resp) => {
         let res = resp.data
         if (res.code == 200) {
           this.treeData = res.data
+          this.processedTreeData = this.processTreeData(res.data)
         }
+      })
+    },
+    processTreeData(data) {
+      if (!data || !Array.isArray(data)) return []
+      return data.map(node => {
+        const processed = {
+          ...node,
+          scopedSlots: { title: 'title' }
+        }
+        if (node.children && node.children.length > 0) {
+          processed.children = this.processTreeData(node.children)
+        }
+        return processed
       })
     },
     edit(item) {
@@ -316,4 +368,65 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.inventory-tree-wrapper {
+  /deep/ .inventory-tree {
+    .tree-node-title {
+      display: inline-flex;
+      align-items: center;
+    }
+    
+    .ant-tree-node-content-wrapper {
+      cursor: pointer;
+      padding: 6px 12px;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      position: relative;
+      padding-left: 16px;
+      
+      &:hover {
+        background-color: #e6f7ff;
+        transform: translateX(4px);
+      }
+      
+      .ant-tree-title {
+        font-size: 14px;
+        font-weight: 500;
+        user-select: none;
+      }
+    }
+    
+    .ant-tree-node-selected .ant-tree-node-content-wrapper {
+      background-color: #bae7ff !important;
+      font-weight: 600;
+      
+      &:hover {
+        background-color: #91d5ff !important;
+      }
+    }
+    
+    // 添加点击提示动画
+    .ant-tree-node-content-wrapper::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 3px;
+      height: 0;
+      background: #1890ff;
+      border-radius: 2px;
+      transition: height 0.3s ease;
+    }
+    
+    .ant-tree-node-content-wrapper:hover::before {
+      height: 70%;
+    }
+    
+    .ant-tree-node-selected .ant-tree-node-content-wrapper::before {
+      height: 100%;
+    }
+  }
+}
 </style>
