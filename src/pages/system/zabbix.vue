@@ -6,7 +6,7 @@
         <a-button @click="load">刷新</a-button>
       </div>
 
-      <a-table :loading="loading" :columns="columns" :data-source="list" :rowKey="r => r.id">
+      <a-table :loading="loading" :columns="columns" :data-source="list" :rowKey="r => r.id" :pagination="{ pageSize: 10 }">
         <template slot="instance" slot-scope="text">
           <a-tag :color="$themeColor">{{ text }}</a-tag>
         </template>
@@ -64,67 +64,53 @@
           </template>
         </template>
         <template slot="operation" slot-scope="text, record">
-          <a-button type="link" size="small" @click="test(record)">测试连接</a-button>
-          <a-divider type="vertical" />
-          <a-button type="link" size="small" @click="toggleEnabled(record)">{{ record.enabled ? '禁用' : '启用' }}</a-button>
-          <a-divider type="vertical" />
-          <a-button type="link" size="small" @click="openEdit(record)">编辑</a-button>
-          <a-divider type="vertical" />
-
-          <!-- MS-Agent 方式 -->
-          <template v-if="record.notify_method !== 'webhook'">
-            <!-- 未安装时显示安装按钮 -->
-            <a-button v-if="!record.ms_agent_installed" type="link" size="small" style="color: #52c41a;" @click="handleInstallMSAgent(record)">
-              <a-icon type="download" /> 安装 MS-Agent
-            </a-button>
-
-            <!-- 已安装时显示获取脚本和重新安装按钮 -->
-            <template v-if="record.ms_agent_installed">
-              <a-button type="link" size="small" @click="handleGetScript(record)">
-                <a-icon type="code" /> 获取脚本
-              </a-button>
-              <a-divider type="vertical" />
-              <a-button type="link" size="small" @click="handleReinstallMSAgent(record)">
-                <a-icon type="reload" /> 重新安装
-              </a-button>
-              <a-divider type="vertical" />
-              <a-popconfirm title="确定要卸载 MS-Agent 配置吗？这将删除 Zabbix 中的相关配置。" okText="确定" cancelText="取消" @confirm="handleUninstallMSAgent(record)">
-                <a-button type="link" size="small" style="color: #ff4d4f;">
-                  <a-icon type="delete" /> 卸载
-                </a-button>
-              </a-popconfirm>
-            </template>
-          </template>
-
-          <!-- Webhook 方式 -->
+          <div style="text-align: center;">
+            <a-button type="link" size="small" @click="test(record)">测试连接</a-button>
+            <a-divider type="vertical" />
+            <a-button type="link" size="small" @click="toggleEnabled(record)">{{ record.enabled ? '禁用' : '启用' }}</a-button>
+            <a-divider type="vertical" />
+            <a-button type="link" size="small" @click="openEdit(record)">编辑</a-button>
+            <a-divider type="vertical" />
+            <a-popconfirm title="确定要删除这个实例吗？" okText="确定" cancelText="取消" @confirm="remove(record)">
+              <a-button type="link" size="small" style="color:#f5222d;">删除</a-button>
+            </a-popconfirm>
+          </div>
+        </template>
+        <template slot="webhook" slot-scope="text, record">
           <template v-if="record.notify_method === 'webhook'">
-            <!-- 未安装时显示安装按钮 -->
-            <a-button v-if="!record.webhook_installed" type="link" size="small" style="color: #52c41a;" @click="handleInstallWebhook(record)">
-              <a-icon type="download" /> 安装 Webhook
-            </a-button>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <!-- 显示安装状态 -->
+              <a-tag v-if="record.webhook_installed" color="green">
+                <a-icon type="check-circle" /> 已安装
+              </a-tag>
+              <a-tag v-else color="orange">
+                <a-icon type="exclamation-circle" /> 未安装
+              </a-tag>
+              
+              <!-- 未安装时显示安装按钮 -->
+              <a-button v-if="!record.webhook_installed" type="link" size="small" style="color: #52c41a; padding: 0;" @click="handleInstallWebhook(record)">
+                <a-icon type="download" /> 安装
+              </a-button>
 
-            <!-- 已安装时显示获取信息和重新安装按钮 -->
-            <template v-if="record.webhook_installed">
-              <a-button type="link" size="small" @click="handleGetWebhookInfo(record)">
-                <a-icon type="info-circle" /> 查看配置
-              </a-button>
-              <a-divider type="vertical" />
-              <a-button type="link" size="small" @click="handleReinstallWebhook(record)">
-                <a-icon type="reload" /> 重新
-              </a-button>
-              <a-divider type="vertical" />
-              <a-popconfirm title="确定要卸载 Webhook 配置吗？这将删除 Zabbix 中的相关配置。" okText="确定" cancelText="取消" @confirm="handleUninstallWebhook(record)">
-                <a-button type="link" size="small" style="color: #ff4d4f;">
-                  <a-icon type="delete" /> 卸载
+              <!-- 已安装时显示查看配置、重装、卸载按钮 -->
+              <template v-if="record.webhook_installed">
+                <a-button type="link" size="small" style="padding: 0;" @click="handleGetWebhookInfo(record)">
+                  <a-icon type="info-circle" /> 查看配置
                 </a-button>
-              </a-popconfirm>
-            </template>
+                <a-divider type="vertical" />
+                <a-button type="link" size="small" style="padding: 0;" @click="handleReinstallWebhook(record)">
+                  <a-icon type="reload" /> 重装
+                </a-button>
+                <a-divider type="vertical" />
+                <a-popconfirm title="确定要卸载 Webhook 配置吗？这将删除 Zabbix 中的相关配置。" okText="确定" cancelText="取消" @confirm="handleUninstallWebhook(record)">
+                  <a-button type="link" size="small" style="color: #ff4d4f; padding: 0;">
+                    <a-icon type="delete" /> 卸载
+                  </a-button>
+                </a-popconfirm>
+              </template>
+            </div>
           </template>
-
-          <a-divider type="vertical" />
-          <a-popconfirm title="确定要删除这个实例吗？" okText="确定" cancelText="取消" @confirm="remove(record)">
-            <a-button type="link" size="small" style="color:#f5222d;">删除</a-button>
-          </a-popconfirm>
+          <span v-else style="color: #999;">-</span>
         </template>
       </a-table>
     </a-card>
@@ -159,11 +145,9 @@
         <a-form-model-item label="告警接收方式">
           <a-radio-group v-model="form.notify_method">
             <a-radio value="webhook">Webhook</a-radio>
-            <a-radio value="msagent">MS-Agent</a-radio>
           </a-radio-group>
           <div style="margin-top: 6px; color:#999; font-size:12px;">
-            Webhook: 通过 Zabbix Webhook 发送告警（需 Zabbix 4.4+）<br />
-            MS-Agent: 需要在 Zabbix Server 上安装 ms-agent 服务
+            通过 Zabbix Webhook 发送告警（需 Zabbix 4.4+）
           </div>
         </a-form-model-item>
         <a-form-model-item label="启用">
@@ -182,16 +166,16 @@
     </a-modal>
 
     <!-- 安装进度对话框 -->
-    <a-modal :title="currentInstallType === 'webhook' ? '安装 Webhook 配置' : '安装 MS-Agent 配置'" :visible="installVisible" :footer="installCompleted ? null : []" :closable="installCompleted"
+    <a-modal :title="currentInstallType === 'webhook' ? '安装 Webhook' : '安装 MS-Agent 配置'" :visible="installVisible" :footer="installCompleted ? null : []" :closable="installCompleted"
       :maskClosable="false" width="800px" @cancel="closeInstallModal">
       <div style="min-height: 300px;">
         <!-- 安装说明 -->
-        <a-alert v-if="!installStarted" :message="currentInstallType === 'webhook' ? '即将在 Zabbix 中安装 Webhook 配置' : '即将在 Zabbix 中安装 MS-Agent 配置'" type="info" show-icon style="margin-bottom: 16px;">
+        <a-alert v-if="!installStarted" :message="currentInstallType === 'webhook' ? '即将在 Zabbix 中安装 Webhook' : '即将在 Zabbix 中安装 MS-Agent 配置'" type="info" show-icon style="margin-bottom: 16px;">
           <template slot="description">
             <div>此操作将在 Zabbix 中创建：</div>
             <ul v-if="currentInstallType === 'webhook'" style="margin: 8px 0; padding-left: 20px;">
               <li>Media Type: ZbxTable Webhook（类型：Webhook）</li>
-              <li>User Group: ZbxTable Webhook Group</li>
+              <li>User Group: ZbxTable Webhook</li>
               <li>User: zbxtable-webhook（自动生成强密码）</li>
               <li>Action: ZbxTable Webhook（包含告警和恢复操作）</li>
               <li>Token: 自动生成唯一 Webhook Token</li>
@@ -423,6 +407,7 @@ import {
   uninstallMSAgent, 
   uninstallWebhook 
 } from '@/services/zabbix'
+import { configGetList } from '@/services/admin'
 
 export default {
   name: 'SystemZabbixInstance',
@@ -465,14 +450,14 @@ export default {
       columns: [
         { title: 'ID', dataIndex: 'id', key: 'id', width: 60 },
         { title: '实例标识', dataIndex: 'instance', key: 'instance', width: 120, scopedSlots: { customRender: 'instance' } },
-        { title: 'Zabbix 信息', key: 'zabbix', scopedSlots: { customRender: 'zabbix' }, width: 250 },
-        { title: '版本', key: 'version', scopedSlots: { customRender: 'version' }, width: 100 },
-        { title: '认证方式', key: 'auth_methods', scopedSlots: { customRender: 'auth_methods' }, width: 120 },
-        { title: '连接', key: 'conn', scopedSlots: { customRender: 'conn' }, width: 100 },
-        { title: '告警接收', key: 'notify_method', scopedSlots: { customRender: 'notify_method' }, width: 130 },
-        { title: '安装状态', key: 'install_status', scopedSlots: { customRender: 'install_status' }, width: 120 },
-        { title: '启用', key: 'enabled', scopedSlots: { customRender: 'enabled' }, width: 80 },
-        { title: '操作', key: 'operation', scopedSlots: { customRender: 'operation' }, width: 600 }
+        { title: 'Zabbix 信息', key: 'zabbix', width: 280, scopedSlots: { customRender: 'zabbix' } },
+        { title: '版本', key: 'version', width: 100, scopedSlots: { customRender: 'version' } },
+        { title: '认证方式', key: 'auth_methods', width: 120, scopedSlots: { customRender: 'auth_methods' } },
+        { title: '连接', key: 'conn', width: 100, scopedSlots: { customRender: 'conn' } },
+        { title: '告警接收', key: 'notify_method', width: 130, scopedSlots: { customRender: 'notify_method' } },
+        { title: '启用', key: 'enabled', width: 80, scopedSlots: { customRender: 'enabled' } },
+        { title: 'Webhook', key: 'webhook', width: 350, scopedSlots: { customRender: 'webhook' }, align: 'center' },
+        { title: '操作', key: 'operation', width: 300, scopedSlots: { customRender: 'operation' }, align: 'center' }
       ]
     }
   },
@@ -627,7 +612,30 @@ export default {
       this.installLogs = []
     },
     // 打开 Webhook 安装对话框
-    handleInstallWebhook (record) {
+    async handleInstallWebhook (record) {
+      // 先检查 webhook_url 是否配置
+      try {
+        const res = await configGetList()
+        const biz = (res && res.data) ? res.data : res
+        if (biz && biz.code === 200) {
+          const configs = biz.data.items || []
+          const webhookUrlConfig = configs.find(c => c.key === 'webhook_url')
+          
+          if (!webhookUrlConfig || !webhookUrlConfig.value || webhookUrlConfig.value.trim() === '') {
+            this.$warning({
+              title: '配置缺失',
+              content: '请先在"系统管理 - 参数配置 - 系统配置"中配置 Webhook 回调地址，否则无法安装 Webhook。',
+              okText: '知道了'
+            })
+            return
+          }
+        }
+      } catch (error) {
+        console.error('检查 webhook_url 配置失败:', error)
+        this.$message.error('检查配置失败，请稍后重试')
+        return
+      }
+      
       this.currentRecord = record
       this.currentInstallType = 'webhook'
       this.installVisible = true
@@ -653,7 +661,7 @@ export default {
       try {
         if (this.currentInstallType === 'webhook') {
           // Webhook 安装流程
-          this.addLog('info', '开始安装 Webhook 配置...')
+          this.addLog('info', '开始安装 Webhook...')
           this.addLog('info', `实例: ${this.currentRecord.instance}`)
           this.addLog('info', `Zabbix: ${this.currentRecord.name} (${this.currentRecord.url})`)
           
@@ -802,7 +810,7 @@ export default {
     // 重新安装 Webhook
     handleReinstallWebhook (record) {
       this.$confirm({
-        title: '重新安装 Webhook 配置',
+        title: '重新安装 Webhook',
         content: '确定要重新安装吗？这将重新创建 Zabbix 中的配置并生成新的 Token。',
         okText: '确定',
         cancelText: '取消',
