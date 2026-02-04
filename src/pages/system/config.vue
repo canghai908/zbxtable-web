@@ -3,6 +3,47 @@
     <div class="config-container">
       <a-card :bordered="false">
         <a-tabs v-model="activeTab" type="card">
+          <!-- 系统外观配置 -->
+          <a-tab-pane key="appearance" tab="系统外观">
+            <a-form-model ref="appearanceForm" :model="appearanceForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
+              <a-form-model-item label="系统名称">
+                <a-input v-model="appearanceForm.system_name" placeholder="请输入系统名称" />
+                <div class="config-hint">系统显示的名称，将在页面标题和导航栏中显示</div>
+              </a-form-model-item>
+              
+              <a-form-model-item label="系统Logo">
+                <div class="logo-upload-container">
+                  <div class="logo-preview">
+                    <img v-if="appearanceForm.system_logo" :src="appearanceForm.system_logo" alt="Logo预览" />
+                    <div v-else class="logo-placeholder">
+                      <a-icon type="picture" style="font-size: 48px; color: #ccc;" />
+                    </div>
+                  </div>
+                  <div class="logo-upload-actions">
+                    <a-upload
+                      name="file"
+                      :show-upload-list="false"
+                      :before-upload="beforeLogoUpload"
+                      :custom-request="handleLogoUpload"
+                      accept="image/png,image/jpeg,image/jpg,image/svg+xml">
+                      <a-button :loading="logoUploading">
+                        <a-icon type="upload" /> 上传Logo
+                      </a-button>
+                    </a-upload>
+                    <div class="upload-hint">
+                      <a-icon type="info-circle" /> 支持 PNG、JPG、SVG 格式，建议尺寸 32x32px，大小不超过2MB
+                    </div>
+                  </div>
+                </div>
+              </a-form-model-item>
+              
+              <a-form-model-item :wrapper-col="{ span: 14, offset: 6 }">
+                <a-button type="primary" @click="saveCategory('appearance')" :loading="saveLoading">保存</a-button>
+                <a-button style="margin-left: 10px;" @click="previewAppearance">预览效果</a-button>
+              </a-form-model-item>
+            </a-form-model>
+          </a-tab-pane>
+
           <!-- 系统配置 -->
           <a-tab-pane key="system" tab="系统配置">
             <a-form-model ref="systemForm" :model="systemForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
@@ -146,17 +187,25 @@ export default {
     return {
       loading: false,
       list: [],
-      activeTab: 'system',
+      activeTab: 'appearance',
+      appearanceForm: {},
       systemForm: {},
       emailForm: {},
       wechatForm: {},
       ollamaForm: {},
       securityForm: {},
       saveLoading: false,
+      logoUploading: false,
       isKeyVisible: false  // 控制密钥是否可见
     }
   },
   computed: {
+    appearanceConfigs() {
+      return this.list.filter(item => 
+        item.key === 'system_name' || 
+        item.key === 'system_logo'
+      )
+    },
     systemConfigs() {
       return this.list.filter(item => 
         item.key === 'zbx_dash' || 
@@ -229,6 +278,9 @@ export default {
     },
     initForms() {
       // 初始化各个表单的数据
+      this.appearanceConfigs.forEach(item => {
+        this.$set(this.appearanceForm, item.key, item.value)
+      })
       this.systemConfigs.forEach(item => {
         this.$set(this.systemForm, item.key, item.value)
       })
@@ -252,6 +304,10 @@ export default {
         let form = {}
         
         switch(category) {
+          case 'appearance':
+            configs = this.appearanceConfigs
+            form = this.appearanceForm
+            break
           case 'system':
             configs = this.systemConfigs
             form = this.systemForm
@@ -277,6 +333,13 @@ export default {
         
         await Promise.all(promises)
         this.$message.success('保存成功')
+        
+        // 如果是外观配置，更新 Vuex 中的系统名称
+        if (category === 'appearance') {
+          this.$store.commit('setting/setSystemName', form.system_name || 'ZbxTable')
+          this.$store.commit('setting/setSystemLogo', form.system_logo || '/static/img/logo.png')
+        }
+        
         this.init()
       } catch (error) {
         this.$message.error('保存失败')
@@ -333,6 +396,51 @@ export default {
       }
       
       document.body.removeChild(textarea)
+    },
+    // Logo上传前的验证
+    beforeLogoUpload(file) {
+      const isImage = file.type === 'image/png' || file.type === 'image/jpeg' || file.type === 'image/jpg' || file.type === 'image/svg+xml'
+      if (!isImage) {
+        this.$message.error('只支持 PNG、JPG、JPEG 或 SVG 格式的图片')
+        return false
+      }
+      const isLt2M = file.size / 1024 / 1024 < 2
+      if (!isLt2M) {
+        this.$message.error('图片大小不能超过 2MB')
+        return false
+      }
+      return true
+    },
+    // 自定义Logo上传
+    async handleLogoUpload({ file }) {
+      this.logoUploading = true
+      try {
+        const formData = new FormData()
+        formData.append('file', file)
+        
+        // 使用 axios 直接发送请求
+        const axios = require('axios')
+        const response = await axios.post('/v1/system/upload-logo', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+        
+        if (response.data.code === 200) {
+          this.appearanceForm.system_logo = response.data.data.url
+          this.$message.success('Logo上传成功')
+        } else {
+          this.$message.error(response.data.message || 'Logo上传失败')
+        }
+      } catch (error) {
+        this.$message.error('Logo上传失败: ' + (error.message || '未知错误'))
+      } finally {
+        this.logoUploading = false
+      }
+    },
+    // 预览外观效果
+    previewAppearance() {
+      this.$message.info('保存后刷新页面即可看到效果')
     }
   }
 }
@@ -390,5 +498,50 @@ export default {
 /deep/ .ant-input,
 /deep/ .ant-input-password {
   border-radius: 4px;
+}
+
+.logo-upload-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.logo-preview {
+  width: 80px;
+  height: 80px;
+  border: 1px dashed #d9d9d9;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #fafafa;
+}
+
+.logo-preview img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.logo-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.logo-upload-actions {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.upload-hint {
+  color: #999;
+  font-size: 12px;
+  line-height: 1.5;
 }
 </style>

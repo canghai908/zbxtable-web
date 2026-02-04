@@ -222,6 +222,11 @@ const options = {
               name: "密码修改",
               component: () => import("@/pages/system/chpwd"),
             },
+            {
+              path: "config",
+              name: "参数配置",
+              component: () => import("@/pages/system/config"),
+            },
           ],
         },
       ],

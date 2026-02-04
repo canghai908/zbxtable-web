@@ -2,7 +2,7 @@
   <common-layout>
     <div class="top">
       <div class="header">
-        <span class="title">ZbxTable</span>
+        <span class="title">{{ systemName }}</span>
         <div>
           <span class="title" style="font-size: 25px;"></span>
         </div>
@@ -37,6 +37,7 @@
 <script>
 import CommonLayout from '@/layouts/CommonLayout'
 import { login, getRoutesConfig } from '@/services/user'
+import { getPublicSystemInfo } from '@/services/admin'
 import { setAuthorization } from '@/utils/request'
 import { loadRoutes } from '@/utils/routerUtil'
 import { mapMutations } from 'vuex'
@@ -47,15 +48,19 @@ export default {
     return {
       logging: false,
       error: '',
-      form: this.$form.createForm(this)
+      form: this.$form.createForm(this),
+      systemName: 'ZbxTable'
     }
   },
   computed: {
-    systemName() {
-      return this.$store.state.setting.systemName
-    }
+    // systemName() {
+    //   return this.$store.state.setting.systemName
+    // }
   },
   mounted() {
+    // 加载系统公开信息
+    this.loadPublicSystemInfo()
+    
     // 开发模式下自动填充账号密码
     if (process.env.NODE_ENV === 'development') {
       this.$nextTick(() => {
@@ -68,6 +73,25 @@ export default {
   },
   methods: {
     ...mapMutations('account', ['setUser', 'setPermissions', 'setRoles']),
+    async loadPublicSystemInfo() {
+      try {
+        const res = await getPublicSystemInfo()
+        const infoRes = (res && res.data && typeof res.data.code !== 'undefined') ? res.data : res
+        
+        if (infoRes && infoRes.code === 200 && infoRes.data) {
+          if (infoRes.data.system_name) {
+            this.systemName = infoRes.data.system_name
+            this.$store.commit('setting/setSystemName', infoRes.data.system_name)
+          }
+          if (infoRes.data.system_logo) {
+            this.$store.commit('setting/setSystemLogo', infoRes.data.system_logo)
+          }
+        }
+      } catch (error) {
+        console.warn('加载系统公开信息失败，使用默认配置:', error)
+        // 加载失败不影响登录页面显示
+      }
+    },
     loadUserTheme(user) {
       try {
         // 从用户信息中读取主题配置
@@ -86,6 +110,30 @@ export default {
         }
       } catch (error) {
         console.warn('加载用户主题配置失败，使用默认配置:', error)
+        // 加载失败不影响登录流程
+      }
+    },
+    async loadSystemConfig() {
+      try {
+        const { configGetList } = require('@/services/admin')
+        const res = await configGetList()
+        const configRes = (res && res.data && typeof res.data.code !== 'undefined') ? res.data : res
+        
+        if (configRes && configRes.code === 200 && configRes.data && configRes.data.items) {
+          const configs = configRes.data.items
+          const systemNameConfig = configs.find(item => item.key === 'system_name')
+          const systemLogoConfig = configs.find(item => item.key === 'system_logo')
+          
+          if (systemNameConfig && systemNameConfig.value) {
+            this.$store.commit('setting/setSystemName', systemNameConfig.value)
+          }
+          
+          if (systemLogoConfig && systemLogoConfig.value) {
+            this.$store.commit('setting/setSystemLogo', systemLogoConfig.value)
+          }
+        }
+      } catch (error) {
+        console.warn('加载系统配置失败，使用默认配置:', error)
         // 加载失败不影响登录流程
       }
     },
@@ -155,6 +203,10 @@ export default {
             const routesConfig =
               routesRes && routesRes.data && routesRes.data ? routesRes.data : []
             loadRoutes(routesConfig)
+            
+            // 加载系统配置（名称和Logo）
+            this.loadSystemConfig()
+            
             this.$router.push('/dashboard/workplace')
             this.$message.success(loginRes.message || '登录成功', 1)
           } catch (e) {

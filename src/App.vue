@@ -9,6 +9,7 @@ import {enquireScreen} from './utils/util'
 import {mapState, mapMutations} from 'vuex'
 import themeUtil from '@/utils/themeUtil';
 import {getI18nKey} from '@/utils/routerUtil'
+import {getPublicSystemInfo} from '@/services/admin'
 
 export default {
   name: 'App',
@@ -20,6 +21,7 @@ export default {
   created () {
     this.setHtmlTitle()
     this.setLanguage(this.lang)
+    this.loadSystemConfig()
     enquireScreen(isMobile => this.setDevice(isMobile))
   },
   mounted() {
@@ -52,7 +54,25 @@ export default {
     ...mapState('setting', ['layout', 'theme', 'weekMode', 'lang'])
   },
   methods: {
-    ...mapMutations('setting', ['setDevice']),
+    ...mapMutations('setting', ['setDevice', 'setSystemName', 'setSystemLogo']),
+    async loadSystemConfig() {
+      try {
+        const res = await getPublicSystemInfo()
+        const infoRes = (res && res.data && typeof res.data.code !== 'undefined') ? res.data : res
+        
+        if (infoRes && infoRes.code === 200 && infoRes.data) {
+          if (infoRes.data.system_name) {
+            this.setSystemName(infoRes.data.system_name)
+          }
+          if (infoRes.data.system_logo) {
+            this.setSystemLogo(infoRes.data.system_logo)
+          }
+        }
+      } catch (error) {
+        console.warn('加载系统配置失败，使用默认配置:', error)
+        // 加载失败不影响应用启动
+      }
+    },
     setWeekModeTheme(weekMode) {
       if (weekMode) {
         document.body.classList.add('week-mode')

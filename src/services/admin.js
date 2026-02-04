@@ -338,6 +338,11 @@ export async function systemDoUpdate() {
 	return request(SYSTEM_UPDATE + '/update', METHOD.POST)
 }
 
+// 获取系统公开信息（无需认证）
+export async function getPublicSystemInfo() {
+	return request('/v1/info', METHOD.GET)
+}
+
 export default {
 	hostList,
 	hostDetail,
@@ -425,4 +430,5 @@ export default {
 	systemVersion,
 	systemCheckUpdate,
 	systemDoUpdate,
+	getPublicSystemInfo,
 }

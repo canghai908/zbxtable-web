@@ -78,8 +78,9 @@ const reqCommon = {
     // 安装相关的 API 不需要 token 验证
     const isInstallAPI = url && (url.indexOf('/install') !== -1)
     const isLoginAPI = url && (url.indexOf('login') !== -1)
-    // 如果不是登录或安装 API，且没有 token，则提示
-    if (!isLoginAPI && !isInstallAPI && xsrfCookieName && !Cookie.get(xsrfCookieName)) {
+    const isPublicInfoAPI = url && (url.indexOf('/v1/info') !== -1)
+    // 如果不是登录、安装或公开信息 API，且没有 token，则提示
+    if (!isLoginAPI && !isInstallAPI && !isPublicInfoAPI && xsrfCookieName && !Cookie.get(xsrfCookieName)) {
       message.warning('认证 token 已过期，请重新登录')
     }
     return config

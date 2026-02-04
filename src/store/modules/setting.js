@@ -109,6 +109,20 @@ export default {
         }
         sessionStorage.setItem(process.env.VUE_APP_TBAS_TITLES_KEY, JSON.stringify(state.customTitles))
       }
+    },
+    setSystemName(state, systemName) {
+      state.systemName = systemName
+      // 保存到 localStorage
+      const localSetting = JSON.parse(localStorage.getItem(process.env.VUE_APP_SETTING_KEY) || '{}')
+      localSetting.systemName = systemName
+      localStorage.setItem(process.env.VUE_APP_SETTING_KEY, JSON.stringify(localSetting))
+    },
+    setSystemLogo(state, systemLogo) {
+      state.systemLogo = systemLogo
+      // 保存到 localStorage
+      const localSetting = JSON.parse(localStorage.getItem(process.env.VUE_APP_SETTING_KEY) || '{}')
+      localSetting.systemLogo = systemLogo
+      localStorage.setItem(process.env.VUE_APP_SETTING_KEY, JSON.stringify(localSetting))
     }
   }
 }

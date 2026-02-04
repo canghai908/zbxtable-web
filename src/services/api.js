@@ -45,4 +45,5 @@ module.exports = {
 	ZABBIX: '/v1/zabbix',
 	METRIC_MAPPING: '/v1/metric_mapping',
 	SYSTEM_UPDATE: '/v1/system',
+	SYSTEM_PUBLIC_INFO: '/v1/info',
 }
