@@ -5,16 +5,18 @@
       <span style="color: #333;font-size: 24px;" v-show="show == 2">告警统计暂无数据</span>
     </div>
     <div class="line-main" v-if="show == 1">
-      <v-chart :forceFit="true" :height="height" :data="data" :scale="scale" :padding="[20, 60, 60, 120]">
+      <v-chart :forceFit="true" :height="height" :data="data" :scale="scale" :padding="[20, 80, 60, 200]">
         <v-tooltip />
         <v-coord type="rect" direction="LT" />
         <v-axis dataKey="name" position="left" :label="{
             textStyle: {
               fontSize: 12,
               textBaseline: 'middle',
-              fill: $themeColor
+              fill: $themeColor,
+              textAlign: 'right'
             },
-            formatter: (text) => formatLongText(text, 15)
+            formatter: (text) => formatLongText(text, 30),
+            autoRotate: false
           }" :line="null" :grid="null" />
         <v-axis dataKey="value" position="bottom" :label="{
             textStyle: {
@@ -25,15 +27,7 @@
             },
             formatter: (val) => `${val}次`
           }" :line="null" :grid="null" />
-        <v-bar position="name*value" :color="$themeColor" :label="['value', {
-            position: 'right',
-            offsetX: 5,
-            textStyle: {
-              fill: $themeColor,
-              fontSize: 12
-            },
-            formatter: (val) => `${val}次`
-          }]" />
+        <v-bar position="name*value" :color="$themeColor" />
       </v-chart>
       
       <!-- 添加主机名和实例标签列表 -->
@@ -110,14 +104,17 @@ export default {
           const match = v.match(/^(.+?)\s*\[(.+?)\]$/);
           let hostname = v;
           let instanceName = '';
+          let displayName = v; // 用于图表显示的唯一标识
           
           if (match) {
             hostname = match[1].trim();
             instanceName = match[2].trim();
+            // 使用"主机名 [实例名]"作为唯一标识
+            displayName = `${hostname} [${instanceName}]`;
           }
           
           list.push({
-            name: hostname, // 图表只显示主机名
+            name: displayName, // 图表使用完整的"主机名 [实例名]"作为唯一标识
             value: this.numList[i] || 0
           });
           
@@ -136,10 +133,24 @@ export default {
       }
     },
     formatLongText(text, maxLength) {
-      if (text && text.length > maxLength) {
-        return text.substring(0, maxLength) + '...';
+      if (!text) return '';
+      // 计算实际字符宽度（中文字符算2个宽度）
+      let width = 0;
+      let result = '';
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        // 中文字符、全角字符等宽字符
+        if (char.match(/[\u4e00-\u9fa5\u3000-\u303f\uff00-\uffef]/)) {
+          width += 2;
+        } else {
+          width += 1;
+        }
+        if (width > maxLength) {
+          return result + '...';
+        }
+        result += char;
       }
-      return text;
+      return result;
     },
     hexToRgba(hex, alpha = 1) {
       if (!hex) return `rgba(24, 144, 255, ${alpha})`

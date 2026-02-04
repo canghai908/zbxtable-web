@@ -452,7 +452,7 @@ export default {
 
 // 主机区域样式
 .host-section {
-  background: @layout-bg-color;
+  background: @component-background;
   border-radius: 12px;
   padding: 20px;
   min-height: 280px;
@@ -460,7 +460,8 @@ export default {
   border: 1px solid @border-color-base;
   
   &:hover {
-    background: @hover-bg-color;
+    border-color: @primary-color;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   }
 }
 
