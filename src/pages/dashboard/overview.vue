@@ -263,13 +263,13 @@ export default {
         let res = resp.data;
         if (res.code == 200) {
           this.win = res.data.vm_win || [];
-          this.winTitle = this.$t('num_windows_hosts') + ' ' + this.win.length;
+          this.winTitle = this.$t('num_windows_hosts');
           this.lin = res.data.vm_lin || [];
-          this.linTitle = this.$t('num_linux_hosts') + ' ' + this.lin.length;
+          this.linTitle = this.$t('num_linux_hosts');
           this.net = res.data.hw_net || [];
-          this.netTitle = this.$t('num_networking_hosts') + ' ' + this.net.length;
+          this.netTitle = this.$t('num_networking_hosts');
           this.srv = res.data.hw_srv || [];
-          this.srvTitle = this.$t('num_hardware_hosts') + ' ' + this.srv.length;
+          this.srvTitle = this.$t('num_hardware_hosts');
         }
       }).finally(() => { 
         this.loading = false;
