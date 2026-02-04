@@ -49,6 +49,12 @@
                     {{ opt.label }}
                   </a-select-option>
                 </a-select>
+                <a-input-group v-else-if="item.key === 'webhook_url'" compact style="display: flex;">
+                  <a-input v-model="systemForm[item.key]" :placeholder="item.comment" style="flex: 1;" />
+                  <a-button type="primary" @click="getCurrentWebUrl" :loading="gettingUrl">
+                    <a-icon type="link" /> 获取当前地址
+                  </a-button>
+                </a-input-group>
                 <a-input v-else v-model="systemForm[item.key]" :placeholder="item.comment" />
                 <div class="config-hint">{{ item.comment }}</div>
               </a-form-model-item>
@@ -193,7 +199,8 @@ export default {
       securityForm: {},
       saveLoading: false,
       logoUploading: false,
-      isKeyVisible: false  // 控制密钥是否可见
+      isKeyVisible: false,  // 控制密钥是否可见
+      gettingUrl: false  // 控制获取地址按钮的加载状态
     }
   },
   computed: {
@@ -435,6 +442,33 @@ export default {
     // 预览外观效果
     previewAppearance() {
       this.$message.info('保存后刷新页面即可看到效果')
+    },
+    // 获取当前 Web 访问地址
+    getCurrentWebUrl() {
+      this.gettingUrl = true
+      try {
+        // 获取当前浏览器的协议、主机名和端口
+        const protocol = window.location.protocol // http: 或 https:
+        const hostname = window.location.hostname // 域名或IP
+        const port = window.location.port // 端口号
+        
+        // 构建完整的 URL
+        let baseUrl = `${protocol}//${hostname}`
+        
+        // 如果端口不是默认端口（80或443），则添加端口号
+        if (port && port !== '80' && port !== '443') {
+          baseUrl += `:${port}`
+        }
+        
+        // 设置到 webhook_url 字段
+        this.systemForm.webhook_url = baseUrl
+        
+        this.$message.success('已获取当前访问地址')
+      } catch (error) {
+        this.$message.error('获取地址失败: ' + error.message)
+      } finally {
+        this.gettingUrl = false
+      }
     }
   }
 }
@@ -547,5 +581,20 @@ export default {
   color: #999;
   font-size: 12px;
   line-height: 1.5;
+}
+
+/deep/ .ant-input-group {
+  display: flex;
+  
+  .ant-input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  
+  .ant-btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    white-space: nowrap;
+  }
 }
 </style>
