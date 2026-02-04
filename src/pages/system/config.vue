@@ -3,18 +3,21 @@
     <div class="config-container">
       <a-card :bordered="false">
         <a-tabs v-model="activeTab" type="card">
-          <!-- 系统外观配置 -->
-          <a-tab-pane key="appearance" tab="系统外观">
-            <a-form-model ref="appearanceForm" :model="appearanceForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
+          <!-- 系统配置 -->
+          <a-tab-pane key="system" tab="系统配置">
+            <a-form-model ref="systemForm" :model="systemForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
+              <!-- 外观配置部分 -->
+              <a-divider orientation="left">外观配置</a-divider>
+              
               <a-form-model-item label="系统名称">
-                <a-input v-model="appearanceForm.system_name" placeholder="请输入系统名称" />
+                <a-input v-model="systemForm.system_name" placeholder="请输入系统名称" />
                 <div class="config-hint">系统显示的名称，将在页面标题和导航栏中显示</div>
               </a-form-model-item>
               
               <a-form-model-item label="系统Logo">
                 <div class="logo-upload-container">
                   <div class="logo-preview">
-                    <img v-if="appearanceForm.system_logo" :src="appearanceForm.system_logo" alt="Logo预览" />
+                    <img v-if="systemForm.system_logo" :src="systemForm.system_logo" alt="Logo预览" />
                     <div v-else class="logo-placeholder">
                       <a-icon type="picture" style="font-size: 48px; color: #ccc;" />
                     </div>
@@ -37,17 +40,10 @@
                 </div>
               </a-form-model-item>
               
-              <a-form-model-item :wrapper-col="{ span: 14, offset: 6 }">
-                <a-button type="primary" @click="saveCategory('appearance')" :loading="saveLoading">保存</a-button>
-                <a-button style="margin-left: 10px;" @click="previewAppearance">预览效果</a-button>
-              </a-form-model-item>
-            </a-form-model>
-          </a-tab-pane>
-
-          <!-- 系统配置 -->
-          <a-tab-pane key="system" tab="系统配置">
-            <a-form-model ref="systemForm" :model="systemForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
-              <a-form-model-item v-for="item in systemConfigs" :key="item.id" :label="item.name">
+              <!-- 系统配置部分 -->
+              <a-divider orientation="left">系统配置</a-divider>
+              
+              <a-form-model-item v-for="item in systemOnlyConfigs" :key="item.id" :label="item.name">
                 <a-select v-if="isBooleanConfig(item.key)" v-model="systemForm[item.key]" :placeholder="item.comment" style="width: 100%">
                   <a-select-option v-for="opt in getBooleanOptions(item.key)" :key="opt.value" :value="opt.value">
                     {{ opt.label }}
@@ -56,8 +52,10 @@
                 <a-input v-else v-model="systemForm[item.key]" :placeholder="item.comment" />
                 <div class="config-hint">{{ item.comment }}</div>
               </a-form-model-item>
+              
               <a-form-model-item :wrapper-col="{ span: 14, offset: 6 }">
                 <a-button type="primary" @click="saveCategory('system')" :loading="saveLoading">保存</a-button>
+                <a-button style="margin-left: 10px;" @click="previewAppearance">预览效果</a-button>
               </a-form-model-item>
             </a-form-model>
           </a-tab-pane>
@@ -187,8 +185,7 @@ export default {
     return {
       loading: false,
       list: [],
-      activeTab: 'appearance',
-      appearanceForm: {},
+      activeTab: 'system',
       systemForm: {},
       emailForm: {},
       wechatForm: {},
@@ -200,14 +197,18 @@ export default {
     }
   },
   computed: {
-    appearanceConfigs() {
+    systemOnlyConfigs() {
       return this.list.filter(item => 
-        item.key === 'system_name' || 
-        item.key === 'system_logo'
+        item.key === 'zbx_dash' || 
+        item.key === 'dash_id' || 
+        item.key === 'sync_inventory' ||
+        item.key === 'webhook_url'
       )
     },
-    systemConfigs() {
+    allSystemConfigs() {
       return this.list.filter(item => 
+        item.key === 'system_name' || 
+        item.key === 'system_logo' ||
         item.key === 'zbx_dash' || 
         item.key === 'dash_id' || 
         item.key === 'sync_inventory' ||
@@ -278,10 +279,7 @@ export default {
     },
     initForms() {
       // 初始化各个表单的数据
-      this.appearanceConfigs.forEach(item => {
-        this.$set(this.appearanceForm, item.key, item.value)
-      })
-      this.systemConfigs.forEach(item => {
+      this.allSystemConfigs.forEach(item => {
         this.$set(this.systemForm, item.key, item.value)
       })
       this.emailConfigs.forEach(item => {
@@ -304,12 +302,8 @@ export default {
         let form = {}
         
         switch(category) {
-          case 'appearance':
-            configs = this.appearanceConfigs
-            form = this.appearanceForm
-            break
           case 'system':
-            configs = this.systemConfigs
+            configs = this.allSystemConfigs
             form = this.systemForm
             break
           case 'email':
@@ -334,8 +328,8 @@ export default {
         await Promise.all(promises)
         this.$message.success('保存成功')
         
-        // 如果是外观配置，更新 Vuex 中的系统名称
-        if (category === 'appearance') {
+        // 如果是系统配置，更新 Vuex 中的系统名称和Logo
+        if (category === 'system') {
           this.$store.commit('setting/setSystemName', form.system_name || 'ZbxTable')
           this.$store.commit('setting/setSystemLogo', form.system_logo || '/static/img/logo.png')
         }
@@ -427,7 +421,7 @@ export default {
         })
         
         if (response.data.code === 200) {
-          this.appearanceForm.system_logo = response.data.data.url
+          this.systemForm.system_logo = response.data.data.url
           this.$message.success('Logo上传成功')
         } else {
           this.$message.error(response.data.message || 'Logo上传失败')
@@ -493,6 +487,16 @@ export default {
 
 /deep/ .ant-form-item {
   margin-bottom: 20px;
+}
+
+/deep/ .ant-divider-horizontal.ant-divider-with-text-left {
+  margin: 32px 0 24px 0;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/deep/ .ant-divider-horizontal.ant-divider-with-text-left:first-of-type {
+  margin-top: 0;
 }
 
 /deep/ .ant-input,
