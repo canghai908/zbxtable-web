@@ -86,6 +86,10 @@ export default {
         }
         window.$i18n.locale = localeMap[lang] || lang
       }
+      // 保存到 localStorage
+      const localSetting = JSON.parse(localStorage.getItem(process.env.VUE_APP_SETTING_KEY) || '{}')
+      localSetting.lang = lang
+      localStorage.setItem(process.env.VUE_APP_SETTING_KEY, JSON.stringify(localSetting))
     },
     setHideSetting(state, hideSetting) {
       state.hideSetting = hideSetting

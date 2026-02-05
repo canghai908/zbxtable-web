@@ -2,29 +2,29 @@
   <page-layout :title="detail.name">
     <div slot="headerContent" class="linux-detail">
       <!-- 主机基本信息 -->
-      <a-card :headStyle="{...$cardHeadStyle, marginBottom: '12px'}" :bodyStyle="{padding: '12px'}" title="主机基本信息">
+      <a-card :headStyle="{...$cardHeadStyle, marginBottom: '12px'}" :bodyStyle="{padding: '12px'}" :title="$t('ser_card_basic_info')">
         <a-row :gutter="[24, 8]">
           <a-col :xl="6" :lg="8" :md="12" :sm="24">
             <div class="info-item">
-              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">主机ID:</span>
+              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">{{ $t('ser_label_host_id') }}:</span>
               <span class="info-value">{{detail.hostid}}</span>
             </div>
           </a-col>
           <a-col :xl="6" :lg="8" :md="12" :sm="24">
             <div class="info-item">
-              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">设备位置:</span>
+              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">{{ $t('ser_label_device_location') }}:</span>
               <span class="info-value">{{detail.location || "--"}}</span>
             </div>
           </a-col>
           <a-col :xl="6" :lg="8" :md="12" :sm="24">
             <div class="info-item">
-              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">部门:</span>
+              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">{{ $t('ser_label_department') }}:</span>
               <span class="info-value">{{detail.department || "--"}}</span>
             </div>
           </a-col>
           <a-col :xl="6" :lg="8" :md="12" :sm="24">
             <div class="info-item">
-              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">运行时间:</span>
+              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">{{ $t('ser_label_uptime') }}:</span>
               <span class="info-value">{{detail.uptime || "--"}}</span>
             </div>
           </a-col>
@@ -32,25 +32,25 @@
         <a-row :gutter="[24, 8]">
           <a-col :xl="6" :lg="8" :md="12" :sm="24">
             <div class="info-item">
-              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">设备型号:</span>
+              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">{{ $t('ser_label_device_model') }}:</span>
               <span class="info-value">{{detail.model}}</span>
             </div>
           </a-col>
           <a-col :xl="6" :lg="8" :md="12" :sm="24">
             <div class="info-item">
-              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">序列号:</span>
+              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">{{ $t('ser_label_serial_no') }}:</span>
               <span class="info-value">{{detail.serial_no || "--"}}</span>
             </div>
           </a-col>
           <a-col :xl="6" :lg="8" :md="12" :sm="24">
             <div class="info-item">
-              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">设备安装时间:</span>
+              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">{{ $t('ser_label_install_date') }}:</span>
               <span class="info-value">{{detail.date_hw_install || "--"}}</span>
             </div>
           </a-col>
           <a-col :xl="6" :lg="8" :md="12" :sm="24">
             <div class="info-item">
-              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">维保到期时间:</span>
+              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">{{ $t('ser_label_expiry_date') }}:</span>
               <span class="info-value">{{detail.date_hw_expiry || "--"}}</span>
             </div>
           </a-col>
@@ -58,39 +58,39 @@
         <a-row :gutter="[24, 8]">
           <a-col :xl="6" :lg="8" :md="12" :sm="24">
             <div class="info-item">
-              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">资产编号:</span>
+              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">{{ $t('ser_label_asset_no') }}:</span>
               <span class="info-value">{{detail.resource_id || "--"}}</span>
             </div>
           </a-col>
           <a-col :xl="18" :lg="16" :md="24" :sm="24">
             <div class="info-item">
-              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">备注:</span>
+              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">{{ $t('ser_label_remarks') }}:</span>
               <span class="info-value">{{detail.vendor || "--"}}</span>
             </div>
           </a-col>
         </a-row>
       </a-card>
       <a-tabs :tabBarStyle="{textAlign: 'center', width: '100%'}" style="padding: 0px 2px;">
-        <a-tab-pane tab="运行信息" key="1">
+        <a-tab-pane :tab="$t('ser_tab_runtime_info')" key="1">
           <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd', padding: '12px'}" :loading="!detail">
             <a-row :gutter="[12, 12]">
               <a-col :xl="{ span: 6 }" :lg="{ span: 12 }">
-                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '0'}" title="CPU数量">
-                  <div class="ser-detail"><b :style="{color: themeColor}">{{detail.os || "--"}}</b><span>核</span></div>
+                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '0'}" :title="$t('ser_card_cpu_count')">
+                  <div class="ser-detail"><b :style="{color: themeColor}">{{detail.os || "--"}}</b><span>{{ $t('ser_unit_core') }}</span></div>
                 </a-card>
               </a-col>
               <a-col :xl="{ span: 6 }" :lg="{ span: 12 }">
-                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '0'}" title="总内存">
-                  <div class="ser-detail"><b :style="{color: themeColor}">{{detail.os || "--"}}</b><span>G</span></div>
+                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '0'}" :title="$t('ser_card_total_memory')">
+                  <div class="ser-detail"><b :style="{color: themeColor}">{{detail.os || "--"}}</b><span>{{ $t('ser_unit_gb') }}</span></div>
                 </a-card>
               </a-col>
               <a-col :xl="{ span: 6 }" :lg="{ span: 12 }">
-                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '0'}" title="总存储">
-                  <div class="ser-detail"><b :style="{color: themeColor}">{{detail.os || "--"}}</b><span>T</span></div>
+                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '0'}" :title="$t('ser_card_total_storage')">
+                  <div class="ser-detail"><b :style="{color: themeColor}">{{detail.os || "--"}}</b><span>{{ $t('ser_unit_tb') }}</span></div>
                 </a-card>
               </a-col>
               <a-col :xl="{ span: 6 }" :lg="{ span: 12 }">
-                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '0'}" title="操作系统">
+                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '0'}" :title="$t('ser_card_os')">
                   <div class="ser-detail"><b :style="{color: themeColor}">{{detail.os || "--"}}</b></div>
                 </a-card>
               </a-col>
@@ -111,6 +111,7 @@ import { parseTimeFun } from "@/utils/formatter";
 import themeMixin from '@/mixins/themeMixin';
 
 export default {
+  i18n: require('./i18n'),
   name: "SerDetail",
   mixins: [themeMixin],
   components: { PageLayout, DetailListItem, DetailList },

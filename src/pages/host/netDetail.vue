@@ -2,29 +2,29 @@
   <page-layout :title="detail.name">
     <div slot="headerContent" class="linux-detail">
       <!-- 主机基本信息 -->
-      <a-card :headStyle="{...$cardHeadStyle, marginBottom: '12px'}" :bodyStyle="{padding: '12px'}" title="主机基本信息">
+      <a-card :headStyle="{...$cardHeadStyle, marginBottom: '12px'}" :bodyStyle="{padding: '12px'}" :title="$t('net_card_basic_info')">
         <a-row :gutter="[24, 8]">
           <a-col :xl="6" :lg="8" :md="12" :sm="24">
             <div class="info-item">
-              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">主机ID:</span>
+              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">{{ $t('net_label_host_id') }}:</span>
               <span class="info-value">{{detail.hostid}}</span>
             </div>
           </a-col>
           <a-col :xl="6" :lg="8" :md="12" :sm="24">
             <div class="info-item">
-              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">设备位置:</span>
+              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">{{ $t('net_label_device_location') }}:</span>
               <span class="info-value">{{detail.location || "--"}}</span>
             </div>
           </a-col>
           <a-col :xl="6" :lg="8" :md="12" :sm="24">
             <div class="info-item">
-              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">所属部门:</span>
+              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">{{ $t('net_label_department') }}:</span>
               <span class="info-value">{{detail.department || "--"}}</span>
             </div>
           </a-col>
           <a-col :xl="6" :lg="8" :md="12" :sm="24">
             <div class="info-item">
-              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">运行时间:</span>
+              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">{{ $t('net_label_uptime') }}:</span>
               <span class="info-value">{{detail.uptime || "--"}}</span>
             </div>
           </a-col>
@@ -32,25 +32,25 @@
         <a-row :gutter="[24, 8]">
           <a-col :xl="6" :lg="8" :md="12" :sm="24">
             <div class="info-item">
-              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">设备安装时间:</span>
+              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">{{ $t('net_label_install_date') }}:</span>
               <span class="info-value">{{detail.date_hw_install || "--"}}</span>
             </div>
           </a-col>
           <a-col :xl="6" :lg="8" :md="12" :sm="24">
             <div class="info-item">
-              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">维保到期时间:</span>
+              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">{{ $t('net_label_expiry_date') }}:</span>
               <span class="info-value">{{detail.date_hw_expiry || "--"}}</span>
             </div>
           </a-col>
           <a-col :xl="6" :lg="8" :md="12" :sm="24">
             <div class="info-item">
-              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">资产编号:</span>
+              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">{{ $t('net_label_asset_no') }}:</span>
               <span class="info-value">{{detail.resource_id || "--"}}</span>
             </div>
           </a-col>
           <a-col :xl="6" :lg="8" :md="12" :sm="24">
             <div class="info-item">
-              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">设备型号:</span>
+              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">{{ $t('net_label_device_model') }}:</span>
               <span class="info-value">{{detail.model}}</span>
             </div>
           </a-col>
@@ -58,50 +58,50 @@
         <a-row :gutter="[24, 8]">
           <a-col :xl="6" :lg="8" :md="12" :sm="24">
             <div class="info-item">
-              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">IP地址:</span>
+              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">{{ $t('net_label_ip_address') }}:</span>
               <span class="info-value">{{detail.interfaces}}</span>
             </div>
           </a-col>
           <a-col :xl="18" :lg="16" :md="24" :sm="24">
             <div class="info-item">
-              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">备注:</span>
+              <span class="info-label" :style="{color: themeColor, opacity: 0.85}">{{ $t('net_label_remarks') }}:</span>
               <span class="info-value">{{detail.vendor || "--"}}</span>
             </div>
           </a-col>
         </a-row>
       </a-card>
       <a-tabs :tabBarStyle="{textAlign: 'center', width: '100%'}" style="padding: 0px 2px;" :loading="loading">
-        <a-tab-pane tab="运行信息" key="2">
+        <a-tab-pane :tab="$t('net_tab_runtime_info')" key="2">
           <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd', padding: '12px'}">
             <a-row :gutter="[12, 12]">
               <a-col :xl="{ span: 6 }" :lg="{ span: 12 }">
-                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '0'}" title="CPU使用率">
+                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '0'}" :title="$t('card_cpu_usage')">
                   <div id="liquidCPU" style="width: 300px; height: 300px;margin:0 auto;"></div>
                 </a-card>
               </a-col>
               <a-col :xl="{ span: 6 }" :lg="{ span: 12 }">
-                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '0'}" title="内存使用率">
+                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '0'}" :title="$t('card_memory_usage')">
                   <div id="liquidMem" style="width: 300px; height: 300px;margin:0 auto;"></div>
                 </a-card>
               </a-col>
               <a-col :xl="{ span: 6 }" :lg="{ span: 12 }">
-                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '0'}" title="网络丢包">
+                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '0'}" :title="$t('card_network_packet_loss')">
                   <div id="liquidPingloss" style="width: 300px; height: 300px;margin:0 auto;"></div>
                 </a-card>
               </a-col>
               <a-col :xl="{ span: 6 }" :lg="{ span: 12 }">
-                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '0'}" title="网络延时">
+                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '0'}" :title="$t('card_network_latency')">
                   <div id="liquidPingsec" class="text-pingsec" :style="{color: themeColor}">{{detail.ping_sec | dataFormat}}</div>
                 </a-card>
               </a-col>
             </a-row>
           </a-card>
         </a-tab-pane>
-        <a-tab-pane tab="接口" key="1">
+        <a-tab-pane :tab="$t('net_tab_interface')" key="1">
           <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd', padding: '12px'}" :loading="!detail">
             <a-row :gutter="[12, 12]">
               <a-col :span="24">
-                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '12px'}" title="网卡列表">
+                <a-card hoverable :headStyle="{...$cardHeadStyle, textAlign: 'center'}" :bodyStyle="{padding: '12px'}" :title="$t('net_card_interface_list')">
                   <a-table :loading="loading2" :columns="columns" :data-source="list" @change="changePage" :pagination="pagination" :row-selection="{
         selectedRowKeys: selectedRowKeys,
         onChange: onSelectChange,
@@ -128,7 +128,7 @@
                 <div slot="outstatus" slot-scope="record">{{record.out_discarded}}/{{record.out_errors}}</div>
                 <div slot="speed" slot-scope="record">{{record.speed | SpeedToSize}}</div>
                 <div slot="operation" slot-scope="record">
-                  <a-button type="primary" @click="seeDetail(record)">详情</a-button>
+                  <a-button type="primary" @click="seeDetail(record)">{{ $t('btn_detail') }}</a-button>
                 </div>
                 <span slot="lastclock" slot-scope="record">{{record.lastclock| dateFormat}}</span>
               </a-table>
@@ -137,17 +137,17 @@
             </a-row>
           </a-card>
           <div>
-            <a-modal v-model="visible" width="1400px" title="接口详情">
+            <a-modal v-model="visible" width="1400px" :title="$t('modal_interface_detail')">
               <a-row>
                 <a-col>
                   <a-form-model class="home-search" layout="inline" style="width: 80%; height: 10%;margin:0 auto;" :colon='false'>
-                    <a-form-model-item label="时间">
+                    <a-form-model-item :label="$t('form_time_label')">
                       <a-range-picker format="YYYY-MM-DD HH:mm:ss" :show-time="{ format: 'HH:mm', defaultValue:[moment('00:00:00', 'HH:mm:ss'),moment('23:59:59', 'HH:mm:ss')]}" v-model="timeValue"
                         @change="changeCreationTime" :getCalendarContainer="triggerNode=>{return triggerNode.parentNode || document.body}" />
                     </a-form-model-item>
                     <a-form-model-item>
-                      <a-button :style="{ marginRight: '10px' }" type="primary" @click="trafficeQuery">查询</a-button>
-                      <a-button @click="restDate">重置</a-button>
+                      <a-button :style="{ marginRight: '10px' }" type="primary" @click="trafficeQuery">{{ $t('form_query_btn') }}</a-button>
+                      <a-button @click="restDate">{{ $t('form_reset_btn') }}</a-button>
                     </a-form-model-item>
                   </a-form-model>
                 </a-col>
@@ -232,7 +232,7 @@
                 </a-col>
               </a-row>
               <template slot="footer">
-                <a-button @click="handleCancel">关闭</a-button>
+                <a-button @click="handleCancel">{{ $t('modal_close') }}</a-button>
               </template>
             </a-modal>
           </div>
@@ -260,6 +260,7 @@ require('echarts-liquidfill')
 import themeMixin from '@/mixins/themeMixin'
 
 export default {
+  i18n: require('./i18n'),
   name: 'NetDetail',
   mixins: [themeMixin],
   components: { PageLayout, DetailListItem, DetailList },
@@ -321,135 +322,9 @@ export default {
         legend: '',
         title: ''
       },
-      columns: [
-        {
-          title: '状态',
-          key: 'operational_status',
-          align: 'left',
-          scopedSlots: { customRender: 'operational_status' },
-          sorter: (a, b) =>
-            a.operational_status.localeCompare(b.operational_status)
-        },
-        {
-          title: '接口索引',
-          key: 'index',
-          align: 'left',
-          scopedSlots: { customRender: 'index' },
-          sorter: (a, b) => b.index - a.index
-        },
-        {
-          title: '接口名',
-          key: 'name',
-          align: 'left',
-          scopedSlots: { customRender: 'name' }
-        },
-        {
-          title: '接收流量(Kbps)',
-          key: 'bits_received',
-          align: 'left',
-          scopedSlots: { customRender: 'bits_received' },
-          sorter: (a, b) => b.bits_received - a.bits_received
-        },
-        {
-          title: '发送流量(Kbps)',
-          key: 'bits_sent',
-          align: 'left',
-          scopedSlots: { customRender: 'bits_sent' },
-          sorter: (a, b) => b.bits_sent - a.bits_sent
-        },
-        {
-          title: '进丢包/错包',
-          key: 'instatus',
-          align: 'left',
-          scopedSlots: { customRender: 'instatus' },
-          sorter: (a, b) => b.instatus - a.instatus
-        },
-        {
-          title: '出丢包/错包',
-          key: 'outstatus',
-          align: 'left',
-          scopedSlots: { customRender: 'outstatus' },
-          sorter: (a, b) => b.outstatus - a.outstatus
-        },
-        {
-          title: '端口速率',
-          key: 'speed',
-          align: 'left',
-          scopedSlots: { customRender: 'speed' },
-          sorter: (a, b) => b.speed - a.speed
-        },
-        {
-          title: '采集时间',
-          key: 'lastclock',
-          align: 'left',
-          scopedSlots: { customRender: 'lastclock' }
-        },
-        {
-          title: '操作',
-          key: 'operation',
-          align: 'left',
-          scopedSlots: { customRender: 'operation' }
-        }
-      ],
-      trafficeColumns: [
-        {
-          title: '类型',
-          key: 'name',
-          align: 'left',
-          scopedSlots: { customRender: 'name' }
-        },
-        {
-          title: '最小',
-          key: 'min',
-          align: 'left',
-          scopedSlots: { customRender: 'min' }
-        },
-        {
-          title: '最大',
-          key: 'max',
-          align: 'left',
-          scopedSlots: { customRender: 'max' }
-        },
-        {
-          title: '平均',
-          key: 'avg',
-          align: 'left',
-          scopedSlots: { customRender: 'avg' }
-        },
-        {
-          title: '95th PercAvg',
-          key: 'th_perc_avg',
-          align: 'left',
-          scopedSlots: { customRender: 'th_perc_avg' }
-        }
-        // { title: '95th PercVal', key: 'th_perc_val', align: 'left', scopedSlots: { customRender: 'th_perc_val' } },
-      ],
-      discardedColumns: [
-        {
-          title: '类型',
-          key: 'name',
-          align: 'left',
-          scopedSlots: { customRender: 'name' }
-        },
-        {
-          title: '最小',
-          key: 'min',
-          align: 'left',
-          scopedSlots: { customRender: 'min' }
-        },
-        {
-          title: '最大',
-          key: 'max',
-          align: 'left',
-          scopedSlots: { customRender: 'max' }
-        },
-        {
-          title: '平均',
-          key: 'avg',
-          align: 'left',
-          scopedSlots: { customRender: 'avg' }
-        }
-      ],
+      columns: [],
+      trafficeColumns: [],
+      discardedColumns: [],
       pagination: {
         total: 0,
         current: 1,
@@ -512,6 +387,7 @@ export default {
     this.dater = parseTimeFun(this.dates)
     this.id = this.$route.query.id || ''
     this.zid = this.$route.query.zid || ''
+    this.initColumns()
     this.init()
   },
   filters: {
@@ -593,6 +469,172 @@ export default {
     }
   },
   methods: {
+    // 转换后端返回的中文字段名为 i18n
+    translateChartData(data) {
+      const nameMap = {
+        '接收流量': this.$t('chart_data_receive_traffic'),
+        '发送流量': this.$t('chart_data_send_traffic'),
+        '接收丢弃包': this.$t('chart_data_receive_discard'),
+        '发送丢弃包': this.$t('chart_data_send_discard'),
+        '接收错包': this.$t('chart_data_receive_error'),
+        '发送错包': this.$t('chart_data_send_error'),
+        '端口状态': this.$t('chart_data_port_status')
+      }
+      
+      if (data.yAxis && Array.isArray(data.yAxis)) {
+        data.yAxis.forEach(item => {
+          if (item.name && nameMap[item.name]) {
+            item.name = nameMap[item.name]
+          }
+        })
+      }
+      
+      if (data.legend && data.legend.data && Array.isArray(data.legend.data)) {
+        data.legend.data = data.legend.data.map(name => nameMap[name] || name)
+      }
+      
+      if (data.table && Array.isArray(data.table)) {
+        data.table.forEach(item => {
+          if (item.name && nameMap[item.name]) {
+            item.name = nameMap[item.name]
+          }
+        })
+      }
+      
+      return data
+    },
+    initColumns() {
+      this.columns = [
+        {
+          title: this.$t('col_status'),
+          key: 'operational_status',
+          align: 'left',
+          scopedSlots: { customRender: 'operational_status' },
+          sorter: (a, b) =>
+            a.operational_status.localeCompare(b.operational_status)
+        },
+        {
+          title: this.$t('net_col_interface_index'),
+          key: 'index',
+          align: 'left',
+          scopedSlots: { customRender: 'index' },
+          sorter: (a, b) => b.index - a.index
+        },
+        {
+          title: this.$t('col_interface_name'),
+          key: 'name',
+          align: 'left',
+          scopedSlots: { customRender: 'name' }
+        },
+        {
+          title: this.$t('col_received_traffic'),
+          key: 'bits_received',
+          align: 'left',
+          scopedSlots: { customRender: 'bits_received' },
+          sorter: (a, b) => b.bits_received - a.bits_received
+        },
+        {
+          title: this.$t('col_sent_traffic'),
+          key: 'bits_sent',
+          align: 'left',
+          scopedSlots: { customRender: 'bits_sent' },
+          sorter: (a, b) => b.bits_sent - a.bits_sent
+        },
+        {
+          title: this.$t('col_in_discarded_errors'),
+          key: 'instatus',
+          align: 'left',
+          scopedSlots: { customRender: 'instatus' },
+          sorter: (a, b) => b.instatus - a.instatus
+        },
+        {
+          title: this.$t('col_out_discarded_errors'),
+          key: 'outstatus',
+          align: 'left',
+          scopedSlots: { customRender: 'outstatus' },
+          sorter: (a, b) => b.outstatus - a.outstatus
+        },
+        {
+          title: this.$t('col_port_speed'),
+          key: 'speed',
+          align: 'left',
+          scopedSlots: { customRender: 'speed' },
+          sorter: (a, b) => b.speed - a.speed
+        },
+        {
+          title: this.$t('col_collection_time'),
+          key: 'lastclock',
+          align: 'left',
+          scopedSlots: { customRender: 'lastclock' }
+        },
+        {
+          title: this.$t('interface_operation'),
+          key: 'operation',
+          align: 'left',
+          scopedSlots: { customRender: 'operation' }
+        }
+      ]
+      
+      this.trafficeColumns = [
+        {
+          title: this.$t('table_type'),
+          key: 'name',
+          align: 'left',
+          scopedSlots: { customRender: 'name' }
+        },
+        {
+          title: this.$t('table_min'),
+          key: 'min',
+          align: 'left',
+          scopedSlots: { customRender: 'min' }
+        },
+        {
+          title: this.$t('table_max'),
+          key: 'max',
+          align: 'left',
+          scopedSlots: { customRender: 'max' }
+        },
+        {
+          title: this.$t('table_avg'),
+          key: 'avg',
+          align: 'left',
+          scopedSlots: { customRender: 'avg' }
+        },
+        {
+          title: this.$t('table_95th_perc_avg'),
+          key: 'th_perc_avg',
+          align: 'left',
+          scopedSlots: { customRender: 'th_perc_avg' }
+        }
+      ]
+      
+      this.discardedColumns = [
+        {
+          title: this.$t('table_type'),
+          key: 'name',
+          align: 'left',
+          scopedSlots: { customRender: 'name' }
+        },
+        {
+          title: this.$t('table_min'),
+          key: 'min',
+          align: 'left',
+          scopedSlots: { customRender: 'min' }
+        },
+        {
+          title: this.$t('table_max'),
+          key: 'max',
+          align: 'left',
+          scopedSlots: { customRender: 'max' }
+        },
+        {
+          title: this.$t('table_avg'),
+          key: 'avg',
+          align: 'left',
+          scopedSlots: { customRender: 'avg' }
+        }
+      ]
+    },
     init() {
       hostDetail(this.id, this.zid)
         .then((resp) => {
@@ -919,31 +961,43 @@ export default {
         let res = resp.data.data
         console.log(res)
         this.loading3 = false
-        //流量
+        //流量 - 转换中文字段名
         this.trafficeSeries.xAxis = res.traffic_series.xAxis
-        this.trafficeSeries.yAxis = res.traffic_series.yAxis
-        this.trafficeSeries.legend = res.traffic_series.legend.data
-        this.trafficeSeries.list = res.traffic_series.table || []
-        this.trafficeSeries.title = '接口' + this.record.name + '流量'
-        //丢包
+        this.trafficeSeries.yAxis = this.translateChartData(res.traffic_series).yAxis
+        this.trafficeSeries.legend = this.translateChartData(res.traffic_series).legend.data
+        this.trafficeSeries.list = (res.traffic_series.table || []).map(item => ({
+          ...item,
+          name: this.$t('chart_data_' + (item.name === '接收流量' ? 'receive_traffic' : 'send_traffic'))
+        }))
+        this.trafficeSeries.title = this.$t('chart_interface_traffic', { name: this.record.name })
+        //丢包 - 转换中文字段名
         this.diescardedSeries.xAxis = res.discarded_series.xAxis
-        this.diescardedSeries.yAxis = res.discarded_series.yAxis
-        this.diescardedSeries.legend = res.discarded_series.legend.data
-        this.diescardedSeries.list = res.discarded_series.table || []
-        this.diescardedSeries.title = '接口' + this.record.name + '丢包'
-        //错包
+        this.diescardedSeries.yAxis = this.translateChartData(res.discarded_series).yAxis
+        this.diescardedSeries.legend = this.translateChartData(res.discarded_series).legend.data
+        this.diescardedSeries.list = (res.discarded_series.table || []).map(item => ({
+          ...item,
+          name: this.$t('chart_data_' + (item.name === '接收丢弃包' ? 'receive_discard' : 'send_discard'))
+        }))
+        this.diescardedSeries.title = this.$t('chart_interface_packet_loss', { name: this.record.name })
+        //错包 - 转换中文字段名
         this.errorsSeries.xAxis = res.errors_series.xAxis
-        this.errorsSeries.yAxis = res.errors_series.yAxis
-        this.errorsSeries.legend = res.errors_series.legend.data
-        this.errorsSeries.list = res.errors_series.table || []
-        this.errorsSeries.title = '接口' + this.record.name + '错误包'
-        //端口状态
+        this.errorsSeries.yAxis = this.translateChartData(res.errors_series).yAxis
+        this.errorsSeries.legend = this.translateChartData(res.errors_series).legend.data
+        this.errorsSeries.list = (res.errors_series.table || []).map(item => ({
+          ...item,
+          name: this.$t('chart_data_' + (item.name === '接收错包' ? 'receive_error' : 'send_error'))
+        }))
+        this.errorsSeries.title = this.$t('chart_interface_error_packets', { name: this.record.name })
+        //端口状态 - 转换中文字段名
         this.operationalSeries.xAxis = res.operational_status_series.xAxis
-        this.operationalSeries.yAxis = res.operational_status_series.yAxis
+        this.operationalSeries.yAxis = this.translateChartData(res.operational_status_series).yAxis
         this.operationalSeries.legend =
-          res.operational_status_series.legend.data
-        this.operationalSeries.list = res.operational_status_series.table || []
-        this.operationalSeries.title = '接口' + this.record.name + '端口状态'
+          this.translateChartData(res.operational_status_series).legend.data
+        this.operationalSeries.list = (res.operational_status_series.table || []).map(item => ({
+          ...item,
+          name: this.$t('chart_data_port_status')
+        }))
+        this.operationalSeries.title = this.$t('chart_interface_port_status', { name: this.record.name })
         echarts.connect('group1')
         this.initTrafficChart()
         this.initDiscardedChart()
@@ -1003,7 +1057,7 @@ export default {
             },
             dataView: {
               show: true,
-              lang: ['数据视图', '关闭', '导出Excel'],
+              lang: [this.$t('toolbar_data_view'), this.$t('toolbar_close'), this.$t('toolbar_export_excel')],
               //optionToContent为重画表格的函数
               optionToContent: function (opt) {
                 //axisData是你想定义的表格第一列的数据，我这里设置为柱形图的x轴数据
@@ -1656,31 +1710,43 @@ export default {
       }).then((resp) => {
         let res = resp.data.data
         this.loading3 = false
-        //流量
+        //流量 - 转换中文字段名
         this.trafficeSeries.xAxis = res.traffic_series.xAxis
-        this.trafficeSeries.yAxis = res.traffic_series.yAxis
-        this.trafficeSeries.legend = res.traffic_series.legend.data
-        this.trafficeSeries.list = res.traffic_series.table || []
-        this.trafficeSeries.title = '接口' + record.name + '流量'
-        //丢包
+        this.trafficeSeries.yAxis = this.translateChartData(res.traffic_series).yAxis
+        this.trafficeSeries.legend = this.translateChartData(res.traffic_series).legend.data
+        this.trafficeSeries.list = (res.traffic_series.table || []).map(item => ({
+          ...item,
+          name: this.$t('chart_data_' + (item.name === '接收流量' ? 'receive_traffic' : 'send_traffic'))
+        }))
+        this.trafficeSeries.title = this.$t('chart_interface_traffic', { name: record.name })
+        //丢包 - 转换中文字段名
         this.diescardedSeries.xAxis = res.discarded_series.xAxis
-        this.diescardedSeries.yAxis = res.discarded_series.yAxis
-        this.diescardedSeries.legend = res.discarded_series.legend.data
-        this.diescardedSeries.list = res.discarded_series.table || []
-        this.diescardedSeries.title = '接口' + record.name + '丢包'
-        //错包
+        this.diescardedSeries.yAxis = this.translateChartData(res.discarded_series).yAxis
+        this.diescardedSeries.legend = this.translateChartData(res.discarded_series).legend.data
+        this.diescardedSeries.list = (res.discarded_series.table || []).map(item => ({
+          ...item,
+          name: this.$t('chart_data_' + (item.name === '接收丢弃包' ? 'receive_discard' : 'send_discard'))
+        }))
+        this.diescardedSeries.title = this.$t('chart_interface_packet_loss', { name: record.name })
+        //错包 - 转换中文字段名
         this.errorsSeries.xAxis = res.errors_series.xAxis
-        this.errorsSeries.yAxis = res.errors_series.yAxis
-        this.errorsSeries.legend = res.errors_series.legend.data
-        this.errorsSeries.list = res.errors_series.table || []
-        this.errorsSeries.title = '接口' + record.name + '错误包'
-        //端口状态
+        this.errorsSeries.yAxis = this.translateChartData(res.errors_series).yAxis
+        this.errorsSeries.legend = this.translateChartData(res.errors_series).legend.data
+        this.errorsSeries.list = (res.errors_series.table || []).map(item => ({
+          ...item,
+          name: this.$t('chart_data_' + (item.name === '接收错包' ? 'receive_error' : 'send_error'))
+        }))
+        this.errorsSeries.title = this.$t('chart_interface_error_packets', { name: record.name })
+        //端口状态 - 转换中文字段名
         this.operationalSeries.xAxis = res.operational_status_series.xAxis
-        this.operationalSeries.yAxis = res.operational_status_series.yAxis
+        this.operationalSeries.yAxis = this.translateChartData(res.operational_status_series).yAxis
         this.operationalSeries.legend =
-          res.operational_status_series.legend.data
-        this.operationalSeries.list = res.operational_status_series.table || []
-        this.operationalSeries.title = '接口' + record.name + '端口状态'
+          this.translateChartData(res.operational_status_series).legend.data
+        this.operationalSeries.list = (res.operational_status_series.table || []).map(item => ({
+          ...item,
+          name: this.$t('chart_data_port_status')
+        }))
+        this.operationalSeries.title = this.$t('chart_interface_port_status', { name: record.name })
         echarts.connect('group1')
         this.initTrafficChart()
         this.initDiscardedChart()

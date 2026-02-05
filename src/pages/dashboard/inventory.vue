@@ -39,7 +39,7 @@
                     <span slot="hostid" slot-scope="record">{{record.hostid}}</span>
                     <span slot="name" slot-scope="record">{{record.name}}</span>
                     <span slot="instance_name" slot-scope="record">
-                      <a-tag :color="$themeColor">{{record.instance_name || '未知'}}</a-tag>
+                      <a-tag :color="$themeColor">{{record.instance_name || $t('instance_unknown')}}</a-tag>
                     </span>
                     <span slot="interfaces" slot-scope="record">{{record.interfaces}}</span>
                     <span slot="uptime" slot-scope="record">{{record.uptime}}</span>
@@ -143,7 +143,7 @@ export default {
       columns: [
         { title: "ID", key: "hostid", align: "left", scopedSlots: { customRender: "hostid" }, },
         { title: this.$t('column_hostname'), key: 'name', align: 'left', scopedSlots: { customRender: 'name' } },
-        { title: '所属实例', key: 'instance_name', align: 'left', width: 120, scopedSlots: { customRender: 'instance_name' } },
+        { title: this.$t('label_instance_name'), key: 'instance_name', align: 'left', width: 120, scopedSlots: { customRender: 'instance_name' } },
         { title: this.$t('column_ip_address'), key: 'interfaces', align: 'left', scopedSlots: { customRender: 'interfaces' } },
         { title: this.$t('column_uptime'), key: 'uptime', align: 'left', scopedSlots: { customRender: 'uptime' } },
         { title: this.$t('column_availability'), key: 'available', align: 'left', width: '120px', scopedSlots: { customRender: 'available' } },
@@ -163,7 +163,7 @@ export default {
         "page-size-options": ["10", "20", "30", "40", "50", "100", "200"],
         pageSize: 10,
         "show-size-changer": true,
-        "show-total": (total) => `共 ${total} 条数据`,
+        "show-total": (total) => this.$t('pagination_total', { total }),
       },
       form: {
         location: "",
@@ -185,7 +185,42 @@ export default {
       this.onSelect([10])
     })
   },
+  watch: {
+    '$i18n.locale'() {
+      // 语言切换时重新初始化树节点名称
+      if (this.treeData) {
+        const localizedTreeData = this.initTreeNodeNames()
+        this.processedTreeData = this.processTreeData(localizedTreeData)
+      }
+    }
+  },
   methods: {
+    // 初始化树节点名称（支持国际化）
+    initTreeNodeNames() {
+      if (!this.treeData || !Array.isArray(this.treeData)) return this.treeData
+      
+      const nameMap = {
+        0: this.$t('tree_asset'),           // 资产树
+        10: this.$t('tree_linux_os'),       // Linux操作系统
+        11: this.$t('tree_windows_os'),     // Windows操作系统
+        12: this.$t('tree_network_devices'), // 网络设备
+        13: this.$t('tree_physical_servers') // 物理服务器
+      }
+      
+      // 递归处理树节点
+      const translateNode = (node) => {
+        const translatedNode = { ...node }
+        if (nameMap[node.id]) {
+          translatedNode.name = nameMap[node.id]
+        }
+        if (node.children && Array.isArray(node.children)) {
+          translatedNode.children = node.children.map(child => translateNode(child))
+        }
+        return translatedNode
+      }
+      
+      return this.treeData.map(node => translateNode(node))
+    },
     getNodeIcon(nodeId) {
       const iconMap = {
         10: 'desktop',        // Linux操作系统
@@ -209,7 +244,9 @@ export default {
         let res = resp.data
         if (res.code == 200) {
           this.treeData = res.data
-          this.processedTreeData = this.processTreeData(res.data)
+          // 应用国际化的树节点名称
+          const localizedTreeData = this.initTreeNodeNames()
+          this.processedTreeData = this.processTreeData(localizedTreeData)
         }
       })
     },
