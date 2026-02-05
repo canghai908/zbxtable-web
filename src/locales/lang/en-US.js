@@ -182,9 +182,9 @@ export default {
   // Alarm Management
   alarmManage: {
     title: 'Alarm Management',
-    alarmRule: 'Alarm Rule',
-    alarmQuery: 'Alarm Query',
-    alarmAnalysis: 'Alarm Analysis',
+    alarmRule: 'Rule',
+    alarmQuery: 'Query',
+    alarmAnalysis: 'Analysis',
     alarmMute: 'Alarm Mute',
     severity: 'Severity',
     severityDisaster: 'Disaster',
@@ -209,7 +209,7 @@ export default {
     hostList: 'Host List',
     hostDetail: 'Host Detail',
     hostname: 'Hostname',
-    ipAddress: 'IP Address',
+    ipAddress: 'IP',
     hostGroup: 'Host Group',
     template: 'Template',
     status: 'Status',

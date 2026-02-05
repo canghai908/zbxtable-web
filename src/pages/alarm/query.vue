@@ -1,83 +1,88 @@
 <template>
   <page-layout :noTitle="true">
     <a-form-model class="home-search" layout="inline" :colon='false'>
-      <a-form-model-item label="搜索">
-        <a-input v-model.trim="hosts" placeholder="主机名" />
+      <a-form-model-item :label="$t('label_search')">
+        <a-input v-model.trim="hosts" :placeholder="$t('label_hostname')" />
       </a-form-model-item>
       <a-form-model-item label="IP">
-        <a-input v-model.trim="hostIp" placeholder="主机IP" />
+        <a-input v-model.trim="hostIp" :placeholder="$t('label_host_ip')" />
       </a-form-model-item>
-      <a-form-model-item label="选择实例">
-        <a-select v-model="selectedInstance" placeholder="全部实例" allowClear style="width: 200px">
-          <a-select-option value="">全部实例</a-select-option>
+      <a-form-model-item :label="$t('label_select_instance')">
+        <a-select v-model="selectedInstance" :placeholder="$t('label_all_instances')" allowClear style="width: 200px">
+          <a-select-option value="">{{ $t('label_all_instances') }}</a-select-option>
           <a-select-option v-for="item in instanceList" :key="item.id" :value="item.id">
             {{ item.name }}
           </a-select-option>
         </a-select>
       </a-form-model-item>
-      <a-form-model-item label="告警类型">
+      <a-form-model-item :label="$t('label_alarm_type')">
         <a-select optionFilterProp="label" style="width:100px" v-model="status" option-label-prop="label" @change="handleStatusChange">
           <a-select-option v-for="(item, index) in statuslist" :key="index" :value="item.id" :label="item.value" :title="item.value">
             {{ item.value }}
           </a-select-option>
         </a-select>
       </a-form-model-item>
-      <a-form-model-item label="告警级别">
+      <a-form-model-item :label="$t('label_alarm_level')">
         <a-select optionFilterProp="label" style="width:100px" v-model="level" option-label-prop="label" @change="handleLevelChange">
           <a-select-option v-for="(item, index) in levellist" :key="index" :value="item.id" :label="item.value" :title="item.value">
             {{ item.value }}
           </a-select-option>
         </a-select>
       </a-form-model-item>
-      <a-form-model-item label="创建时间">
+      <a-form-model-item :label="$t('label_creation_time')">
         <a-range-picker format="YYYY-MM-DD HH:mm:ss" :show-time="{ format: 'HH:mm', defaultValue:[moment('00:00:00', 'HH:mm:ss'),moment('23:59:59', 'HH:mm:ss')]}" v-model="timeValue"
           @change="changeCreationTime" :getCalendarContainer="triggerNode=>{return triggerNode.parentNode || document.body}" />
       </a-form-model-item>
       <a-form-model-item>
-        <a-button type="primary" @click="init">查询</a-button>
-        <a-button style="margin-left: 10px;" @click="resetData">重置</a-button>
-        <a-button style="margin-left: 10px;" type="primary" @click="anayexport">导出</a-button>
+        <a-button type="primary" @click="init">{{ $t('btn_query') }}</a-button>
+        <a-button style="margin-left: 10px;" @click="resetData">{{ $t('btn_reset') }}</a-button>
+        <a-button style="margin-left: 10px;" type="primary" @click="anayexport">{{ $t('btn_export') }}</a-button>
       </a-form-model-item>
     </a-form-model>
 
     <div class="linux-list">
       <a-table :loading="loading" :columns="columns" :data-source="list" @expand="getEvent" @change="changePage" :pagination="pagination" :rowKey="(record) => { return record.id;}">
-        <a-table slot="expandedRowRender" :columns="innerColumns" :data-source="innerData" :pagination="false">
-          <span slot="notify_time" slot-scope="record">{{record.notify_time | parsetime }}</span>
-          <span slot="status" slot-scope="record">
-            <a-badge v-if="record.status==0" status="success"></a-badge>
-            <a-badge v-else-if="record.status==1" status="error"></a-badge>
-            <a-badge v-else-if="record.status==2" status="processing"></a-badge>
-            {{record.status | notifyResult }}
-          </span>
-        </a-table>
+        <!-- 主表格的插槽 -->
         <div slot="instance_name" slot-scope="record">
           <a-tag :color="themeColor">{{getInstanceName(record.zid)}}</a-tag>
         </div>
-        <div slot="level" slot-scope="record">
-          <a-tag v-if="record.level==0" color="#97AAB3">{{record.level | levelFilter}}</a-tag>
-          <a-tag v-else-if="record.level==1" color=" #7499FF">{{record.level | levelFilter}}</a-tag>
-          <a-tag v-else-if="record.level==2" color="#FFC859">{{record.level | levelFilter}}</a-tag>
-          <a-tag v-else-if="record.level==3" color="#FFA059">{{record.level | levelFilter}}</a-tag>
-          <a-tag v-else-if="record.level==4" color="#E97659">{{record.level | levelFilter}}</a-tag>
-          <a-tag v-else-if="record.level==5" color="#f50000">{{record.level | levelFilter}}</a-tag>
-        </div>
         <div slot="status" slot-scope="record">
-          <a-tag v-if="record.status==0" color="#87d068">{{record.status | statusFilter}}</a-tag>
-          <a-tag v-else-if="record.status==1" color="#f50">{{record.status | statusFilter}}</a-tag>
+          <a-tag v-if="record.status==0" color="#87d068">{{ $t('alarm_type_recovery') }}</a-tag>
+          <a-tag v-else-if="record.status==1" color="#f50">{{ $t('alarm_type_alarm') }}</a-tag>
         </div>
-        <span slot="occur_time" slot-scope="record">{{record.occur_time | parsetime }}</span>
+        <div slot="level" slot-scope="record">
+          <a-tag v-if="record.level==0" color="#97AAB3">{{ $t('level_unclassified') }}</a-tag>
+          <a-tag v-else-if="record.level==1" color=" #7499FF">{{ $t('level_information') }}</a-tag>
+          <a-tag v-else-if="record.level==2" color="#FFC859">{{ $t('level_warning') }}</a-tag>
+          <a-tag v-else-if="record.level==3" color="#FFA059">{{ $t('level_average') }}</a-tag>
+          <a-tag v-else-if="record.level==4" color="#E97659">{{ $t('level_high') }}</a-tag>
+          <a-tag v-else-if="record.level==5" color="#f50000">{{ $t('level_disaster') }}</a-tag>
+        </div>
+        <span slot="occur_time" slot-scope="record">{{ record.occur_time | parsetime }}</span>
         <span slot="notify_status" slot-scope="record">
-
           <a-badge v-if="record.notify_status==0" status="success"></a-badge>
           <a-badge v-else-if="record.notify_status==1" status="default"></a-badge>
           <a-badge v-else-if="record.notify_status==2" status="processing"></a-badge>
-          {{record.notify_status | notifyStatusFilter }}
+          <template v-if="record.notify_status==0">{{ $t('notify_status_notified') }}</template>
+          <template v-else-if="record.notify_status==1">{{ $t('notify_status_muted') }}</template>
+          <template v-else-if="record.notify_status==2">{{ $t('notify_status_default_rule') }}</template>
         </span>
         <span slot="operation" slot-scope="record">
           <a-button v-if="record.notify_status!=1" class="pd20 paddingleft0" type="link" size="small" @click="addMutes(record)">{{ $t('btn_mute') }}</a-button>
           <a-button class="pd20" type="link" size="small" @click="analyzeWithDeepseek(record)">{{ $t('btn_ai_analysis') }}</a-button>
         </span>
+        
+        <!-- 展开行的嵌套表格 -->
+        <a-table slot="expandedRowRender" :columns="innerColumns" :data-source="innerData" :pagination="false">
+          <span slot="notify_time" slot-scope="record">{{ record.notify_time | parsetime }}</span>
+          <span slot="status" slot-scope="record">
+            <a-badge v-if="record.status==0" status="success"></a-badge>
+            <a-badge v-else-if="record.status==1" status="error"></a-badge>
+            <a-badge v-else-if="record.status==2" status="processing"></a-badge>
+            <template v-if="record.status==0">{{ $t('notify_result_delivered') }}</template>
+            <template v-else-if="record.status==1">{{ $t('notify_result_failed') }}</template>
+          </span>
+        </a-table>
       </a-table>
     </div>
 
@@ -251,7 +256,7 @@ export default {
         { title: this.$t('col_instance'), key: "instance_name", align: "left", width: 120, scopedSlots: { customRender: "instance_name" } },
         { title: this.$t('col_alarm_type'), key: "status", align: "left", scopedSlots: { customRender: "status" } },
         { title: this.$t('col_device_name'), dataIndex: "hostname", align: "left" },
-        { title: this.$t('col_ip'), dataIndex: "host_ip", align: "left", scopedSlots: { customRender: "host_ip" } },
+        { title: this.$t('col_ip'), dataIndex: "host_ip", align: "left" },
         { title: this.$t('col_alarm_level'), key: "level", align: "left", scopedSlots: { customRender: "level" } },
         { title: this.$t('col_alarm_description'), dataIndex: "message", align: "left" },
         { title: this.$t('col_alarm_detail'), dataIndex: "detail", align: "left" },
@@ -283,12 +288,12 @@ export default {
           })
         }
       }).catch(err => {
-        console.error('加载实例列表失败:', err)
+        console.error(this.$t('msg_load_instances_failed'), err)
       })
     },
     getInstanceName(zid) {
-      if (!zid) return '未知'
-      return this.instanceMap[zid] || '未知'
+      if (!zid) return this.$t('msg_unknown')
+      return this.instanceMap[zid] || this.$t('msg_unknown')
     },
     init() {
       this.loading = true;
@@ -414,7 +419,7 @@ export default {
       let analysisTimeout = null;
       
       const analysisData = {
-        message: "请分析以下告警详情，说明可能的原因并给出具体的解决方案：\n" + record.detail,
+        message: this.$t('msg_analysis_prompt') + "\n" + record.detail,
         requestId: this.currentRequestId,
         onProgress: (text, responseRequestId) => {
           try {
@@ -465,9 +470,9 @@ export default {
           if (error.name === 'AbortError') {
             return;
           }
-          let errorMsg = '未知错误';
+          let errorMsg = this.$t('msg_unknown_error');
           if (error.code === 'ECONNABORTED') {
-            errorMsg = '请求超时，请稍后重试';
+            errorMsg = this.$t('msg_request_timeout');
           } else if (error.response) {
             errorMsg = error.response.data?.message || error.message;
           } else if (error.message) {
@@ -523,64 +528,64 @@ export default {
       return parseTimeFun(v);
     },
     levelFilter(v) {
-      let res = "未分类";
+      let res = this.$t('level_unclassified');
       switch (v) {
         case "0":
-          res = "未分类";
+          res = this.$t('level_unclassified');
           break;
         case "1":
-          res = "信息";
+          res = this.$t('level_information');
           break;
         case "2":
-          res = "警告";
+          res = this.$t('level_warning');
           break;
         case "3":
-          res = "一般";
+          res = this.$t('level_average');
           break;
         case "4":
-          res = "严重";
+          res = this.$t('level_high');
           break;
         case "5":
-          res = "灾难";
+          res = this.$t('level_disaster');
           break;
       }
       return res;
     },
     statusFilter(v) {
-      let res = "未分类";
+      let res = this.$t('level_unclassified');
       switch (v) {
         case "0":
-          res = "恢复";
+          res = this.$t('alarm_type_recovery');
           break;
         case "1":
-          res = "告警";
+          res = this.$t('alarm_type_alarm');
           break;
       }
       return res;
     },
     notifyStatusFilter(v) {
-      let res = "已通知";
+      let res = this.$t('notify_status_notified');
       switch (v) {
         case "0":
-          res = "已通知";
+          res = this.$t('notify_status_notified');
           break;
         case "1":
-          res = "已屏蔽";
+          res = this.$t('notify_status_muted');
           break;
         case "2":
-          res = "默认规则";
+          res = this.$t('notify_status_default_rule');
           break;
       }
       return res;
     },
     notifyResult(v) {
-      let res = "已通知";
+      let res = this.$t('notify_status_notified');
       switch (v) {
         case "0":
-          res = "已送达";
+          res = this.$t('notify_result_delivered');
           break;
         case "1":
-          res = "失败";
+          res = this.$t('notify_result_failed');
           break;
       }
       return res;

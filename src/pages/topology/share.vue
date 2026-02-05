@@ -5,22 +5,22 @@
       <div class="header-content">
         <div class="topology-title">
           <a-icon type="apartment" class="title-icon" />
-          <h1>共享拓扑{{ form.name ? ' - ' + form.name : '' }}</h1>
+          <h1>{{ $t('title_shared_topology') }}{{ form.name ? ' - ' + form.name : '' }}</h1>
           <span v-if="form.updateTime" class="update-time">
             <a-icon type="clock-circle" />
-            更新时间: {{ form.updateTime }}
+            {{ $t('label_update_time') }}: {{ form.updateTime }}
           </span>
-          <a-badge :status="isWebSocket ? 'processing' : 'default'" :text="isWebSocket ? '实时更新中' : '未连接'" class="status-badge" />
+          <a-badge :status="isWebSocket ? 'processing' : 'default'" :text="isWebSocket ? $t('status_realtime_updating') : $t('status_not_connected')" class="status-badge" />
         </div>
         <div class="header-actions">
           <a-button-group>
             <a-button @click="saveToPNG()">
               <a-icon type="file-image" />
-              导出PNG
+              {{ $t('btn_export_png') }}
             </a-button>
             <a-button @click="saveToSVG()">
               <a-icon type="save" />
-              导出SVG
+              {{ $t('btn_export_svg') }}
             </a-button>
           </a-button-group>
         </div>
@@ -218,6 +218,7 @@ Graph.registerNode(
 
 export default {
   name: 'PublicTopology',
+  i18n: require('./i18n'),
   data() {
     return {
       id: '',
@@ -240,7 +241,7 @@ export default {
   created() {
     this.id = this.$route.query.id || ""
     if (!this.id) {
-      this.$message.error('缺少拓扑ID参数')
+      this.$message.error(this.$t('msg_missing_topology_id'))
       return
     }
   },
@@ -437,7 +438,7 @@ export default {
       this.isWebSocket = true
       console.log('Sending initial "success" message')
       this.websock.send("success")
-      this.$message.success("WebSocket已连接")
+      this.$message.success(this.$t('msg_websocket_connected'))
     },
     
     websocketonclose() {
@@ -448,7 +449,7 @@ export default {
       this.isWebSocket = false
       console.error('WebSocket error occurred:', error)
       console.error('WebSocket readyState:', this.websock?.readyState)
-      this.$message.error('WebSocket连接错误')
+      this.$message.error(this.$t('msg_websocket_error'))
     },
     
     websocketonmessage(e) {
@@ -734,12 +735,12 @@ export default {
           } else if (res.code == 403) {
             this.$message.error(res.message)
           } else {
-            this.$message.error('加载拓扑失败')
+            this.$message.error(this.$t('msg_load_topology_failed'))
           }
         })
         .catch((error) => {
           console.error('Load topology error:', error)
-          this.$message.error('加载拓扑失败: ' + (error.response?.data?.message || error.message))
+          this.$message.error(this.$t('msg_load_topology_failed') + ': ' + (error.response?.data?.message || error.message))
         })
     }
   }

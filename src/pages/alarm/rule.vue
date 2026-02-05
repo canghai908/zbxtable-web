@@ -1,8 +1,8 @@
 <template>
   <page-layout :noTitle="true">
-    <a-alert message="多实例告警规则说明" type="info" show-icon closable style="margin-bottom: 16px;">
+    <a-alert :message="$t('alert_multi_instance_title')" type="info" show-icon closable style="margin-bottom: 16px;">
       <template slot="description">
-        系统已支持多实例数据聚合。在配置告警分发规则时，可以选择一个或多个实例，规则将应用于所选实例的告警。
+        {{ $t('alert_multi_instance_desc') }}
       </template>
     </a-alert>
 
@@ -20,7 +20,7 @@
       <a-table :loading="loading" :columns="columns" :data-source="list" @change="changePage" :pagination="pagination" :rowKey="(record) => { return record.id;}">
         <span slot="created" slot-scope="record">{{record.created | parsetime }}</span>
         <span slot="status" slot-scope="record">
-          <a-switch :checked="record.status == '0' ? true : false" checked-children="启用" un-checked-children="禁用" @change="onStatusChange($event, record)" />
+          <a-switch :checked="record.status == '0' ? true : false" :checked-children="$t('status_enabled')" :un-checked-children="$t('status_disabled')" @change="onStatusChange($event, record)" />
         </span>
         <span slot="operation" slot-scope="record">
           <!-- <a-button class="pd20 paddingleft0" type="link" size="small" @click="seeDetail(record)">详细信息</a-button> -->
@@ -34,22 +34,22 @@
     <!-- 新增/编辑规则弹窗 -->
     <a-modal :title="editingId ? $t('modal_title_edit_rule') : $t('modal_title_add_rule')" :visible="modalVisible" :confirmLoading="modalLoading" @ok="saveRule" @cancel="closeModal" width="900px">
       <a-form-model :model="editRule" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
-        <a-form-model-item label="名称" required>
-          <a-input v-model.trim="editRule.name" placeholder="请输入规则名称" />
+        <a-form-model-item :label="$t('form_label_name')" required>
+          <a-input v-model.trim="editRule.name" :placeholder="$t('form_placeholder_name')" />
         </a-form-model-item>
-        <a-form-model-item label="实例" required>
-          <a-select v-model="editRule.z_ids" mode="multiple" style="width: 100%" placeholder="选择告警实例">
+        <a-form-model-item :label="$t('form_label_instance')" required>
+          <a-select v-model="editRule.z_ids" mode="multiple" style="width: 100%" :placeholder="$t('form_placeholder_instance')">
             <a-select-option v-for="(item, index) in instanceList" :key="index" :value="item.id.toString()" :label="item.name" :title="item.name">
               {{ item.name }}
             </a-select-option>
           </a-select>
         </a-form-model-item>
 
-        <a-card title="匹配条件" :bordered="false" size="small">
+        <a-card :title="$t('card_title_match_conditions')" :bordered="false" size="small">
           <div v-for="(itv, its) in editRule.conditions" :key="its" class="condition-row">
             <a-row :gutter="8" type="flex" align="middle">
               <a-col :span="6">
-                <a-form-item label="字段" :label-col="{ span: 24 }" :wrapper-col="{ span: 24 }">
+                <a-form-item :label="$t('condition_field')" :label-col="{ span: 24 }" :wrapper-col="{ span: 24 }">
                   <a-select v-model="itv.r_type">
                     <a-select-option v-for="(item, index) in rTypeOptions" :key="index" :value="item.value">
                       {{ item.label }}
@@ -58,7 +58,7 @@
                 </a-form-item>
               </a-col>
               <a-col :span="5">
-                <a-form-item label="操作符" :label-col="{ span: 24 }" :wrapper-col="{ span: 24 }">
+                <a-form-item :label="$t('condition_operator')" :label-col="{ span: 24 }" :wrapper-col="{ span: 24 }">
                   <a-select v-model="itv.r_func">
                     <a-select-option v-for="(item, index) in rFuncOptions" :key="index" :value="item.value">
                       {{ item.label }}
@@ -67,49 +67,49 @@
                 </a-form-item>
               </a-col>
               <a-col :span="8">
-                <a-form-item label="值" :label-col="{ span: 24 }" :wrapper-col="{ span: 24 }">
-                  <a-input v-model="itv.r_value" placeholder="匹配值" />
+                <a-form-item :label="$t('condition_value')" :label-col="{ span: 24 }" :wrapper-col="{ span: 24 }">
+                  <a-input v-model="itv.r_value" :placeholder="$t('condition_placeholder_value')" />
                 </a-form-item>
               </a-col>
               <a-col :span="5" class="condition-actions">
                 <a-button type="danger" v-if="editRule.conditions && editRule.conditions.length > 1" icon="delete" size="small" @click="editRule.conditions.splice(its, 1)">
-                  删除
+                  {{ $t('btn_delete_condition') }}
                 </a-button>
                 <a-button type="primary" v-if="its === 0" icon="plus" size="small" @click="editRule.conditions.push({ r_type: '', r_func: '', r_value: '' })" style="margin-left: 8px;">
-                  添加
+                  {{ $t('btn_add_condition') }}
                 </a-button>
               </a-col>
             </a-row>
           </div>
         </a-card>
 
-        <a-card title="时间与通道" :bordered="false" size="small" style="margin-top: 12px;">
-          <a-form-model-item label="星期">
+        <a-card :title="$t('card_title_time_channel')" :bordered="false" size="small" style="margin-top: 12px;">
+          <a-form-model-item :label="$t('form_label_week')">
             <a-select v-model="editRule.s_week" mode="multiple" style="width: 100%">
               <a-select-option v-for="(item, index) in rWeekOptions" :key="index" :value="item.value">
                 {{ item.label }}
               </a-select-option>
             </a-select>
           </a-form-model-item>
-          <a-form-model-item label="时间段">
+          <a-form-model-item :label="$t('form_label_time_range')">
             <a-time-picker v-model="editRule.s_time" format="HH:mm" style="margin-right: 8px;" />
             <a-time-picker v-model="editRule.e_time" format="HH:mm" />
           </a-form-model-item>
-          <a-form-model-item label="通道">
+          <a-form-model-item :label="$t('form_label_channel')">
             <a-checkbox-group v-model="editRule.channel" :options="rChannelOptions" />
           </a-form-model-item>
         </a-card>
 
-        <a-card title="接收对象" :bordered="false" size="small" style="margin-top: 12px;">
-          <a-form-model-item label="接收人">
-            <a-select v-model="editRule.user_ids" mode="multiple" style="width: 100%" placeholder="告警接收人">
+        <a-card :title="$t('card_title_receiver_object')" :bordered="false" size="small" style="margin-top: 12px;">
+          <a-form-model-item :label="$t('form_label_receiver')">
+            <a-select v-model="editRule.user_ids" mode="multiple" style="width: 100%" :placeholder="$t('form_placeholder_receiver')">
               <a-select-option v-for="(item, index) in userlist" :key="index" :value="item.id.toString()" :label="item.username" :title="item.username">
                 {{ item.username }}
               </a-select-option>
             </a-select>
           </a-form-model-item>
-          <a-form-model-item label="接收组">
-            <a-select v-model="editRule.group_ids" mode="multiple" style="width: 100%" placeholder="告警接收组">
+          <a-form-model-item :label="$t('form_label_receiver_group')">
+            <a-select v-model="editRule.group_ids" mode="multiple" style="width: 100%" :placeholder="$t('form_placeholder_receiver_group')">
               <a-select-option v-for="(item, index) in grouplist" :key="index" :value="item.id.toString()" :label="item.name" :title="item.name">
                 {{ item.name }}
               </a-select-option>
@@ -117,11 +117,11 @@
           </a-form-model-item>
         </a-card>
 
-        <a-form-model-item label="备注" style="margin-top: 12px;">
-          <a-input v-model.trim="editRule.note" placeholder="备注说明" />
+        <a-form-model-item :label="$t('form_label_note')" style="margin-top: 12px;">
+          <a-input v-model.trim="editRule.note" :placeholder="$t('form_placeholder_note')" />
         </a-form-model-item>
-        <a-form-model-item label="状态">
-          <a-switch v-model="editRule.status" checked-children="启用" un-checked-children="禁用" />
+        <a-form-model-item :label="$t('form_label_status')">
+          <a-switch v-model="editRule.status" :checked-children="$t('status_enabled')" :un-checked-children="$t('status_disabled')" />
         </a-form-model-item>
       </a-form-model>
     </a-modal>
@@ -158,35 +158,14 @@ export default {
       loading: false,
       pplist: [],
       status: "",
-      rTypeOptions: [
-        { value: "host", label: "主机" },
-        { value: "group", label: "主机组" },
-        { value: "item", label: "指标名称" },
-        { value: "key", label: "指标Key" },
-        { value: "trigger", label: "触发器" },
-        { value: "severity", label: "告警级别" }
-      ],
+      rTypeOptions: [],
       rFuncOptions: [
         { value: "==", label: "==" },
         { value: "=~", label: "=~" },
         { value: "!=", label: "!=" }
       ],
-      rWeekOptions: [
-        { value: "0", label: "星期日" },
-        { value: "1", label: "星期一" },
-        { value: "2", label: "星期二" },
-        { value: "3", label: "星期三" },
-        { value: "4", label: "星期四" },
-        { value: "5", label: "星期五" },
-        { value: "6", label: "星期六" }
-      ],
-      rChannelOptions: [
-        { value: "mail", label: "邮件" },
-        { value: "wechat", label: "微信" },
-        { value: "wechat_robot", label: "企业微信群机器人" },
-        // { value: "dingding", label: "钉钉" },
-        // { value: "sms", label: "短信" },
-      ],
+      rWeekOptions: [],
+      rChannelOptions: [],
       // 弹窗状态
       modalVisible: false,
       modalLoading: false,
@@ -205,86 +184,7 @@ export default {
         note: "",
         status: true,
       },
-      columns: [
-        { title: "ID", dataIndex: "id", align: "left" },
-        { title: "名称", dataIndex: "name", align: "left" },
-        {
-          title: "实例", dataIndex: "z_ids", align: "left", customRender: (value) => {
-            if (!value) return '未选择'
-            const ids = value.toString().split(',')
-            const names = ids.map(id => {
-              const instance = this.instanceList.find(item => item.id.toString() === id.trim())
-              return instance ? instance.name : id
-            })
-            return { children: names.join(', '), attrs: {} }
-          },
-        },
-        { title: "分发条件", dataIndex: "conditions", align: "left" },
-        {
-          title: "分发通道", dataIndex: "channel", align: "left", customRender: (value, row, index) => {
-            let allist = []
-            value.split(",").forEach(items => {
-              if (items == "wechat") {
-                allist.push("微信");
-              }
-              if (items == "wechat_robot") {
-                allist.push("企业微信群机器人");
-              }
-              if (items == "sms") {
-                allist.push("短信");
-              }
-              if (items == "dingding") {
-                allist.push("钉钉");
-              }
-              if (items == "mail") {
-                allist.push("邮件");
-              }
-            });
-            const obj = {
-              children: allist.join(","),
-            };
-            return obj;
-          },
-        },
-        {
-          title: "接收人", dataIndex: "user_ids", align: "left", customRender: (value, row, index) => {
-            let allist = []
-            value.split(",").forEach(items => {
-              this.userlist.forEach(tid => {
-                if (items == tid.id) {
-                  allist.push(tid.username);
-                }
-              });
-            });
-            const obj = {
-              children: allist.join(","),
-              attrs: {},
-            };
-            return obj;
-          },
-        },
-        {
-          title: "接收组", dataIndex: "group_ids", align: "left", customRender: (value, row, index) => {
-            let allist = []
-            value.split(",").forEach(items => {
-              this.grouplist.forEach(tid => {
-                if (items == tid.id) {
-                  allist.push(tid.name);
-                }
-              });
-            });
-            const obj = {
-              children: allist.join(","),
-              attrs: {},
-            };
-            return obj;
-          },
-        },
-        { title: "备注", dataIndex: "note", align: "left" },
-        { title: "添加时间", key: "created", align: "left", scopedSlots: { customRender: "created" }, },
-        { title: "状态", key: "status", align: "left", scopedSlots: { customRender: "status" } },
-        { title: "操作", key: "operation", align: "center", scopedSlots: { customRender: "operation" } },
-      ],
+      columns: [],
       instanceList: [],
       grouplist: [],
       userlist: [],
@@ -313,9 +213,118 @@ export default {
       moment(qtime, "YYYY-MM-DD HH:mm:ss"),
       moment(ntime, "YYYY-MM-DD HH:mm:ss"),
     ];
+    this.initOptions();
     this.init();
   },
   methods: {
+    initOptions() {
+      // 初始化字段选项
+      this.rTypeOptions = [
+        { value: "host", label: this.$t('field_host') },
+        { value: "group", label: this.$t('field_group') },
+        { value: "item", label: this.$t('field_item') },
+        { value: "key", label: this.$t('field_key') },
+        { value: "trigger", label: this.$t('field_trigger') },
+        { value: "severity", label: this.$t('field_severity') }
+      ];
+      
+      // 初始化星期选项
+      this.rWeekOptions = [
+        { value: "0", label: this.$t('week_sunday') },
+        { value: "1", label: this.$t('week_monday') },
+        { value: "2", label: this.$t('week_tuesday') },
+        { value: "3", label: this.$t('week_wednesday') },
+        { value: "4", label: this.$t('week_thursday') },
+        { value: "5", label: this.$t('week_friday') },
+        { value: "6", label: this.$t('week_saturday') }
+      ];
+      
+      // 初始化通道选项
+      this.rChannelOptions = [
+        { value: "mail", label: this.$t('channel_mail') },
+        { value: "wechat", label: this.$t('channel_wechat') },
+        { value: "wechat_robot", label: this.$t('channel_wechat_robot') },
+        // { value: "dingding", label: this.$t('channel_dingding') },
+        // { value: "sms", label: this.$t('channel_sms') },
+      ];
+      
+      // 初始化表格列
+      this.columns = [
+        { title: this.$t('col_id'), dataIndex: "id", align: "left" },
+        { title: this.$t('col_name'), dataIndex: "name", align: "left" },
+        {
+          title: this.$t('col_instances'), dataIndex: "z_ids", align: "left", customRender: (value) => {
+            if (!value) return this.$t('status_not_selected')
+            const ids = value.toString().split(',')
+            const names = ids.map(id => {
+              const instance = this.instanceList.find(item => item.id.toString() === id.trim())
+              return instance ? instance.name : id
+            })
+            return { children: names.join(', '), attrs: {} }
+          },
+        },
+        { title: this.$t('col_distribution_conditions'), dataIndex: "conditions", align: "left" },
+        {
+          title: this.$t('col_distribution_channel'), dataIndex: "channel", align: "left", customRender: (value, row, index) => {
+            let allist = []
+            const channelMap = {
+              "wechat": this.$t('channel_wechat'),
+              "wechat_robot": this.$t('channel_wechat_robot'),
+              "sms": this.$t('channel_sms'),
+              "dingding": this.$t('channel_dingding'),
+              "mail": this.$t('channel_mail')
+            }
+            value.split(",").forEach(items => {
+              if (channelMap[items]) {
+                allist.push(channelMap[items]);
+              }
+            });
+            const obj = {
+              children: allist.join(","),
+            };
+            return obj;
+          },
+        },
+        {
+          title: this.$t('col_receiver'), dataIndex: "user_ids", align: "left", customRender: (value, row, index) => {
+            let allist = []
+            value.split(",").forEach(items => {
+              this.userlist.forEach(tid => {
+                if (items == tid.id) {
+                  allist.push(tid.username);
+                }
+              });
+            });
+            const obj = {
+              children: allist.join(","),
+              attrs: {},
+            };
+            return obj;
+          },
+        },
+        {
+          title: this.$t('col_receiver_group'), dataIndex: "group_ids", align: "left", customRender: (value, row, index) => {
+            let allist = []
+            value.split(",").forEach(items => {
+              this.grouplist.forEach(tid => {
+                if (items == tid.id) {
+                  allist.push(tid.name);
+                }
+              });
+            });
+            const obj = {
+              children: allist.join(","),
+              attrs: {},
+            };
+            return obj;
+          },
+        },
+        { title: this.$t('col_note'), dataIndex: "note", align: "left" },
+        { title: this.$t('col_add_time'), key: "created", align: "left", scopedSlots: { customRender: "created" }, },
+        { title: this.$t('col_status'), key: "status", align: "left", scopedSlots: { customRender: "status" } },
+        { title: this.$t('col_operation'), key: "operation", align: "center", scopedSlots: { customRender: "operation" } },
+      ];
+  },
     resetEditRule() {
       this.editRule = {
         name: "",
@@ -483,11 +492,11 @@ export default {
     },
     async saveRule() {
       if (!this.editRule.name) {
-        this.$message.warning("请填写名称")
+        this.$message.warning(this.$t('msg_please_fill_name'))
         return
       }
       if (!this.editRule.z_ids || this.editRule.z_ids.length === 0) {
-        this.$message.warning("请选择实例")
+        this.$message.warning(this.$t('msg_please_select_instance'))
         return
       }
       this.modalLoading = true
@@ -517,11 +526,11 @@ export default {
         }
         const res = resp.data
         if (res.code === 200) {
-          this.$message.success(res.message || "保存成功")
+          this.$message.success(res.message || this.$t('msg_save_success'))
           this.modalVisible = false
           this.init()
         } else {
-          this.$message.error(res.message || "保存失败")
+          this.$message.error(res.message || this.$t('msg_save_failed'))
         }
       } finally {
         this.modalLoading = false

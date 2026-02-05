@@ -2,14 +2,14 @@
   <div class="drawer_container">
     <!-- 画布设置 -->
     <div v-if="drawerType === 'grid'">
-      <div class="drawer_title">画布设置</div>
+      <div class="drawer_title">{{ $t('title_canvas_settings') }}</div>
       <div class="drawer_wrap">
         <a-form-model :model="form" :label-col="labelCol" :wrapper-col="wrapperCol">
-          <a-form-model-item label="拓扑图名称">
-            <a-input v-model="form.name" placeholder="请输入拓扑图名称" />
+          <a-form-model-item :label="$t('label_topology_name')">
+            <a-input v-model="form.name" :placeholder="$t('placeholder_enter_topology_name')" />
           </a-form-model-item>
           <a-form-model-item label="">
-            <a-alert message="点击画布空白处可关闭此面板" type="info" show-icon />
+            <a-alert :message="$t('alert_click_blank_to_close')" type="info" show-icon />
           </a-form-model-item>
         </a-form-model>
       </div>
@@ -17,20 +17,20 @@
 
     <!-- 节点设置 -->
     <div v-if="drawerType === 'node'">
-      <div class="drawer_title">{{ isTextNode ? '文字节点设置' : '节点设置' }}</div>
+      <div class="drawer_title">{{ isTextNode ? $t('title_text_node_settings') : $t('title_node_settings') }}</div>
       <div class="drawer_wrap">
         <!-- 文字节点设置 -->
         <a-form v-if="isTextNode" :model="drawerTextNode" :label-col="labelCol" :wrapper-col="wrapperCol">
-          <a-form-item label="文字内容">
+          <a-form-item :label="$t('label_text_content')">
             <a-textarea 
               v-model="drawerTextNode.text" 
               :rows="4"
-              placeholder="请输入文字内容"
+              :placeholder="$t('placeholder_enter_text_content')"
               @change="handleTextChange"
             />
           </a-form-item>
           
-          <a-form-item label="字体大小">
+          <a-form-item :label="$t('label_font_size')">
             <a-slider 
               v-model="drawerTextNode.fontSize" 
               :min="12" 
@@ -41,15 +41,15 @@
             <span style="margin-left: 10px;">{{ drawerTextNode.fontSize }}px</span>
           </a-form-item>
           
-          <a-form-item label="字体粗细">
+          <a-form-item :label="$t('label_font_weight')">
             <a-radio-group v-model="drawerTextNode.fontWeight" @change="handleFontWeightChange">
-              <a-radio-button value="normal">正常</a-radio-button>
-              <a-radio-button value="bold">加粗</a-radio-button>
-              <a-radio-button value="bolder">特粗</a-radio-button>
+              <a-radio-button value="normal">{{ $t('font_weight_normal') }}</a-radio-button>
+              <a-radio-button value="bold">{{ $t('font_weight_bold') }}</a-radio-button>
+              <a-radio-button value="bolder">{{ $t('font_weight_bolder') }}</a-radio-button>
             </a-radio-group>
           </a-form-item>
           
-          <a-form-item label="字体颜色">
+          <a-form-item :label="$t('label_font_color')">
             <a-input 
               v-model="drawerTextNode.fontColor" 
               type="color" 
@@ -59,7 +59,7 @@
             <span style="margin-left: 10px;">{{ drawerTextNode.fontColor }}</span>
           </a-form-item>
           
-          <a-form-item label="预览">
+          <a-form-item :label="$t('label_preview')">
             <div 
               :style="{
                 fontSize: drawerTextNode.fontSize + 'px',
@@ -73,24 +73,24 @@
                 wordBreak: 'break-word'
               }"
             >
-              {{ drawerTextNode.text || '请输入文字内容' }}
+              {{ drawerTextNode.text || $t('placeholder_enter_text_content') }}
             </div>
           </a-form-item>
           
-          <a-form-item label="功能">
+          <a-form-item :label="$t('label_function')">
             <a-button type="danger" ghost @click="deleteNode">
-              删除
+              {{ $t('btn_delete') }}
             </a-button>
           </a-form-item>
         </a-form>
         
         <!-- 普通节点设置 -->
         <a-form v-else :model="drawerNode" :label-col="labelCol" :wrapper-col="wrapperCol">
-          <a-form-item label="Zabbix实例">
+          <a-form-item :label="$t('label_zabbix_instance')">
             <a-select 
               v-model="drawerNode.ZID" 
               style="width: 100%" 
-              placeholder="请选择Zabbix实例"
+              :placeholder="$t('placeholder_select_zabbix_instance')"
               @change="handleInstanceChange"
             >
               <a-select-option v-for="instance in zabbixInstances" :key="instance.id" :value="instance.id">
@@ -99,11 +99,11 @@
             </a-select>
           </a-form-item>
           
-          <a-form-item label="设备类型">
+          <a-form-item :label="$t('label_device_type')">
             <a-select 
               :value="drawerNode.HostType" 
               style="width: 100%" 
-              placeholder="请选择设备类型" 
+              :placeholder="$t('placeholder_select_device_type')" 
               @change="handleChange"
             >
               <a-select-option v-for="(item, index) in HostTypeList" :key="index" :value="item.value">
@@ -112,13 +112,13 @@
             </a-select>
           </a-form-item>
           
-          <a-form-item label="设备名称">
+          <a-form-item :label="$t('label_device_name')">
             <a-select 
               v-model="drawerNode.HostID"
               show-search 
               style="width: 100%" 
               option-filter-prop="label" 
-              placeholder="请选择设备"
+              :placeholder="$t('placeholder_select_device')"
               @popupScroll="handleHostPopupScroll" 
               @search="handleHostSearch" 
               @change="handleHostChange"
@@ -135,9 +135,9 @@
             </a-select>
           </a-form-item>
           
-          <a-form-item label="功能">
+          <a-form-item :label="$t('label_function')">
             <a-button type="danger" ghost @click="deleteNode">
-              删除
+              {{ $t('btn_delete') }}
             </a-button>
           </a-form-item>
         </a-form>
@@ -146,14 +146,14 @@
 
     <!-- 线条设置 -->
     <div v-if="drawerType === 'edge'">
-      <div class="drawer_title">线条设置</div>
+      <div class="drawer_title">{{ $t('title_line_settings') }}</div>
       <div class="drawer_wrap">
         <a-form :model="drawerEdge" :label-col="labelCol" :wrapper-col="wrapperCol">
-          <a-form-item label="Zabbix实例">
+          <a-form-item :label="$t('label_zabbix_instance')">
             <a-select 
               v-model="drawerEdge.ZID" 
               style="width: 100%" 
-              placeholder="请选择Zabbix实例"
+              :placeholder="$t('placeholder_select_zabbix_instance')"
               @change="handleInstanceChange"
             >
               <a-select-option v-for="instance in zabbixInstances" :key="instance.id" :value="instance.id">
@@ -162,11 +162,11 @@
             </a-select>
           </a-form-item>
           
-          <a-form-item label="设备类型">
+          <a-form-item :label="$t('label_device_type')">
             <a-select 
               :value="drawerEdge.HostType"
               style="width: 100%" 
-              placeholder="请选择设备类型"
+              :placeholder="$t('placeholder_select_device_type')"
               @change="handleChange"
             >
               <a-select-option v-for="(item, index) in HostTypeList" :key="index" :value="item.value">
@@ -175,13 +175,13 @@
             </a-select>
           </a-form-item>
           
-          <a-form-item label="设备名称">
+          <a-form-item :label="$t('label_device_name')">
             <a-select 
               v-model="drawerEdge.HostID"
               show-search 
               style="width: 100%" 
               option-filter-prop="label"
-              placeholder="请选择设备"
+              :placeholder="$t('placeholder_select_device')"
               @popupScroll="handleHostPopupScroll" 
               @search="handleHostSearch" 
               @change="handleHostChange"
@@ -198,13 +198,13 @@
             </a-select>
           </a-form-item>
           
-          <a-form-item label="流量指标">
+          <a-form-item :label="$t('label_flow_metric')">
             <a-select 
               v-model="drawerEdge.FlowID"
               show-search 
               style="width: 100%" 
               option-filter-prop="label"
-              placeholder="请选择流量指标"
+              :placeholder="$t('placeholder_select_flow_metric')"
               @popupScroll="handlePopupScroll" 
               @search="handleSearch" 
               @change="handleFlowChange"
@@ -221,13 +221,13 @@
             </a-select>
           </a-form-item>
           
-          <a-form-item label="触发指标">
+          <a-form-item :label="$t('label_trigger_metric')">
             <a-select 
               v-model="drawerEdge.TriggerID"
               show-search 
               style="width: 100%" 
               option-filter-prop="label"
-              placeholder="请选择触发指标"
+              :placeholder="$t('placeholder_select_trigger_metric')"
               @popupScroll="handleTriggerPopupScroll" 
               @search="handleTriggerSearch" 
               @change="handleTriggerChange"
@@ -244,9 +244,9 @@
             </a-select>
           </a-form-item>
           
-          <a-form-item label="功能">
+          <a-form-item :label="$t('label_function')">
             <a-button type="danger" ghost @click="deleteNode">
-              删除
+              {{ $t('btn_delete') }}
             </a-button>
           </a-form-item>
         </a-form>
@@ -269,6 +269,7 @@ const debounce = (func, delay = 60) => {
 };
 
 export default {
+  i18n: require('./i18n'),
   data() {
     return {
       zabbixInstances: [], // Zabbix实例列表
@@ -395,7 +396,7 @@ export default {
           this.zabbixInstances = (resp.data.data || []).filter(instance => instance.enabled)
         }
       } catch (err) {
-        this.$message.error('加载Zabbix实例失败')
+        this.$message.error(this.$t('msg_load_instance_failed'))
       }
     },
     
@@ -445,7 +446,7 @@ export default {
           this.curHostsList = this.hostsFilterList.slice(0, selectSize)
         }
       } catch (err) {
-        this.$message.error('加载主机列表失败')
+        this.$message.error(this.$t('msg_load_host_failed'))
       }
     },
     
@@ -455,7 +456,7 @@ export default {
       const zid = this.drawerEdge.ZID
       
       if (!zid) {
-        this.$message.warn('请先选择Zabbix实例')
+        this.$message.warn(this.$t('msg_select_instance_first'))
         return
       }
       
@@ -473,7 +474,7 @@ export default {
           this.curFlowItemList = this.flowItemFilterList.slice(0, selectSize)
         }
       } catch (err) {
-        console.error('加载流量监控项失败', err)
+        console.error(this.$t('msg_load_flow_failed'), err)
       }
       
       // 加载触发器
@@ -485,7 +486,7 @@ export default {
           this.curTriggerItemList = this.triggerItemFilterList.slice(0, selectSize)
         }
       } catch (err) {
-        console.error('加载触发器失败', err)
+        console.error(this.$t('msg_load_trigger_failed'), err)
       }
     },
     
@@ -518,7 +519,7 @@ export default {
       if (zid) {
         this.loadHostsByInstance(zid, item.value)
       } else {
-        this.$message.warn('请先选择Zabbix实例')
+        this.$message.warn(this.$t('msg_select_instance_first'))
       }
     },
     

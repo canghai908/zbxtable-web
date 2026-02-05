@@ -1,8 +1,8 @@
 <template>
   <page-layout :noTitle="true">
-    <a-alert message="多实例主机报表说明" type="info" show-icon closable style="margin-bottom: 16px;">
+    <a-alert :message="$t('multi_instance_alert_title')" type="info" show-icon closable style="margin-bottom: 16px;">
       <template slot="description">
-        系统已支持多实例数据聚合。在配置主机报表时,一个报表可以包含来自不同实例的主机指标数据。
+        {{ $t('multi_instance_alert_content') }}
       </template>
     </a-alert>
     
@@ -88,7 +88,7 @@
       </a-table>
     </div>
 
-    <!-- 添加/编辑主机报表弹窗 -->
+    <!-- Add/Edit Host Report Modal -->
     <a-modal :title="formModalTitle" :visible="formModalVisible" :width="1000" :confirm-loading="formModalLoading" @ok="handleFormSubmit" @cancel="handleFormCancel">
       <a-form-model ref="formModal" :rules="formRules" :model="formData" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
         <a-form-model-item :label="$t('host_report_name')" prop="name">
@@ -100,7 +100,7 @@
             <a-radio value="scheduled">{{ $t('scheduled_report') }}</a-radio>
           </a-radio-group>
         </a-form-model-item>
-        <!-- 实时报表：显示开始和结束时间 -->
+        <!-- Realtime report: show start and end time -->
         <template v-if="formData.reportMode === 'realtime'">
           <a-form-model-item :label="$t('start_time')" prop="startTime">
             <a-date-picker v-model="formData.startTime" show-time format="YYYY-MM-DD HH:mm:ss" :placeholder="$t('select_start_time')" style="width: 100%" />
@@ -113,7 +113,7 @@
           <div v-for="(config, index) in formData.hostConfigs" :key="index" style="margin-bottom: 16px; padding: 16px; border: 1px solid #d9d9d9; border-radius: 4px;">
             <a-row :gutter="16" style="margin-bottom: 8px;">
               <a-col :span="22">
-                <a-select v-model="config.zid" placeholder="请先选择实例" @change="(value) => handleInstanceChange(value, index)" style="width: 100%" show-search option-filter-prop="children">
+                <a-select v-model="config.zid" :placeholder="$t('select_instance_first')" @change="(value) => handleInstanceChange(value, index)" style="width: 100%" show-search option-filter-prop="children">
                   <a-select-option v-for="item in instanceList" :key="item.id" :value="item.id">
                     {{ item.name }}
                   </a-select-option>
@@ -122,7 +122,7 @@
             </a-row>
             <a-row :gutter="16">
               <a-col :span="10">
-                <a-select v-model="config.host_id" show-search :placeholder="config.zid ? $t('select_host') : '请先选择实例'" @popupScroll="handleHostPopupScrollForConfig(index)"
+                <a-select v-model="config.host_id" show-search :placeholder="config.zid ? $t('select_host') : $t('select_instance_first')" @popupScroll="handleHostPopupScrollForConfig(index)"
                   @search="(value) => handleHostSearchForConfig(value, index)" option-filter-prop="label" @change="handleHostChange(config, index)" style="width: 100%" :disabled="!config.zid">
                   <a-select-option v-for="(host, idx) in configHostsList[index]" :key="idx" :title="host.name" :label="host.name" :value="host.hostid">
                     {{ host.name }}
@@ -130,7 +130,7 @@
                 </a-select>
               </a-col>
               <a-col :span="12">
-                <a-select mode="multiple" show-search v-model="config.item_ids" :placeholder="config.host_id ? $t('select_items') : '请先选择主机'" @popupScroll="() => handleItemPopupScroll(index)"
+                <a-select mode="multiple" show-search v-model="config.item_ids" :placeholder="config.host_id ? $t('select_items') : $t('select_host_first')" @popupScroll="() => handleItemPopupScroll(index)"
                   @search="(value) => handleItemSearch(value, index)" option-filter-prop="label" style="width: 100%" :disabled="!config.host_id">
                   <a-select-option v-for="(item, idx) in curItemsList[index]" :key="idx" :label="item.name" :title="item.name" :value="item.itemid">
                     {{ item.name }}
@@ -147,13 +147,13 @@
             {{ $t('add_host_config') }}
           </a-button>
         </a-form-model-item>
-        <!-- 循环报表：显示邮箱和周期选择 -->
+        <!-- Scheduled report: show email and cycle selection -->
         <template v-if="formData.reportMode === 'scheduled'">
           <a-form-model-item :label="$t('email')" prop="emails">
             <a-input v-model.trim="formData.emails" :placeholder="$t('email_placeholder')" />
           </a-form-model-item>
         </template>
-        <!-- 循环报表：显示周期选择 -->
+        <!-- Scheduled report: show cycle selection -->
         <template v-if="formData.reportMode === 'scheduled'">
           <a-form-model-item :label="$t('period')" prop="cycle">
             <a-checkbox-group v-model="formData.cycle">
@@ -218,9 +218,9 @@ export default {
         status: '2',
         cycle: 'day',
       },
-      // 实例列表
+      // Instance list
       instanceList: [],
-      // 表单弹窗相关
+      // Form modal related
       formModalVisible: false,
       formModalLoading: false,
       formModalTitle: '',
@@ -228,7 +228,7 @@ export default {
       editId: '',
       formData: {
         name: '',
-        reportMode: 'realtime', // 默认实时报表
+        reportMode: 'realtime', // Default to realtime report
         hostConfigs: [
           {
             zid: undefined,
@@ -260,7 +260,7 @@ export default {
         selectedInstance: [
           {
             required: false,
-            message: '请选择实例',
+            message: this.$t('select_instance_first'),
             trigger: 'change'
           }
         ],
@@ -276,7 +276,7 @@ export default {
               }
               for (let config of value) {
                 if (!config.zid) {
-                  callback(new Error('请为每个主机配置选择实例'))
+                  callback(new Error(this.$t('select_instance_for_each_config')))
                   return
                 }
                 if (!config.host_id) {
@@ -306,7 +306,7 @@ export default {
             message: this.$t('message_reporting_period'),
             trigger: 'change',
             validator: (rule, value, callback) => {
-              // 循环报表需要周期，实时报表不需要
+              // Scheduled report needs cycle, realtime report doesn't
               if (this.formData.reportMode === 'scheduled' && (!value || value.length === 0)) {
                 callback(new Error(this.$t('message_reporting_period')))
                 return
@@ -321,7 +321,7 @@ export default {
             message: this.$t('select_start_time'),
             trigger: 'change',
             validator: (rule, value, callback) => {
-              // 实时报表需要开始时间
+              // Realtime report needs start time
               if (this.formData.reportMode === 'realtime' && !value) {
                 callback(new Error(this.$t('select_start_time')))
                 return
@@ -336,7 +336,7 @@ export default {
             message: this.$t('select_end_time'),
             trigger: 'change',
             validator: (rule, value, callback) => {
-              // 实时报表需要结束时间
+              // Realtime report needs end time
               if (this.formData.reportMode === 'realtime' && !value) {
                 callback(new Error(this.$t('select_end_time')))
                 return
@@ -381,11 +381,11 @@ export default {
       malist: [],
       pagination: {
         total: 0, current: 1, "show-quick-jumper": true, "page-size-options": ["10", "20", "30", "40", "50", "100", "200"],
-        pageSize: 10, "show-size-changer": true, "show-total": (total) => `共 ${total} 条数据`
+        pageSize: 10, "show-size-changer": true, "show-total": (total) => this.$t('total_records', { total })
       },
       mapagination: {
         total: 0, current: 1, "show-quick-jumper": true, "page-size-options": ["10", "20", "30", "40", "50", "100", "200"],
-        pageSize: 10, "show-size-changer": true, "show-total": (total) => `共 ${total} 条数据`
+        pageSize: 10, "show-size-changer": true, "show-total": (total) => this.$t('total_records', { total })
       },
     }
   },
@@ -399,7 +399,7 @@ export default {
         return '--';
       }
       try {
-        // moment.js 可以自动解析 ISO 8601 格式，包括带时区的格式
+        // moment.js can automatically parse ISO 8601 format, including timezone format
         const m = moment(dateStr);
         if (m.isValid()) {
           return m.format(pattern);
@@ -421,19 +421,19 @@ export default {
           this.instanceList = biz.data || []
         }
       } catch (e) {
-        console.error('加载实例列表失败', e)
+        console.error(this.$t('load_instances_failed'), e)
       }
     },
     handleInstanceChange(value, index) {
-      // 设置该配置的实例ID
+      // Set instance ID for this config
       this.$set(this.formData.hostConfigs[index], 'zid', value)
-      // 清空该配置的主机和监控项
+      // Clear host and items for this config
       this.$set(this.formData.hostConfigs[index], 'host_id', '')
       this.$set(this.formData.hostConfigs[index], 'item_ids', [])
       this.$set(this.curItemsList, index, [])
       this.$set(this.itemsFilterList, index, [])
       
-      // 加载该实例的所有主机
+      // Load all hosts for this instance
       if (value) {
         let params = {
           page: 1,
@@ -444,13 +444,13 @@ export default {
           let res = resp.data
           if (res.code == 200) {
             const hosts = res.data.items || []
-            // 为该配置加载主机列表
+            // Load host list for this config
             this.$set(this.configHostsFilterList, index, hosts)
             this.$set(this.configHostsList, index, hosts.slice(0, selectSize))
           }
         }).catch(err => {
-          console.error('加载主机列表失败:', err)
-          this.$message.error('加载主机列表失败')
+          console.error(this.$t('load_hosts_failed'), err)
+          this.$message.error(this.$t('load_hosts_failed'))
         })
       } else {
         this.$set(this.configHostsList, index, [])
@@ -540,7 +540,7 @@ export default {
     resetFormData() {
       this.formData = {
         name: '',
-        reportMode: 'realtime', // 默认实时报表
+        reportMode: 'realtime', // Default to realtime report
         hostConfigs: [
           {
             zid: undefined,
@@ -579,9 +579,9 @@ export default {
             this.formData.status = reportData.status === '1' || reportData.status === 1
             this.formData.cycle = reportData.cycle ? reportData.cycle.split(',') : ['day']
             this.formData.report_type = 'host'
-            this.formData.reportMode = reportData.report_mode || 'scheduled' // 默认为循环报表
+            this.formData.reportMode = reportData.report_mode || 'scheduled' // Default to scheduled report
             
-            // 加载时间（使用 start 和 end 字段，而不是 start_at 和 end_at）
+            // Load time (use start and end fields, not start_at and end_at)
             if (reportData.start && reportData.start !== '0001-01-01T00:00:00Z') {
               this.formData.startTime = moment(reportData.start)
             } else {
@@ -593,7 +593,7 @@ export default {
               this.formData.endTime = null
             }
             
-            // 解析host_ids和item_ids
+            // Parse host_ids and item_ids
             if (reportData.host_ids) {
               try {
                 const hostConfigs = JSON.parse(reportData.host_ids)
@@ -604,10 +604,10 @@ export default {
                     item_ids: (config.item_ids || []).map(id => String(id))
                   }))
                   
-                  // 为每个配置加载对应的主机列表和items
+                  // Load corresponding host list and items for each config
                   this.formData.hostConfigs.forEach((config, index) => {
                     if (config.zid) {
-                      // 加载该实例的主机列表
+                      // Load host list for this instance
                       let params = {
                         page: 1,
                         limit: 10000,
@@ -620,7 +620,7 @@ export default {
                           this.$set(this.configHostsFilterList, index, hosts)
                           this.$set(this.configHostsList, index, hosts.slice(0, selectSize))
                           
-                          // 如果有已选择的主机，加载监控项
+                          // If host is already selected, load items
                           if (config.host_id) {
                             this.handleHostChange(config, index)
                           }
@@ -643,7 +643,7 @@ export default {
       this.$refs.formModal.validate((valid) => {
         if (valid) {
           this.formModalLoading = true
-          // 构建host_ids和item_ids JSON字符串
+          // Build host_ids and item_ids JSON string
           const hostIds = JSON.stringify(this.formData.hostConfigs.map(c => ({
             host_id: c.host_id,
             item_ids: c.item_ids,
@@ -651,7 +651,7 @@ export default {
           })))
           const itemIds = JSON.stringify(this.formData.hostConfigs.flatMap(c => c.item_ids))
           
-          // 格式化时间
+          // Format time
           let startTimeStr = ''
           let endTimeStr = ''
           if (this.formData.startTime) {
@@ -667,8 +667,8 @@ export default {
             report_mode: this.formData.reportMode,
             host_ids: hostIds,
             item_ids: itemIds,
-            cycle: this.formData.reportMode === 'scheduled' ? this.formData.cycle.join(',') : '', // 循环报表需要周期
-            status: this.formData.reportMode === 'scheduled' ? (this.formData.status ? '1' : '0') : '1', // 实时报表默认启用
+            cycle: this.formData.reportMode === 'scheduled' ? this.formData.cycle.join(',') : '', // Scheduled report needs cycle
+            status: this.formData.reportMode === 'scheduled' ? (this.formData.status ? '1' : '0') : '1', // Realtime report is enabled by default
             emails: this.formData.emails,
             desc: this.formData.desc,
             start: startTimeStr,
@@ -697,20 +697,20 @@ export default {
       this.resetFormData()
     },
     handleReportModeChange() {
-      // 切换报表模式时，清空相关字段
+      // Clear related fields when switching report mode
       if (this.formData.reportMode === 'realtime') {
-        // 实时报表：清空周期和状态
+        // Realtime report: clear cycle and status
         this.formData.cycle = []
         this.formData.status = true
       } else {
-        // 循环报表：清空开始和结束时间
+        // Scheduled report: clear start and end time
         this.formData.startTime = null
         this.formData.endTime = null
         if (this.formData.cycle.length === 0) {
-          this.formData.cycle = ['day'] // 默认选择日报
+          this.formData.cycle = ['day'] // Default to daily
         }
       }
-      // 重新验证表单
+      // Re-validate form
       if (this.$refs.formModal) {
         this.$refs.formModal.validate()
       }
@@ -722,7 +722,7 @@ export default {
       }
       
       if (!config.zid) {
-        this.$message.warning('请先选择实例')
+        this.$message.warning(this.$t('select_instance_first'))
         return
       }
       
@@ -737,14 +737,14 @@ export default {
           this.$set(this.itemsFilterList, index, res.data.items)
           this.$set(this.curItemsList, index, res.data.items.slice(0, selectSize))
           
-          // 确保item_ids的类型与items列表中的itemid类型一致（统一转换为字符串）
+          // Ensure item_ids type matches itemid type in items list (convert to string)
           if (config.item_ids && Array.isArray(config.item_ids) && config.item_ids.length > 0) {
             const items = res.data.items || []
-            // 将item_ids统一转换为字符串，并过滤出有效的item_ids
+            // Convert item_ids to strings and filter valid item_ids
             const validItemIds = config.item_ids.map(id => String(id)).filter(id => {
               return items.some(item => String(item.itemid) === id)
             })
-            // 更新item_ids为有效的item_ids（确保类型一致）
+            // Update item_ids with valid item_ids (ensure type consistency)
             this.$set(config, 'item_ids', validItemIds)
           }
         }
@@ -765,11 +765,11 @@ export default {
     },
     removeHostConfig(index) {
       this.formData.hostConfigs.splice(index, 1)
-      // 清理对应的items和hosts列表
+      // Clean up corresponding items and hosts lists
       delete this.curItemsList[index]
       delete this.configHostsList[index]
       delete this.configHostsFilterList[index]
-      // 重新索引
+      // Re-index
       const newItemsList = {}
       const newHostsList = {}
       const newHostsFilterList = {}
@@ -799,20 +799,20 @@ export default {
       }
     }),
     handleHostSearchForConfig: debounce(function (value, index) {
-      // 如果没有搜索值，恢复完整列表
+      // If no search value, restore full list
       if (!value || value.trim() === '') {
         const allHosts = this.configHostsFilterList[index] || []
         this.$set(this.configHostsList, index, allHosts.slice(0, selectSize))
         return
       }
-      // 从完整列表中过滤
+      // Filter from full list
       const allHosts = this.configHostsFilterList[index] || []
       const filtered = allHosts.filter((item) => {
         const reg = new RegExp(value, 'gi')
         const match = item.name.toString().match(reg)
         return match
       })
-      // 更新显示列表为过滤后的前selectSize条
+      // Update display list to first selectSize items after filtering
       this.$set(this.configHostsList, index, filtered.slice(0, selectSize))
     }),
     handleItemPopupScroll: debounce(function (index) {

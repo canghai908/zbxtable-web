@@ -5,14 +5,14 @@
       <div class="header-content">
         <div class="topology-title">
           <a-icon type="apartment" class="title-icon" />
-          <h1>{{ form.name || '拓扑预览' }}</h1>
+          <h1>{{ form.name || $t('title_topology_preview') }}</h1>
           <span v-if="form.updateTime" class="update-time">
             <a-icon type="clock-circle" />
-            更新时间: {{ form.updateTime }}
+            {{ $t('label_update_time') }}: {{ form.updateTime }}
           </span>
           <a-badge 
             :status="isWebSocket ? 'processing' : 'default'" 
-            :text="isWebSocket ? '实时更新中' : '未连接'"
+            :text="isWebSocket ? $t('status_realtime_updating') : $t('status_not_connected')"
             class="status-badge"
           />
       </div>
@@ -20,16 +20,16 @@
           <a-button-group>
             <a-button @click="saveToPNG()">
               <a-icon type="file-image" />
-              导出PNG
+              {{ $t('btn_export_png') }}
             </a-button>
             <a-button @click="saveToSVG()">
               <a-icon type="save" />
-              导出SVG
+              {{ $t('btn_export_svg') }}
             </a-button>
           </a-button-group>
           <a-button @click="backToList()" style="margin-left: 12px;">
             <a-icon type="rollback" />
-            返回列表
+            {{ $t('btn_back_to_list') }}
           </a-button>
         </div>
       </div>
@@ -222,6 +222,7 @@ Graph.registerNode(
 
 export default {
   name: 'tuopu',
+  i18n: require('./i18n'),
   components: {
     PageLayout,
   },
@@ -480,7 +481,7 @@ export default {
     websocketonopen() { //连接建立之后执行send方法发送数据
       this.isWebSocket = true;
       this.websock.send("success")
-      this.$message.success("WebSocket已连接")
+      this.$message.success(this.$t('msg_websocket_connected'))
 
     },
     websocketonclose() {//断开
@@ -765,10 +766,10 @@ export default {
               this.graph.zoomToFit({ padding: 100, maxScale: 1 })
             })
           } else {
-            this.$message.error(res.message || '获取拓扑详情失败')
+            this.$message.error(res.message || this.$t('msg_load_topology_failed'))
           }
         }).catch((err) => {
-          this.$message.error('获取拓扑详情失败')
+          this.$message.error(this.$t('msg_load_topology_failed'))
           console.error(err)
         })
       }

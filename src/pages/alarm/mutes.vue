@@ -1,50 +1,50 @@
 <template>
   <page-layout :noTitle="true">
     <a-form-model class="home-search" layout="inline" :colon='false'>
-      <a-form-model-item label="搜索">
-        <a-input v-model.trim="hosts" placeholder="主机名" />
+      <a-form-model-item :label="$t('mutes_search_label')">
+        <a-input v-model.trim="hosts" :placeholder="$t('mutes_search_placeholder')" />
       </a-form-model-item>
       <!-- 实例筛选已取消：统一跟随顶部“当前 Zabbix 连接” -->
       <a-form-model-item>
-        <a-button type="primary" @click="init">查询</a-button>
-        <a-button style="margin-left: 10px;" @click="resetData">重置</a-button>
-        <a-button type="primary" style="margin-left: 10px;" @click="showModal">新增</a-button>
+        <a-button type="primary" @click="init">{{ $t('mutes_btn_query') }}</a-button>
+        <a-button style="margin-left: 10px;" @click="resetData">{{ $t('mutes_btn_reset') }}</a-button>
+        <a-button type="primary" style="margin-left: 10px;" @click="showModal">{{ $t('mutes_btn_add') }}</a-button>
       </a-form-model-item>
     </a-form-model>
     <div>
       <a-table :loading="loading" :columns="columns" :data-source="list" @change="changePage" :pagination="pagination" :rowKey="(record) => { return record.id;}">
         <span slot="status" slot-scope="record">
-          <a-switch :checked="record.status == '0' ? true : false" checked-children="启用" un-checked-children="禁用" @change="onStatusChange($event, record)" />
+          <a-switch :checked="record.status == '0' ? true : false" :checked-children="$t('status_enabled')" :un-checked-children="$t('status_disabled')" @change="onStatusChange($event, record)" />
         </span>
         <span slot="s_time" slot-scope="record">{{record.s_time | parsetime }}</span>
         <span slot="e_time" slot-scope="record">{{record.e_time | parsetime }}</span>
         <span slot="created" slot-scope="record">{{record.created | parsetime }}</span>
         <span slot="operation" slot-scope="record">
           <!-- <a-button class="pd20 paddingleft0" type="link" size="small" @click="seeDetail(record)">详细信息</a-button> -->
-          <a-button class="pd20 paddingleft0" type="link" size="small" @click="seeEdit(record)">编辑</a-button>
-          <a-popconfirm title="确定要删除吗?" ok-text="确定" cancel-text="取消" @confirm="deleteRecord(record)">
-            <a-button class="paddingleft0" type="link" size="small">删除</a-button>
+          <a-button class="pd20 paddingleft0" type="link" size="small" @click="seeEdit(record)">{{ $t('btn_edit') }}</a-button>
+          <a-popconfirm :title="$t('confirm_delete_title')" :ok-text="$t('confirm_delete_ok')" :cancel-text="$t('confirm_delete_cancel')" @confirm="deleteRecord(record)">
+            <a-button class="paddingleft0" type="link" size="small">{{ $t('btn_delete') }}</a-button>
           </a-popconfirm>
         </span>
       </a-table>
     </div>
-    <a-modal title="新增规则" :visible="visible" :confirm-loading="confirmLoading" @ok="createRule" @cancel="handleCancel" width="1000px">
+    <a-modal :title="$t('mutes_modal_title_add')" :visible="visible" :confirm-loading="confirmLoading" @ok="createRule" @cancel="handleCancel" width="1000px">
       <template>
         <a-form-model :model="rule">
-          <a-form-model-item :label="$t('title')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="name" :required="true">
-            <a-input v-model.trim="rule.name" :placeholder="$t('titleInput')" />
+          <a-form-model-item :label="$t('mutes_form_name')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="name" :required="true">
+            <a-input v-model.trim="rule.name" :placeholder="$t('mutes_form_name_placeholder')" />
           </a-form-model-item>
-          <a-form-model-item :label="$t('zid')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="zid" :required="true">
-            <a-select v-model="rule.zid" mode="multiple" style="width: 100%" placeholder="选择告警实例" @change="handleTenantChange">
+          <a-form-model-item :label="$t('mutes_form_instance')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="zid" :required="true">
+            <a-select v-model="rule.zid" mode="multiple" style="width: 100%" :placeholder="$t('mutes_form_instance_placeholder')" @change="handleTenantChange">
               <a-select-option v-for="(item, index) in tenantlist" :key="index" :value="item.zid" :label="item.zid" :title="item.zid">
                 {{ item.zid }}
               </a-select-option>
             </a-select>
           </a-form-model-item>
-          <a-card class="card" :title="$t('task1')" :bordered="false">
+          <a-card class="card" :title="$t('mutes_form_condition_card_title')" :bordered="false">
             <a-row class="form-row" v-for="(itv, its) in rule.conditions" :key="its">
               <a-col :lg="6" :md="12" :sm="24">
-                <a-form-item :label="$t('rule')" :required="false">
+                <a-form-item :label="$t('mutes_form_field')" :required="false">
                   <a-select v-model="itv.r_type">
                     <a-select-option v-for="(item, index) in rTypeOptions" :key="index" :value="item.value" :label="item.label" :title="item.label">
                       {{ item.label }}
@@ -53,7 +53,7 @@
                 </a-form-item>
               </a-col>
               <a-col :xl="{span: 6, offset: 1}" :lg="{span: 8}" :md="{span: 12}" :sm="24">
-                <a-form-item :label="$t('operator')">
+                <a-form-item :label="$t('mutes_form_operator')">
                   <a-select v-model="itv.r_func">
                     <a-select-option v-for="(item, index) in rFuncOptions" :key="index" :value="item.value" :label="item.label" :title="item.label">
                       {{ item.label }}
@@ -62,27 +62,27 @@
                 </a-form-item>
               </a-col>
               <a-col :xl="{span: 6, offset: 1}" :lg="{span: 10}" :md="{span: 24}" :sm="24">
-                <a-form-item :label="$t('value')" :required="false">
-                  <a-input v-model="itv.r_value" :placeholder="$t('valueInput')" />
+                <a-form-item :label="$t('mutes_form_value')" :required="false">
+                  <a-input v-model="itv.r_value" :placeholder="$t('mutes_form_value_placeholder')" />
                 </a-form-item>
               </a-col>
               <a-col :span="2" :offset="1">
-                <a-form-item :label="$t('operation')" :required="false">
+                <a-form-item :label="$t('mutes_form_operation')" :required="false">
                   <a-button type="primary" style="margin-right: 10px" v-if="rule.conditions && rule.conditions.length > 1" icon="delete" shape="circle" @click="rule.conditions.splice(its, 1)" />
                   <a-button type="primary" v-if="its == 0" icon="plus" shape="circle" @click='rule.conditions.push({ r_type: "", r_func: "", r_value: "",})' />
                 </a-form-item>
               </a-col>
             </a-row>
           </a-card>
-          <a-card class="card" :title="$t('task')" :bordered="false">
+          <a-card class="card" :title="$t('mutes_form_time_card_title')" :bordered="false">
             <a-row>
               <a-col :span="8">
-                <a-form-model-item :label="$t('s_time')" :labelCol="{span: 8}" :wrapperCol="{span: 14}" :required="true">
+                <a-form-model-item :label="$t('mutes_form_start_time')" :labelCol="{span: 8}" :wrapperCol="{span: 14}" :required="true">
                   <a-date-picker show-time v-model="rule.s_time" @change="changeStime"></a-date-picker>
                 </a-form-model-item>
               </a-col>
               <a-col :span="8">
-                <a-form-model-item :label="$t('tduration')" :labelCol="{span: 8}" :wrapperCol="{span: 16}" :required="true">
+                <a-form-model-item :label="$t('mutes_form_duration')" :labelCol="{span: 8}" :wrapperCol="{span: 16}" :required="true">
                   <a-select v-model="duration" @change="changeDuration">
                     <a-select-option v-for="(item, index) in tOptions" :key="index" :value="item.value" :label="item.label" :title="item.label">
                       {{ item.label }}
@@ -91,14 +91,14 @@
                 </a-form-model-item>
               </a-col>
               <a-col :span="8">
-                <a-form-model-item :label="$t('e_time')" :labelCol="{span: 8}" :wrapperCol="{span: 16}" :required="true">
+                <a-form-model-item :label="$t('mutes_form_end_time')" :labelCol="{span: 8}" :wrapperCol="{span: 16}" :required="true">
                   <a-date-picker show-time v-model="rule.e_time" @change="changeEtime"></a-date-picker>
                 </a-form-model-item>
               </a-col>
             </a-row>
             <a-row>
               <a-col :span="16">
-                <a-form-model-item :label="$t('mchannels')" :labelCol="{span: 4}" :wrapperCol="{span: 16}" :required="true">
+                <a-form-model-item :label="$t('mutes_form_mute_channels')" :labelCol="{span: 4}" :wrapperCol="{span: 16}" :required="true">
                   <a-checkbox-group v-model="rule.channel" :options="rChannelOptions" @change="onChannelChange">
                   </a-checkbox-group>
                 </a-form-model-item>
@@ -106,8 +106,8 @@
             </a-row>
             <a-row>
               <a-col :span="16">
-                <a-form-model-item :label="$t('mute_note')" :labelCol="{span:4}" :wrapperCol="{span: 18}" :required="true">
-                  <a-textarea v-model.trim="rule.note" :placeholder="$t('mute_noteInput')" :rows="2" />
+                <a-form-model-item :label="$t('mutes_form_mute_note')" :labelCol="{span:4}" :wrapperCol="{span: 18}" :required="true">
+                  <a-textarea v-model.trim="rule.note" :placeholder="$t('mutes_form_mute_note_placeholder')" :rows="2" />
                 </a-form-model-item>
               </a-col>
             </a-row>
@@ -115,14 +115,14 @@
         </a-form-model>
       </template>
     </a-modal>
-    <a-modal title="编辑规则" :visible="visibleEdit" :confirm-loading="confirmLoading" @ok="updateRule" @cancel="handleEditCancel" width="1000px">
+    <a-modal :title="$t('mutes_modal_title_edit')" :visible="visibleEdit" :confirm-loading="confirmLoading" @ok="updateRule" @cancel="handleEditCancel" width="1000px">
       <template>
         <a-form-model :model="rule">
           <a-form-model-item :label="$t('title')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="name" :required="true">
             <a-input v-model.trim="rule.name" :placeholder="$t('titleInput')" />
           </a-form-model-item>
           <a-form-model-item :label="$t('zid')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="zid">
-            <a-select v-model="rule.zid" mode="multiple" style="width: 100%" placeholder="选择告警实例" @change="handleTenantChange" :required="true">
+            <a-select v-model="rule.zid" mode="multiple" style="width: 100%" :placeholder="$t('mutes_form_instance_placeholder')" @change="handleTenantChange" :required="true">
               <a-select-option v-for="(item, index) in tenantlist" :key="index" :value="item.zid" :label="item.zid" :title="item.zid">
                 {{ item.zid }}
               </a-select-option>
@@ -246,89 +246,11 @@ export default {
         duration: "1h",
         status: "0",
       },
-      rChannelOptions: [
-        { value: "mail", label: "邮件" },
-        { value: "wechat", label: "微信" },
-        // { value: "dingding", label: "钉钉" },
-        // { value: "sms", label: "短信" },
-      ],
-      rFuncOptions: [
-        { value: "==", label: "等于" },
-        { value: "=~", label: "包含" },
-        { value: "!=", label: "不等于" },],
-      rTypeOptions: [
-        { value: "host", label: "主机名" },
-        { value: "group", label: "主机组" },
-        { value: "item", label: "指标名称" },
-        { value: "key", label: "指标Key" },
-        { value: "trigger", label: "触发器名称" },
-        { value: "severity", label: "告警级别" }],
-      columns: [
-        { title: "ID", dataIndex: "id", align: "center" },
-        { title: "策略名称", dataIndex: "name", align: "left" },
-        {
-          title: "实例", dataIndex: "zid", align: "left", customRender: (value, row, index) => {
-            let allist = []
-            value.split(",").forEach(items => {
-              this.tenantlist.forEach(tid => {
-                if (items == tid.zid) {
-                  allist.push(tid.zid);
-                }
-              });
-
-            });
-            const obj = {
-              children: allist.join(","),
-              attrs: {},
-            };
-            return obj;
-          },
-        },
-        { title: "屏蔽条件", dataIndex: "conditions", align: "left", },
-        {
-          title: "屏蔽时长", key: "duration", align: "left", customRender: (value, row, index) => {
-            var dateBegin = new Date(row.s_time);
-            var dateEnd = new Date(row.e_time);
-            var dateDiff = dateEnd.getTime() - dateBegin.getTime(); //时间差的毫秒数
-            var dayDiff = Math.floor(dateDiff / (24 * 3600 * 1000)); //计算出相差天数
-            var leave1 = dateDiff % (24 * 3600 * 1000); //计算天数后剩余的毫秒数
-            var hours = Math.floor(leave1 / (3600 * 1000)); //计算出小时数
-            //计算相差分钟数
-            var leave2 = leave1 % (3600 * 1000); //计算小时数后剩余的毫秒数
-            var minutes = Math.floor(leave2 / (60 * 1000)); //计算相差分钟数
-            //计算相差秒数
-            var leave3 = leave2 % (60 * 1000); //计算分钟数后剩余的毫秒数
-            var seconds = Math.round(leave3 / 1000);
-            let duration = dayDiff + "天" + hours + "小时" + minutes + "分钟" + seconds + "秒"
-            const obj = {
-              children: duration,
-              attrs: {},
-            };
-            return obj;
-          },
-        },
-        { title: "开始时间", key: "s_time", align: "left", scopedSlots: { customRender: "s_time" }, },
-        { title: "结束时间", key: "e_time", align: "left", scopedSlots: { customRender: "e_time" }, },
-        { title: "添加时间", key: "created", align: "left", scopedSlots: { customRender: "created" }, },
-        { title: "策略状态", key: "status", align: "left", scopedSlots: { customRender: "status" }, },
-        { title: "操作", key: "operation", align: "left", scopedSlots: { customRender: "operation" } },
-      ],
-      tOptions: [
-        { value: "1", label: "1小时" },
-        { value: "2", label: "2小时" },
-        { value: "3", label: "5小时" },
-        { value: "6", label: "8小时" },
-        { value: "12", label: "12小时" },
-        { value: "24", label: "1天" },
-        { value: "48", label: "2天" },
-        { value: "120", label: "5天" },
-        { value: "168", label: "7天" },
-        { value: "336", label: "14天" },
-        { value: "720", label: "30天" },
-        { value: "1440", label: "60天" },
-        { value: "2160", label: "90天" },
-        { value: "86400", label: "永久" },
-      ],
+      rChannelOptions: [],
+      rFuncOptions: [],
+      rTypeOptions: [],
+      columns: [],
+      tOptions: [],
       tenantlist: [],
       list: [],
       pagination: {
@@ -338,7 +260,7 @@ export default {
         "page-size-options": ["10", "20", "30", "40", "50", "100", "200"],
         pageSize: 10,
         "show-size-changer": true,
-        "show-total": (total) => `共 ${total} 条数据`,
+        "show-total": (total) => ``,
       },
       duration: "1h",
       moment,
@@ -347,6 +269,7 @@ export default {
     };
   },
   created() {
+    this.initOptions();
     this.init();
     this.hostid = this.$route.query.hostid || ""
     this.host = this.$route.query.host || ""
@@ -378,6 +301,105 @@ export default {
     }
   },
   methods: {
+    initOptions() {
+      // 初始化通道选项
+      this.rChannelOptions = [
+        { value: "mail", label: this.$t('channel_mail') },
+        { value: "wechat", label: this.$t('channel_wechat') },
+        // { value: "dingding", label: this.$t('channel_dingding') },
+        // { value: "sms", label: this.$t('channel_sms') },
+      ];
+      
+      // 初始化操作符选项
+      this.rFuncOptions = [
+        { value: "==", label: this.$t('mutes_operator_equal') },
+        { value: "=~", label: this.$t('mutes_operator_contain') },
+        { value: "!=", label: this.$t('mutes_operator_not_equal') },
+      ];
+      
+      // 初始化字段选项
+      this.rTypeOptions = [
+        { value: "host", label: this.$t('mutes_field_hostname') },
+        { value: "group", label: this.$t('mutes_field_hostgroup') },
+        { value: "item", label: this.$t('mutes_field_item_name') },
+        { value: "key", label: this.$t('mutes_field_item_key') },
+        { value: "trigger", label: this.$t('mutes_field_trigger_name') },
+        { value: "severity", label: this.$t('mutes_field_severity') }
+      ];
+      
+      // 初始化时长选项
+      this.tOptions = [
+        { value: "1", label: this.$t('mutes_duration_1h') },
+        { value: "2", label: this.$t('mutes_duration_2h') },
+        { value: "3", label: this.$t('mutes_duration_5h') },
+        { value: "6", label: this.$t('mutes_duration_8h') },
+        { value: "12", label: this.$t('mutes_duration_12h') },
+        { value: "24", label: this.$t('mutes_duration_1d') },
+        { value: "48", label: this.$t('mutes_duration_2d') },
+        { value: "120", label: this.$t('mutes_duration_5d') },
+        { value: "168", label: this.$t('mutes_duration_7d') },
+        { value: "336", label: this.$t('mutes_duration_14d') },
+        { value: "720", label: this.$t('mutes_duration_30d') },
+        { value: "1440", label: this.$t('mutes_duration_60d') },
+        { value: "2160", label: this.$t('mutes_duration_90d') },
+        { value: "86400", label: this.$t('mutes_duration_forever') },
+      ];
+      
+      // 初始化表格列
+      this.columns = [
+        { title: this.$t('mutes_col_id'), dataIndex: "id", align: "center" },
+        { title: this.$t('mutes_col_policy_name'), dataIndex: "name", align: "left" },
+        {
+          title: this.$t('mutes_col_instance'), dataIndex: "zid", align: "left", customRender: (value, row, index) => {
+            let allist = []
+            value.split(",").forEach(items => {
+              this.tenantlist.forEach(tid => {
+                if (items == tid.zid) {
+                  allist.push(tid.zid);
+                }
+              });
+
+            });
+            const obj = {
+              children: allist.join(","),
+              attrs: {},
+            };
+            return obj;
+          },
+        },
+        { title: this.$t('mutes_col_mute_condition'), dataIndex: "conditions", align: "left", },
+        {
+          title: this.$t('mutes_col_mute_duration'), key: "duration", align: "left", customRender: (value, row, index) => {
+            var dateBegin = new Date(row.s_time);
+            var dateEnd = new Date(row.e_time);
+            var dateDiff = dateEnd.getTime() - dateBegin.getTime(); //时间差的毫秒数
+            var dayDiff = Math.floor(dateDiff / (24 * 3600 * 1000)); //计算出相差天数
+            var leave1 = dateDiff % (24 * 3600 * 1000); //计算天数后剩余的毫秒数
+            var hours = Math.floor(leave1 / (3600 * 1000)); //计算出小时数
+            //计算相差分钟数
+            var leave2 = leave1 % (3600 * 1000); //计算小时数后剩余的毫秒数
+            var minutes = Math.floor(leave2 / (60 * 1000)); //计算相差分钟数
+            //计算相差秒数
+            var leave3 = leave2 % (60 * 1000); //计算分钟数后剩余的毫秒数
+            var seconds = Math.round(leave3 / 1000);
+            let duration = dayDiff + this.$t('duration_day') + hours + this.$t('duration_hour') + minutes + this.$t('duration_minute') + seconds + this.$t('duration_second')
+            const obj = {
+              children: duration,
+              attrs: {},
+            };
+            return obj;
+          },
+        },
+        { title: this.$t('mutes_col_start_time'), key: "s_time", align: "left", scopedSlots: { customRender: "s_time" }, },
+        { title: this.$t('mutes_col_end_time'), key: "e_time", align: "left", scopedSlots: { customRender: "e_time" }, },
+        { title: this.$t('mutes_col_add_time'), key: "created", align: "left", scopedSlots: { customRender: "created" }, },
+        { title: this.$t('mutes_col_policy_status'), key: "status", align: "left", scopedSlots: { customRender: "status" }, },
+        { title: this.$t('mutes_col_operation'), key: "operation", align: "left", scopedSlots: { customRender: "operation" } },
+      ];
+      
+      // 更新分页文本
+      this.pagination["show-total"] = (total) => this.$t('mutes_pagination_total', { total });
+    },
     init() {
       this.loading = true;
       let req = {

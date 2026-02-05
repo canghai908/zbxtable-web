@@ -161,10 +161,10 @@
                           icon="copy" 
                           @click="copyEncryptionKey"
                           :disabled="!isKeyVisible">
-                          复制密钥
+                          {{ $t('copyKey') }}
                         </a-button>
                         <span v-if="!isKeyVisible" style="margin-left: 8px; color: #999; font-size: 11px;">
-                          需要先显示完整密钥才能复制
+                          {{ $t('needShowKeyFirst') }}
                         </span>
                       </div>
                     </div>
@@ -251,7 +251,34 @@ export default {
   created() {
     this.init()
   },
+  watch: {
+    // 监听语言变化，重新翻译配置项
+    '$i18n.locale'() {
+      this.translateConfigItems()
+    },
+    // 监听配置列表变化，进行翻译
+    list: {
+      handler() {
+        this.translateConfigItems()
+      },
+      deep: true
+    }
+  },
   methods: {
+    // 翻译配置项的 name 和 comment
+    translateConfigItems() {
+      const locale = this.$i18n.locale || 'CN'
+      const translations = this.$options.i18n.configItemTranslations[locale]
+      
+      if (!translations) return
+      
+      this.list.forEach(item => {
+        if (item.key && translations[item.key]) {
+          item.name = translations[item.key].name
+          item.comment = translations[item.key].comment
+        }
+      })
+    },
     isBooleanConfig(key) {
       // 判断是否为布尔类型的配置项（开启/关闭）
       const booleanKeys = ['zbx_dash', 'sync_inventory', 'wechat_enabled', 'email_isSSl']
@@ -280,6 +307,8 @@ export default {
           let res = resp.data
           if (res.code == 200) {
             this.list = res.data.items || []
+            // 获取数据后立即翻译
+            this.translateConfigItems()
             this.initForms()
           }
         })
@@ -381,7 +410,7 @@ export default {
     copyEncryptionKey() {
       const key = this.securityForm['encryption_key']
       if (!key) {
-        this.$message.warning('密钥为空')
+        this.$message.warning(this.$t('keyEmpty'))
         return
       }
       
@@ -394,9 +423,9 @@ export default {
       
       try {
         document.execCommand('copy')
-        this.$message.success('加密密钥已复制到剪贴板')
+        this.$message.success(this.$t('keyCopied'))
       } catch (err) {
-        this.$message.error('复制失败，请手动复制')
+        this.$message.error(this.$t('copyFailed'))
       }
       
       document.body.removeChild(textarea)
@@ -405,12 +434,12 @@ export default {
     beforeLogoUpload(file) {
       const isImage = file.type === 'image/png' || file.type === 'image/jpeg' || file.type === 'image/jpg' || file.type === 'image/svg+xml'
       if (!isImage) {
-        this.$message.error('只支持 PNG、JPG、JPEG 或 SVG 格式的图片')
+        this.$message.error(this.$t('logoFormatError'))
         return false
       }
       const isLt2M = file.size / 1024 / 1024 < 2
       if (!isLt2M) {
-        this.$message.error('图片大小不能超过 2MB')
+        this.$message.error(this.$t('logoSizeError'))
         return false
       }
       return true
@@ -432,19 +461,19 @@ export default {
         
         if (response.data.code === 200) {
           this.systemForm.system_logo = response.data.data.url
-          this.$message.success('Logo上传成功')
+          this.$message.success(this.$t('logoUploadSuccess'))
         } else {
-          this.$message.error(response.data.message || 'Logo上传失败')
+          this.$message.error(response.data.message || this.$t('logoUploadFailed'))
         }
       } catch (error) {
-        this.$message.error('Logo上传失败: ' + (error.message || '未知错误'))
+        this.$message.error(this.$t('logoUploadFailed') + ': ' + (error.message || this.$t('unknownError')))
       } finally {
         this.logoUploading = false
       }
     },
     // 预览外观效果
     previewAppearance() {
-      this.$message.info('保存后刷新页面即可看到效果')
+      this.$message.info(this.$t('previewHint'))
     },
     // 获取当前 Web 访问地址
     getCurrentWebUrl() {
@@ -466,9 +495,9 @@ export default {
         // 设置到 webhook_url 字段
         this.systemForm.webhook_url = baseUrl
         
-        this.$message.success('已获取当前访问地址')
+        this.$message.success(this.$t('urlGetSuccess'))
       } catch (error) {
-        this.$message.error('获取地址失败: ' + error.message)
+        this.$message.error(this.$t('urlGetFailed') + ': ' + error.message)
       } finally {
         this.gettingUrl = false
       }

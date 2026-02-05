@@ -2,9 +2,9 @@
   <page-layout :title="$t('egress_config')">
     <div>
       <a-card :bordered="false">
-        <a-alert message="配置说明" type="info" show-icon closable style="margin-bottom: 16px;">
+        <a-alert :message="$t('config_description_title')" type="info" show-icon closable style="margin-bottom: 16px;">
           <template slot="description">
-            出口配置用于监控网络出口的流量情况。请先选择 Zabbix 实例，然后选择主机和对应的入流量、出流量监控项。配置完成后，系统会自动采集数据并在首页展示。
+            {{ $t('config_description_content') }}
           </template>
         </a-alert>
 
@@ -237,8 +237,8 @@ export default {
           this.instanceList = biz.data || []
         }
       } catch (e) {
-        console.error('加载实例列表失败', e)
-        this.$message.error('加载实例列表失败')
+        console.error(this.$t('load_instances_failed'), e)
+        this.$message.error(this.$t('load_instances_failed'))
       }
     },
     async loadData() {
@@ -255,7 +255,7 @@ export default {
             itemList: [],
           }))
           
-          // 为每个配置加载主机和监控项名称
+          // Load host and item names for each configuration
           for (let item of this.dataSource) {
             if (item.zid) {
               await this.loadHostList(item)
@@ -266,8 +266,8 @@ export default {
           }
         }
       } catch (e) {
-        console.error('加载出口配置失败', e)
-        this.$message.error('加载出口配置失败')
+        console.error(this.$t('load_egress_config_failed'), e)
+        this.$message.error(this.$t('load_egress_config_failed'))
       } finally {
         this.loading = false
       }
@@ -294,7 +294,7 @@ export default {
       if (target) {
         target.editable = true
         target._backup = { ...target }
-        // 加载主机和监控项列表
+        // Load host and item lists
         if (target.zid) {
           this.loadHostList(target)
         }
@@ -317,7 +317,7 @@ export default {
     },
     async handleSave(record) {
       if (!record.name || !record.zid || !record.host_id || !record.in_item_id || !record.out_item_id) {
-        this.$message.warning('请填写完整信息')
+        this.$message.warning(this.$t('fill_complete_info'))
         return
       }
 
@@ -337,24 +337,24 @@ export default {
           const res = await egressConfigAdd(params)
           const biz = (res && res.data) ? res.data : res
           if (biz && biz.code === 200) {
-            this.$message.success('添加成功')
+            this.$message.success(this.$t('add_success'))
             this.loadData()
           } else {
-            this.$message.error(biz.message || '添加失败')
+            this.$message.error(biz.message || this.$t('add_failed'))
           }
         } else {
           const res = await egressConfigUpdate(record.id, params)
           const biz = (res && res.data) ? res.data : res
           if (biz && biz.code === 200) {
-            this.$message.success('更新成功')
+            this.$message.success(this.$t('update_success'))
             this.loadData()
           } else {
-            this.$message.error(biz.message || '更新失败')
+            this.$message.error(biz.message || this.$t('update_failed'))
           }
         }
       } catch (e) {
-        console.error('保存失败', e)
-        this.$message.error('保存失败')
+        console.error(this.$t('save_failed'), e)
+        this.$message.error(this.$t('save_failed'))
       } finally {
         this.loading = false
       }
@@ -365,14 +365,14 @@ export default {
         const res = await egressConfigDelete(record.id)
         const biz = (res && res.data) ? res.data : res
         if (biz && biz.code === 200) {
-          this.$message.success('删除成功')
+          this.$message.success(this.$t('delete_success'))
           this.loadData()
         } else {
-          this.$message.error(biz.message || '删除失败')
+          this.$message.error(biz.message || this.$t('delete_failed'))
         }
       } catch (e) {
-        console.error('删除失败', e)
-        this.$message.error('删除失败')
+        console.error(this.$t('delete_failed'), e)
+        this.$message.error(this.$t('delete_failed'))
       } finally {
         this.loading = false
       }
@@ -403,7 +403,7 @@ export default {
           record.hostList = biz.data.items || []
         }
       } catch (e) {
-        console.error('加载主机列表失败', e)
+        console.error(this.$t('load_hosts_failed'), e)
       }
     },
     async loadItemList(record) {
@@ -417,30 +417,30 @@ export default {
           record.itemList = biz.data.items || []
         }
       } catch (e) {
-        console.error('加载监控项列表失败', e)
+        console.error(this.$t('load_items_failed'), e)
       }
     },
     getInstanceName(zid) {
-      if (!zid) return '未知'
+      if (!zid) return this.$t('unknown')
       const instance = this.instanceList.find(item => item.id === zid)
       return instance ? instance.name : zid
     },
     getHostName(record) {
-      if (!record.host_id) return '未选择'
+      if (!record.host_id) return this.$t('not_selected')
       if (!record.hostList || record.hostList.length === 0) {
-        return record.host_id || '未知'
+        return record.host_id || this.$t('unknown')
       }
       const host = record.hostList.find(item => item.hostid === record.host_id)
-      return host ? host.name : (record.host_id || '未知')
+      return host ? host.name : (record.host_id || this.$t('unknown'))
     },
     getItemName(record, type) {
       const itemId = type === 'in' ? record.in_item_id : record.out_item_id
-      if (!itemId) return '未选择'
+      if (!itemId) return this.$t('not_selected')
       if (!record.itemList || record.itemList.length === 0) {
-        return itemId || '未知'
+        return itemId || this.$t('unknown')
       }
       const item = record.itemList.find(i => i.itemid === itemId)
-      return item ? item.name : (itemId || '未知')
+      return item ? item.name : (itemId || this.$t('unknown'))
     },
   }
 }
@@ -462,7 +462,7 @@ export default {
 </style>
 
 <style lang="less">
-// 全局样式，用于下拉选项
+// Global styles for dropdown options
 .ant-select-dropdown {
   .ant-select-dropdown-menu-item {
     white-space: normal;

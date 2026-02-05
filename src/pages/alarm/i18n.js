@@ -136,6 +136,175 @@ module.exports = {
       analysis_alarm_time: '告警时间',
       analysis_historical_alarm_top10: '历史告警TOP10',
       analysis_alarm_classification_top: '告警分类TOP',
+      
+      // 告警规则页面 - a-alert
+      alert_multi_instance_title: '多实例告警规则说明',
+      alert_multi_instance_desc: '系统已支持多实例数据聚合。在配置告警分发规则时，可以选择一个或多个实例，规则将应用于所选实例的告警。',
+      
+      // 告警规则页面 - 表格列
+      col_name: '名称',
+      col_instances: '实例',
+      col_distribution_conditions: '分发条件',
+      col_distribution_channel: '分发通道',
+      col_receiver: '接收人',
+      col_receiver_group: '接收组',
+      col_note: '备注',
+      col_add_time: '添加时间',
+      
+      // 告警规则页面 - 状态
+      status_enabled: '启用',
+      status_disabled: '禁用',
+      status_not_selected: '未选择',
+      
+      // 告警规则页面 - 模态框表单
+      form_label_name: '名称',
+      form_label_instance: '实例',
+      form_label_week: '星期',
+      form_label_time_range: '时间段',
+      form_label_channel: '通道',
+      form_label_receiver: '接收人',
+      form_label_receiver_group: '接收组',
+      form_label_note: '备注',
+      form_label_status: '状态',
+      
+      form_placeholder_name: '请输入规则名称',
+      form_placeholder_instance: '选择告警实例',
+      form_placeholder_receiver: '告警接收人',
+      form_placeholder_receiver_group: '告警接收组',
+      form_placeholder_note: '备注说明',
+      
+      // 告警规则页面 - 匹配条件
+      card_title_match_conditions: '匹配条件',
+      card_title_time_channel: '时间与通道',
+      card_title_receiver_object: '接收对象',
+      
+      condition_field: '字段',
+      condition_operator: '操作符',
+      condition_value: '值',
+      condition_placeholder_value: '匹配值',
+      
+      // 字段选项
+      field_host: '主机',
+      field_group: '主机组',
+      field_item: '指标名称',
+      field_key: '指标Key',
+      field_trigger: '触发器',
+      field_severity: '告警级别',
+      
+      // 星期选项
+      week_sunday: '星期日',
+      week_monday: '星期一',
+      week_tuesday: '星期二',
+      week_wednesday: '星期三',
+      week_thursday: '星期四',
+      week_friday: '星期五',
+      week_saturday: '星期六',
+      
+      // 通道选项
+      channel_mail: '邮件',
+      channel_wechat: '微信',
+      channel_wechat_robot: '企业微信群机器人',
+      channel_dingding: '钉钉',
+      channel_sms: '短信',
+      
+      // 按钮
+      btn_delete_condition: '删除',
+      btn_add_condition: '添加',
+      
+      // 提示消息
+      msg_please_fill_name: '请填写名称',
+      msg_please_select_instance: '请选择实例',
+      
+      // 告警屏蔽页面 (mutes.vue)
+      mutes_search_label: '搜索',
+      mutes_search_placeholder: '主机名',
+      mutes_btn_query: '查询',
+      mutes_btn_reset: '重置',
+      mutes_btn_add: '新增',
+      
+      // 表格列
+      mutes_col_id: 'ID',
+      mutes_col_policy_name: '策略名称',
+      mutes_col_instance: '实例',
+      mutes_col_mute_condition: '屏蔽条件',
+      mutes_col_mute_duration: '屏蔽时长',
+      mutes_col_start_time: '开始时间',
+      mutes_col_end_time: '结束时间',
+      mutes_col_add_time: '添加时间',
+      mutes_col_policy_status: '策略状态',
+      mutes_col_operation: '操作',
+      
+      // 时长单位
+      duration_day: '天',
+      duration_hour: '小时',
+      duration_minute: '分钟',
+      duration_second: '秒',
+      
+      // 模态框
+      mutes_modal_title_add: '新增规则',
+      mutes_modal_title_edit: '编辑规则',
+      
+      // 表单字段
+      mutes_form_name: '名称',
+      mutes_form_name_placeholder: '请输入策略名称',
+      mutes_form_instance: '实例',
+      mutes_form_instance_placeholder: '选择告警实例',
+      mutes_form_condition_card_title: '屏蔽条件',
+      mutes_form_time_card_title: '时间与通道',
+      mutes_form_field: '字段',
+      mutes_form_operator: '操作符',
+      mutes_form_value: '值',
+      mutes_form_value_placeholder: '请输入值',
+      mutes_form_operation: '操作',
+      mutes_form_start_time: '开始时间',
+      mutes_form_duration: '屏蔽时长',
+      mutes_form_end_time: '结束时间',
+      mutes_form_mute_channels: '屏蔽通道',
+      mutes_form_mute_note: '屏蔽原因',
+      mutes_form_mute_note_placeholder: '请输入屏蔽原因',
+      
+      // 字段选项
+      mutes_field_hostname: '主机名',
+      mutes_field_hostgroup: '主机组',
+      mutes_field_item_name: '指标名称',
+      mutes_field_item_key: '指标Key',
+      mutes_field_trigger_name: '触发器名称',
+      mutes_field_severity: '告警级别',
+      
+      // 操作符选项
+      mutes_operator_equal: '等于',
+      mutes_operator_contain: '包含',
+      mutes_operator_not_equal: '不等于',
+      
+      // 时长选项
+      mutes_duration_1h: '1小时',
+      mutes_duration_2h: '2小时',
+      mutes_duration_5h: '5小时',
+      mutes_duration_8h: '8小时',
+      mutes_duration_12h: '12小时',
+      mutes_duration_1d: '1天',
+      mutes_duration_2d: '2天',
+      mutes_duration_5d: '5天',
+      mutes_duration_7d: '7天',
+      mutes_duration_14d: '14天',
+      mutes_duration_30d: '30天',
+      mutes_duration_60d: '60天',
+      mutes_duration_90d: '90天',
+      mutes_duration_forever: '永久',
+      
+      // 分页
+      mutes_pagination_total: '共 {total} 条数据',
+      
+      // query.vue 额外翻译
+      msg_load_instances_failed: '加载实例列表失败',
+      msg_unknown: '未知',
+      msg_analysis_prompt: '请分析以下告警详情，说明可能的原因并给出具体的解决方案：',
+      msg_unknown_error: '未知错误',
+      msg_request_timeout: '请求超时，请稍后重试',
+      
+      // rule.vue 额外翻译
+      msg_save_success: '保存成功',
+      msg_save_failed: '保存失败',
     },
     US: {
       // Search form
@@ -143,10 +312,10 @@ module.exports = {
       label_hostname: 'Hostname',
       label_host_ip: 'Host IP',
       label_ip: 'IP',
-      label_select_instance: 'Select Instance',
+      label_select_instance: 'Instance',
       label_all_instances: 'All Instances',
-      label_alarm_type: 'Alarm Type',
-      label_alarm_level: 'Alarm Level',
+      label_alarm_type: 'Type',
+      label_alarm_level: 'Severity',
       label_creation_time: 'Creation Time',
       label_effective_time: 'Effective Time',
       label_start_end: 'Start-End',
@@ -176,14 +345,14 @@ module.exports = {
       // Table columns
       col_id: 'ID',
       col_instance: 'Instance',
-      col_alarm_type: 'Alarm Type',
+      col_alarm_type: 'Type',
       col_device_name: 'Device Name',
       col_hostname: 'Hostname',
       col_ip: 'IP',
-      col_alarm_level: 'Alarm Level',
-      col_alarm_description: 'Alarm Description',
-      col_alarm_detail: 'Alarm Detail',
-      col_occurrence_time: 'Occurrence Time',
+      col_alarm_level: 'Severity',
+      col_alarm_description: 'Description',
+      col_alarm_detail: 'Detail',
+      col_occurrence_time: 'Occurrence',
       col_notification_status: 'Notification Status',
       col_operation: 'Operation',
       col_rule_name: 'Rule Name',
@@ -210,8 +379,8 @@ module.exports = {
       
       // Operation buttons
       btn_mute: 'Mute',
-      btn_ai_analysis: 'AI Assistant Analysis',
-      btn_view_detail: 'View Detail',
+      btn_ai_analysis: 'AI Assistant',
+      btn_view_detail: 'Detail',
       
       // AI analysis modal
       modal_title_ai_analysis: 'AI Assistant Analysis Result',
@@ -234,7 +403,7 @@ module.exports = {
       
       // Alarm rule related
       rule_name: 'Rule Name',
-      rule_name_placeholder: 'Policy Name',
+      rule_name_placeholder: 'Name',
       rule_distribution_dimension: 'Distribution Dimension',
       rule_condition: 'Condition',
       rule_operator: 'Operator',
@@ -250,12 +419,12 @@ module.exports = {
       effective_time: 'Effective Time',
       
       // Alarm mute related
-      mute_reason: 'Mute Reason',
+      mute_reason: 'Reason',
       mute_reason_placeholder: 'Please Enter Mute Reason',
-      mute_duration: 'Mute Duration',
-      mute_condition: 'Mute Condition',
-      mute_channel: 'Mute Channel',
-      start_time: 'Start Time',
+      mute_duration: 'Duration',
+      mute_condition: 'Condition',
+      mute_channel: 'Channel',
+      start_time: 'Time',
       end_time: 'End Time',
       
       // Confirm dialog
@@ -273,6 +442,175 @@ module.exports = {
       analysis_alarm_time: 'Alarm Time',
       analysis_historical_alarm_top10: 'Historical Alarm TOP10',
       analysis_alarm_classification_top: 'Alarm Classification TOP',
+      
+      // Alarm rule page - a-alert
+      alert_multi_instance_title: 'Multi-Instance Alarm Rule Description',
+      alert_multi_instance_desc: 'The system now supports multi-instance data aggregation. When configuring alarm distribution rules, you can select one or more instances, and the rule will apply to alarms from the selected instances.',
+      
+      // Alarm rule page - Table columns
+      col_name: 'Name',
+      col_instances: 'Instances',
+      col_distribution_conditions: 'Conditions',
+      col_distribution_channel: 'Channel',
+      col_receiver: 'User',
+      col_receiver_group: 'Group',
+      col_note: 'Note',
+      col_add_time: 'Created',
+      
+      // Alarm rule page - Status
+      status_enabled: 'Enabled',
+      status_disabled: 'Disabled',
+      status_not_selected: 'Not Selected',
+      
+      // Alarm rule page - Modal form
+      form_label_name: 'Name',
+      form_label_instance: 'Instance',
+      form_label_week: 'Week',
+      form_label_time_range: 'Time Range',
+      form_label_channel: 'Channel',
+      form_label_receiver: 'User',
+      form_label_receiver_group: 'Group',
+      form_label_note: 'Note',
+      form_label_status: 'Status',
+      
+      form_placeholder_name: 'Please Enter Rule Name',
+      form_placeholder_instance: 'Select Alarm Instance',
+      form_placeholder_receiver: 'Alarm Receiver',
+      form_placeholder_receiver_group: 'Group',
+      form_placeholder_note: 'Note Description',
+      
+      // Alarm rule page - Match conditions
+      card_title_match_conditions: 'Conditions',
+      card_title_time_channel: 'Duration & Channel',
+      card_title_receiver_object: 'Receiver Object',
+      
+      condition_field: 'Field',
+      condition_operator: 'Operator',
+      condition_value: 'Value',
+      condition_placeholder_value: 'Match Value',
+      
+      // Field options
+      field_host: 'Host',
+      field_group: 'Host Group',
+      field_item: 'Item Name',
+      field_key: 'Item Key',
+      field_trigger: 'Trigger',
+      field_severity: 'Severity',
+      
+      // Week options
+      week_sunday: 'Sunday',
+      week_monday: 'Monday',
+      week_tuesday: 'Tuesday',
+      week_wednesday: 'Wednesday',
+      week_thursday: 'Thursday',
+      week_friday: 'Friday',
+      week_saturday: 'Saturday',
+      
+      // Channel options
+      channel_mail: 'Email',
+      channel_wechat: 'WeChat',
+      channel_wechat_robot: 'WeChat Work Group Robot',
+      channel_dingding: 'DingTalk',
+      channel_sms: 'SMS',
+      
+      // Buttons
+      btn_delete_condition: 'Delete',
+      btn_add_condition: 'Add',
+      
+      // Messages
+      msg_please_fill_name: 'Please Fill in Name',
+      msg_please_select_instance: 'Please Select Instance',
+      
+      // Alarm mute page (mutes.vue)
+      mutes_search_label: 'Search',
+      mutes_search_placeholder: 'Hostname',
+      mutes_btn_query: 'Query',
+      mutes_btn_reset: 'Reset',
+      mutes_btn_add: 'Add',
+      
+      // Table columns
+      mutes_col_id: 'ID',
+      mutes_col_policy_name: 'Name',
+      mutes_col_instance: 'Instance',
+      mutes_col_mute_condition: 'Condition',
+      mutes_col_mute_duration: 'Duration',
+      mutes_col_start_time: 'Start',
+      mutes_col_end_time: 'End',
+      mutes_col_add_time: 'Created',
+      mutes_col_policy_status: 'Status',
+      mutes_col_operation: 'Operation',
+      
+      // Duration units
+      duration_day: 'Day',
+      duration_hour: 'Hour',
+      duration_minute: 'Minute',
+      duration_second: 'Second',
+      
+      // Modal
+      mutes_modal_title_add: 'Add Rule',
+      mutes_modal_title_edit: 'Edit Rule',
+      
+      // Form fields
+      mutes_form_name: 'Name',
+      mutes_form_name_placeholder: 'Please Enter Policy Name',
+      mutes_form_instance: 'Instance',
+      mutes_form_instance_placeholder: 'Select Alarm Instance',
+      mutes_form_condition_card_title: 'Condition',
+      mutes_form_time_card_title: 'Duration & Channel',
+      mutes_form_field: 'Field',
+      mutes_form_operator: 'Operator',
+      mutes_form_value: 'Value',
+      mutes_form_value_placeholder: 'Please Enter Value',
+      mutes_form_operation: 'Operation',
+      mutes_form_start_time: 'Start',
+      mutes_form_duration: 'Duration',
+      mutes_form_end_time: 'Time',
+      mutes_form_mute_channels: 'Channels',
+      mutes_form_mute_note: 'Reason',
+      mutes_form_mute_note_placeholder: 'Please Enter Mute Reason',
+      
+      // Field options
+      mutes_field_hostname: 'Hostname',
+      mutes_field_hostgroup: 'Host Group',
+      mutes_field_item_name: 'Item Name',
+      mutes_field_item_key: 'Item Key',
+      mutes_field_trigger_name: 'Trigger Name',
+      mutes_field_severity: 'Severity',
+      
+      // Operator options
+      mutes_operator_equal: 'Equal',
+      mutes_operator_contain: 'Contain',
+      mutes_operator_not_equal: 'Not Equal',
+      
+      // Duration options
+      mutes_duration_1h: '1 Hour',
+      mutes_duration_2h: '2 Hours',
+      mutes_duration_5h: '5 Hours',
+      mutes_duration_8h: '8 Hours',
+      mutes_duration_12h: '12 Hours',
+      mutes_duration_1d: '1 Day',
+      mutes_duration_2d: '2 Days',
+      mutes_duration_5d: '5 Days',
+      mutes_duration_7d: '7 Days',
+      mutes_duration_14d: '14 Days',
+      mutes_duration_30d: '30 Days',
+      mutes_duration_60d: '60 Days',
+      mutes_duration_90d: '90 Days',
+      mutes_duration_forever: 'Forever',
+      
+      // Pagination
+      mutes_pagination_total: 'Total {total} Items',
+      
+      // query.vue additional translations
+      msg_load_instances_failed: 'Failed to Load Instance List',
+      msg_unknown: 'Unknown',
+      msg_analysis_prompt: 'Please analyze the following alarm details, explain possible causes and provide specific solutions:',
+      msg_unknown_error: 'Unknown Error',
+      msg_request_timeout: 'Request Timeout, Please Try Again Later',
+      
+      // rule.vue additional translations
+      msg_save_success: 'Save Successful',
+      msg_save_failed: 'Save Failed',
     },
     HK: {
       // 搜索表單
@@ -410,6 +748,175 @@ module.exports = {
       analysis_alarm_time: '告警時間',
       analysis_historical_alarm_top10: '歷史告警TOP10',
       analysis_alarm_classification_top: '告警分類TOP',
+      
+      // 告警規則頁面 - a-alert
+      alert_multi_instance_title: '多實例告警規則說明',
+      alert_multi_instance_desc: '系統已支持多實例數據聚合。在配置告警分發規則時，可以選擇一個或多個實例，規則將應用於所選實例的告警。',
+      
+      // 告警規則頁面 - 表格列
+      col_name: '名稱',
+      col_instances: '實例',
+      col_distribution_conditions: '分發條件',
+      col_distribution_channel: '分發通道',
+      col_receiver: '接收人',
+      col_receiver_group: '接收組',
+      col_note: '備註',
+      col_add_time: '添加時間',
+      
+      // 告警規則頁面 - 狀態
+      status_enabled: '啟用',
+      status_disabled: '禁用',
+      status_not_selected: '未選擇',
+      
+      // 告警規則頁面 - 模態框表單
+      form_label_name: '名稱',
+      form_label_instance: '實例',
+      form_label_week: '星期',
+      form_label_time_range: '時間段',
+      form_label_channel: '通道',
+      form_label_receiver: '接收人',
+      form_label_receiver_group: '接收組',
+      form_label_note: '備註',
+      form_label_status: '狀態',
+      
+      form_placeholder_name: '請輸入規則名稱',
+      form_placeholder_instance: '選擇告警實例',
+      form_placeholder_receiver: '告警接收人',
+      form_placeholder_receiver_group: '告警接收組',
+      form_placeholder_note: '備註說明',
+      
+      // 告警規則頁面 - 匹配條件
+      card_title_match_conditions: '匹配條件',
+      card_title_time_channel: '時間與通道',
+      card_title_receiver_object: '接收對象',
+      
+      condition_field: '字段',
+      condition_operator: '操作符',
+      condition_value: '值',
+      condition_placeholder_value: '匹配值',
+      
+      // 字段選項
+      field_host: '主機',
+      field_group: '主機組',
+      field_item: '指標名稱',
+      field_key: '指標Key',
+      field_trigger: '觸發器',
+      field_severity: '告警級別',
+      
+      // 星期選項
+      week_sunday: '星期日',
+      week_monday: '星期一',
+      week_tuesday: '星期二',
+      week_wednesday: '星期三',
+      week_thursday: '星期四',
+      week_friday: '星期五',
+      week_saturday: '星期六',
+      
+      // 通道選項
+      channel_mail: '郵件',
+      channel_wechat: '微信',
+      channel_wechat_robot: '企業微信群機器人',
+      channel_dingding: '釘釘',
+      channel_sms: '短信',
+      
+      // 按鈕
+      btn_delete_condition: '刪除',
+      btn_add_condition: '添加',
+      
+      // 提示消息
+      msg_please_fill_name: '請填寫名稱',
+      msg_please_select_instance: '請選擇實例',
+      
+      // 告警屏蔽頁面 (mutes.vue)
+      mutes_search_label: '搜索',
+      mutes_search_placeholder: '主機名',
+      mutes_btn_query: '查詢',
+      mutes_btn_reset: '重置',
+      mutes_btn_add: '新增',
+      
+      // 表格列
+      mutes_col_id: 'ID',
+      mutes_col_policy_name: '策略名稱',
+      mutes_col_instance: '實例',
+      mutes_col_mute_condition: '屏蔽條件',
+      mutes_col_mute_duration: '屏蔽時長',
+      mutes_col_start_time: '開始時間',
+      mutes_col_end_time: '結束時間',
+      mutes_col_add_time: '添加時間',
+      mutes_col_policy_status: '策略狀態',
+      mutes_col_operation: '操作',
+      
+      // 時長單位
+      duration_day: '天',
+      duration_hour: '小時',
+      duration_minute: '分鐘',
+      duration_second: '秒',
+      
+      // 模態框
+      mutes_modal_title_add: '新增規則',
+      mutes_modal_title_edit: '編輯規則',
+      
+      // 表單字段
+      mutes_form_name: '名稱',
+      mutes_form_name_placeholder: '請輸入策略名稱',
+      mutes_form_instance: '實例',
+      mutes_form_instance_placeholder: '選擇告警實例',
+      mutes_form_condition_card_title: '屏蔽條件',
+      mutes_form_time_card_title: '時間與通道',
+      mutes_form_field: '字段',
+      mutes_form_operator: '操作符',
+      mutes_form_value: '值',
+      mutes_form_value_placeholder: '請輸入值',
+      mutes_form_operation: '操作',
+      mutes_form_start_time: '開始時間',
+      mutes_form_duration: '屏蔽時長',
+      mutes_form_end_time: '結束時間',
+      mutes_form_mute_channels: '屏蔽通道',
+      mutes_form_mute_note: '屏蔽原因',
+      mutes_form_mute_note_placeholder: '請輸入屏蔽原因',
+      
+      // 字段選項
+      mutes_field_hostname: '主機名',
+      mutes_field_hostgroup: '主機組',
+      mutes_field_item_name: '指標名稱',
+      mutes_field_item_key: '指標Key',
+      mutes_field_trigger_name: '觸發器名稱',
+      mutes_field_severity: '告警級別',
+      
+      // 操作符選項
+      mutes_operator_equal: '等於',
+      mutes_operator_contain: '包含',
+      mutes_operator_not_equal: '不等於',
+      
+      // 時長選項
+      mutes_duration_1h: '1小時',
+      mutes_duration_2h: '2小時',
+      mutes_duration_5h: '5小時',
+      mutes_duration_8h: '8小時',
+      mutes_duration_12h: '12小時',
+      mutes_duration_1d: '1天',
+      mutes_duration_2d: '2天',
+      mutes_duration_5d: '5天',
+      mutes_duration_7d: '7天',
+      mutes_duration_14d: '14天',
+      mutes_duration_30d: '30天',
+      mutes_duration_60d: '60天',
+      mutes_duration_90d: '90天',
+      mutes_duration_forever: '永久',
+      
+      // 分頁
+      mutes_pagination_total: '共 {total} 條數據',
+      
+      // query.vue 額外翻譯
+      msg_load_instances_failed: '加載實例列表失敗',
+      msg_unknown: '未知',
+      msg_analysis_prompt: '請分析以下告警詳情，說明可能的原因並給出具體的解決方案：',
+      msg_unknown_error: '未知錯誤',
+      msg_request_timeout: '請求超時，請稍後重試',
+      
+      // rule.vue 額外翻譯
+      msg_save_success: '保存成功',
+      msg_save_failed: '保存失敗',
     },
   },
 };

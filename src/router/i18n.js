@@ -22,8 +22,8 @@ module.exports = {
       },
       host: {
         name: '主机应用',
-        linux: {name: 'Linux系统'},
-        windows: {name: 'Windows系统'},
+        linux: {name: 'Linux'},
+        windows: {name: 'Windows'},
         lindetail: {name: 'Linux详情'},
         windetail: {name: 'Windows详情'}
       },
@@ -120,15 +120,15 @@ module.exports = {
       },
       alarm: {
         name: 'Alarm',
-        list: {name: 'Alarm Query'},
+        list: {name: 'Query'},
         query: {name: 'Alarm Query'},
         alarmList: {name: 'Alarm Query'},
         rule: {name: 'Distribution Rules'},
         alarmRule: {name: 'Distribution Rules'},
         mutes: {name: 'Mute Rules'},
         alarmMutes: {name: 'Mute Rules'},
-        analysis: {name: 'Alarm Analysis'},
-        alarmAnalysis: {name: 'Alarm Analysis'}
+        analysis: {name: 'Analysis'},
+        alarmAnalysis: {name: 'Analysis'}
       },
       host: {
         name: 'Host',
@@ -155,7 +155,7 @@ module.exports = {
       },
       topology: {
         name: 'Topology',
-        list: {name: 'Topology Maintenance'},
+        list: {name: 'Topology'},
         detail: {name: 'Edit'},
         show: {name: 'Show'}
       },
@@ -167,7 +167,7 @@ module.exports = {
         name: 'System',
         users: {name: 'User'},
         systemUsers: {name: 'User'},
-        groups: {name: 'User'},
+        groups: {name: 'User Group'},
         systemGroups: {name: 'User'},
         bandwidth: {name: 'Egress'},
         systemBandwidth: {name: 'Egress'},

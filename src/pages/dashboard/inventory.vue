@@ -153,7 +153,7 @@ export default {
         { title: this.$t('column_installation_date'), key: 'date_hw_install', align: 'left', scopedSlots: { customRender: 'date_hw_install' } },
         { title: this.$t('column_hardware_expiration_date'), key: 'date_hw_expiry', align: 'left', scopedSlots: { customRender: 'date_hw_expiry' } },
         { title: this.$t('column_mac_address'), key: 'mac', align: 'left', scopedSlots: { customRender: 'mac' } },
-        { title: this.$t('column_actions'), key: 'edit', align: 'center', fixed: 'right', width: '80px', scopedSlots: { customRender: 'operation' } }
+        { title: this.$t('column_actions'), key: 'edit', align: 'center', fixed: 'right', width: '100px', scopedSlots: { customRender: 'operation' } }
       ],
       list: [],
       pagination: {

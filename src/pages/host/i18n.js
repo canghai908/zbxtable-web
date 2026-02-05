@@ -249,7 +249,7 @@ module.exports = {
       label_ip: 'IP',
       label_ipmi: 'IPMI',
       label_management_address: 'Management Address',
-      label_collection_status: 'Collection Status',
+      label_collection_status: 'Status',
       btn_query: 'Query',
       btn_reset: 'Reset',
       btn_export: 'Export',
@@ -270,7 +270,7 @@ module.exports = {
       col_ipmi_address: 'IPMI Address',
       col_location: 'Location',
       col_device_location: 'Device Location',
-      col_ip_address: 'IP Address',
+      col_ip_address: 'IP',
       col_ipmi: 'IPMI',
       col_kernel_version: 'Kernel Version',
       col_os_version: 'OS Version',
@@ -279,12 +279,12 @@ module.exports = {
       col_memory_usage: 'Memory Usage',
       col_disk_usage: 'Disk Usage',
       col_ping: 'Ping(Sec/Loss)',
-      col_collection_status: 'Collection Status',
+      col_collection_status: 'Status',
       col_operation: 'Operation',
       
       // Operation buttons
-      btn_view_graph: 'View Graph',
-      btn_view_detail: 'View Detail',
+      btn_view_graph: 'Graph',
+      btn_view_detail: 'Detail',
       
       // Tags
       tag_unknown: 'Unknown',
@@ -311,7 +311,7 @@ module.exports = {
       // Device info popover
       title_device_info: 'Device Info',
       label_instance_name: 'Instance Name',
-      label_IP: 'IP Address',
+      label_IP: 'IP',
       label_cpu_utilization: 'CPU Usage',
       label_memory_utilization: 'Memory Usage',
       label_num_errors: 'Errors',
@@ -329,7 +329,7 @@ module.exports = {
       detail_unknown: 'Unknown',
       
       // Tabs
-      tab_runtime_info: 'Runtime Info',
+      tab_runtime_info: 'Info',
       
       // Card titles
       card_cpu_usage: 'CPU Usage',
@@ -349,9 +349,9 @@ module.exports = {
       
       // Network interface table
       interface_status: 'Status',
-      interface_name: 'Interface Name',
-      interface_received_traffic: 'Received Traffic(Kbps)',
-      interface_sent_traffic: 'Sent Traffic(Kbps)',
+      interface_name: 'Name',
+      interface_received_traffic: 'Received(Kbps)',
+      interface_sent_traffic: 'Sent(Kbps)',
       interface_in_discarded_errors: 'In Discarded/Errors',
       interface_out_discarded_errors: 'Out Discarded/Errors',
       interface_port_speed: 'Port Speed',
@@ -394,9 +394,9 @@ module.exports = {
       col_inodes_utilization: 'Inodes Utilization',
       col_collection_time: 'Collection Time',
       col_status: 'Status',
-      col_interface_name: 'Interface Name',
-      col_received_traffic: 'Received Traffic(Kbps)',
-      col_sent_traffic: 'Sent Traffic(Kbps)',
+      col_interface_name: 'Name',
+      col_received_traffic: 'Received(Kbps)',
+      col_sent_traffic: 'Sent(Kbps)',
       col_in_discarded_errors: 'In Discarded/Errors',
       col_out_discarded_errors: 'Out Discarded/Errors',
       col_port_speed: 'Port Speed',
@@ -427,24 +427,24 @@ module.exports = {
       chart_data_port_status: 'Port Status',
       
       // Network device detail page
-      net_card_basic_info: 'Basic Information',
+      net_card_basic_info: 'Information',
       net_label_host_id: 'Host ID',
       net_label_device_location: 'Device Location',
       net_label_department: 'Department',
       net_label_uptime: 'Uptime',
       net_label_install_date: 'Installation Date',
       net_label_expiry_date: 'Warranty Expiry Date',
-      net_label_asset_no: 'Asset Number',
+      net_label_asset_no: 'SN',
       net_label_device_model: 'Device Model',
-      net_label_ip_address: 'IP Address',
+      net_label_ip_address: 'IP',
       net_label_remarks: 'Remarks',
-      net_tab_runtime_info: 'Runtime Info',
+      net_tab_runtime_info: 'Info',
       net_tab_interface: 'Interface',
       net_card_interface_list: 'Interface List',
       net_col_interface_index: 'Interface Index',
       
       // Windows detail page
-      win_card_basic_info: 'Basic Information',
+      win_card_basic_info: 'Information',
       win_label_host_id: 'Host ID',
       win_label_cpu_cores: 'CPU Cores',
       win_label_type: 'Type',
@@ -452,9 +452,9 @@ module.exports = {
       win_label_os: 'Operating System',
       win_label_uptime: 'Uptime',
       win_label_remarks: 'Remarks',
-      win_tab_runtime_info: 'Runtime Info',
+      win_tab_runtime_info: 'Info',
       win_card_disk_usage: 'Disk Usage',
-      win_card_network_card: 'Network Card',
+      win_card_network_card: 'Network',
       win_col_disk: 'Disk',
       win_col_total_space: 'Total Space',
       win_col_used_space: 'Used Space',
@@ -462,7 +462,7 @@ module.exports = {
       win_col_collection_time: 'Collection Time',
       
       // Server detail page
-      ser_card_basic_info: 'Basic Information',
+      ser_card_basic_info: 'Information',
       ser_label_host_id: 'Host ID',
       ser_label_device_location: 'Device Location',
       ser_label_department: 'Department',
@@ -471,9 +471,9 @@ module.exports = {
       ser_label_serial_no: 'Serial Number',
       ser_label_install_date: 'Installation Date',
       ser_label_expiry_date: 'Warranty Expiry Date',
-      ser_label_asset_no: 'Asset Number',
+      ser_label_asset_no: 'SN',
       ser_label_remarks: 'Remarks',
-      ser_tab_runtime_info: 'Runtime Info',
+      ser_tab_runtime_info: 'Info',
       ser_card_cpu_count: 'CPU Count',
       ser_card_total_memory: 'Total Memory',
       ser_card_total_storage: 'Total Storage',

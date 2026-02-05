@@ -4,13 +4,13 @@
       <iframe src="https://dl.cactifans.com/pia/1.html" frameborder="0" style="width: 100%;border:none;height: 100%;"></iframe>
     </div> -->
     <a-form-model class="home-search" layout="inline" :colon='false'>
-      <a-form-model-item label="搜索">
-        <a-input v-model.trim="topology" placeholder="拓扑图名称" />
+      <a-form-model-item :label="$t('label_search')">
+        <a-input v-model.trim="topology" :placeholder="$t('placeholder_topology_name')" />
       </a-form-model-item>
       <a-form-model-item>
-        <a-button type="primary" @click="init">查询</a-button>
-        <a-button style="margin-left: 10px;" @click="resetData">重置</a-button>
-        <a-button type="primary" style="margin-left: 10px;" @click="newPage">新建拓扑</a-button>
+        <a-button type="primary" @click="init">{{ $t('btn_query') }}</a-button>
+        <a-button style="margin-left: 10px;" @click="resetData">{{ $t('btn_reset') }}</a-button>
+        <a-button type="primary" style="margin-left: 10px;" @click="newPage">{{ $t('btn_new_topology') }}</a-button>
       </a-form-model-item>
     </a-form-model>
     <div class="linux-list">
@@ -18,25 +18,25 @@
         <span slot="id" slot-scope="record">{{record.id}}</span>
         <div slot="topology" slot-scope="record">{{record.topology}}</div>
         <div slot="status" slot-scope="record">
-          <a-badge v-if="record.status == 1" status="success" text="已共享" />
-          <a-badge v-else-if="record.status == 0" status="default" text="未共享" />
-          <a-badge v-else status="default" text="未知" />
+          <a-badge v-if="record.status == 1" status="success" :text="$t('status_shared')" />
+          <a-badge v-else-if="record.status == 0" status="default" :text="$t('status_not_shared')" />
+          <a-badge v-else status="default" :text="$t('status_unknown')" />
         </div>
         <div slot="created_at" slot-scope="record">
           {{ new Date(+new Date(record.created_at) + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '') || '--' }}</div>
         <div slot="updated_at" slot-scope="record">
           {{ new Date(+new Date(record.created_at) + 8 * 3600 * 1000).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '') || '--' }}</div>
         <div slot="operation" slot-scope="record">
-          <a-button class="pd20 paddingleft0" type="link" size="small" v-if="record.status==0" @click="deployTopo(record)">共享</a-button>
-          <a-button class="pd20 paddingleft0" type="link" size="small" v-else @click="deployTopo(record)">取消共享</a-button>
+          <a-button class="pd20 paddingleft0" type="link" size="small" v-if="record.status==0" @click="deployTopo(record)">{{ $t('btn_share') }}</a-button>
+          <a-button class="pd20 paddingleft0" type="link" size="small" v-else @click="deployTopo(record)">{{ $t('btn_cancel_share') }}</a-button>
           <a-button class="pd20 paddingleft0" type="link" size="small" v-if="record.status==1" @click="copyShareLink(record)">
             <a-icon type="link" />
-            共享链接
+            {{ $t('btn_share') }}
           </a-button>
-          <a-button class="pd20 paddingleft0" type="link" size="small" @click="seeDetail(record)">编辑</a-button>
-          <a-button class="pd20 paddingleft0" type="link" size="small" @click="showTopo(record)">预览</a-button>
-          <a-popconfirm title="确定要删除吗?" ok-text="确定" cancel-text="取消" @confirm="confirm(record)">
-            <a-button class="paddingleft0" type="link" size="small">删除</a-button>
+          <a-button class="pd20 paddingleft0" type="link" size="small" @click="seeDetail(record)">{{ $t('btn_edit') }}</a-button>
+          <a-button class="pd20 paddingleft0" type="link" size="small" @click="showTopo(record)">{{ $t('btn_view') }}</a-button>
+          <a-popconfirm :title="$t('confirm_delete')" :ok-text="$t('confirm_yes')" :cancel-text="$t('confirm_no')" @confirm="confirm(record)">
+            <a-button class="paddingleft0" type="link" size="small">{{ $t('btn_delete') }}</a-button>
           </a-popconfirm>
         </div>
       </a-table>
@@ -49,6 +49,7 @@ import PageLayout from '@/layouts/PageLayout'
 import { topologyList, deleteTopology, deployTopology } from '@/services/admin'
 export default {
   name: 'tuopu',
+  i18n: require('./i18n'),
   components: { PageLayout },
   data() {
     return {
@@ -57,25 +58,29 @@ export default {
       page: 1,
       pageSize: 10,
       loading: false,
-      columns: [
-        { title: '序号', key: 'id', align: 'center', scopedSlots: { customRender: 'id' } },
-        { title: '拓扑名称', key: 'topology', align: 'center', scopedSlots: { customRender: 'topology' } },
-        { title: '拓扑状态', key: 'status', align: 'center', scopedSlots: { customRender: 'status' } },
-        { title: '创建时间', key: 'created_at', align: 'center', scopedSlots: { customRender: 'created_at' } },
-        { title: '更新时间', key: 'updated_at', align: 'center', scopedSlots: { customRender: 'updated_at' } },
-        { title: '操作', key: 'operation', align: 'center', scopedSlots: { customRender: 'operation' } }
-      ],
+      columns: [],
       list: [],
       pagination: {
         total: 0, current: 1, "show-quick-jumper": true, "page-size-options": ["10", "20", "30", "40", "50", "100", "200"],
-        pageSize: 10, "show-size-changer": true, "show-total": (total) => `共 ${total} 条数据`
+        pageSize: 10, "show-size-changer": true, "show-total": (total) => this.$t('pagination_total', { total })
       }
     }
   },
   created() {
+    this.initColumns()
     this.init()
   },
   methods: {
+    initColumns() {
+      this.columns = [
+        { title: this.$t('col_id'), key: 'id', align: 'center', scopedSlots: { customRender: 'id' } },
+        { title: this.$t('label_topology_name'), key: 'topology', align: 'center', scopedSlots: { customRender: 'topology' } },
+        { title: this.$t('col_status'), key: 'status', align: 'center', scopedSlots: { customRender: 'status' } },
+        { title: this.$t('col_created_at'), key: 'created_at', align: 'center', scopedSlots: { customRender: 'created_at' } },
+        { title: this.$t('col_updated_at'), key: 'updated_at', align: 'center', scopedSlots: { customRender: 'updated_at' } },
+        { title: this.$t('col_operation'), key: 'operation', align: 'center', scopedSlots: { customRender: 'operation' } }
+      ]
+    },
     init() {
       this.loading = true
       topologyList({ page: this.page, limit: this.pageSize, name: this.topology }).then((resp) => {
@@ -86,10 +91,10 @@ export default {
           this.pagination.pageSize = this.pageSize
           this.list = res.data.items || []
         } else {
-          this.$message.error(res.message || '获取拓扑列表失败')
+          this.$message.error(res.message || this.$t('msg_load_failed'))
         }
       }).catch((err) => {
-        this.$message.error('获取拓扑列表失败')
+        this.$message.error(this.$t('msg_load_failed'))
         console.error(err)
       }).finally(() => { this.loading = false })
     },
@@ -114,13 +119,13 @@ export default {
       deleteTopology(record.id).then((resp) => {
         let res = resp.data
         if (res.code == 200) {
-          this.$message.success(res.message || '删除成功')
+          this.$message.success(res.message || this.$t('msg_delete_success'))
           this.init()
         } else {
-          this.$message.error(res.message || '删除失败')
+          this.$message.error(res.message || this.$t('msg_delete_failed'))
         }
       }).catch((err) => {
-        this.$message.error('删除失败')
+        this.$message.error(this.$t('msg_delete_failed'))
         console.error(err)
       })
     },
@@ -128,13 +133,13 @@ export default {
       deleteTopology(record.id).then((resp) => {
         let res = resp.data
         if (res.code == 200) {
-          this.$message.success(res.message || '删除成功')
+          this.$message.success(res.message || this.$t('msg_delete_success'))
           this.init()
         } else {
-          this.$message.error(res.message || '删除失败')
+          this.$message.error(res.message || this.$t('msg_delete_failed'))
         }
       }).catch((err) => {
-        this.$message.error('删除失败')
+        this.$message.error(this.$t('msg_delete_failed'))
         console.error(err)
       })
     },
@@ -142,13 +147,13 @@ export default {
       deployTopology(record).then((resp) => {
         let res = resp.data
         if (res.code == 200) {
-          this.$message.success(res.message || '操作成功')
+          this.$message.success(res.message || this.$t('msg_operation_success'))
           this.init()
         } else {
-          this.$message.error(res.message || '操作失败')
+          this.$message.error(res.message || this.$t('msg_operation_failed'))
         }
       }).catch((err) => {
-        this.$message.error('操作失败')
+        this.$message.error(this.$t('msg_operation_failed'))
         console.error(err)
       })
     },
@@ -168,16 +173,16 @@ export default {
       
       try {
         document.execCommand('copy')
-        this.$message.success('公开链接已复制到剪贴板')
+        this.$message.success(this.$t('msg_link_copied'))
         
         // 显示链接
         this.$info({
-          title: '公开访问链接',
+          title: this.$t('title_share_link'),
           content: shareUrl,
-          okText: '关闭'
+          okText: this.$t('btn_close')
         })
       } catch (err) {
-        this.$message.error('复制失败，请手动复制')
+        this.$message.error(this.$t('msg_copy_failed'))
       } finally {
         document.body.removeChild(textarea)
       }

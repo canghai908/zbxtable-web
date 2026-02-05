@@ -3,26 +3,26 @@
     <div class="topology-header">
       <div class="header-row">
         <div class="topology-info">
-          <h2>{{ isReading ? '查看拓扑' : (id ? '编辑拓扑' : '新建拓扑') }}</h2>
+          <h2>{{ isReading ? $t('title_view_topology') : (id ? $t('title_edit_topology') : $t('title_new_topology')) }}</h2>
           <a-input 
             v-model="form.name" 
-            placeholder="请输入拓扑图名称" 
+            :placeholder="$t('placeholder_enter_topology_name')" 
             style="width: 300px;"
             :disabled="isReading"
           />
           <a-select 
             v-model="canvasSizePreset" 
-            placeholder="画布尺寸" 
+            :placeholder="$t('label_canvas_size')" 
             style="width: 200px;"
             :disabled="isReading"
             @change="handleCanvasSizeChange"
           >
             <a-select-option value="1920x1080">1920x1080 (Full HD)</a-select-option>
             <a-select-option value="2560x1440">2560x1440 (2K)</a-select-option>
-            <a-select-option value="3000x2000">3000x2000 (默认)</a-select-option>
+            <a-select-option value="3000x2000">{{ $t('canvas_size_default') }}</a-select-option>
             <a-select-option value="3840x2160">3840x2160 (4K)</a-select-option>
             <a-select-option value="4096x2160">4096x2160 (4K DCI)</a-select-option>
-            <a-select-option value="custom">自定义尺寸</a-select-option>
+            <a-select-option value="custom">{{ $t('canvas_size_custom') }}</a-select-option>
           </a-select>
           <a-button 
             v-if="!isReading" 
@@ -30,18 +30,18 @@
             @click="showCanvasSizeModal"
             style="padding: 0 8px;"
           >
-            <a-icon type="setting" /> 自定义
+            <a-icon type="setting" /> {{ $t('btn_custom') }}
           </a-button>
         </div>
         <div class="topology-actions">
           <a-button v-if="isReading" type="primary" @click="editNode">
-            <a-icon type="edit" /> 编辑
+            <a-icon type="edit" /> {{ $t('btn_edit') }}
           </a-button>
           <a-button v-else type="primary" @click="saveData">
-            <a-icon type="save" /> 保存
+            <a-icon type="save" /> {{ $t('btn_save') }}
           </a-button>
           <a-button @click="backToList">
-            <a-icon type="rollback" /> 返回
+            <a-icon type="rollback" /> {{ $t('btn_back') }}
           </a-button>
         </div>
       </div>
@@ -49,41 +49,41 @@
       <!-- 工具栏 - 横向布局 -->
       <div class="toolbar-container" v-if="!isReading">
         <div class="toolbar-section">
-          <div class="section-label">节点工具</div>
+          <div class="section-label">{{ $t('label_node_tools') }}</div>
           <div class="tool-buttons">
           <a-tooltip placement="bottom">
-              <template slot="title">云服务</template>
+              <template slot="title">{{ $t('tool_cloud') }}</template>
               <div class="tool-btn" @mousedown="startDrag('cloud',$event)">
-                <img src="@/assets/img/cloud.png" alt="云服务">
-                <span>云</span>
+                <img src="@/assets/img/cloud.png" :alt="$t('tool_cloud')">
+                <span>{{ $t('tool_cloud_short') }}</span>
             </div>
           </a-tooltip>
           <a-tooltip placement="bottom">
-              <template slot="title">核心设备</template>
+              <template slot="title">{{ $t('tool_core') }}</template>
               <div class="tool-btn" @mousedown="startDrag('core',$event)">
-                <img src="@/assets/img/core.png" alt="核心">
-                <span>核心</span>
+                <img src="@/assets/img/core.png" :alt="$t('tool_core')">
+                <span>{{ $t('tool_core_short') }}</span>
             </div>
           </a-tooltip>
           <a-tooltip placement="bottom">
-              <template slot="title">交换机</template>
+              <template slot="title">{{ $t('tool_switch') }}</template>
               <div class="tool-btn" @mousedown="startDrag('switch',$event)">
-                <img src="@/assets/img/switch.png" alt="交换机">
-                <span>交换机</span>
+                <img src="@/assets/img/switch.png" :alt="$t('tool_switch')">
+                <span>{{ $t('tool_switch_short') }}</span>
             </div>
           </a-tooltip>
           <a-tooltip placement="bottom">
-              <template slot="title">服务器</template>
+              <template slot="title">{{ $t('tool_server') }}</template>
               <div class="tool-btn" @mousedown="startDrag('server',$event)">
-                <img src="@/assets/img/server.png" alt="服务器">
-                <span>服务器</span>
+                <img src="@/assets/img/server.png" :alt="$t('tool_server')">
+                <span>{{ $t('tool_server_short') }}</span>
             </div>
           </a-tooltip>
           <a-tooltip placement="bottom">
-              <template slot="title">防火墙</template>
+              <template slot="title">{{ $t('tool_firewall') }}</template>
               <div class="tool-btn" @mousedown="startDrag('firewalld',$event)">
-                <img src="@/assets/img/firewalld.png" alt="防火墙">
-                <span>防火墙</span>
+                <img src="@/assets/img/firewalld.png" :alt="$t('tool_firewall')">
+                <span>{{ $t('tool_firewall_short') }}</span>
             </div>
           </a-tooltip>
           </div>
@@ -92,13 +92,13 @@
         <div class="toolbar-divider"></div>
         
         <div class="toolbar-section">
-          <div class="section-label">文字工具</div>
+          <div class="section-label">{{ $t('label_text_tools') }}</div>
           <div class="tool-buttons">
             <a-tooltip placement="bottom">
-              <template slot="title">添加文字</template>
+              <template slot="title">{{ $t('tool_add_text') }}</template>
               <div class="tool-btn" @click="addTextNode">
                 <a-icon type="font-size" class="icon-large" />
-                <span>文字</span>
+                <span>{{ $t('tool_text') }}</span>
               </div>
             </a-tooltip>
           </div>
@@ -107,13 +107,13 @@
         <div class="toolbar-divider"></div>
         
         <div class="toolbar-section">
-          <div class="section-label">背景</div>
+          <div class="section-label">{{ $t('label_background') }}</div>
           <div class="tool-buttons">
             <a-tooltip placement="bottom">
-              <template slot="title">设置背景图</template>
+              <template slot="title">{{ $t('tool_set_background') }}</template>
               <div class="tool-btn" @click="showBackgroundModal">
                 <a-icon type="picture" class="icon-large" />
-                <span>背景图</span>
+                <span>{{ $t('tool_background') }}</span>
               </div>
             </a-tooltip>
           </div>
@@ -122,19 +122,19 @@
         <div class="toolbar-divider"></div>
         
         <div class="toolbar-section">
-          <div class="section-label">操作</div>
+          <div class="section-label">{{ $t('label_operations') }}</div>
           <div class="tool-buttons">
             <a-tooltip placement="bottom">
-              <template slot="title">删除选中</template>
+              <template slot="title">{{ $t('tool_delete_selected') }}</template>
               <a-popconfirm 
-                title="确定要删除选中的元素吗?" 
-                ok-text="确定" 
-                cancel-text="取消" 
+                :title="$t('confirm_delete_elements')" 
+                :ok-text="$t('confirm_yes')" 
+                :cancel-text="$t('confirm_no')" 
                 @confirm="deleteNode()"
               >
                 <div class="tool-btn">
                   <a-icon type="delete" class="icon-large" />
-                  <span>删除</span>
+                  <span>{{ $t('btn_delete') }}</span>
             </div>
               </a-popconfirm>
           </a-tooltip>
@@ -146,13 +146,13 @@
     <!-- 画布尺寸设置弹窗 -->
     <a-modal
       v-model="canvasSizeModalVisible"
-      title="自定义画布尺寸"
+      :title="$t('modal_custom_canvas_size')"
       :width="500"
       @ok="handleCanvasSizeOk"
       @cancel="handleCanvasSizeCancel"
     >
       <a-form :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
-        <a-form-item label="画布宽度">
+        <a-form-item :label="$t('label_canvas_width')">
           <a-input-number 
             v-model="customCanvasWidth" 
             :min="800" 
@@ -160,9 +160,9 @@
             :step="100"
             style="width: 100%;"
           />
-          <span style="color: #999; font-size: 12px;">像素 (800-10000)</span>
+          <span style="color: #999; font-size: 12px;">{{ $t('unit_pixels_range', { min: 800, max: 10000 }) }}</span>
         </a-form-item>
-        <a-form-item label="画布高度">
+        <a-form-item :label="$t('label_canvas_height')">
           <a-input-number 
             v-model="customCanvasHeight" 
             :min="600" 
@@ -170,11 +170,11 @@
             :step="100"
             style="width: 100%;"
           />
-          <span style="color: #999; font-size: 12px;">像素 (600-10000)</span>
+          <span style="color: #999; font-size: 12px;">{{ $t('unit_pixels_range', { min: 600, max: 10000 }) }}</span>
         </a-form-item>
         <a-alert 
-          message="提示" 
-          description="画布尺寸决定了可编辑区域的大小。建议根据实际需要选择合适的尺寸，过大的画布可能影响性能。" 
+          :message="$t('hint_title')" 
+          :description="$t('canvas_size_hint')" 
           type="info" 
           show-icon 
         />
@@ -184,72 +184,72 @@
     <!-- 背景图设置弹窗 -->
     <a-modal
       v-model="backgroundModalVisible"
-      title="设置背景图"
+      :title="$t('modal_set_background')"
       :width="600"
       @ok="handleBackgroundOk"
       @cancel="handleBackgroundCancel"
     >
       <a-form :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
-        <a-form-item label="背景图片">
+        <a-form-item :label="$t('label_background_image')">
           <a-upload
             :before-upload="beforeUpload"
             :show-upload-list="false"
             accept="image/*"
           >
             <a-button>
-              <a-icon type="upload" /> 选择图片
+              <a-icon type="upload" /> {{ $t('btn_select_image') }}
             </a-button>
           </a-upload>
           <div v-if="backgroundImage" style="margin-top: 10px;">
             <img :src="backgroundImage" style="max-width: 100%; max-height: 200px; border: 1px solid #d9d9d9; border-radius: 4px;" />
             <div v-if="imageNaturalSize.width" style="margin-top: 8px; padding: 8px; background: #f5f5f5; border-radius: 4px;">
               <div style="font-size: 12px; color: #666;">
-                <div><strong>图片尺寸：</strong>{{ imageNaturalSize.width }} x {{ imageNaturalSize.height }} 像素</div>
-                <div><strong>画布尺寸：</strong>{{ form.canvasWidth }} x {{ form.canvasHeight }} 像素</div>
+                <div><strong>{{ $t('label_image_size') }}：</strong>{{ imageNaturalSize.width }} x {{ imageNaturalSize.height }} {{ $t('unit_pixels') }}</div>
+                <div><strong>{{ $t('label_canvas_size') }}：</strong>{{ form.canvasWidth }} x {{ form.canvasHeight }} {{ $t('unit_pixels') }}</div>
                 <div v-if="imageNaturalSize.width > form.canvasWidth || imageNaturalSize.height > form.canvasHeight" style="color: #ff4d4f; margin-top: 4px;">
-                  <a-icon type="warning" /> 警告：图片尺寸超过画布尺寸，建议调整画布大小或使用较小的图片
+                  <a-icon type="warning" /> {{ $t('warning_image_exceeds_canvas') }}
                 </div>
                 <div v-else style="color: #52c41a; margin-top: 4px;">
-                  <a-icon type="check-circle" /> 图片尺寸适合当前画布
+                  <a-icon type="check-circle" /> {{ $t('info_image_fits_canvas') }}
                 </div>
               </div>
             </div>
           </div>
         </a-form-item>
         
-        <a-form-item label="背景大小">
+        <a-form-item :label="$t('label_background_size')">
           <a-radio-group v-model="backgroundSize">
-            <a-radio value="cover">覆盖</a-radio>
-            <a-radio value="contain">包含</a-radio>
-            <a-radio value="auto">原始大小</a-radio>
+            <a-radio value="cover">{{ $t('bg_size_cover') }}</a-radio>
+            <a-radio value="contain">{{ $t('bg_size_contain') }}</a-radio>
+            <a-radio value="auto">{{ $t('bg_size_auto') }}</a-radio>
           </a-radio-group>
         </a-form-item>
         
-        <a-form-item label="背景位置">
+        <a-form-item :label="$t('label_background_position')">
           <a-radio-group v-model="backgroundPosition">
-            <a-radio value="center">居中</a-radio>
-            <a-radio value="top">顶部</a-radio>
-            <a-radio value="bottom">底部</a-radio>
+            <a-radio value="center">{{ $t('bg_pos_center') }}</a-radio>
+            <a-radio value="top">{{ $t('bg_pos_top') }}</a-radio>
+            <a-radio value="bottom">{{ $t('bg_pos_bottom') }}</a-radio>
           </a-radio-group>
         </a-form-item>
         
-        <a-form-item label="背景重复">
+        <a-form-item :label="$t('label_background_repeat')">
           <a-radio-group v-model="backgroundRepeat">
-            <a-radio value="no-repeat">不重复</a-radio>
-            <a-radio value="repeat">重复</a-radio>
-            <a-radio value="repeat-x">水平重复</a-radio>
-            <a-radio value="repeat-y">垂直重复</a-radio>
+            <a-radio value="no-repeat">{{ $t('bg_repeat_no') }}</a-radio>
+            <a-radio value="repeat">{{ $t('bg_repeat_yes') }}</a-radio>
+            <a-radio value="repeat-x">{{ $t('bg_repeat_x') }}</a-radio>
+            <a-radio value="repeat-y">{{ $t('bg_repeat_y') }}</a-radio>
           </a-radio-group>
         </a-form-item>
         
-        <a-form-item label="背景透明度">
+        <a-form-item :label="$t('label_background_opacity')">
           <a-slider v-model="backgroundOpacity" :min="0" :max="100" :step="5" />
           <span style="margin-left: 10px;">{{ backgroundOpacity }}%</span>
         </a-form-item>
         
         <a-form-item label="">
           <a-button type="danger" ghost @click="removeBackground">
-            <a-icon type="delete" /> 移除背景图
+            <a-icon type="delete" /> {{ $t('btn_remove_background') }}
           </a-button>
         </a-form-item>
       </a-form>
@@ -327,6 +327,7 @@ Graph.registerNode(
 
 export default {
   name: 'tuopu',
+  i18n: require('./i18n'),
   components: {
     PageLayout,
     RightDrawer
@@ -652,11 +653,11 @@ export default {
     
     handleCanvasSizeOk() {
       if (this.customCanvasWidth < 800 || this.customCanvasWidth > 10000) {
-        this.$message.error('画布宽度必须在 800-10000 之间')
+        this.$message.error(this.$t('error_canvas_width_range'))
         return
       }
       if (this.customCanvasHeight < 600 || this.customCanvasHeight > 10000) {
-        this.$message.error('画布高度必须在 600-10000 之间')
+        this.$message.error(this.$t('error_canvas_height_range'))
         return
       }
       
@@ -665,7 +666,7 @@ export default {
       this.canvasSizePreset = 'custom'
       this.updateCanvasSize()
       this.canvasSizeModalVisible = false
-      this.$message.success('画布尺寸已更新')
+      this.$message.success(this.$t('msg_canvas_size_updated'))
     },
     
     handleCanvasSizeCancel() {
@@ -685,7 +686,7 @@ export default {
     
     startDrag(type, e) {
       if (this.isReading) {
-        this.$message.warn('阅读模式不可编辑')
+        this.$message.warn(this.$t('msg_readonly_mode'))
       } else {
         startDragToGraph(this.graph, type, e)
       }
@@ -693,7 +694,7 @@ export default {
     
     addTextNode() {
       if (this.isReading) {
-        this.$message.warn('阅读模式不可编辑')
+        this.$message.warn(this.$t('msg_readonly_mode'))
         return
       }
       
@@ -703,7 +704,7 @@ export default {
       // 改变鼠标样式，提示用户点击画布
       document.getElementById('containerChart').style.cursor = 'crosshair'
       
-      this.$message.info('请在画布上点击以放置文字节点')
+      this.$message.info(this.$t('msg_click_canvas_to_place'))
     },
     
     createTextNodeAt(x, y) {
@@ -741,14 +742,14 @@ export default {
       // 延迟选中节点
       this.$nextTick(() => {
         this.graph.select(textNode)
-        this.$message.success('文字节点已添加，点击节点可在右侧面板编辑')
+        this.$message.success(this.$t('msg_text_node_added'))
       })
     },
     
     // 背景图相关方法
     showBackgroundModal() {
       if (this.isReading) {
-        this.$message.warn('阅读模式不可编辑')
+        this.$message.warn(this.$t('msg_readonly_mode'))
         return
       }
       this.backgroundModalVisible = true
@@ -782,8 +783,13 @@ export default {
           // 检查图片尺寸是否超过画布
           if (img.naturalWidth > this.form.canvasWidth || img.naturalHeight > this.form.canvasHeight) {
             this.$warning({
-              title: '图片尺寸提示',
-              content: `图片尺寸 (${img.naturalWidth}x${img.naturalHeight}) 超过当前画布尺寸 (${this.form.canvasWidth}x${this.form.canvasHeight})。建议调整画布大小或使用较小的图片以获得最佳效果。`,
+              title: this.$t('msg_image_size_warning_title'),
+              content: this.$t('msg_image_size_warning_content', {
+                imageWidth: img.naturalWidth,
+                imageHeight: img.naturalHeight,
+                canvasWidth: this.form.canvasWidth,
+                canvasHeight: this.form.canvasHeight
+              }),
             })
           }
         }
@@ -797,7 +803,7 @@ export default {
     handleBackgroundOk() {
       this.applyBackground()
       this.backgroundModalVisible = false
-      this.$message.success('背景图已应用')
+      this.$message.success(this.$t('msg_background_applied'))
     },
     
     handleBackgroundCancel() {
@@ -915,7 +921,7 @@ export default {
         this.graph.removeCell(oldBg)
       }
       
-      this.$message.success('背景图已移除')
+      this.$message.success(this.$t('msg_background_removed'))
     },
     
     editNode() {
@@ -927,15 +933,15 @@ export default {
       if (cells && cells.length > 0) {
         this.graph.removeCells(cells)
         this.type = 'grid'
-        this.$message.success(`已删除 ${cells.length} 个元素`)
+        this.$message.success(this.$t('msg_elements_deleted', { count: cells.length }))
       } else {
-        this.$message.warn('请先选中要删除的元素')
+        this.$message.warn(this.$t('msg_select_elements_first'))
       }
     },
     
     saveData() {
       if (!this.form.name) {
-        this.$message.warn('请输入拓扑图名称')
+        this.$message.warn(this.$t('msg_enter_topology_name'))
         return
       }
       
@@ -982,20 +988,20 @@ export default {
         updateTopology(this.id, params).then((resp) => {
           let res = resp.data
           if (res.code == 200) {
-            this.$message.success(res.message || '更新成功')
+            this.$message.success(res.message || this.$t('msg_update_success'))
             this.isReading = true
           } else {
-            this.$message.error(res.message || '更新失败')
+            this.$message.error(res.message || this.$t('msg_update_failed'))
           }
         }).catch((err) => {
-          this.$message.error('更新失败')
+          this.$message.error(this.$t('msg_update_failed'))
           console.error(err)
         })
       } else {
         createTopology(params).then((resp) => {
           let res = resp.data
           if (res.code == 200) {
-            this.$message.success(res.message || '创建成功')
+            this.$message.success(res.message || this.$t('msg_create_success'))
             this.isReading = true
             // 创建成功后，获取ID并更新路由
             if (res.data && res.data.id) {
@@ -1003,10 +1009,10 @@ export default {
               this.$router.replace({ query: { id: this.id } })
             }
           } else {
-            this.$message.error(res.message || '创建失败')
+            this.$message.error(res.message || this.$t('msg_create_failed'))
           }
         }).catch((err) => {
-          this.$message.error('创建失败')
+          this.$message.error(this.$t('msg_create_failed'))
           console.error(err)
         })
       }
@@ -1100,10 +1106,10 @@ export default {
               this.graph.zoomToFit({ padding: 100, maxScale: 1 })
             })
           } else {
-            this.$message.error(res.message || '获取拓扑详情失败')
+            this.$message.error(res.message || this.$t('msg_load_topology_failed'))
           }
         }).catch((err) => {
-          this.$message.error('获取拓扑详情失败')
+          this.$message.error(this.$t('msg_load_topology_failed'))
           console.error(err)
         })
       }

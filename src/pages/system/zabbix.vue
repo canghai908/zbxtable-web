@@ -11,8 +11,8 @@
           <a-tag :color="$themeColor">{{ text }}</a-tag>
         </template>
         <template slot="enabled" slot-scope="text, record">
-          <a-tag v-if="record.enabled" :color="$themeColor">启用</a-tag>
-          <a-tag v-else color="red">禁用</a-tag>
+          <a-tag v-if="record.enabled" :color="$themeColor">{{ $t('status_enabled') }}</a-tag>
+          <a-tag v-else color="red">{{ $t('status_disabled') }}</a-tag>
         </template>
         <template slot="zabbix" slot-scope="text, record">
           <div>
@@ -27,15 +27,15 @@
           <div v-if="record.auth_methods && record.auth_methods.length > 0">
             <a-tag v-for="method in record.auth_methods" :key="method" :color="method === 'password' ? 'green' : 'purple'" style="margin-bottom: 4px;">
               <a-icon :type="method === 'password' ? 'lock' : 'key'" />
-              {{ method === 'password' ? '密码' : 'Token' }}
+              {{ method === 'password' ? $t('password') : 'Token' }}
             </a-tag>
           </div>
           <span v-else style="color: #999;">-</span>
         </template>
         <template slot="conn" slot-scope="text, record">
-          <a-tag v-if="record.enabled && record.last_test_ok" color="green">已连接</a-tag>
-          <a-tag v-else-if="record.enabled && !record.last_test_ok" color="orange">未验证</a-tag>
-          <a-tag v-else color="default">不可用</a-tag>
+          <a-tag v-if="record.enabled && record.last_test_ok" color="green">{{ $t('status_connected') }}</a-tag>
+          <a-tag v-else-if="record.enabled && !record.last_test_ok" color="orange">{{ $t('status_not_verified') }}</a-tag>
+          <a-tag v-else color="default">{{ $t('status_unavailable') }}</a-tag>
         </template>
         <template slot="notify_method" slot-scope="text, record">
           <a-tag v-if="record.notify_method === 'webhook'" color="blue">
@@ -48,31 +48,31 @@
         <template slot="install_status" slot-scope="text, record">
           <template v-if="record.notify_method === 'webhook'">
             <a-tag v-if="record.webhook_installed" color="green">
-              <a-icon type="check-circle" /> 已安装
+              <a-icon type="check-circle" /> {{ $t('status_installed') }}
             </a-tag>
             <a-tag v-else color="orange">
-              <a-icon type="exclamation-circle" /> 未安装
+              <a-icon type="exclamation-circle" /> {{ $t('status_not_installed') }}
             </a-tag>
           </template>
           <template v-else>
             <a-tag v-if="record.ms_agent_installed" color="green">
-              <a-icon type="check-circle" /> 已安装
+              <a-icon type="check-circle" /> {{ $t('status_installed') }}
             </a-tag>
             <a-tag v-else color="orange">
-              <a-icon type="exclamation-circle" /> 未安装
+              <a-icon type="exclamation-circle" /> {{ $t('status_not_installed') }}
             </a-tag>
           </template>
         </template>
         <template slot="operation" slot-scope="text, record">
           <div style="text-align: center;">
-            <a-button type="link" size="small" @click="test(record)">测试连接</a-button>
+            <a-button type="link" size="small" @click="test(record)">{{ $t('btn_test_connection') }}</a-button>
             <a-divider type="vertical" />
-            <a-button type="link" size="small" @click="toggleEnabled(record)">{{ record.enabled ? '禁用' : '启用' }}</a-button>
+            <a-button type="link" size="small" @click="toggleEnabled(record)">{{ record.enabled ? $t('btn_toggle_disable') : $t('btn_toggle_enable') }}</a-button>
             <a-divider type="vertical" />
-            <a-button type="link" size="small" @click="openEdit(record)">编辑</a-button>
+            <a-button type="link" size="small" @click="openEdit(record)">{{ $t('btn_edit') }}</a-button>
             <a-divider type="vertical" />
-            <a-popconfirm title="确定要删除这个实例吗？" okText="确定" cancelText="取消" @confirm="remove(record)">
-              <a-button type="link" size="small" style="color:#f5222d;">删除</a-button>
+            <a-popconfirm :title="$t('confirm_delete_title')" :okText="$t('confirm_delete_ok')" :cancelText="$t('confirm_delete_cancel')" @confirm="remove(record)">
+              <a-button type="link" size="small" style="color:#f5222d;">{{ $t('btn_delete') }}</a-button>
             </a-popconfirm>
           </div>
         </template>
@@ -81,30 +81,30 @@
             <div style="display: flex; align-items: center; gap: 8px;">
               <!-- 显示安装状态 -->
               <a-tag v-if="record.webhook_installed" color="green">
-                <a-icon type="check-circle" /> 已安装
+                <a-icon type="check-circle" /> {{ $t('status_installed') }}
               </a-tag>
               <a-tag v-else color="orange">
-                <a-icon type="exclamation-circle" /> 未安装
+                <a-icon type="exclamation-circle" /> {{ $t('status_not_installed') }}
               </a-tag>
               
               <!-- 未安装时显示安装按钮 -->
               <a-button v-if="!record.webhook_installed" type="link" size="small" style="color: #52c41a; padding: 0;" @click="handleInstallWebhook(record)">
-                <a-icon type="download" /> 安装
+                <a-icon type="download" /> {{ $t('btn_install') }}
               </a-button>
 
               <!-- 已安装时显示查看配置、重装、卸载按钮 -->
               <template v-if="record.webhook_installed">
                 <a-button type="link" size="small" style="padding: 0;" @click="handleGetWebhookInfo(record)">
-                  <a-icon type="info-circle" /> 查看配置
+                  <a-icon type="info-circle" /> {{ $t('btn_view_config') }}
                 </a-button>
                 <a-divider type="vertical" />
                 <a-button type="link" size="small" style="padding: 0;" @click="handleReinstallWebhook(record)">
-                  <a-icon type="reload" /> 重装
+                  <a-icon type="reload" /> {{ $t('btn_reinstall') }}
                 </a-button>
                 <a-divider type="vertical" />
-                <a-popconfirm title="确定要卸载 Webhook 配置吗？这将删除 Zabbix 中的相关配置。" okText="确定" cancelText="取消" @confirm="handleUninstallWebhook(record)">
+                <a-popconfirm :title="$t('confirm_uninstall_webhook_title')" :okText="$t('confirm_delete_ok')" :cancelText="$t('confirm_delete_cancel')" @confirm="handleUninstallWebhook(record)">
                   <a-button type="link" size="small" style="color: #ff4d4f; padding: 0;">
-                    <a-icon type="delete" /> 卸载
+                    <a-icon type="delete" /> {{ $t('btn_uninstall') }}
                   </a-button>
                 </a-popconfirm>
               </template>
@@ -116,83 +116,83 @@
     </a-card>
 
     <!-- 编辑/新增对话框 -->
-    <a-modal :title="editingId ? '编辑实例' : '新增实例'" :visible="visible" @ok="save" @cancel="visible=false" :confirmLoading="saving" :okButtonProps="{ disabled: !testOk }">
+    <a-modal :title="editingId ? $t('modal_title_edit') : $t('modal_title_add')" :visible="visible" @ok="save" @cancel="visible=false" :confirmLoading="saving" :okButtonProps="{ disabled: !testOk }">
       <a-form-model :model="form" :label-col="{span: 7}" :wrapper-col="{span: 15}">
-        <a-form-model-item label="实例标识" required>
-          <a-input v-model="form.instance" placeholder="例如：zabbix-001" :disabled="!!editingId" />
+        <a-form-model-item :label="$t('form_instance_id')" required>
+          <a-input v-model="form.instance" :placeholder="$t('form_instance_id_placeholder')" :disabled="!!editingId" />
         </a-form-model-item>
-        <a-form-model-item label="可见名称" required>
-          <a-input v-model="form.name" placeholder="例如：生产环境" />
+        <a-form-model-item :label="$t('form_visible_name')" required>
+          <a-input v-model="form.name" :placeholder="$t('form_visible_name_placeholder')" />
         </a-form-model-item>
-        <a-form-model-item label="Zabbix URL" required>
-          <a-input v-model="form.url" placeholder="http://zabbix.example.com" />
+        <a-form-model-item :label="$t('form_zabbix_url')" required>
+          <a-input v-model="form.url" :placeholder="$t('form_zabbix_url_placeholder')" />
         </a-form-model-item>
-        <a-form-model-item label="用户名">
-          <a-input v-model="form.user" placeholder="可选（Token优先）" />
+        <a-form-model-item :label="$t('form_username')">
+          <a-input v-model="form.user" :placeholder="$t('form_username_placeholder')" />
         </a-form-model-item>
-        <a-form-model-item label="密码">
-          <a-input-password v-model="form.pass" :placeholder="editingId ? '留空则保持原配置不变' : '可选（Token优先）'" />
+        <a-form-model-item :label="$t('form_password')">
+          <a-input-password v-model="form.pass" :placeholder="editingId ? $t('form_password_placeholder_edit') : $t('form_password_placeholder_add')" />
           <div v-if="editingId" style="margin-top: 4px; color: #999; font-size: 12px;">
-            <a-icon type="info-circle" /> 编辑时不显示已配置的密码，留空则保持原配置
+            <a-icon type="info-circle" /> {{ $t('form_password_hint') }}
           </div>
         </a-form-model-item>
-        <a-form-model-item label="Zabbix Token">
-          <a-input v-model="form.token" :placeholder="editingId ? '留空则保持原配置不变' : 'Zabbix API Token（可选）'" />
+        <a-form-model-item :label="$t('form_zabbix_token')">
+          <a-input v-model="form.token" :placeholder="editingId ? $t('form_zabbix_token_placeholder_edit') : $t('form_zabbix_token_placeholder_add')" />
           <div v-if="editingId" style="margin-top: 4px; color: #999; font-size: 12px;">
-            <a-icon type="info-circle" /> 编辑时不显示已配置的Token，留空则保持原配置
+            <a-icon type="info-circle" /> {{ $t('form_zabbix_token_hint') }}
           </div>
         </a-form-model-item>
-        <a-form-model-item label="告警接收方式">
+        <a-form-model-item :label="$t('form_alarm_receive_method')">
           <a-radio-group v-model="form.notify_method">
             <a-radio value="webhook">Webhook</a-radio>
           </a-radio-group>
           <div style="margin-top: 6px; color:#999; font-size:12px;">
-            通过 Zabbix Webhook 发送告警（需 Zabbix 4.4+）
+            {{ $t('form_alarm_receive_desc') }}
           </div>
         </a-form-model-item>
-        <a-form-model-item label="启用">
+        <a-form-model-item :label="$t('form_enabled')">
           <a-switch v-model="form.enabled" />
         </a-form-model-item>
         <a-form-model-item :wrapper-col="{ span: 15, offset: 7 }">
-          <a-button :loading="testing" @click="testConnection">测试连接</a-button>
+          <a-button :loading="testing" @click="testConnection">{{ $t('form_test_connection_btn') }}</a-button>
           <span v-if="testMsg" :style="{ marginLeft: '12px', color: testOk ? '#52c41a' : '#f5222d' }">
             {{ testMsg }}
           </span>
           <div style="margin-top: 6px; color: #999; font-size: 12px;">
-            需要先"测试连接"成功，才允许保存。
+            {{ $t('form_test_connection_hint') }}
           </div>
         </a-form-model-item>
       </a-form-model>
     </a-modal>
 
     <!-- 安装进度对话框 -->
-    <a-modal :title="currentInstallType === 'webhook' ? '安装 Webhook' : '安装 MS-Agent 配置'" :visible="installVisible" :footer="installCompleted ? null : []" :closable="installCompleted"
+    <a-modal :title="currentInstallType === 'webhook' ? $t('modal_title_install_webhook') : $t('modal_title_install_msagent')" :visible="installVisible" :footer="installCompleted ? null : []" :closable="installCompleted"
       :maskClosable="false" width="800px" @cancel="closeInstallModal">
       <div style="min-height: 300px;">
         <!-- 安装说明 -->
-        <a-alert v-if="!installStarted" :message="currentInstallType === 'webhook' ? '即将在 Zabbix 中安装 Webhook' : '即将在 Zabbix 中安装 MS-Agent 配置'" type="info" show-icon style="margin-bottom: 16px;">
+        <a-alert v-if="!installStarted" :message="currentInstallType === 'webhook' ? $t('install_webhook_desc') : $t('install_msagent_desc')" type="info" show-icon style="margin-bottom: 16px;">
           <template slot="description">
-            <div>此操作将在 Zabbix 中创建：</div>
+            <div>{{ $t('install_webhook_items') }}</div>
             <ul v-if="currentInstallType === 'webhook'" style="margin: 8px 0; padding-left: 20px;">
-              <li>Media Type: ZbxTable Webhook（类型：Webhook）</li>
-              <li>User Group: ZbxTable Webhook</li>
-              <li>User: zbxtable-webhook（自动生成强密码）</li>
-              <li>Action: ZbxTable Webhook（包含告警和恢复操作）</li>
-              <li>Token: 自动生成唯一 Webhook Token</li>
-              <li>Webhook URL: 自动配置回调地址</li>
+              <li>{{ $t('install_webhook_item1') }}</li>
+              <li>{{ $t('install_webhook_item2') }}</li>
+              <li>{{ $t('install_webhook_item3') }}</li>
+              <li>{{ $t('install_webhook_item4') }}</li>
+              <li>{{ $t('install_webhook_item5') }}</li>
+              <li>{{ $t('install_webhook_item6') }}</li>
             </ul>
             <ul v-else style="margin: 8px 0; padding-left: 20px;">
-              <li>Media Type: MS-Agent Media</li>
-              <li>User Group: MS-Agent Group</li>
-              <li>User: ms-agent（自动生成强密码）</li>
-              <li>Action: MS-Agent（包含告警和恢复操作）</li>
-              <li>Token: 自动生成唯一 Token</li>
+              <li>{{ $t('install_msagent_item1') }}</li>
+              <li>{{ $t('install_msagent_item2') }}</li>
+              <li>{{ $t('install_msagent_item3') }}</li>
+              <li>{{ $t('install_msagent_item4') }}</li>
+              <li>{{ $t('install_msagent_item5') }}</li>
             </ul>
             <div style="margin-top: 8px;">
               <a-button type="primary" @click="startInstall" :loading="installing">
-                <a-icon type="download" /> 开始安装
+                <a-icon type="download" /> {{ $t('btn_start_install') }}
               </a-button>
-              <a-button style="margin-left: 8px;" @click="installVisible = false">取消</a-button>
+              <a-button style="margin-left: 8px;" @click="installVisible = false">{{ $t('btn_cancel') }}</a-button>
             </div>
           </template>
         </a-alert>
@@ -200,10 +200,10 @@
         <!-- 安装进度 -->
         <div v-if="installStarted">
           <a-steps :current="currentStep" size="small" style="margin-bottom: 20px;">
-            <a-step title="连接 Zabbix" />
-            <a-step title="创建配置" />
-            <a-step title="生成 Token" />
-            <a-step title="完成" />
+            <a-step :title="$t('install_step_connect')" />
+            <a-step :title="$t('install_step_create')" />
+            <a-step :title="$t('install_step_generate')" />
+            <a-step :title="$t('install_step_complete')" />
           </a-steps>
 
           <!-- 安装日志 -->
@@ -212,36 +212,36 @@
               <span style="color: #666;">[{{ log.time }}]</span> {{ log.message }}
             </div>
             <div v-if="installing" style="color: #0ff;">
-              <a-icon type="loading" /> 正在执行...
+              <a-icon type="loading" /> {{ $t('install_log_executing') }}
             </div>
           </div>
 
           <!-- 安装结果 -->
           <div v-if="installCompleted" style="margin-top: 16px;">
-            <a-alert v-if="installSuccess" message="安装成功！" type="success" show-icon style="margin-bottom: 12px;">
+            <a-alert v-if="installSuccess" :message="$t('install_success_title')" type="success" show-icon style="margin-bottom: 12px;">
               <template slot="description">
                 <span v-if="currentInstallType === 'webhook'">
-                  Webhook 配置已在 Zabbix 中创建完成。现在可以查看 Webhook 配置信息。
+                  {{ $t('install_success_webhook_desc') }}
                 </span>
                 <span v-else>
-                  MS-Agent 配置已在 Zabbix 中创建完成。请在 Zabbix Server 上执行以下命令完成安装。
+                  {{ $t('install_success_msagent_desc') }}
                 </span>
               </template>
             </a-alert>
-            <a-alert v-else message="安装失败" type="error" show-icon style="margin-bottom: 12px;">
+            <a-alert v-else :message="$t('install_failed_title')" type="error" show-icon style="margin-bottom: 12px;">
               <template slot="description">
-                {{ installError || '安装过程中出现错误，请查看日志了解详情。' }}
+                {{ installError || $t('install_failed_desc') }}
               </template>
             </a-alert>
 
             <!-- MS-Agent 安装成功后显示 curl 命令 -->
             <div v-if="installSuccess && currentInstallType === 'msagent' && installScriptData" style="margin-bottom: 16px;">
-              <a-alert message="快速安装命令" type="info" show-icon>
+              <a-alert :message="$t('msagent_quick_install_cmd')" type="info" show-icon>
                 <template slot="description">
-                  <div style="margin-bottom: 8px;">在 Zabbix Server 上以 root 用户执行以下命令：</div>
+                  <div style="margin-bottom: 8px;">{{ $t('msagent_quick_install_cmd_desc') }}</div>
                   <div style="position: relative; background: #f5f5f5; padding: 12px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 13px;">
-                    <a-button size="small" icon="copy" style="position: absolute; right: 8px; top: 8px;" @click="copyToClipboard(installScriptData.install_command, '安装命令')">
-                      复制
+                    <a-button size="small" icon="copy" style="position: absolute; right: 8px; top: 8px;" @click="copyToClipboard(installScriptData.install_command, $t('msagent_quick_install_cmd'))">
+                      {{ $t('btn_copy') }}
                     </a-button>
                     <pre style="margin: 0; padding-top: 30px; white-space: pre-wrap; word-break: break-all;">{{ installScriptData.install_command }}</pre>
                   </div>
@@ -251,15 +251,15 @@
 
             <div style="text-align: right;">
               <a-button v-if="installSuccess && currentInstallType === 'msagent'" type="primary" @click="handleGetScriptAfterInstall">
-                <a-icon type="code" /> 查看完整脚本
+                <a-icon type="code" /> {{ $t('btn_view_full_script') }}
               </a-button>
               <a-button v-if="installSuccess && currentInstallType === 'webhook'" type="primary" @click="handleGetWebhookInfoAfterInstall">
-                <a-icon type="info-circle" /> 查看配置
+                <a-icon type="info-circle" /> {{ $t('btn_view_config') }}
               </a-button>
               <a-button v-if="!installSuccess" type="primary" @click="retryInstall">
-                <a-icon type="reload" /> 重试
+                <a-icon type="reload" /> {{ $t('btn_retry') }}
               </a-button>
-              <a-button style="margin-left: 8px;" @click="closeInstallModal">关闭</a-button>
+              <a-button style="margin-left: 8px;" @click="closeInstallModal">{{ $t('btn_close') }}</a-button>
             </div>
           </div>
         </div>
@@ -267,122 +267,122 @@
     </a-modal>
 
     <!-- Webhook 配置信息对话框 -->
-    <a-modal title="Webhook 配置信息" :visible="webhookInfoVisible" @cancel="webhookInfoVisible=false" :footer="null" width="800px">
+    <a-modal :title="$t('modal_title_webhook_info')" :visible="webhookInfoVisible" @cancel="webhookInfoVisible=false" :footer="null" width="800px">
       <div v-if="webhookInfo">
         <div :style="{ padding: '12px 16px', background: hexToRgba($themeColor, 0.1), border: `1px solid ${hexToRgba($themeColor, 0.3)}`, borderRadius: '4px', marginBottom: '16px' }">
           <div :style="{ display: 'flex', alignItems: 'center', marginBottom: '8px' }">
             <a-icon type="check-circle" :style="{ fontSize: '16px', color: $themeColor, marginRight: '8px' }" />
-            <strong :style="{ color: $themeColor }">配置说明</strong>
+            <strong :style="{ color: $themeColor }">{{ $t('webhook_config_desc').split('。')[0] }}</strong>
           </div>
           <div style="color: #666; font-size: 13px;">
-            Webhook 已在 Zabbix 中自动配置完成，无需额外操作。以下是配置详情：
+            {{ $t('webhook_config_desc') }}
           </div>
         </div>
 
         <a-descriptions bordered :column="1">
-          <a-descriptions-item label="Webhook URL">
+          <a-descriptions-item :label="$t('webhook_url')">
             <div style="display: flex; align-items: center; gap: 8px;">
               <code style="flex: 1;">{{ webhookInfo.webhook_url }}</code>
-              <a-button size="small" icon="copy" @click="copyToClipboard(webhookInfo.webhook_url, 'Webhook URL')">复制</a-button>
+              <a-button size="small" icon="copy" @click="copyToClipboard(webhookInfo.webhook_url, $t('webhook_url'))">{{ $t('btn_copy') }}</a-button>
             </div>
           </a-descriptions-item>
-          <a-descriptions-item label="实例标识">
+          <a-descriptions-item :label="$t('webhook_instance')">
             <div style="display: flex; align-items: center; gap: 8px;">
               <code style="flex: 1;">{{ webhookInfo.instance }}</code>
-              <a-button size="small" icon="copy" @click="copyToClipboard(webhookInfo.instance, '实例标识')">复制</a-button>
+              <a-button size="small" icon="copy" @click="copyToClipboard(webhookInfo.instance, $t('webhook_instance'))">{{ $t('btn_copy') }}</a-button>
             </div>
           </a-descriptions-item>
-          <a-descriptions-item label="认证 Token">
+          <a-descriptions-item :label="$t('webhook_token')">
             <div style="display: flex; align-items: center; gap: 8px;">
               <code style="flex: 1; word-break: break-all;">{{ webhookInfo.webhook_token }}</code>
-              <a-button size="small" icon="copy" @click="copyToClipboard(webhookInfo.webhook_token, 'WebhookToken')">复制</a-button>
+              <a-button size="small" icon="copy" @click="copyToClipboard(webhookInfo.webhook_token, $t('webhook_token'))">{{ $t('btn_copy') }}</a-button>
             </div>
           </a-descriptions-item>
-          <a-descriptions-item label="请求方法">
+          <a-descriptions-item :label="$t('webhook_method')">
             <a-tag color="blue">{{ webhookInfo.method }}</a-tag>
           </a-descriptions-item>
-          <a-descriptions-item label="Content-Type">
+          <a-descriptions-item :label="$t('webhook_content_type')">
             <code>{{ webhookInfo.content_type }}</code>
           </a-descriptions-item>
-          <a-descriptions-item label="请求头">
+          <a-descriptions-item :label="$t('webhook_headers')">
             <pre :style="{ background: hexToRgba($themeColor, 0.08), padding: '8px', borderRadius: '4px', margin: 0, border: `1px solid ${hexToRgba($themeColor, 0.2)}` }">{{ webhookInfo.headers }}</pre>
-            <a-button size="small" icon="copy" style="margin-top: 8px;" @click="copyToClipboard(webhookInfo.headers, '请求头')">复制</a-button>
+            <a-button size="small" icon="copy" style="margin-top: 8px;" @click="copyToClipboard(webhookInfo.headers, $t('webhook_headers'))">{{ $t('btn_copy') }}</a-button>
           </a-descriptions-item>
         </a-descriptions>
 
         <div :style="{ padding: '12px 16px', background: hexToRgba($themeColor, 0.08), border: `1px solid ${hexToRgba($themeColor, 0.25)}`, borderRadius: '4px', marginTop: '16px' }">
           <div :style="{ display: 'flex', alignItems: 'center', marginBottom: '8px' }">
             <a-icon type="info-circle" :style="{ fontSize: '16px', color: $themeColor, marginRight: '8px' }" />
-            <strong :style="{ color: $themeColor }">工作原理</strong>
+            <strong :style="{ color: $themeColor }">{{ $t('webhook_working_principle') }}</strong>
           </div>
             <div style="color: #666; font-size: 13px;">
-              <div>• Zabbix 触发告警时，会自动通过 Webhook 将告警信息发送到 ZbxTable</div>
-              <div>• Webhook 脚本已内置实例标识 和 Token，无需手动配置</div>
-              <div>• 告警数据会自动路由到对应的实例</div>
-              <div>• 相比 MS-Agent，Webhook 方式无需在服务器上安装额外服务</div>
+              <div>• {{ $t('webhook_principle_1') }}</div>
+              <div>• {{ $t('webhook_principle_2') }}</div>
+              <div>• {{ $t('webhook_principle_3') }}</div>
+              <div>• {{ $t('webhook_principle_4') }}</div>
             </div>
         </div>
 
         <div :style="{ marginTop: '16px', padding: '12px', background: hexToRgba($themeColor, 0.05), borderRadius: '4px', border: `1px solid ${hexToRgba($themeColor, 0.2)}` }">
-          <h4 :style="{ marginBottom: '8px', color: $themeColor }">验证方法</h4>
+          <h4 :style="{ marginBottom: '8px', color: $themeColor }">{{ $t('webhook_verify_title') }}</h4>
           <div style="color: #666; font-size: 13px;">
-            <div>1. 在 Zabbix 中查看 Media Type: <strong>ZbxTable</strong></div>
-            <div>2. 在 Zabbix 中查看 Action: <strong>ZbxTable Webhook</strong></div>
-            <div>3. 触发一个测试告警，验证是否能正常接收</div>
+            <div>{{ $t('webhook_verify_1') }}</div>
+            <div>{{ $t('webhook_verify_2') }}</div>
+            <div>{{ $t('webhook_verify_3') }}</div>
           </div>
         </div>
       </div>
     </a-modal>
 
     <!-- MS-Agent 安装脚本对话框 -->
-    <a-modal title="MS-Agent 安装脚本" :visible="scriptVisible" @cancel="scriptVisible=false" :footer="null" width="900px">
+    <a-modal :title="$t('modal_title_msagent_script')" :visible="scriptVisible" @cancel="scriptVisible=false" :footer="null" width="900px">
       <div v-if="scriptData">
-        <a-alert message="安装说明" description="请在 Zabbix Server 上以 root 用户执行以下脚本，完成 MS-Agent 的安装和配置。" type="info" show-icon style="margin-bottom: 16px;" />
+        <a-alert :message="$t('msagent_install_desc')" type="info" show-icon style="margin-bottom: 16px;" />
 
         <a-tabs default-active-key="1">
-          <a-tab-pane key="1" tab="完整安装脚本">
+          <a-tab-pane key="1" :tab="$t('msagent_tab_full_script')">
             <div style="position: relative;">
-              <a-button type="primary" size="small" icon="copy" style="position: absolute; right: 8px; top: 8px; z-index: 1;" @click="copyToClipboard(scriptData.install_command, '安装脚本')">
-                复制脚本
+              <a-button type="primary" size="small" icon="copy" style="position: absolute; right: 8px; top: 8px; z-index: 1;" @click="copyToClipboard(scriptData.install_command, $t('msagent_tab_full_script'))">
+                {{ $t('btn_copy') }}
               </a-button>
               <pre style="background: #f5f5f5; padding: 16px; border-radius: 4px; max-height: 400px; overflow: auto; padding-top: 40px;">{{ scriptData.install_command }}</pre>
             </div>
-            <a-alert message="执行方法" type="warning" show-icon style="margin-top: 12px;">
+            <a-alert :message="$t('msagent_execute_method')" type="warning" show-icon style="margin-top: 12px;">
               <template slot="description">
-                <div>1. 将上述脚本保存为文件（如 install_msagent.sh）</div>
-                <div>2. 赋予执行权限：<code>chmod +x install_msagent.sh</code></div>
-                <div>3. 执行脚本：<code>bash install_msagent.sh</code></div>
+                <div>1. {{ $t('msagent_execute_step1') }}</div>
+                <div>2. {{ $t('msagent_execute_step2') }}</div>
+                <div>3. {{ $t('msagent_execute_step3') }}</div>
               </template>
             </a-alert>
           </a-tab-pane>
 
-          <a-tab-pane key="2" tab="配置文件">
+          <a-tab-pane key="2" :tab="$t('msagent_tab_config')">
             <div style="position: relative;">
-              <a-button type="primary" size="small" icon="copy" style="position: absolute; right: 8px; top: 8px; z-index: 1;" @click="copyToClipboard(scriptData.config_content, '配置文件')">
-                复制配置
+              <a-button type="primary" size="small" icon="copy" style="position: absolute; right: 8px; top: 8px; z-index: 1;" @click="copyToClipboard(scriptData.config_content, $t('msagent_tab_config'))">
+                {{ $t('btn_copy') }}
               </a-button>
               <pre style="background: #f5f5f5; padding: 16px; border-radius: 4px; max-height: 400px; overflow: auto; padding-top: 40px;">{{ scriptData.config_content }}</pre>
             </div>
-            <a-alert message="配置文件路径" description="/etc/ms-agent/config.yml" type="info" show-icon style="margin-top: 12px;" />
+            <a-alert :message="$t('msagent_config_path')" description="/etc/ms-agent/config.yml" type="info" show-icon style="margin-top: 12px;" />
           </a-tab-pane>
 
-          <a-tab-pane key="3" tab="快速安装">
+          <a-tab-pane key="3" :tab="$t('msagent_tab_quick_install')">
             <div style="position: relative;">
-              <a-button type="primary" size="small" icon="copy" style="position: absolute; right: 8px; top: 8px; z-index: 1;" @click="copyToClipboard(scriptData.curl_command, 'curl 命令')">
-                复制命令
+              <a-button type="primary" size="small" icon="copy" style="position: absolute; right: 8px; top: 8px; z-index: 1;" @click="copyToClipboard(scriptData.curl_command, $t('msagent_tab_quick_install'))">
+                {{ $t('btn_copy') }}
               </a-button>
               <pre style="background: #f5f5f5; padding: 16px; border-radius: 4px; padding-top: 40px;">{{ scriptData.curl_command }}</pre>
             </div>
-            <a-alert message="注意" description="此命令仅下载并安装 MS-Agent，安装后需要手动配置 /etc/ms-agent/config.yml 文件。" type="warning" show-icon style="margin-top: 12px;" />
+            <a-alert :message="$t('btn_cancel')" :description="$t('msagent_quick_install_note')" type="warning" show-icon style="margin-top: 12px;" />
           </a-tab-pane>
         </a-tabs>
 
         <div style="margin-top: 16px; padding: 12px; background: #fafafa; border-radius: 4px;">
-          <h4 style="margin-bottom: 8px;">安装后验证</h4>
+          <h4 style="margin-bottom: 8px;">{{ $t('msagent_verify_title') }}</h4>
           <div style="color: #666; font-size: 13px;">
-            <div>• 查看服务状态：<code>systemctl status ms-agent</code></div>
-            <div>• 查看日志：<code>tail -f /var/log/ms-agent/ms-agent.log</code></div>
-            <div>• 重启服务：<code>systemctl restart ms-agent</code></div>
+            <div>• {{ $t('msagent_verify_status') }}</div>
+            <div>• {{ $t('msagent_verify_log') }}</div>
+            <div>• {{ $t('msagent_verify_restart') }}</div>
           </div>
         </div>
       </div>
@@ -449,16 +449,16 @@ export default {
       webhookInfoVisible: false,
       webhookInfo: null,
       columns: [
-        { title: 'ID', dataIndex: 'id', key: 'id', width: 60 },
-        { title: '实例标识', dataIndex: 'instance', key: 'instance', width: 120, scopedSlots: { customRender: 'instance' } },
-        { title: 'Zabbix 信息', key: 'zabbix', width: 280, scopedSlots: { customRender: 'zabbix' } },
-        { title: '版本', key: 'version', width: 100, scopedSlots: { customRender: 'version' } },
-        { title: '认证方式', key: 'auth_methods', width: 120, scopedSlots: { customRender: 'auth_methods' } },
-        { title: '连接', key: 'conn', width: 100, scopedSlots: { customRender: 'conn' } },
-        { title: '告警接收', key: 'notify_method', width: 130, scopedSlots: { customRender: 'notify_method' } },
-        { title: '启用', key: 'enabled', width: 80, scopedSlots: { customRender: 'enabled' } },
-        { title: 'Webhook', key: 'webhook', width: 350, scopedSlots: { customRender: 'webhook' }, align: 'center' },
-        { title: '操作', key: 'operation', width: 300, scopedSlots: { customRender: 'operation' }, align: 'center' }
+        { title: this.$t('col_id'), dataIndex: 'id', key: 'id', width: 60 },
+        { title: this.$t('col_instance_id'), dataIndex: 'instance', key: 'instance', width: 120, scopedSlots: { customRender: 'instance' } },
+        { title: this.$t('col_zabbix_info'), key: 'zabbix', width: 280, scopedSlots: { customRender: 'zabbix' } },
+        { title: this.$t('col_version'), key: 'version', width: 100, scopedSlots: { customRender: 'version' } },
+        { title: this.$t('col_auth_method'), key: 'auth_methods', width: 120, scopedSlots: { customRender: 'auth_methods' } },
+        { title: this.$t('col_connection'), key: 'conn', width: 100, scopedSlots: { customRender: 'conn' } },
+        { title: this.$t('col_alarm_receive'), key: 'notify_method', width: 130, scopedSlots: { customRender: 'notify_method' } },
+        { title: this.$t('col_enabled'), key: 'enabled', width: 80, scopedSlots: { customRender: 'enabled' } },
+        { title: this.$t('col_webhook'), key: 'webhook', width: 350, scopedSlots: { customRender: 'webhook' }, align: 'center' },
+        { title: this.$t('col_operation'), key: 'operation', width: 300, scopedSlots: { customRender: 'operation' }, align: 'center' }
       ]
     }
   },
@@ -517,7 +517,7 @@ export default {
     },
     async testConnection () {
       if (!this.form.url) {
-        this.$message.warning('请先填写 Zabbix URL')
+        this.$message.warning(this.$t('msg_fill_url'))
         return
       }
       this.testing = true
@@ -528,10 +528,10 @@ export default {
         const biz = (res && res.data) ? res.data : res
         if (biz && biz.code === 200) {
           this.testOk = true
-          this.testMsg = `连接成功，版本：${biz.data.version || '-'}`
+          this.testMsg = this.$t('msg_connection_success') + (biz.data.version || '-')
         } else {
           this.testOk = false
-          this.testMsg = (biz && biz.message) || '连接失败'
+          this.testMsg = (biz && biz.message) || this.$t('msg_connection_failed')
         }
       } finally {
         this.testing = false
@@ -539,11 +539,11 @@ export default {
     },
     async save () {
       if (!this.form.instance || !this.form.name || !this.form.url) {
-        this.$message.warning('请填写实例标识、名称和 Zabbix URL')
+        this.$message.warning(this.$t('msg_fill_required'))
         return
       }
       if (!this.testOk) {
-        this.$message.warning('请先测试连接成功')
+        this.$message.warning(this.$t('msg_test_first'))
         return
       }
       this.saving = true
@@ -556,11 +556,11 @@ export default {
         }
         const biz = (res && res.data) ? res.data : res
         if (biz && biz.code === 200) {
-          this.$message.success('保存成功')
+          this.$message.success(this.$t('msg_save_success'))
           this.visible = false
           await this.load()
         } else {
-          this.$message.error((biz && biz.message) || '保存失败')
+          this.$message.error((biz && biz.message) || this.$t('msg_save_failed'))
         }
       } finally {
         this.saving = false
@@ -570,10 +570,10 @@ export default {
       const res = await testZabbixInstance(record.id)
       const biz = (res && res.data) ? res.data : res
       if (biz && biz.code === 200) {
-        this.$message.success(`连接成功，版本：${biz.data.version || '-'}`)
+        this.$message.success(this.$t('msg_connection_success') + (biz.data.version || '-'))
         await this.load()
       } else {
-        this.$message.error((biz && biz.message) || '连接失败')
+        this.$message.error((biz && biz.message) || this.$t('msg_connection_failed'))
         await this.load()
       }
     },
@@ -582,20 +582,20 @@ export default {
       const res = await setZabbixInstanceEnabled(record.id, target)
       const biz = (res && res.data) ? res.data : res
       if (biz && biz.code === 200) {
-        this.$message.success(target ? '已启用' : '已禁用')
+        this.$message.success(target ? this.$t('msg_enabled') : this.$t('msg_disabled'))
         await this.load()
       } else {
-        this.$message.error((biz && biz.message) || '操作失败')
+        this.$message.error((biz && biz.message) || this.$t('msg_operation_failed'))
       }
     },
     async remove (record) {
       const res = await deleteZabbixInstance(record.id)
       const biz = (res && res.data) ? res.data : res
       if (biz && biz.code === 200) {
-        this.$message.success('已删除')
+        this.$message.success(this.$t('msg_deleted'))
         await this.load()
       } else {
-        this.$message.error((biz && biz.message) || '删除失败')
+        this.$message.error((biz && biz.message) || this.$t('msg_delete_failed'))
       }
     },
     // 打开 MS-Agent 安装对话框
@@ -624,16 +624,16 @@ export default {
           
           if (!webhookUrlConfig || !webhookUrlConfig.value || webhookUrlConfig.value.trim() === '') {
             this.$warning({
-              title: '配置缺失',
-              content: '请先在"系统管理 - 参数配置 - 系统配置"中配置 Webhook 回调地址，否则无法安装 Webhook。',
-              okText: '知道了'
+              title: this.$t('msg_webhook_config_missing'),
+              content: this.$t('msg_webhook_url_not_configured'),
+              okText: this.$t('msg_know')
             })
             return
           }
         }
       } catch (error) {
         console.error('检查 webhook_url 配置失败:', error)
-        this.$message.error('检查配置失败，请稍后重试')
+        this.$message.error(this.$t('msg_check_config_failed'))
         return
       }
       
@@ -662,28 +662,28 @@ export default {
       try {
         if (this.currentInstallType === 'webhook') {
           // Webhook 安装流程
-          this.addLog('info', '开始安装 Webhook...')
-          this.addLog('info', `实例: ${this.currentRecord.instance}`)
+          this.addLog('info', this.$t('install_webhook_desc') + '...')
+          this.addLog('info', `${this.$t('col_instance_id')}: ${this.currentRecord.instance}`)
           this.addLog('info', `Zabbix: ${this.currentRecord.name} (${this.currentRecord.url})`)
           
           await this.sleep(500)
           this.currentStep = 0
-          this.addLog('info', '[步骤 1/3] 连接 Zabbix API...')
+          this.addLog('info', `[${this.$t('install_step_connect')} 1/3] ${this.$t('install_step_connect')} API...`)
           await this.sleep(500)
-          this.addLog('success', '✓ Zabbix API 连接成功')
+          this.addLog('success', `✓ Zabbix API ${this.$t('status_connected')}`)
           
           this.currentStep = 1
-          this.addLog('info', '[步骤 2/3] 创建 Webhook 配置...')
+          this.addLog('info', `[${this.$t('install_step_create')} 2/3] ${this.$t('install_step_create')}...`)
           await this.sleep(300)
-          this.addLog('info', '  - 创建 Media Type: ZbxTable')
+          this.addLog('info', '  - ' + this.$t('install_webhook_item1').split('（')[0])
           await this.sleep(300)
-          this.addLog('info', '  - 创建 User Group: ZbxTable Webhook')
+          this.addLog('info', '  - ' + this.$t('install_webhook_item2'))
           await this.sleep(300)
-          this.addLog('info', '  - 创建 User: zbxtable-webhook')
+          this.addLog('info', '  - ' + this.$t('install_webhook_item3').split('（')[0])
           await this.sleep(300)
-          this.addLog('info', '  - 配置 Webhook 脚本')
+          this.addLog('info', '  - ' + this.$t('install_webhook_item4').split('（')[0])
           await this.sleep(300)
-          this.addLog('info', '  - 创建 Action: ZbxTable Webhook')
+          this.addLog('info', '  - ' + this.$t('install_webhook_item4').split('（')[0])
           
           // 调用后端 API
           const res = await installWebhook(this.currentRecord.id)
@@ -691,45 +691,45 @@ export default {
           
           if (biz && biz.code === 200) {
             await this.sleep(500)
-            this.addLog('success', '✓ Webhook 配置创建成功')
+            this.addLog('success', '✓ ' + this.$t('install_step_create') + this.$t('install_success_title'))
             
             this.currentStep = 2
-            this.addLog('info', '[步骤 3/3] 生成认证 X-Token...')
+            this.addLog('info', `[${this.$t('install_step_generate')} 3/3] ${this.$t('install_step_generate')}...`)
             await this.sleep(500)
-            this.addLog('success', '✓ X-Token 生成成功')
+            this.addLog('success', '✓ Token ' + this.$t('install_step_generate') + this.$t('install_success_title'))
               
-            this.addLog('success', '✓ Webhook 配置安装完成！')
-            this.addLog('info', 'Webhook 已自动配置，无需额外操作')
+            this.addLog('success', '✓ Webhook ' + this.$t('install_success_title'))
+            this.addLog('info', this.$t('webhook_config_desc').split('。')[0])
             
             this.installSuccess = true
             
             // 刷新列表以更新状态
             await this.load()
           } else {
-            throw new Error((biz && biz.message) || '安装失败')
+            throw new Error((biz && biz.message) || this.$t('install_failed_title'))
           }
         } else {
           // MS-Agent 安装流程
-          this.addLog('info', '开始安装 MS-Agent 配置...')
-          this.addLog('info', `实例: ${this.currentRecord.instance}`)
+          this.addLog('info', this.$t('install_msagent_desc') + '...')
+          this.addLog('info', `${this.$t('col_instance_id')}: ${this.currentRecord.instance}`)
           this.addLog('info', `Zabbix: ${this.currentRecord.name} (${this.currentRecord.url})`)
           
           await this.sleep(500)
           this.currentStep = 0
-          this.addLog('info', '[步骤 1/3] 连接 Zabbix API...')
+          this.addLog('info', `[${this.$t('install_step_connect')} 1/3] ${this.$t('install_step_connect')} API...`)
           await this.sleep(500)
-          this.addLog('success', '✓ Zabbix API 连接成功')
+          this.addLog('success', `✓ Zabbix API ${this.$t('status_connected')}`)
           
           this.currentStep = 1
-          this.addLog('info', '[步骤 2/3] 创建 Zabbix 配置...')
+          this.addLog('info', `[${this.$t('install_step_create')} 2/3] ${this.$t('install_step_create')} Zabbix...`)
           await this.sleep(300)
-          this.addLog('info', '  - 创建 Media Type: MS-Agent')
+          this.addLog('info', '  - ' + this.$t('install_msagent_item1'))
           await this.sleep(300)
-          this.addLog('info', '  - 创建 User Group: MS-Agent')
+          this.addLog('info', '  - ' + this.$t('install_msagent_item2'))
           await this.sleep(300)
-          this.addLog('info', '  - 创建 User: ms-agent')
+          this.addLog('info', '  - ' + this.$t('install_msagent_item3').split('（')[0])
           await this.sleep(300)
-          this.addLog('info', '  - 创建 Action: MS-Agent')
+          this.addLog('info', '  - ' + this.$t('install_msagent_item4').split('（')[0])
           
           // 调用后端 API
           const res = await installMSAgent(this.currentRecord.id)
@@ -737,15 +737,15 @@ export default {
           
           if (biz && biz.code === 200) {
             await this.sleep(500)
-            this.addLog('success', '✓ Zabbix 配置创建成功')
+            this.addLog('success', '✓ Zabbix ' + this.$t('install_step_create') + this.$t('install_success_title'))
             
             this.currentStep = 2
-            this.addLog('info', '[步骤 3/3] 生成认证 Token...')
+            this.addLog('info', `[${this.$t('install_step_generate')} 3/3] ${this.$t('install_step_generate')}...`)
             await this.sleep(500)
-            this.addLog('success', '✓ Token 生成成功')
+            this.addLog('success', '✓ Token ' + this.$t('install_step_generate') + this.$t('install_success_title'))
             
-            this.addLog('success', '✓ MS-Agent 配置安装完成！')
-            this.addLog('info', '正在获取安装脚本...')
+            this.addLog('success', '✓ MS-Agent ' + this.$t('install_success_title'))
+            this.addLog('info', this.$t('btn_view_full_script') + '...')
             
             this.installSuccess = true
             
@@ -758,18 +758,18 @@ export default {
               const scriptBiz = (scriptRes && scriptRes.data) ? scriptRes.data : scriptRes
               if (scriptBiz && scriptBiz.code === 200) {
                 this.installScriptData = scriptBiz.data
-                this.addLog('success', '✓ 安装脚本已生成')
-                this.addLog('info', '请复制下方命令在 Zabbix Server 上执行')
+                this.addLog('success', '✓ ' + this.$t('msagent_tab_full_script') + this.$t('install_step_generate') + this.$t('install_success_title'))
+                this.addLog('info', this.$t('msagent_quick_install_cmd_desc'))
               }
             } catch (err) {
-              this.addLog('warning', '⚠ 获取安装脚本失败，请稍后手动获取')
+              this.addLog('warning', '⚠ ' + this.$t('msg_operation_failed'))
             }
           } else {
-            throw new Error((biz && biz.message) || '安装失败')
+            throw new Error((biz && biz.message) || this.$t('install_failed_title'))
           }
         }
       } catch (error) {
-        this.addLog('error', '✗ 安装失败: ' + (error.message || error))
+        this.addLog('error', '✗ ' + this.$t('install_failed_title') + ': ' + (error.message || error))
         this.installSuccess = false
         this.installError = error.message || error
       } finally {
@@ -811,10 +811,10 @@ export default {
     // 重新安装 Webhook
     handleReinstallWebhook (record) {
       this.$confirm({
-        title: '重新安装 Webhook',
-        content: '确定要重新安装吗？这将重新创建 Zabbix 中的配置并生成新的 Token。',
-        okText: '确定',
-        cancelText: '取消',
+        title: this.$t('confirm_reinstall_webhook_title'),
+        content: this.$t('confirm_reinstall_webhook_content'),
+        okText: this.$t('confirm_delete_ok'),
+        cancelText: this.$t('confirm_delete_cancel'),
         onOk: () => {
           this.handleInstallWebhook(record)
         }
@@ -851,7 +851,7 @@ export default {
       const updatedRecord = this.list.find(r => r.id === record.id)
       
       if (!updatedRecord || !updatedRecord.webhook_installed) {
-        this.$message.warning('请先安装 Webhook 配置')
+        this.$message.warning(this.$t('msg_install_first_webhook'))
         return
       }
       
@@ -862,10 +862,10 @@ export default {
           this.webhookInfo = biz.data
           this.webhookInfoVisible = true
         } else {
-          this.$message.error((biz && biz.message) || '获取配置失败')
+          this.$message.error((biz && biz.message) || this.$t('msg_operation_failed'))
         }
       } catch (error) {
-        this.$message.error('获取配置失败：' + (error.message || error))
+        this.$message.error(this.$t('msg_operation_failed') + '：' + (error.message || error))
       }
     },
     // 卸载 MS-Agent
@@ -925,9 +925,9 @@ export default {
       textarea.select()
       try {
         document.execCommand('copy')
-        this.$message.success(`${name}已复制到剪贴板`)
+        this.$message.success(name + this.$t('msg_copy_success'))
       } catch (err) {
-        this.$message.error('复制失败，请手动复制')
+        this.$message.error(this.$t('msg_copy_failed'))
       }
       document.body.removeChild(textarea)
     }

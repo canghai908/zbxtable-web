@@ -64,7 +64,7 @@
     </a-row>
     <a-row style="margin: 20px -12px">
       <a-col style="padding: 0 12px" :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
-        <a-card title="Linux操作系统 TOP5" :headStyle="$cardHeadStyle" size="small">
+        <a-card title="Linux TOP5" :headStyle="$cardHeadStyle" size="small">
           <div class="home_line">
             <div style="flex: 0 0 50%" v-if="linC && linC.length">
               <h3>CPU使用率</h3>
