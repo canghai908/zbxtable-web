@@ -104,20 +104,37 @@
             </a-form-model>
           </a-tab-pane>
 
-          <!-- Ollama AI 配置 -->
-          <a-tab-pane key="ollama" :tab="$t('ollamaTab')">
-            <a-form-model ref="ollamaForm" :model="ollamaForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
-              <a-form-model-item v-for="item in ollamaConfigs" :key="item.id" :label="item.name">
-                <a-select v-if="isBooleanConfig(item.key)" v-model="ollamaForm[item.key]" :placeholder="item.comment" style="width: 100%">
-                  <a-select-option v-for="opt in getBooleanOptions(item.key)" :key="opt.value" :value="opt.value">
-                    {{ opt.label }}
-                  </a-select-option>
+          <!-- AI 配置 -->
+          <a-tab-pane key="ai" :tab="$t('aiTab')">
+            <a-form-model ref="aiForm" :model="aiForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
+              <!-- AI 类型选择 -->
+              <a-form-model-item :label="getConfigName('ai_type')">
+                <a-select v-model="aiForm.ai_type" :placeholder="getConfigComment('ai_type')" style="width: 100%" @change="onAiTypeChange">
+                  <a-select-option value="ollama">Ollama</a-select-option>
+                  <a-select-option value="deepseek">Deepseek</a-select-option>
                 </a-select>
-                <a-input v-else v-model="ollamaForm[item.key]" :placeholder="item.comment" />
-                <div class="config-hint">{{ item.comment }}</div>
+                <div class="config-hint">{{ getConfigComment('ai_type') }}</div>
               </a-form-model-item>
+
+              <!-- Ollama 配置项 -->
+              <template v-if="aiForm.ai_type === 'ollama'">
+                <a-form-model-item v-for="item in ollamaConfigs" :key="item.id" :label="item.name">
+                  <a-input v-model="aiForm[item.key]" :placeholder="item.comment" />
+                  <div class="config-hint">{{ item.comment }}</div>
+                </a-form-model-item>
+              </template>
+
+              <!-- Deepseek 配置项 -->
+              <template v-if="aiForm.ai_type === 'deepseek'">
+                <a-form-model-item v-for="item in deepseekConfigs" :key="item.id" :label="item.name">
+                  <a-input-password v-if="item.key === 'deepseek_api_key'" v-model="aiForm[item.key]" :placeholder="item.comment" />
+                  <a-input v-else v-model="aiForm[item.key]" :placeholder="item.comment" />
+                  <div class="config-hint">{{ item.comment }}</div>
+                </a-form-model-item>
+              </template>
+
               <a-form-model-item :wrapper-col="{ span: 14, offset: 6 }">
-                <a-button type="primary" @click="saveCategory('ollama')" :loading="saveLoading">{{$t('save')}}</a-button>
+                <a-button type="primary" @click="saveCategory('ai')" :loading="saveLoading">{{$t('save')}}</a-button>
               </a-form-model-item>
             </a-form-model>
           </a-tab-pane>
@@ -195,7 +212,7 @@ export default {
       systemForm: {},
       emailForm: {},
       wechatForm: {},
-      ollamaForm: {},
+      aiForm: {},
       securityForm: {},
       saveLoading: false,
       logoUploading: false,
@@ -232,9 +249,19 @@ export default {
         item.key && item.key.startsWith('wechat_')
       )
     },
+    aiConfigs() {
+      return this.list.filter(item => 
+        item.key && (item.key.startsWith('ollama_') || item.key.startsWith('deepseek_') || item.key === 'ai_type')
+      )
+    },
     ollamaConfigs() {
       return this.list.filter(item => 
         item.key && item.key.startsWith('ollama_')
+      )
+    },
+    deepseekConfigs() {
+      return this.list.filter(item => 
+        item.key && item.key.startsWith('deepseek_')
       )
     },
     securityConfigs() {
@@ -327,9 +354,13 @@ export default {
       this.wechatConfigs.forEach(item => {
         this.$set(this.wechatForm, item.key, item.value)
       })
-      this.ollamaConfigs.forEach(item => {
-        this.$set(this.ollamaForm, item.key, item.value)
+      this.aiConfigs.forEach(item => {
+        this.$set(this.aiForm, item.key, item.value)
       })
+      // 如果没有设置 ai_type，默认为 ollama
+      if (!this.aiForm.ai_type) {
+        this.$set(this.aiForm, 'ai_type', 'ollama')
+      }
       this.securityConfigs.forEach(item => {
         this.$set(this.securityForm, item.key, item.value)
       })
@@ -353,9 +384,9 @@ export default {
             configs = this.wechatConfigs
             form = this.wechatForm
             break
-          case 'ollama':
-            configs = this.ollamaConfigs
-            form = this.ollamaForm
+          case 'ai':
+            configs = this.aiConfigs
+            form = this.aiForm
             break
         }
         
@@ -474,6 +505,21 @@ export default {
     // 预览外观效果
     previewAppearance() {
       this.$message.info(this.$t('previewHint'))
+    },
+    // AI 类型切换
+    onAiTypeChange(value) {
+      // 当切换 AI 类型时，可以在这里做一些额外的处理
+      console.log('AI type changed to:', value)
+    },
+    // 获取配置项的名称（用于动态获取翻译）
+    getConfigName(key) {
+      const item = this.list.find(item => item.key === key)
+      return item ? item.name : key
+    },
+    // 获取配置项的注释（用于动态获取翻译）
+    getConfigComment(key) {
+      const item = this.list.find(item => item.key === key)
+      return item ? item.comment : ''
     },
     // 获取当前 Web 访问地址
     getCurrentWebUrl() {

@@ -70,6 +70,10 @@ module.exports = {
         name: '企业微信 Secret',
         comment: '企业微信应用的 Secret'
       },
+      ai_type: {
+        name: 'AI 类型',
+        comment: '选择使用的 AI 服务类型：ollama 或 deepseek'
+      },
       ollama_host: {
         name: 'Ollama Host',
         comment: 'Ollama 服务地址，如 http://127.0.0.1:11434'
@@ -77,6 +81,18 @@ module.exports = {
       ollama_model: {
         name: 'Ollama Model',
         comment: '默认使用的大模型名称'
+      },
+      deepseek_api_key: {
+        name: 'Deepseek API Key',
+        comment: 'Deepseek API 密钥'
+      },
+      deepseek_model: {
+        name: 'Deepseek Model',
+        comment: 'Deepseek 模型名称，如 deepseek-chat'
+      },
+      deepseek_base_url: {
+        name: 'Deepseek Base URL',
+        comment: 'Deepseek API 地址，默认为 https://api.deepseek.com'
       }
     },
     HK: {
@@ -148,6 +164,10 @@ module.exports = {
         name: '企業微信 Secret',
         comment: '企業微信應用的 Secret'
       },
+      ai_type: {
+        name: 'AI 類型',
+        comment: '選擇使用的 AI 服務類型：ollama 或 deepseek'
+      },
       ollama_host: {
         name: 'Ollama Host',
         comment: 'Ollama 服務地址，如 http://127.0.0.1:11434'
@@ -155,6 +175,18 @@ module.exports = {
       ollama_model: {
         name: 'Ollama Model',
         comment: '默認使用的大模型名稱'
+      },
+      deepseek_api_key: {
+        name: 'Deepseek API Key',
+        comment: 'Deepseek API 密鑰'
+      },
+      deepseek_model: {
+        name: 'Deepseek Model',
+        comment: 'Deepseek 模型名稱，如 deepseek-chat'
+      },
+      deepseek_base_url: {
+        name: 'Deepseek Base URL',
+        comment: 'Deepseek API 地址，默認為 https://api.deepseek.com'
       }
     },
     US: {
@@ -226,6 +258,10 @@ module.exports = {
         name: 'WeChat Work Secret',
         comment: 'Secret of WeChat Work application'
       },
+      ai_type: {
+        name: 'AI Type',
+        comment: 'Select AI service type: ollama or deepseek'
+      },
       ollama_host: {
         name: 'Ollama Host',
         comment: 'Ollama service address, e.g. http://127.0.0.1:11434'
@@ -233,6 +269,18 @@ module.exports = {
       ollama_model: {
         name: 'Ollama Model',
         comment: 'Default AI model name to use'
+      },
+      deepseek_api_key: {
+        name: 'Deepseek API Key',
+        comment: 'Deepseek API key'
+      },
+      deepseek_model: {
+        name: 'Deepseek Model',
+        comment: 'Deepseek model name, e.g. deepseek-chat'
+      },
+      deepseek_base_url: {
+        name: 'Deepseek Base URL',
+        comment: 'Deepseek API base URL, default is https://api.deepseek.com'
       }
     }
   },
@@ -242,7 +290,7 @@ module.exports = {
       systemTab: '系统配置',
       emailTab: '邮件配置',
       wechatTab: '企业微信配置',
-      ollamaTab: 'Ollama AI 配置',
+      aiTab: 'AI 配置',
       securityTab: '安全配置',
       
       // 外观配置
@@ -307,7 +355,7 @@ module.exports = {
       systemTab: '系統配置',
       emailTab: '郵件配置',
       wechatTab: '企業微信配置',
-      ollamaTab: 'Ollama AI 配置',
+      aiTab: 'AI 配置',
       securityTab: '安全配置',
       
       // 外觀配置
@@ -372,7 +420,7 @@ module.exports = {
       systemTab: 'System',
       emailTab: 'Email',
       wechatTab: 'WeChat',
-      ollamaTab: 'AI',
+      aiTab: 'AI',
       securityTab: 'Security',
       
       // Appearance Config
