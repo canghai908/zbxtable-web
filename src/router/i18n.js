@@ -10,6 +10,7 @@ module.exports = {
       },
       alarm: {
         name: '告警管理',
+        list: {name: '告警查询'},
         query: {name: '告警查询'},
         alarmList: {name: '告警查询'},
         rule: {name: '分发规则'},
@@ -37,7 +38,9 @@ module.exports = {
         srvList: {name: '物理服务器'},
         detail: {name: '详细信息'},
         srvDetail: {name: '详细信息'},
+        fiber: {name: '光纤交换机'},
         sanList: {name: '光纤交换机'},
+        storage: {name: '存储设备'},
         stoList: {name: '存储设备'}
       },
       topology: {
@@ -64,6 +67,7 @@ module.exports = {
         config: {name: '参数配置'},
         sysConfig: {name: '参数配置'},
         version: {name: '版本信息'},
+        mapping: {name: '指标映射'},
         metricMapping: {name: '指标映射'}
       },
       form: {
@@ -109,13 +113,14 @@ module.exports = {
     US: {
       home: {name: 'Home'},
       dashboard: {
-        name: 'System Overview',
+        name: 'Dashboard',
         workplace: {name: 'Dashboard'},
         inventory: {name: 'Inventory'},
         overview: {name: 'Overview'}
       },
       alarm: {
         name: 'Alarm',
+        list: {name: 'Alarm Query'},
         query: {name: 'Alarm Query'},
         alarmList: {name: 'Alarm Query'},
         rule: {name: 'Distribution Rules'},
@@ -143,7 +148,9 @@ module.exports = {
         srvList: {name: 'Physical Servers'},
         detail: {name: 'Detailed Info'},
         srvDetail: {name: 'Detailed Info'},
+        fiber: {name: 'Fiber Channel Switch'},
         sanList: {name: 'Fiber Channel Switch'},
+        storage: {name: 'Storage Devices'},
         stoList: {name: 'Storage Devices'}
       },
       topology: {
@@ -169,7 +176,8 @@ module.exports = {
         systemChpwd: {name: 'Change Password'},
         config: {name: 'Parameter'},
         sysConfig: {name: 'Parameter'},
-        version: {name: 'Version Info'},
+        version: {name: 'Version'},
+        mapping: {name: 'Metric Mapping'},
         metricMapping: {name: 'Metric Mapping'}
       },
       form: {
@@ -222,6 +230,7 @@ module.exports = {
       },
       alarm: {
         name: '告警管理',
+        list: {name: '告警查詢'},
         query: {name: '告警查詢'},
         alarmList: {name: '告警查詢'},
         rule: {name: '分發規則'},
@@ -249,7 +258,9 @@ module.exports = {
         srvList: {name: '物理服務器'},
         detail: {name: '詳細信息'},
         srvDetail: {name: '詳細信息'},
+        fiber: {name: '光纖交換機'},
         sanList: {name: '光纖交換機'},
+        storage: {name: '存儲設備'},
         stoList: {name: '存儲設備'}
       },
       topology: {
@@ -276,6 +287,7 @@ module.exports = {
         config: {name: '參數配置'},
         sysConfig: {name: '參數配置'},
         version: {name: '版本信息'},
+        mapping: {name: '指標映射'},
         metricMapping: {name: '指標映射'}
       },
       form: {
