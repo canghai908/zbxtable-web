@@ -78,12 +78,24 @@ module.exports = {
       
       // AI分析模态框
       modal_title_ai_analysis: 'AI助手分析结果',
+      drawer_title_ai_chat: 'AI 助手',
       text_analyzing: '分析中...',
       text_abort_analysis: '中止分析',
       text_close: '关闭',
       text_confirm: '确定',
       confirm_abort_title: '确认中止',
       confirm_abort_content: '是否确认中止当前分析？',
+      
+      // AI 聊天
+      chat_input_placeholder: '输入消息...',
+      chat_send: '发送',
+      chat_stop: '停止',
+      chat_clear: '清空对话',
+      chat_user: '我',
+      chat_assistant: 'AI 助手',
+      chat_alarm_context: '告警上下文',
+      confirm_clear_chat_title: '确认清空',
+      confirm_clear_chat_content: '是否确认清空所有对话记录？',
       
       // 消息提示
       msg_password_not_configured: '密码没有配置，无法查看图形',
@@ -384,12 +396,24 @@ module.exports = {
       
       // AI analysis modal
       modal_title_ai_analysis: 'AI Assistant Analysis Result',
+      drawer_title_ai_chat: 'AI Assistant',
       text_analyzing: 'Analyzing...',
       text_abort_analysis: 'Abort Analysis',
       text_close: 'Close',
       text_confirm: 'Confirm',
       confirm_abort_title: 'Confirm Abort',
       confirm_abort_content: 'Are you sure to abort the current analysis?',
+      
+      // AI Chat
+      chat_input_placeholder: 'Type a message...',
+      chat_send: 'Send',
+      chat_stop: 'Stop',
+      chat_clear: 'Clear Chat',
+      chat_user: 'You',
+      chat_assistant: 'AI Assistant',
+      chat_alarm_context: 'Alarm Context',
+      confirm_clear_chat_title: 'Confirm Clear',
+      confirm_clear_chat_content: 'Are you sure to clear all chat history?',
       
       // Messages
       msg_password_not_configured: 'Password Not Configured, Cannot View Graph',
@@ -690,12 +714,24 @@ module.exports = {
       
       // AI分析模態框
       modal_title_ai_analysis: 'AI助手分析結果',
+      drawer_title_ai_chat: 'AI 助手',
       text_analyzing: '分析中...',
       text_abort_analysis: '中止分析',
       text_close: '關閉',
       text_confirm: '確定',
       confirm_abort_title: '確認中止',
       confirm_abort_content: '是否確認中止當前分析？',
+      
+      // AI 聊天
+      chat_input_placeholder: '輸入消息...',
+      chat_send: '發送',
+      chat_stop: '停止',
+      chat_clear: '清空對話',
+      chat_user: '我',
+      chat_assistant: 'AI 助手',
+      chat_alarm_context: '告警上下文',
+      confirm_clear_chat_title: '確認清空',
+      confirm_clear_chat_content: '是否確認清空所有對話記錄？',
       
       // 消息提示
       msg_password_not_configured: '密碼沒有配置，無法查看圖形',

@@ -86,21 +86,85 @@
       </a-table>
     </div>
 
-    <!-- 修改分析结果弹窗 -->
-    <a-modal :title="$t('modal_title_ai_analysis')" :visible="deepseekModalVisible" :maskClosable="false" :keyboard="false" @ok="handleModalOk" @cancel="handleModalCancel" @close="handleModalClose" width="800px">
-      <div v-if="analyzing" style="text-align: center;">
-        <a-spin :tip="$t('text_analyzing')" />
+    <!-- AI 助手 Drawer -->
+    <a-drawer
+      :title="$t('drawer_title_ai_chat')"
+      placement="right"
+      :closable="true"
+      :visible="aiDrawerVisible"
+      :width="720"
+      @close="handleDrawerClose"
+      :bodyStyle="{ padding: 0, height: 'calc(100vh - 55px)', overflow: 'hidden' }">
+      
+      <div class="ai-chat-container">
+        <!-- 告警上下文信息 -->
+        <div v-if="currentAlarmContext" class="alarm-context">
+          <a-alert :message="$t('chat_alarm_context')" type="info" show-icon closable @close="currentAlarmContext = null">
+            <template slot="description">
+              <div class="context-content">
+                <div><strong>{{ $t('col_device_name') }}:</strong> {{ currentAlarmContext.hostname }}</div>
+                <div><strong>{{ $t('col_ip') }}:</strong> {{ currentAlarmContext.host_ip }}</div>
+                <div><strong>{{ $t('col_alarm_description') }}:</strong> {{ currentAlarmContext.message }}</div>
+              </div>
+            </template>
+          </a-alert>
+        </div>
+
+        <!-- 聊天消息区域 -->
+        <div class="chat-messages" ref="chatMessages">
+          <div v-for="(msg, index) in chatMessages" :key="index" :class="['chat-message', msg.role]">
+            <div class="message-header">
+              <a-avatar :size="32" :style="{ backgroundColor: msg.role === 'user' ? '#1890ff' : '#52c41a' }">
+                <a-icon :type="msg.role === 'user' ? 'user' : 'robot'" />
+              </a-avatar>
+              <span class="message-sender">{{ msg.role === 'user' ? $t('chat_user') : $t('chat_assistant') }}</span>
+              <span class="message-time">{{ msg.time }}</span>
+            </div>
+            <div class="message-content">
+              <div v-if="msg.role === 'assistant'" class="markdown-body" v-html="msg.formattedContent"></div>
+              <div v-else class="user-message">{{ msg.content }}</div>
+            </div>
+          </div>
+          
+          <!-- 正在输入指示器 -->
+          <div v-if="isTyping" class="chat-message assistant typing-indicator">
+            <div class="message-header">
+              <a-avatar :size="32" :style="{ backgroundColor: '#52c41a' }">
+                <a-icon type="robot" />
+              </a-avatar>
+              <span class="message-sender">{{ $t('chat_assistant') }}</span>
+            </div>
+            <div class="message-content">
+              <div class="typing-dots">
+                <span></span><span></span><span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 输入区域 -->
+        <div class="chat-input-area">
+          <div class="input-actions">
+            <a-button size="small" @click="clearChat" icon="delete">{{ $t('chat_clear') }}</a-button>
+          </div>
+          <div class="input-wrapper">
+            <a-textarea
+              v-model="chatInput"
+              :placeholder="$t('chat_input_placeholder')"
+              :auto-size="{ minRows: 1, maxRows: 4 }"
+              @pressEnter="handleSendMessage"
+              :disabled="isTyping"
+            />
+            <a-button v-if="isTyping" type="danger" @click="stopGeneration">
+              <a-icon type="stop" /> {{ $t('chat_stop') }}
+            </a-button>
+            <a-button v-else type="primary" @click="handleSendMessage" :disabled="!chatInput.trim()">
+              <a-icon type="send" /> {{ $t('chat_send') }}
+            </a-button>
+          </div>
+        </div>
       </div>
-      <div v-else class="markdown-body" v-html="formattedResult"></div>
-      <template slot="footer">
-        <a-button key="cancel" @click="handleModalCancel">
-          {{ analyzing ? $t('text_abort_analysis') : $t('text_close') }}
-        </a-button>
-        <a-button key="ok" type="primary" @click="handleModalOk" :disabled="analyzing">
-          {{ $t('text_confirm') }}
-        </a-button>
-      </template>
-    </a-modal>
+    </a-drawer>
   </page-layout>
 </template>
 
@@ -212,10 +276,11 @@ export default {
       timeValue: null,
       beginTime: "",
       endTime: "",
-      deepseekModalVisible: false,
-      analyzing: false,
-      analysisResult: '',
-      formattedResult: '',
+      aiDrawerVisible: false,
+      isTyping: false,
+      chatInput: '',
+      chatMessages: [],
+      currentAlarmContext: null,
       abortController: null,
       currentRequestId: null,
       hostIp: "",
@@ -397,13 +462,68 @@ export default {
         }
       })
     },
-    // 发送到Deepseek分析
+    // 打开 AI 助手分析
     analyzeWithDeepseek(record) {
-      // 重置所有状态
-      this.deepseekModalVisible = true;
-      this.analyzing = true;
-      this.analysisResult = '';
-      this.formattedResult = '';
+      // 打开 Drawer
+      this.aiDrawerVisible = true;
+      
+      // 设置告警上下文
+      this.currentAlarmContext = {
+        hostname: record.hostname,
+        host_ip: record.host_ip,
+        message: record.message,
+        detail: record.detail,
+        level: record.level,
+        status: record.status
+      };
+      
+      // 如果是首次打开或者聊天记录为空，自动发送初始分析请求
+      if (this.chatMessages.length === 0) {
+        this.chatInput = this.$t('msg_analysis_prompt');
+        this.$nextTick(() => {
+          this.handleSendMessage();
+        });
+      }
+    },
+    
+    // 发送消息
+    handleSendMessage(e) {
+      // 如果是按 Enter 键且没有按 Shift，则发送消息
+      if (e && e.shiftKey) {
+        return;
+      }
+      if (e) {
+        e.preventDefault();
+      }
+      
+      const message = this.chatInput.trim();
+      if (!message || this.isTyping) {
+        return;
+      }
+      
+      // 添加用户消息
+      const userMessage = {
+        role: 'user',
+        content: message,
+        time: this.formatTime(new Date())
+      };
+      this.chatMessages.push(userMessage);
+      
+      // 清空输入框
+      this.chatInput = '';
+      
+      // 滚动到底部
+      this.$nextTick(() => {
+        this.scrollToBottom();
+      });
+      
+      // 发送到 AI
+      this.sendToAI(message);
+    },
+    
+    // 发送到 AI
+    sendToAI(userMessage) {
+      this.isTyping = true;
       
       // 确保上一个请求被取消
       if (this.abortController) {
@@ -416,10 +536,31 @@ export default {
       
       // 创建新的 AbortController
       this.abortController = new AbortController();
+      
+      // 构建完整的消息（包含告警上下文）
+      let fullMessage = userMessage;
+      if (this.currentAlarmContext) {
+        fullMessage = `${this.$t('chat_alarm_context')}:\n` +
+          `${this.$t('col_device_name')}: ${this.currentAlarmContext.hostname}\n` +
+          `${this.$t('col_ip')}: ${this.currentAlarmContext.host_ip}\n` +
+          `${this.$t('col_alarm_description')}: ${this.currentAlarmContext.message}\n` +
+          `${this.$t('col_alarm_detail')}: ${this.currentAlarmContext.detail}\n\n` +
+          `${userMessage}`;
+      }
+      
+      // 创建 AI 消息占位符
+      const aiMessageIndex = this.chatMessages.length;
+      this.chatMessages.push({
+        role: 'assistant',
+        content: '',
+        formattedContent: '',
+        time: this.formatTime(new Date())
+      });
+      
       let analysisTimeout = null;
       
       const analysisData = {
-        message: this.$t('msg_analysis_prompt') + "\n" + record.detail,
+        message: fullMessage,
         requestId: this.currentRequestId,
         onProgress: (text, responseRequestId) => {
           try {
@@ -428,17 +569,22 @@ export default {
               if (analysisTimeout) {
                 clearTimeout(analysisTimeout);
               }
-              if (this.deepseekModalVisible) {
-                this.analyzing = false;
-                this.analysisResult = text;
+              if (this.aiDrawerVisible) {
+                // 更新 AI 消息内容
+                this.chatMessages[aiMessageIndex].content = text;
                 try {
                   const processedText = processThinkTags(text);
                   const htmlContent = marked(processedText, { renderer });
-                  this.formattedResult = DOMPurify.sanitize(htmlContent);
+                  this.chatMessages[aiMessageIndex].formattedContent = DOMPurify.sanitize(htmlContent);
                 } catch (parseError) {
                   console.error('Markdown parse error:', parseError);
-                  this.formattedResult = text;
+                  this.chatMessages[aiMessageIndex].formattedContent = text;
                 }
+                
+                // 滚动到底部
+                this.$nextTick(() => {
+                  this.scrollToBottom();
+                });
               }
             }
           } catch (error) {
@@ -448,28 +594,31 @@ export default {
         signal: this.abortController.signal
       };
 
-      // 设置总体超时处理，调整为6分钟（比请求超时稍长一些）
+      // 设置总体超时处理
       analysisTimeout = setTimeout(() => {
-        if (this.analyzing) {
-          this.analyzing = false;
-          this.analysisResult = this.$t('msg_analysis_timeout');
+        if (this.isTyping) {
+          this.isTyping = false;
+          this.chatMessages[aiMessageIndex].content = this.$t('msg_analysis_timeout');
+          this.chatMessages[aiMessageIndex].formattedContent = this.$t('msg_analysis_timeout');
           this.$message.warning(this.$t('msg_analysis_timeout'));
         }
       }, 360000); // 6分钟总体超时
 
-      // 调用 Deepseek API
+      // 调用 AI API
       alarmDeepseekAnalysis(analysisData)
         .then(() => {
           clearTimeout(analysisTimeout);
-          this.analyzing = false;
+          this.isTyping = false;
         })
         .catch(error => {
           clearTimeout(analysisTimeout);
-          this.analyzing = false;
+          this.isTyping = false;
+          
           // 如果是用户主动取消，不显示错误信息
           if (error.name === 'AbortError') {
             return;
           }
+          
           let errorMsg = this.$t('msg_unknown_error');
           if (error.code === 'ECONNABORTED') {
             errorMsg = this.$t('msg_request_timeout');
@@ -478,49 +627,88 @@ export default {
           } else if (error.message) {
             errorMsg = error.message;
           }
-          this.analysisResult = this.$t('msg_analysis_failed') + ': ' + errorMsg;
+          
+          this.chatMessages[aiMessageIndex].content = this.$t('msg_analysis_failed') + ': ' + errorMsg;
+          this.chatMessages[aiMessageIndex].formattedContent = this.$t('msg_analysis_failed') + ': ' + errorMsg;
           this.$message.error(this.$t('msg_analysis_failed'));
         });
     },
     
-    handleModalClose() {
-      this.abortAnalysis();
-    },
-    
-    handleModalCancel() {
-      if (this.analyzing) {
-        this.$confirm({
-          title: this.$t('confirm_abort_title'),
-          content: this.$t('confirm_abort_content'),
-          okText: this.$t('text_confirm'),
-          cancelText: this.$t('text_close'),
-          onOk: () => {
-            this.abortAnalysis();
-          }
-        });
-      } else {
-        this.abortAnalysis();
-      }
-    },
-    
-    handleModalOk() {
-      if (!this.analyzing) {
-        this.abortAnalysis();
-      }
-    },
-    
-    abortAnalysis() {
-      // 取消请求
+    // 停止生成
+    stopGeneration() {
+      // 取消当前请求
       if (this.abortController) {
         this.abortController.abort();
         this.abortController = null;
       }
-      // 清理所有状态
-      this.deepseekModalVisible = false;
-      this.analyzing = false;
-      this.analysisResult = '';
-      this.formattedResult = '';
+      
+      // 停止输入状态
+      this.isTyping = false;
       this.currentRequestId = null;
+      
+      // 在最后一条消息后添加停止标记
+      const lastMessage = this.chatMessages[this.chatMessages.length - 1];
+      if (lastMessage && lastMessage.role === 'assistant') {
+        if (!lastMessage.content || lastMessage.content.trim() === '') {
+          // 如果 AI 还没有输出任何内容，移除这条消息
+          this.chatMessages.pop();
+        } else {
+          // 添加停止标记
+          lastMessage.content += '\n\n_[已停止生成]_';
+          const processedText = processThinkTags(lastMessage.content);
+          const htmlContent = marked(processedText, { renderer });
+          lastMessage.formattedContent = DOMPurify.sanitize(htmlContent);
+        }
+      }
+      
+      this.$message.info('已停止生成');
+    },
+    
+    // 清空对话
+    clearChat() {
+      this.$confirm({
+        title: this.$t('confirm_clear_chat_title'),
+        content: this.$t('confirm_clear_chat_content'),
+        okText: this.$t('text_confirm'),
+        cancelText: this.$t('text_close'),
+        onOk: () => {
+          // 先停止当前生成
+          if (this.isTyping) {
+            this.stopGeneration();
+          }
+          
+          this.chatMessages = [];
+          this.currentAlarmContext = null;
+        }
+      });
+    },
+    
+    // 关闭 Drawer
+    handleDrawerClose() {
+      // 取消正在进行的请求
+      if (this.abortController) {
+        this.abortController.abort();
+        this.abortController = null;
+      }
+      
+      this.aiDrawerVisible = false;
+      this.isTyping = false;
+      this.currentRequestId = null;
+    },
+    
+    // 滚动到底部
+    scrollToBottom() {
+      const container = this.$refs.chatMessages;
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+      }
+    },
+    
+    // 格式化时间
+    formatTime(date) {
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      return `${hours}:${minutes}`;
     },
   },
   filters: {
@@ -622,6 +810,205 @@ export default {
   height: 64px;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
+}
+
+/* AI 聊天 Drawer 样式 */
+.ai-chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #f5f5f5;
+  overflow: hidden;
+}
+
+.alarm-context {
+  padding: 16px;
+  background: #fff;
+  border-bottom: 1px solid #e8e8e8;
+  
+  .context-content {
+    font-size: 13px;
+    line-height: 1.8;
+    
+    div {
+      margin-bottom: 4px;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+    
+    strong {
+      color: #595959;
+      margin-right: 8px;
+    }
+  }
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #d9d9d9;
+    border-radius: 3px;
+    
+    &:hover {
+      background: #bfbfbf;
+    }
+  }
+}
+
+.chat-message {
+  margin-bottom: 24px;
+  animation: fadeIn 0.3s ease-in;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  .message-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    
+    .message-sender {
+      margin-left: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      color: #262626;
+    }
+    
+    .message-time {
+      margin-left: auto;
+      font-size: 12px;
+      color: #8c8c8c;
+    }
+  }
+  
+  .message-content {
+    margin-left: 40px;
+    
+    .user-message {
+      background: #1890ff;
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 8px;
+      display: inline-block;
+      max-width: 80%;
+      word-wrap: break-word;
+      line-height: 1.6;
+    }
+  }
+  
+  &.user {
+    .message-content {
+      text-align: right;
+      
+      .user-message {
+        text-align: left;
+      }
+    }
+  }
+  
+  &.assistant {
+    .message-content {
+      .markdown-body {
+        background: #fff;
+        padding: 16px;
+        border-radius: 8px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      }
+    }
+  }
+}
+
+.typing-indicator {
+  .typing-dots {
+    display: inline-flex;
+    align-items: center;
+    padding: 16px;
+    background: #fff;
+    border-radius: 8px;
+    
+    span {
+      width: 8px;
+      height: 8px;
+      margin: 0 2px;
+      background: #1890ff;
+      border-radius: 50%;
+      animation: typingDot 1.4s infinite;
+      
+      &:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      
+      &:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+    }
+  }
+}
+
+@keyframes typingDot {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.7;
+  }
+  30% {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.chat-input-area {
+  background: #fff;
+  border-top: 1px solid #e8e8e8;
+  padding: 16px;
+  
+  .input-actions {
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .input-wrapper {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    
+    textarea {
+      flex: 1;
+      resize: none;
+      border-radius: 8px;
+      
+      &:focus {
+        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+      }
+    }
+    
+    button {
+      height: 40px;
+      border-radius: 8px;
+      padding: 0 24px;
+    }
+  }
 }
 
 /* 添加Markdown样式 */
