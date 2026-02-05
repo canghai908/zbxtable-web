@@ -7,13 +7,13 @@
     </a-alert>
 
     <a-form-model class="home-search" layout="inline" :colon='false'>
-      <a-form-model-item label="搜索">
-        <a-input v-model.trim="name" placeholder="策略名称" />
+      <a-form-model-item :label="$t('label_search')">
+        <a-input v-model.trim="name" :placeholder="$t('rule_name_placeholder')" />
       </a-form-model-item>
       <a-form-model-item>
-        <a-button type="primary" @click="init">查询</a-button>
-        <a-button style="margin-left: 10px;" @click="resetData">重置</a-button>
-        <a-button style="margin-left: 10px;" type="primary" @click="addRecord">添加</a-button>
+        <a-button type="primary" @click="init">{{ $t('btn_query') }}</a-button>
+        <a-button style="margin-left: 10px;" @click="resetData">{{ $t('btn_reset') }}</a-button>
+        <a-button style="margin-left: 10px;" type="primary" @click="addRecord">{{ $t('btn_add') }}</a-button>
       </a-form-model-item>
     </a-form-model>
     <div class="linux-list">
@@ -24,15 +24,15 @@
         </span>
         <span slot="operation" slot-scope="record">
           <!-- <a-button class="pd20 paddingleft0" type="link" size="small" @click="seeDetail(record)">详细信息</a-button> -->
-          <a-button class="pd20 paddingleft0" type="link" size="small" @click="seeEdit(record)">编辑</a-button>
-          <a-popconfirm title="确定要删除吗?" ok-text="确定" cancel-text="取消" @confirm="deleteRecord(record)">
-            <a-button class="paddingleft0" type="link" size="small" v-auth="`delete`">删除</a-button>
+          <a-button class="pd20 paddingleft0" type="link" size="small" @click="seeEdit(record)">{{ $t('btn_edit') }}</a-button>
+          <a-popconfirm :title="$t('confirm_delete_title')" :ok-text="$t('confirm_delete_ok')" :cancel-text="$t('confirm_delete_cancel')" @confirm="deleteRecord(record)">
+            <a-button class="paddingleft0" type="link" size="small" v-auth="`delete`">{{ $t('btn_delete') }}</a-button>
           </a-popconfirm>
         </span>
       </a-table>
     </div>
     <!-- 新增/编辑规则弹窗 -->
-    <a-modal :title="editingId ? '编辑分发规则' : '新增分发规则'" :visible="modalVisible" :confirmLoading="modalLoading" @ok="saveRule" @cancel="closeModal" width="900px">
+    <a-modal :title="editingId ? $t('modal_title_edit_rule') : $t('modal_title_add_rule')" :visible="modalVisible" :confirmLoading="modalLoading" @ok="saveRule" @cancel="closeModal" width="900px">
       <a-form-model :model="editRule" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
         <a-form-model-item label="名称" required>
           <a-input v-model.trim="editRule.name" placeholder="请输入规则名称" />
@@ -136,6 +136,7 @@ import { parseTimeFun } from "@/utils/formatter";
 import moment from "moment";
 import "moment/locale/zh-cn";
 export default {
+  i18n: require('./i18n'),
   name: "LinuxList",
   components: {
     PageLayout,
@@ -295,7 +296,7 @@ export default {
         "page-size-options": ["10", "20", "30", "40", "50", "100", "200"],
         pageSize: 10,
         "show-size-changer": true,
-        "show-total": (total) => `共 ${total} 条数据`,
+        "show-total": (total) => this.$t('pagination_total', { total }),
       },
       moment,
       tenantid: "",

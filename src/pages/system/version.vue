@@ -17,7 +17,7 @@
       <div style="margin-top: 24px;">
         <h3 style="margin-bottom: 16px;">
           <a-icon type="cloud-download" style="margin-right: 8px;" />
-          系统更新
+          {{$t('system_update')}}
         </h3>
         
         <!-- 更新信息 -->
@@ -27,13 +27,13 @@
           show-icon
           style="margin-bottom: 16px;">
           <template slot="message">
-            <span style="font-weight: 500;">发现新版本</span>
+            <span style="font-weight: 500;">{{$t('new_version_found')}}</span>
           </template>
           <template slot="description">
             <div>
-              <p>当前版本：{{ updateInfo.current_version }}</p>
-              <p>最新版本：{{ updateInfo.latest_version }}</p>
-              <p style="margin-bottom: 0;">可以更新到最新版本以获得新功能和安全更新</p>
+              <p>{{$t('current_version')}}：{{ updateInfo.current_version }}</p>
+              <p>{{$t('latest_version')}}：{{ updateInfo.latest_version }}</p>
+              <p style="margin-bottom: 0;">{{$t('can_update_tip')}}</p>
             </div>
           </template>
         </a-alert>
@@ -41,7 +41,7 @@
         <a-alert
           v-else-if="updateChecked && !updateInfo.has_update"
           type="success"
-          message="当前已是最新版本"
+          :message="$t('already_latest')"
           show-icon
           style="margin-bottom: 16px;"
         />
@@ -53,7 +53,7 @@
             icon="reload"
             :loading="checkingUpdate"
             @click="handleCheckUpdate">
-            检查更新
+            {{checkingUpdate ? $t('checking_update') : $t('check_update')}}
           </a-button>
           
           <a-button 
@@ -62,7 +62,7 @@
             icon="cloud-download"
             :loading="updating"
             @click="handleUpdate">
-            立即更新
+            {{updating ? $t('updating') : $t('update_now')}}
           </a-button>
         </a-space>
       </div>
@@ -71,7 +71,7 @@
     <!-- 更新进度对话框 -->
     <a-modal
       v-model="updateModalVisible"
-      title="系统更新"
+      :title="$t('system_update')"
       :footer="null"
       :closable="false"
       :maskClosable="false"
@@ -83,7 +83,7 @@
           {{ updateMessage }}
         </p>
         <p v-if="countdown > 0" style="font-size: 14px; color: rgba(0, 0, 0, 0.65);">
-          系统将在 {{ countdown }} 秒后重启...
+          {{$t('restart_in_seconds', {seconds: countdown})}}
         </p>
         <a-progress 
           v-if="countdown > 0"
@@ -169,13 +169,13 @@ export default {
           this.updateChecked = true
           
           if (data.hasUpdate) {
-            this.$message.success('发现新版本：' + data.latestVersion)
+            this.$message.success(this.$t('new_version_found') + '：' + data.latestVersion)
           } else {
-            this.$message.info('当前已是最新版本')
+            this.$message.info(this.$t('already_latest'))
           }
         })
         .catch((error) => {
-          this.$message.error('检查更新失败：' + (error.message || '未知错误'))
+          this.$message.error(this.$t('check_update_failed') + '：' + (error.message || ''))
         })
         .finally(() => {
           this.checkingUpdate = false
@@ -186,11 +186,14 @@ export default {
     handleUpdate() {
       const that = this
       this.$confirm({
-        title: '确认更新',
-        content: `确定要从 ${this.updateInfo.current_version} 更新到 ${this.updateInfo.latest_version} 吗？更新过程中系统将会重启，请确保已保存所有工作。`,
-        okText: '确定更新',
+        title: this.$t('confirm_update_title'),
+        content: this.$t('confirm_update_content', {
+          current: this.updateInfo.current_version,
+          latest: this.updateInfo.latest_version
+        }),
+        okText: this.$t('confirm_update_btn'),
         okType: 'danger',
-        cancelText: '取消',
+        cancelText: this.$t('cancel'),
         onOk() {
           that.doUpdate()
         }
@@ -201,14 +204,14 @@ export default {
     doUpdate() {
       this.updating = true
       this.updateModalVisible = true
-      this.updateMessage = '正在下载更新...'
+      this.updateMessage = this.$t('downloading_update')
       
       systemDoUpdate()
         .then((resp) => {
           const data = resp.data.data
           
           if (data.success && data.needRestart) {
-            this.updateMessage = '更新成功！系统即将重启...'
+            this.updateMessage = this.$t('update_success_restarting')
             this.countdown = data.restartDelay || 3
             
             // 开始倒计时
@@ -216,7 +219,7 @@ export default {
               this.countdown--
               if (this.countdown <= 0) {
                 clearInterval(this.countdownTimer)
-                this.updateMessage = '系统正在重启，请稍候...'
+                this.updateMessage = this.$t('system_restarting')
                 
                 // 5 秒后刷新页面
                 setTimeout(() => {
@@ -226,12 +229,12 @@ export default {
             }, 1000)
           } else {
             this.updateModalVisible = false
-            this.$message.success('更新完成')
+            this.$message.success(this.$t('update_complete'))
           }
         })
         .catch((error) => {
           this.updateModalVisible = false
-          this.$message.error('更新失败：' + (error.message || '未知错误'))
+          this.$message.error(this.$t('update_failed') + '：' + (error.message || ''))
         })
         .finally(() => {
           this.updating = false

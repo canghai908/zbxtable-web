@@ -8,7 +8,7 @@
         <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path>
       </svg>
       <div class="github-tooltip">
-        <span class="tooltip-text">Star on GitHub</span>
+        <span class="tooltip-text">{{$t('githubTooltip')}}</span>
       </div>
     </a>
 
@@ -28,7 +28,7 @@
           <img :src="logoUrl" alt="Logo" class="logo-image" />
         </div>
         <h1 class="system-title">{{ systemName }}</h1>
-        <p class="system-subtitle">Zabbix 监控数据可视化平台</p>
+        <p class="system-subtitle">{{$t('systemSubtitle')}}</p>
       </div>
 
       <!-- 登录表单 -->
@@ -47,8 +47,8 @@
             <a-input 
               autocomplete="autocomplete" 
               size="large" 
-              placeholder="请输入账户名"
-              v-decorator="['name', {rules: [{ required: true, message: '请输入账户名', whitespace: true}]}]"
+              :placeholder="$t('pleaseInputUsername')"
+              v-decorator="['name', {rules: [{ required: true, message: $t('pleaseInputUsername'), whitespace: true}]}]"
               class="custom-input"
             >
               <a-icon slot="prefix" type="user" class="input-icon" />
@@ -60,8 +60,8 @@
               size="large" 
               autocomplete="autocomplete" 
               type="password" 
-              placeholder="请输入密码"
-              v-decorator="['password', {rules: [{ required: true, message: '请输入密码', whitespace: true}]}]"
+              :placeholder="$t('pleaseInputPassword')"
+              v-decorator="['password', {rules: [{ required: true, message: $t('pleaseInputPassword'), whitespace: true}]}]"
               class="custom-input"
             >
               <a-icon slot="prefix" type="lock" class="input-icon" />
@@ -77,8 +77,8 @@
               class="submit-button"
               block
             >
-              <span v-if="!logging">登 录</span>
-              <span v-else>登录中...</span>
+              <span v-if="!logging">{{$t('login')}}</span>
+              <span v-else>{{$t('loggingIn')}}</span>
             </a-button>
           </a-form-item>
         </a-form>
@@ -86,7 +86,7 @@
 
       <!-- 页脚信息 -->
       <div class="footer-section">
-        <p class="footer-text">© 2026 ZbxTable. All rights reserved.</p>
+        <p class="footer-text">{{$t('copyright')}}</p>
       </div>
     </div>
   </div>
@@ -100,6 +100,7 @@ import { loadRoutes } from '@/utils/routerUtil'
 import { mapMutations } from 'vuex'
 export default {
   name: 'Login',
+  i18n: require('./i18n'),
   data() {
     return {
       logging: false,
@@ -273,7 +274,7 @@ export default {
             this.loadSystemConfig()
             
             this.$router.push('/dashboard/workplace')
-            this.$message.success(loginRes.message || '登录成功', 1)
+            this.$message.success(loginRes.message || this.$t('loginSuccess'), 1)
           } catch (e) {
             // 路由加载失败时也至少完成登录并进入首页
             this.$router.push('/dashboard/workplace')

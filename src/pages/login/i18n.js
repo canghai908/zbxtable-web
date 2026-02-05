@@ -1,0 +1,46 @@
+module.exports = {
+  messages: {
+    CN: {
+      title: '登录',
+      username: '账户名',
+      password: '密码',
+      login: '登 录',
+      loggingIn: '登录中...',
+      pleaseInputUsername: '请输入账户名',
+      pleaseInputPassword: '请输入密码',
+      loginSuccess: '登录成功',
+      loginFailed: '登录失败',
+      systemSubtitle: 'Zabbix 监控数据可视化平台',
+      githubTooltip: 'Star on GitHub',
+      copyright: '© 2026 ZbxTable. All rights reserved.',
+    },
+    HK: {
+      title: '登錄',
+      username: '賬戶名',
+      password: '密碼',
+      login: '登 錄',
+      loggingIn: '登錄中...',
+      pleaseInputUsername: '請輸入賬戶名',
+      pleaseInputPassword: '請輸入密碼',
+      loginSuccess: '登錄成功',
+      loginFailed: '登錄失敗',
+      systemSubtitle: 'Zabbix 監控數據可視化平台',
+      githubTooltip: 'Star on GitHub',
+      copyright: '© 2026 ZbxTable. All rights reserved.',
+    },
+    US: {
+      title: 'Login',
+      username: 'Username',
+      password: 'Password',
+      login: 'Login',
+      loggingIn: 'Logging in...',
+      pleaseInputUsername: 'Please input username',
+      pleaseInputPassword: 'Please input password',
+      loginSuccess: 'Login Success',
+      loginFailed: 'Login Failed',
+      systemSubtitle: 'Zabbix Monitoring Data Visualization Platform',
+      githubTooltip: 'Star on GitHub',
+      copyright: '© 2026 ZbxTable. All rights reserved.',
+    }
+  }
+}

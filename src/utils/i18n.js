@@ -3,6 +3,7 @@ import VueI18n from 'vue-i18n'
 import routesI18n from '@/router/i18n'
 import './Objects'
 import {getI18nKey} from '@/utils/routerUtil'
+import locales from '@/locales'
 
 /**
  * 创建 i18n 配置
@@ -12,11 +13,29 @@ import {getI18nKey} from '@/utils/routerUtil'
  */
 function initI18n(locale, fallback) {
   Vue.use(VueI18n)
-  let i18nOptions = {
-    locale,
-    fallbackLocale: fallback,
-    silentFallbackWarn: true,
+  
+  // 语言映射：CN -> zh-CN, HK -> zh-TW, US -> en-US
+  const localeMap = {
+    'CN': 'zh-CN',
+    'HK': 'zh-TW',
+    'US': 'en-US'
   }
+  
+  const actualLocale = localeMap[locale] || locale
+  const actualFallback = localeMap[fallback] || fallback
+  
+  let i18nOptions = {
+    locale: actualLocale,
+    fallbackLocale: actualFallback,
+    silentFallbackWarn: true,
+    messages: {}
+  }
+  
+  // 加载语言包
+  Object.keys(locales).forEach(lang => {
+    i18nOptions.messages[lang] = locales[lang]
+  })
+  
   return new VueI18n(i18nOptions)
 }
 
@@ -63,10 +82,29 @@ function mergeI18nFromRoutes(i18n, routes) {
   formatFullPath(routes)
   const CN = generateI18n(new Object(), routes, 'name')
   const US = generateI18n(new Object(), routes, 'path')
+  const HK = generateI18n(new Object(), routes, 'name') // 繁体使用与简体相同的name
+  
+  // 映射到新的locale key
+  i18n.mergeLocaleMessage('zh-CN', CN)
+  i18n.mergeLocaleMessage('en-US', US)
+  i18n.mergeLocaleMessage('zh-TW', HK)
+  
+  // 兼容旧的locale key
   i18n.mergeLocaleMessage('CN', CN)
   i18n.mergeLocaleMessage('US', US)
+  i18n.mergeLocaleMessage('HK', HK)
+  
   const messages = routesI18n.messages
   Object.keys(messages).forEach(lang => {
+    // 映射旧的locale key到新的
+    const localeMap = {
+      'CN': 'zh-CN',
+      'HK': 'zh-TW',
+      'US': 'en-US'
+    }
+    const newLang = localeMap[lang] || lang
+    i18n.mergeLocaleMessage(newLang, messages[lang])
+    // 同时保留旧的key以兼容
     i18n.mergeLocaleMessage(lang, messages[lang])
   })
 }

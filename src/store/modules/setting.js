@@ -77,6 +77,15 @@ export default {
     },
     setLang(state, lang) {
       state.lang = lang
+      // 同时更新 i18n 的 locale
+      if (window.$i18n) {
+        const localeMap = {
+          'CN': 'zh-CN',
+          'HK': 'zh-TW',
+          'US': 'en-US'
+        }
+        window.$i18n.locale = localeMap[lang] || lang
+      }
     },
     setHideSetting(state, hideSetting) {
       state.hideSetting = hideSetting

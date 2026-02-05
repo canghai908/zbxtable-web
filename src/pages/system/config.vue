@@ -4,20 +4,20 @@
       <a-card :bordered="false">
         <a-tabs v-model="activeTab" type="card">
           <!-- 系统配置 -->
-          <a-tab-pane key="system" tab="系统配置">
+          <a-tab-pane key="system" :tab="$t('systemTab')">
             <a-form-model ref="systemForm" :model="systemForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
               <!-- 外观配置部分 -->
-              <a-divider orientation="left">外观配置</a-divider>
+              <a-divider orientation="left">{{$t('appearanceConfig')}}</a-divider>
               
-              <a-form-model-item label="系统名称">
-                <a-input v-model="systemForm.system_name" placeholder="请输入系统名称" />
-                <div class="config-hint">系统显示的名称，将在页面标题和导航栏中显示</div>
+              <a-form-model-item :label="$t('systemName')">
+                <a-input v-model="systemForm.system_name" :placeholder="$t('systemNamePlaceholder')" />
+                <div class="config-hint">{{$t('systemNameHint')}}</div>
               </a-form-model-item>
               
-              <a-form-model-item label="系统Logo">
+              <a-form-model-item :label="$t('systemLogo')">
                 <div class="logo-upload-container">
                   <div class="logo-preview">
-                    <img v-if="systemForm.system_logo" :src="systemForm.system_logo" alt="Logo预览" />
+                    <img v-if="systemForm.system_logo" :src="systemForm.system_logo" :alt="$t('logoPreview')" />
                     <div v-else class="logo-placeholder">
                       <a-icon type="picture" style="font-size: 48px; color: #ccc;" />
                     </div>
@@ -30,18 +30,18 @@
                       :custom-request="handleLogoUpload"
                       accept="image/png,image/jpeg,image/jpg,image/svg+xml">
                       <a-button :loading="logoUploading">
-                        <a-icon type="upload" /> 上传Logo
+                        <a-icon type="upload" /> {{logoUploading ? $t('logoUploading') : $t('uploadLogo')}}
                       </a-button>
                     </a-upload>
                     <div class="upload-hint">
-                      <a-icon type="info-circle" /> 支持 PNG、JPG、SVG 格式，建议尺寸 32x32px，大小不超过2MB
+                      <a-icon type="info-circle" /> {{$t('logoUploadHint')}}
                     </div>
                   </div>
                 </div>
               </a-form-model-item>
               
               <!-- 系统配置部分 -->
-              <a-divider orientation="left">系统配置</a-divider>
+              <a-divider orientation="left">{{$t('systemSettings')}}</a-divider>
               
               <a-form-model-item v-for="item in systemOnlyConfigs" :key="item.id" :label="item.name">
                 <a-select v-if="isBooleanConfig(item.key)" v-model="systemForm[item.key]" :placeholder="item.comment" style="width: 100%">
@@ -52,7 +52,7 @@
                 <a-input-group v-else-if="item.key === 'webhook_url'" compact style="display: flex;">
                   <a-input v-model="systemForm[item.key]" :placeholder="item.comment" style="flex: 1;" />
                   <a-button type="primary" @click="getCurrentWebUrl" :loading="gettingUrl">
-                    <a-icon type="link" /> 获取当前地址
+                    <a-icon type="link" /> {{gettingUrl ? $t('gettingUrl') : $t('getCurrentUrl')}}
                   </a-button>
                 </a-input-group>
                 <a-input v-else v-model="systemForm[item.key]" :placeholder="item.comment" />
@@ -60,14 +60,14 @@
               </a-form-model-item>
               
               <a-form-model-item :wrapper-col="{ span: 14, offset: 6 }">
-                <a-button type="primary" @click="saveCategory('system')" :loading="saveLoading">保存</a-button>
-                <a-button style="margin-left: 10px;" @click="previewAppearance">预览效果</a-button>
+                <a-button type="primary" @click="saveCategory('system')" :loading="saveLoading">{{$t('save')}}</a-button>
+                <a-button style="margin-left: 10px;" @click="previewAppearance">{{$t('previewEffect')}}</a-button>
               </a-form-model-item>
             </a-form-model>
           </a-tab-pane>
 
           <!-- 邮件配置 -->
-          <a-tab-pane key="email" tab="邮件配置">
+          <a-tab-pane key="email" :tab="$t('emailTab')">
             <a-form-model ref="emailForm" :model="emailForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
               <a-form-model-item v-for="item in emailConfigs" :key="item.id" :label="item.name">
                 <a-select v-if="isBooleanConfig(item.key)" v-model="emailForm[item.key]" :placeholder="item.comment" style="width: 100%">
@@ -80,13 +80,13 @@
                 <div class="config-hint">{{ item.comment }}</div>
               </a-form-model-item>
               <a-form-model-item :wrapper-col="{ span: 14, offset: 6 }">
-                <a-button type="primary" @click="saveCategory('email')" :loading="saveLoading">保存</a-button>
+                <a-button type="primary" @click="saveCategory('email')" :loading="saveLoading">{{$t('save')}}</a-button>
               </a-form-model-item>
             </a-form-model>
           </a-tab-pane>
 
           <!-- 企业微信配置 -->
-          <a-tab-pane key="wechat" tab="企业微信配置">
+          <a-tab-pane key="wechat" :tab="$t('wechatTab')">
             <a-form-model ref="wechatForm" :model="wechatForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
               <a-form-model-item v-for="item in wechatConfigs" :key="item.id" :label="item.name">
                 <a-select v-if="isBooleanConfig(item.key)" v-model="wechatForm[item.key]" :placeholder="item.comment" style="width: 100%">
@@ -99,13 +99,13 @@
                 <div class="config-hint">{{ item.comment }}</div>
               </a-form-model-item>
               <a-form-model-item :wrapper-col="{ span: 14, offset: 6 }">
-                <a-button type="primary" @click="saveCategory('wechat')" :loading="saveLoading">保存</a-button>
+                <a-button type="primary" @click="saveCategory('wechat')" :loading="saveLoading">{{$t('save')}}</a-button>
               </a-form-model-item>
             </a-form-model>
           </a-tab-pane>
 
           <!-- Ollama AI 配置 -->
-          <a-tab-pane key="ollama" tab="Ollama AI 配置">
+          <a-tab-pane key="ollama" :tab="$t('ollamaTab')">
             <a-form-model ref="ollamaForm" :model="ollamaForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
               <a-form-model-item v-for="item in ollamaConfigs" :key="item.id" :label="item.name">
                 <a-select v-if="isBooleanConfig(item.key)" v-model="ollamaForm[item.key]" :placeholder="item.comment" style="width: 100%">
@@ -117,13 +117,13 @@
                 <div class="config-hint">{{ item.comment }}</div>
               </a-form-model-item>
               <a-form-model-item :wrapper-col="{ span: 14, offset: 6 }">
-                <a-button type="primary" @click="saveCategory('ollama')" :loading="saveLoading">保存</a-button>
+                <a-button type="primary" @click="saveCategory('ollama')" :loading="saveLoading">{{$t('save')}}</a-button>
               </a-form-model-item>
             </a-form-model>
           </a-tab-pane>
 
           <!-- 安全配置 -->
-          <a-tab-pane key="security" tab="安全配置">
+          <a-tab-pane key="security" :tab="$t('securityTab')">
             <a-form-model ref="securityForm" :model="securityForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
               <a-form-model-item v-for="item in securityConfigs" :key="item.id" :label="item.name">
                 <a-input 
@@ -132,7 +132,7 @@
                   disabled
                   style="font-family: 'Courier New', monospace; background-color: #f5f5f5;">
                   <template slot="suffix">
-                    <a-tooltip :title="isKeyVisible ? '隐藏密钥' : '显示完整密钥'">
+                    <a-tooltip :title="isKeyVisible ? $t('hideKey') : $t('showKey')">
                       <a-icon 
                         :type="isKeyVisible ? 'eye-invisible' : 'eye'" 
                         style="cursor: pointer; color: #1890ff;" 
@@ -145,16 +145,16 @@
                 </div>
                 <a-alert 
                   v-if="item.key === 'encryption_key'" 
-                  message="安全提示" 
+                  :message="$t('securityWarning')" 
                   type="warning" 
                   show-icon 
                   style="margin-top: 12px;">
                   <template slot="description">
                     <div style="font-size: 12px; line-height: 1.6;">
-                      <div>• 此密钥用于加密存储 Zabbix 密码和 Token 等敏感信息</div>
-                      <div>• 系统初始化时自动生成，不可通过界面修改</div>
-                      <div>• 请妥善保管此密钥，丢失将导致已加密数据无法解密</div>
-                      <div>• 建议定期备份数据库，包含此密钥配置</div>
+                      <div>• {{$t('keyDesc1', {defaultMessage: '此密钥用于加密存储 Zabbix 密码和 Token 等敏感信息'})}}</div>
+                      <div>• {{$t('keyDesc2', {defaultMessage: '系统初始化时自动生成，不可通过界面修改'})}}</div>
+                      <div>• {{$t('keyDesc3', {defaultMessage: '请妥善保管此密钥，丢失将导致已加密数据无法解密'})}}</div>
+                      <div>• {{$t('keyDesc4', {defaultMessage: '建议定期备份数据库，包含此密钥配置'})}}</div>
                       <div style="margin-top: 8px;">
                         <a-button 
                           size="small" 
@@ -185,7 +185,7 @@ import { parseTimeFun } from '@/utils/formatter'
 import { configGetList, configUpdate } from '@/services/admin'
 export default {
   name: 'edit',
-  i18n: require('./i18n'),
+  i18n: require('./config-i18n'),
   components: { PageLayout },
   data() {
     return {
@@ -259,15 +259,18 @@ export default {
     },
     getBooleanOptions(key) {
       // email_isSSl 使用 true/false，其他使用 1/0
+      const enabledText = this.$t('enabled')
+      const disabledText = this.$t('disabled')
+      
       if (key === 'email_isSSl') {
         return [
-          { label: '开启', value: 'true' },
-          { label: '关闭', value: 'false' }
+          { label: enabledText, value: 'true' },
+          { label: disabledText, value: 'false' }
         ]
       }
       return [
-        { label: '开启', value: '1' },
-        { label: '关闭', value: '0' }
+        { label: enabledText, value: '1' },
+        { label: disabledText, value: '0' }
       ]
     },
     init() {
@@ -333,7 +336,7 @@ export default {
         })
         
         await Promise.all(promises)
-        this.$message.success('保存成功')
+        this.$message.success(this.$t('saveSuccess'))
         
         // 如果是系统配置，更新 Vuex 中的系统名称和Logo
         if (category === 'system') {
@@ -343,7 +346,7 @@ export default {
         
         this.init()
       } catch (error) {
-        this.$message.error('保存失败')
+        this.$message.error(this.$t('saveFailed'))
       } finally {
         this.saveLoading = false
       }

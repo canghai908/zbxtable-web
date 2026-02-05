@@ -2,33 +2,33 @@
   <page-layout :noTitle="true">
     <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="!showPage">
       <a-form-model class="home-search" layout="inline" :colon='false'>
-        <a-form-model-item label="选择实例">
-          <a-select v-model="selectedInstance" placeholder="全部实例" allowClear style="width: 200px">
-            <a-select-option value="">全部实例</a-select-option>
+        <a-form-model-item :label="$t('analysis_select_instance')">
+          <a-select v-model="selectedInstance" :placeholder="$t('analysis_all_instances')" allowClear style="width: 200px">
+            <a-select-option value="">{{ $t('analysis_all_instances') }}</a-select-option>
             <a-select-option v-for="item in instanceList" :key="item.id" :value="item.id">
               {{ item.name }}
             </a-select-option>
           </a-select>
         </a-form-model-item>
-        <a-form-model-item label="告警时间">
+        <a-form-model-item :label="$t('analysis_alarm_time')">
           <a-range-picker format="YYYY-MM-DD HH:mm:ss" :show-time="{ format: 'HH:mm', defaultValue:[moment('00:00:00', 'HH:mm:ss'),moment('23:59:59', 'HH:mm:ss')]}" v-model="timeValue"
             @change="changeCreationTime" :getCalendarContainer="triggerNode=>{return triggerNode.parentNode || document.body}" />
         </a-form-model-item>
         <a-form-model-item>
-          <a-button type="primary" @click="init">查询</a-button>
+          <a-button type="primary" @click="init">{{ $t('btn_query') }}</a-button>
         </a-form-model-item>
         <a-form-model-item>
-          <a-button type="primary" @click="anayexport">导出</a-button>
+          <a-button type="primary" @click="anayexport">{{ $t('btn_export') }}</a-button>
         </a-form-model-item>
       </a-form-model>
       <a-row style="margin: 20px -12px">
         <a-col style="padding: 0 12px" :xl="12" :lg="12" :md="24" :sm="24" :xs="24" v-if="nameList && nameList.length">
-          <a-card hoverable :headStyle="$cardHeadStyle" :bodyStyle="{padding: '0'}" title="历史告警TOP10">
+          <a-card hoverable :headStyle="$cardHeadStyle" :bodyStyle="{padding: '0'}" :title="$t('analysis_historical_alarm_top10')">
             <e-line :mock="nameList" :numList="numList" />
           </a-card>
         </a-col>
         <a-col style="padding: 0 12px" :xl="12" :lg="12" :md="24" :sm="24" :xs="24" v-if="list && list.length">
-          <a-card hoverable :headStyle="$cardHeadStyle" :bodyStyle="{padding: '0'}" title="告警分类TOP">
+          <a-card hoverable :headStyle="$cardHeadStyle" :bodyStyle="{padding: '0'}" :title="$t('analysis_alarm_classification_top')">
             <e-pie :mock="list" />
           </a-card>
         </a-col>
@@ -47,6 +47,7 @@ import { parseTimeFun } from "@/utils/formatter";
 import moment from "moment";
 import "moment/locale/zh-cn";
 export default {
+  i18n: require('./i18n'),
   name: "analysis",
   components: {
     PageLayout,

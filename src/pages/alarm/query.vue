@@ -75,24 +75,24 @@
           {{record.notify_status | notifyStatusFilter }}
         </span>
         <span slot="operation" slot-scope="record">
-          <a-button v-if="record.notify_status!=1" class="pd20 paddingleft0" type="link" size="small" @click="addMutes(record)">屏蔽</a-button>
-          <a-button class="pd20" type="link" size="small" @click="analyzeWithDeepseek(record)">AI助手分析</a-button>
+          <a-button v-if="record.notify_status!=1" class="pd20 paddingleft0" type="link" size="small" @click="addMutes(record)">{{ $t('btn_mute') }}</a-button>
+          <a-button class="pd20" type="link" size="small" @click="analyzeWithDeepseek(record)">{{ $t('btn_ai_analysis') }}</a-button>
         </span>
       </a-table>
     </div>
 
     <!-- 修改分析结果弹窗 -->
-    <a-modal title="AI助手分析结果" :visible="deepseekModalVisible" :maskClosable="false" :keyboard="false" @ok="handleModalOk" @cancel="handleModalCancel" @close="handleModalClose" width="800px">
+    <a-modal :title="$t('modal_title_ai_analysis')" :visible="deepseekModalVisible" :maskClosable="false" :keyboard="false" @ok="handleModalOk" @cancel="handleModalCancel" @close="handleModalClose" width="800px">
       <div v-if="analyzing" style="text-align: center;">
-        <a-spin tip="分析中..." />
+        <a-spin :tip="$t('text_analyzing')" />
       </div>
       <div v-else class="markdown-body" v-html="formattedResult"></div>
       <template slot="footer">
         <a-button key="cancel" @click="handleModalCancel">
-          {{ analyzing ? '中止分析' : '关闭' }}
+          {{ analyzing ? $t('text_abort_analysis') : $t('text_close') }}
         </a-button>
         <a-button key="ok" type="primary" @click="handleModalOk" :disabled="analyzing">
-          确定
+          {{ $t('text_confirm') }}
         </a-button>
       </template>
     </a-modal>
@@ -168,6 +168,7 @@ function processThinkTags(text) {
 }
 
 export default {
+  i18n: require('./i18n'),
   name: "LinuxList",
   mixins: [themeMixin],
   components: {
@@ -183,41 +184,10 @@ export default {
       selectedInstance: '',
       status: "",
       level: "",
-      statuslist: [
-        { id: 1, value: "告警", },
-        { id: 0, value: "恢复", }
-      ],
-      levellist: [
-        { id: 0, value: "未分类", },
-        { id: 1, value: "信息", },
-        { id: 2, value: "警告", },
-        { id: 3, value: "一般", },
-        { id: 4, value: "严重", },
-        { id: 5, value: "灾难", },
-      ],
-      columns: [
-        { title: "ID", dataIndex: "id", align: "left" },
-        { title: "所属实例", key: "instance_name", align: "left", width: 120, scopedSlots: { customRender: "instance_name" } },
-        { title: "告警类型", key: "status", align: "left", scopedSlots: { customRender: "status" }, },
-        { title: "设备名称", dataIndex: "hostname", align: "left" },
-        { title: "IP", dataIndex: "host_ip", align: "left", scopedSlots: { customRender: "host_ip" }, },
-        { title: "告警级别", key: "level", align: "left", scopedSlots: { customRender: "level" }, },
-        { title: "告警描述", dataIndex: "message", align: "left" },
-        { title: "告警详情", dataIndex: "detail", align: "left" },
-        { title: "发生时间", key: "occur_time", align: "left", scopedSlots: { customRender: "occur_time" }, },
-        { title: "通知状态", key: "notify_status", align: "left", scopedSlots: { customRender: "notify_status" }, },
-        { title: "操作", key: "operation", align: "center", scopedSlots: { customRender: "operation" } },
-      ],
-      innerColumns: [
-        { title: "规则名称", dataIndex: "rule", align: "left" },
-        { title: "接收渠道", dataIndex: "channel", align: "left" },
-        { title: "接收用户", dataIndex: "user", align: "left" },
-        { title: "接收账号", dataIndex: "account", align: "left" },
-        { title: "通知时间", key: "notify_time", align: "left", scopedSlots: { customRender: "notify_time" }, },
-        { title: "通知内容", dataIndex: "notify_content", align: "left", width: "300px", ellipsis: true, },
-        { title: "通知结果", key: "status", align: "left", scopedSlots: { customRender: "status" }, },
-        { title: "错误信息", dataIndex: "notify_error", align: "left", width: "300px", ellipsis: true, },
-      ],
+      statuslist: [],
+      levellist: [],
+      columns: [],
+      innerColumns: [],
       // tenantlist/tenantid 已取消：跟随“当前 Zabbix 连接”
       list: [],
       innerData: [],
@@ -228,7 +198,7 @@ export default {
         "page-size-options": ["10", "20", "30", "40", "50", "100", "200"],
         pageSize: 10,
         "show-size-changer": true,
-        "show-total": (total) => `共 ${total} 条数据`,
+        "show-total": (total) => this.$t('pagination_total', { total }),
       },
       moment,
       // 兼容旧字段（不再参与请求）
@@ -255,10 +225,51 @@ export default {
       moment(qtime, "YYYY-MM-DD HH:mm:ss"),
       moment(ntime, "YYYY-MM-DD HH:mm:ss"),
     ];
+    this.initOptions();
+    this.initColumns();
     this.loadInstances();
     this.init();
   },
   methods: {
+    initOptions() {
+      this.statuslist = [
+        { id: 1, value: this.$t('alarm_type_alarm') },
+        { id: 0, value: this.$t('alarm_type_recovery') }
+      ];
+      this.levellist = [
+        { id: 0, value: this.$t('level_unclassified') },
+        { id: 1, value: this.$t('level_information') },
+        { id: 2, value: this.$t('level_warning') },
+        { id: 3, value: this.$t('level_average') },
+        { id: 4, value: this.$t('level_high') },
+        { id: 5, value: this.$t('level_disaster') },
+      ];
+    },
+    initColumns() {
+      this.columns = [
+        { title: this.$t('col_id'), dataIndex: "id", align: "left" },
+        { title: this.$t('col_instance'), key: "instance_name", align: "left", width: 120, scopedSlots: { customRender: "instance_name" } },
+        { title: this.$t('col_alarm_type'), key: "status", align: "left", scopedSlots: { customRender: "status" } },
+        { title: this.$t('col_device_name'), dataIndex: "hostname", align: "left" },
+        { title: this.$t('col_ip'), dataIndex: "host_ip", align: "left", scopedSlots: { customRender: "host_ip" } },
+        { title: this.$t('col_alarm_level'), key: "level", align: "left", scopedSlots: { customRender: "level" } },
+        { title: this.$t('col_alarm_description'), dataIndex: "message", align: "left" },
+        { title: this.$t('col_alarm_detail'), dataIndex: "detail", align: "left" },
+        { title: this.$t('col_occurrence_time'), key: "occur_time", align: "left", scopedSlots: { customRender: "occur_time" } },
+        { title: this.$t('col_notification_status'), key: "notify_status", align: "left", scopedSlots: { customRender: "notify_status" } },
+        { title: this.$t('col_operation'), key: "operation", align: "center", scopedSlots: { customRender: "operation" } },
+      ];
+      this.innerColumns = [
+        { title: this.$t('col_rule_name'), dataIndex: "rule", align: "left" },
+        { title: this.$t('col_receiving_channel'), dataIndex: "channel", align: "left" },
+        { title: this.$t('col_receiving_user'), dataIndex: "user", align: "left" },
+        { title: this.$t('col_receiving_account'), dataIndex: "account", align: "left" },
+        { title: this.$t('col_notification_time'), key: "notify_time", align: "left", scopedSlots: { customRender: "notify_time" } },
+        { title: this.$t('col_notification_content'), dataIndex: "notify_content", align: "left", width: "300px", ellipsis: true },
+        { title: this.$t('col_notification_result'), key: "status", align: "left", scopedSlots: { customRender: "status" } },
+        { title: this.$t('col_error_message'), dataIndex: "notify_error", align: "left", width: "300px", ellipsis: true },
+      ];
+    },
     loadInstances() {
       listZabbixInstance().then((resp) => {
         let res = resp.data
@@ -436,8 +447,8 @@ export default {
       analysisTimeout = setTimeout(() => {
         if (this.analyzing) {
           this.analyzing = false;
-          this.analysisResult = '分析超时，请稍后重试或缩短分析内容';
-          this.$message.warning('分析请求超时');
+          this.analysisResult = this.$t('msg_analysis_timeout');
+          this.$message.warning(this.$t('msg_analysis_timeout'));
         }
       }, 360000); // 6分钟总体超时
 
@@ -462,8 +473,8 @@ export default {
           } else if (error.message) {
             errorMsg = error.message;
           }
-          this.analysisResult = '分析失败: ' + errorMsg;
-          this.$message.error('分析请求失败');
+          this.analysisResult = this.$t('msg_analysis_failed') + ': ' + errorMsg;
+          this.$message.error(this.$t('msg_analysis_failed'));
         });
     },
     
@@ -474,10 +485,10 @@ export default {
     handleModalCancel() {
       if (this.analyzing) {
         this.$confirm({
-          title: '确认中止',
-          content: '是否确认中止当前分析？',
-          okText: '确认',
-          cancelText: '取消',
+          title: this.$t('confirm_abort_title'),
+          content: this.$t('confirm_abort_content'),
+          okText: this.$t('text_confirm'),
+          cancelText: this.$t('text_close'),
           onOk: () => {
             this.abortAnalysis();
           }

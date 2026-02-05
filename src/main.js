@@ -14,9 +14,13 @@ import Plugins from "@/plugins";
 import { initI18n } from "@/utils/i18n";
 import bootstrap from "@/bootstrap";
 import "moment/locale/zh-cn";
+import "moment/locale/zh-tw";
 import 'highlight.js/styles/github.css';  // 或其他主题样式
 const router = initRouter(store.state.setting.asyncRoutes);
 const i18n = initI18n("CN", "US");
+
+// 将 i18n 实例挂载到 window，方便在 store 中访问
+window.$i18n = i18n;
 
 Vue.use(Antd);
 Vue.config.productionTip = false;

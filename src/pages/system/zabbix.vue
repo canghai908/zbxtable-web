@@ -1,9 +1,9 @@
 <template>
   <page-layout :noTitle="true">
-    <a-card title="Zabbix 实例管理" :bordered="false">
+    <a-card :title="$t('title')" :bordered="false">
       <div style="margin-bottom: 12px; display: flex; gap: 8px; align-items: center;">
-        <a-button type="primary" @click="openCreate">新增实例</a-button>
-        <a-button @click="load">刷新</a-button>
+        <a-button type="primary" @click="openCreate">{{$t('addInstance')}}</a-button>
+        <a-button @click="load">{{$t('refresh')}}</a-button>
       </div>
 
       <a-table :loading="loading" :columns="columns" :data-source="list" :rowKey="r => r.id" :pagination="{ pageSize: 10 }">
@@ -411,6 +411,7 @@ import { configGetList } from '@/services/admin'
 
 export default {
   name: 'SystemZabbixInstance',
+  i18n: require('./zabbix-i18n'),
   components: { PageLayout },
   data () {
     return {
