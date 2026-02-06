@@ -185,7 +185,7 @@
                       <p style="margin-bottom: 8px;">✅ 配置文件已生成</p>
                       <p style="margin-bottom: 8px;">✅ 数据库已初始化</p>
                       <p v-if="portChanged" style="margin-bottom: 8px;">🔄 HTTP 端口: {{ oldPort }} → {{ newPort }}</p>
-                      <p v-else style="margin-bottom: 8px;">🔄 HTTP 端口: {{ newPort || '8085' }}</p>
+                      <p v-else style="margin-bottom: 8px;">🔄 HTTP 端口: {{ newPort || '8088' }}</p>
                       <p style="margin-bottom: 12px; font-weight: 500;">⚠️ 请重启程序以加载配置：</p>
                       <div style="background: #f5f5f5; padding: 12px; border-radius: 4px; margin-bottom: 12px;">
                         <code style="font-size: 14px; color: #d63031; font-weight: 500;">
@@ -206,7 +206,7 @@
                     前往登录页面
                   </a-button>
                   <p style="margin-top: 12px; color: #999; font-size: 13px;">
-                    登录地址: http://{{ getHostname() }}:{{ newPort || '8085' }}/login
+                    登录地址: http://{{ getHostname() }}:{{ newPort || '8088' }}/login
                   </p>
                 </div>
               </div>
@@ -304,7 +304,7 @@ export default {
         ]
       },
       systemForm: {
-        httpport: 8085,
+        httpport: 8088,
         runmode: 'prod',
         timeout: 12
       },
