@@ -171,9 +171,45 @@
 
         <!-- 步骤 4: 完成安装 -->
         <div v-show="currentStep === 3" class="step-content">
-          <a-result status="success" title="安装完成！" sub-title="ZbxTable 已成功安装，您现在可以开始使用了。">
+          <a-result status="success" title="安装完成！" sub-title="配置文件已生成，数据库已初始化，请手动重启程序">
             <template slot="extra">
-              <a-button type="primary" @click="goToLogin">前往登录</a-button>
+              <div class="success-instructions">
+                <a-alert
+                  message="请手动重启程序"
+                  type="warning"
+                  show-icon
+                  style="margin-bottom: 24px; text-align: left;"
+                >
+                  <template slot="description">
+                    <div style="line-height: 1.8;">
+                      <p style="margin-bottom: 8px;">✅ 配置文件已生成</p>
+                      <p style="margin-bottom: 8px;">✅ 数据库已初始化</p>
+                      <p v-if="portChanged" style="margin-bottom: 8px;">🔄 HTTP 端口: {{ oldPort }} → {{ newPort }}</p>
+                      <p v-else style="margin-bottom: 8px;">🔄 HTTP 端口: {{ newPort || '8085' }}</p>
+                      <p style="margin-bottom: 12px; font-weight: 500;">⚠️ 请重启程序以加载配置：</p>
+                      <div style="background: #f5f5f5; padding: 12px; border-radius: 4px; margin-bottom: 12px;">
+                        <code style="font-size: 14px; color: #d63031; font-weight: 500;">
+                          systemctl restart zbxtable
+                        </code>
+                      </div>
+                      <p style="margin-bottom: 12px; color: #666; font-size: 13px;">
+                        重启完成后，点击下方按钮跳转到登录页面
+                      </p>
+                      <p style="margin: 0; color: #666; font-size: 13px;">
+                        💡 提示：默认管理员账号 admin，密码 Zbxtable
+                      </p>
+                    </div>
+                  </template>
+                </a-alert>
+                <div style="text-align: center;">
+                  <a-button type="primary" size="large" icon="login" @click="goToLogin">
+                    前往登录页面
+                  </a-button>
+                  <p style="margin-top: 12px; color: #999; font-size: 13px;">
+                    登录地址: http://{{ getHostname() }}:{{ newPort || '8085' }}/login
+                  </p>
+                </div>
+              </div>
             </template>
           </a-result>
         </div>
@@ -204,6 +240,9 @@ export default {
       installing: false,
       dbChecking: false,
       dbCheckResult: null,
+      portChanged: false,
+      oldPort: '',
+      newPort: '',
       dbForm: {
         dbtype: 'mysql',
         dbhost: 'localhost',
@@ -426,7 +465,27 @@ export default {
           (biz && typeof biz.success !== 'undefined' ? biz.success : undefined)
 
         if (ok && success) {
-          this.$message.success('安装成功！')
+          // 获取端口信息
+          const portChanged = 
+            (biz && biz.data && biz.data.port_changed) || 
+            (biz && biz.port_changed) || 
+            false
+          
+          const oldPort = 
+            (biz && biz.data && biz.data.old_port) || 
+            (biz && biz.old_port) || 
+            '8085'
+          
+          const newPort = 
+            (biz && biz.data && biz.data.new_port) || 
+            (biz && biz.new_port) || 
+            '8085'
+          
+          this.portChanged = portChanged
+          this.oldPort = oldPort
+          this.newPort = newPort
+          
+          this.$message.success('安装成功！请手动重启程序')
           resetInstallStatusCache()
           this.currentStep = 3
         } else {
@@ -439,6 +498,9 @@ export default {
       } finally {
         this.installing = false
       }
+    },
+    getHostname() {
+      return window.location.hostname
     },
     goToLogin() {
       resetInstallStatusCache()
@@ -564,5 +626,14 @@ export default {
 .password-mask {
   color: #999;
   letter-spacing: 2px;
+}
+
+.success-instructions {
+  max-width: 600px;
+  margin: 0 auto;
+  
+  p {
+    font-size: 14px;
+  }
 }
 </style>
