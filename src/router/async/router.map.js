@@ -157,6 +157,9 @@ const routerMap = {
 	metricMapping: {
 		component: () => import('@/pages/system/metricMapping'),
 	},
+	menuManagement: {
+		component: () => import('@/pages/system/menu'),
+	},
 
 	form: {
 		name: '表单页',
