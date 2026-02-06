@@ -15,6 +15,10 @@
         :row-key="record => record.id"
         :default-expand-all-rows="true"
       >
+        <span slot="menu_name" slot-scope="text, record">
+          {{ record.display_name || record.name }}
+        </span>
+
         <span slot="icon" slot-scope="text">
           <a-icon v-if="text" :type="text" style="font-size: 18px;" />
           <span v-else>-</span>
@@ -68,7 +72,7 @@
           <a-select v-model="formData.parent_id" :placeholder="$t('select_parent')">
             <a-select-option :value="0">{{ $t('root_menu') }}</a-select-option>
             <a-select-option v-for="menu in parentMenus" :key="menu.id" :value="menu.id">
-              {{ menu.name }}
+              {{ menu.display_name || menu.name }}
             </a-select-option>
           </a-select>
         </a-form-model-item>
@@ -138,6 +142,7 @@
 <script>
 import PageLayout from '@/layouts/PageLayout'
 import { getMenus, getParentMenus, createMenu, updateMenu, deleteMenu } from '@/services/menu'
+import { getI18nKey } from '@/utils/routerUtil'
 
 export default {
   name: 'MenuManagement',
@@ -147,7 +152,9 @@ export default {
     return {
       loading: false,
       menus: [],
+      rawMenus: [], // 存储原始的中文菜单数据
       parentMenus: [],
+      rawParentMenus: [], // 存储原始的中文父菜单数据
       modalVisible: false,
       modalLoading: false,
       isEdit: false,
@@ -181,6 +188,7 @@ export default {
           dataIndex: 'name',
           key: 'name',
           width: 200,
+          scopedSlots: { customRender: 'menu_name' },
         },
         {
           title: this.$t('menu_path'),
@@ -249,13 +257,71 @@ export default {
     this.loadMenus()
     this.loadParentMenus()
   },
+  watch: {
+    '$i18n.locale'() {
+      // 语言切换时重新翻译菜单数据
+      if (this.rawMenus && this.rawMenus.length > 0) {
+        this.menus = this.translateMenuData(this.rawMenus)
+      }
+      if (this.rawParentMenus && this.rawParentMenus.length > 0) {
+        this.parentMenus = this.translateMenuData(this.rawParentMenus)
+      }
+    }
+  },
   methods: {
+    getGlobalI18n() {
+      return (this.$root && this.$root.$i18n) ? this.$root.$i18n : this.$i18n
+    },
+    resolveMenuFullPath(menu, menuMap, cache) {
+      if (!menu || !menu.id) return ''
+      if (cache[menu.id]) return cache[menu.id]
+
+      const rawPath = (menu.path || '').trim()
+      if (!menu.parent_id || menu.parent_id === 0) {
+        if (!rawPath) {
+          cache[menu.id] = ''
+          return ''
+        }
+        const rootPath = rawPath.startsWith('/') ? rawPath : `/${rawPath}`
+        cache[menu.id] = rootPath
+        return rootPath
+      }
+
+      const parent = menuMap[menu.parent_id]
+      const parentFullPath = parent ? this.resolveMenuFullPath(parent, menuMap, cache) : ''
+
+      if (!rawPath) {
+        cache[menu.id] = parentFullPath
+        return parentFullPath
+      }
+
+      if (rawPath.startsWith('/')) {
+        cache[menu.id] = rawPath
+        return rawPath
+      }
+
+      const joined = parentFullPath
+        ? `${parentFullPath.replace(/\/$/, '')}/${rawPath}`
+        : `/${rawPath}`
+      cache[menu.id] = joined
+      return joined
+    },
+    translateMenuName(menu, fullPath) {
+      const i18n = this.getGlobalI18n()
+      if (!i18n) return menu.name
+      const i18nKey = fullPath ? getI18nKey(fullPath) : ''
+      if (i18nKey && i18n.te(i18nKey)) {
+        return i18n.t(i18nKey)
+      }
+      return menu.name
+    },
     async loadMenus() {
       this.loading = true
       try {
         const res = await getMenus()
         if (res.data.code === 200) {
-          this.menus = res.data.data || []
+          this.rawMenus = res.data.data || [] // 保存原始数据
+          this.menus = this.translateMenuData(this.rawMenus)
         } else {
           this.$message.error(res.data.message || this.$t('load_failed'))
         }
@@ -269,11 +335,34 @@ export default {
       try {
         const res = await getParentMenus()
         if (res.data.code === 200) {
-          this.parentMenus = res.data.data || []
+          this.rawParentMenus = res.data.data || [] // 保存原始数据
+          this.parentMenus = this.translateMenuData(this.rawParentMenus)
         }
       } catch (error) {
         console.error('加载父菜单失败:', error)
       }
+    },
+    // 翻译菜单数据
+    translateMenuData(menus) {
+      if (!menus || !Array.isArray(menus)) return menus
+
+      const menuMap = {}
+      menus.forEach(menu => {
+        if (menu && menu.id) {
+          menuMap[menu.id] = menu
+        }
+      })
+      const cache = {}
+
+      return menus.map(menu => {
+        const fullPath = this.resolveMenuFullPath(menu, menuMap, cache)
+        return {
+          ...menu,
+          raw_name: menu.name,
+          full_path: fullPath,
+          display_name: this.translateMenuName(menu, fullPath),
+        }
+      })
     },
     buildMenuTree(menus, parentId) {
       const tree = []

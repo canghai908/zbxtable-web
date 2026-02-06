@@ -343,6 +343,16 @@ export async function getPublicSystemInfo() {
 	return request('/v1/info', METHOD.GET)
 }
 
+// 获取初始配置状态
+export async function getInitialSetupStatus() {
+	return request('/v1/system/setup-status', METHOD.GET)
+}
+
+// 完成初始配置
+export async function completeInitialSetup() {
+	return request('/v1/system/complete-setup', METHOD.POST)
+}
+
 export default {
 	hostList,
 	hostDetail,

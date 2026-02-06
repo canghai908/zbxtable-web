@@ -68,7 +68,8 @@ module.exports = {
         sysConfig: {name: '参数配置'},
         version: {name: '版本信息'},
         mapping: {name: '指标映射'},
-        metricMapping: {name: '指标映射'}
+        metricMapping: {name: '指标映射'},
+        menu: {name: '菜单管理'},
       },
       form: {
         name: '表单页',
@@ -178,6 +179,7 @@ module.exports = {
         sysConfig: {name: 'Parameter'},
         version: {name: 'Version'},
         mapping: {name: 'Metric Mapping'},
+        menu: {name: 'Menu'},
         metricMapping: {name: 'Metric Mapping'}
       },
       form: {
@@ -288,6 +290,7 @@ module.exports = {
         sysConfig: {name: '參數配置'},
         version: {name: '版本信息'},
         mapping: {name: '指標映射'},
+        menu: {name: '菜單'},
         metricMapping: {name: '指標映射'}
       },
       form: {

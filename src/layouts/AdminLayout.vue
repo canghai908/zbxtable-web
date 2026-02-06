@@ -23,6 +23,9 @@
         <page-footer :link-list="footerLinks" :copyright="copyright" />
       </a-layout-footer> -->
     </a-layout>
+
+    <!-- 首次配置引导 -->
+    <setup-guide :visible="showSetupGuide" @finish="handleSetupFinish" @skip="handleSetupSkip" />
   </a-layout>
 </template>
 
@@ -32,19 +35,22 @@ import AdminHeader from './header/AdminHeader'
 import Drawer from '../components/tool/Drawer'
 import SideMenu from '../components/menu/SideMenu'
 import Setting from '../components/setting/Setting'
+import SetupGuide from '../components/SetupGuide'
 import {mapState, mapMutations, mapGetters} from 'vuex'
+import {getInitialSetupStatus, completeInitialSetup} from '@/services/admin'
 
 // const minHeight = window.innerHeight - 64 - 122
 
 export default {
   name: 'AdminLayout',
-  components: {Setting, SideMenu, Drawer, AdminHeader},
+  components: {Setting, SideMenu, Drawer, AdminHeader, SetupGuide},
   data () {
     return {
       minHeight: window.innerHeight - 64,
       collapsed: false,
       showSetting: false,
-      drawerOpen: false
+      drawerOpen: false,
+      showSetupGuide: false
     }
   },
   provide() {
@@ -106,11 +112,50 @@ export default {
           }
         }
       }
+    },
+    async checkSetupStatus() {
+      try {
+        const res = await getInitialSetupStatus()
+        const biz = (res && res.data) ? res.data : res
+        if (biz && biz.code === 200) {
+          const data = biz.data
+          // 如果初始配置未完成，显示引导
+          if (!data.setup_completed) {
+            // 延迟显示引导，确保页面已加载
+            setTimeout(() => {
+              this.showSetupGuide = true
+            }, 1000)
+          }
+        }
+      } catch (error) {
+        console.error('检查初始配置状态失败:', error)
+      }
+    },
+    async handleSetupFinish() {
+      try {
+        const res = await completeInitialSetup()
+        const biz = (res && res.data) ? res.data : res
+        if (biz && biz.code === 200) {
+          this.$message.success(this.$t('setupGuide.complete_success'))
+          this.showSetupGuide = false
+        } else {
+          this.$message.error(this.$t('setupGuide.complete_mark_failed'))
+        }
+      } catch (error) {
+        console.error('完成初始配置失败:', error)
+        this.$message.error(this.$t('setupGuide.complete_action_failed'))
+      }
+    },
+    handleSetupSkip() {
+      this.showSetupGuide = false
+      this.$message.info(this.$t('setupGuide.skip_tip'))
     }
   },
   created() {
     this.correctPageMinHeight(this.minHeight - 24)
     this.setActivated(this.$route)
+    // 检查是否需要显示初始配置引导
+    this.checkSetupStatus()
   },
   beforeDestroy() {
     this.correctPageMinHeight(-this.minHeight + 24)

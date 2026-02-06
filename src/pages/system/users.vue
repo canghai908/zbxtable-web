@@ -16,7 +16,7 @@
       </a-form-model-item>
     </a-form-model>
     <div class="linux-list">
-      <a-table :loading="loading" :columns="columns" :data-source="list" @change="changePage" :pagination="pagination" :rowKey="(record) => { return record.hostid;}">
+      <a-table :loading="loading" :columns="columns" :data-source="list" @change="changePage" :pagination="pagination" :rowKey="(record) => { return record.id;}">
         <span slot="id" slot-scope="record">{{record.id}}</span>
         <div slot="username" slot-scope="record">{{record.username}}</div>
         <div slot="role" slot-scope="record">{{getRoleLabel(record.role)}}</div>
@@ -58,29 +58,29 @@
           <a-form-model-item :label="$t('modalUsername')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="username">
             <a-input v-model.trim="user.username" :placeholder="$t('modalInputUser')" />
           </a-form-model-item>
-          <a-form-model-item :label="$t('password')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="password">
+          <a-form-model-item :label="$t('label_password')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="password">
             <a-input-password v-model="user.password" :placeholder="$t('modalInputPassword')" />
           </a-form-model-item>
-          <a-form-model-item :label="$t('role')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="role">
+          <a-form-model-item :label="$t('label_role')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="role">
             <a-select v-model="user.role">
               <a-select-option v-for="(item, index) in roleOption" :key="index" :value="item.value" :label="item.label" :title="item.label">
                 {{ item.label }}
               </a-select-option>
             </a-select>
           </a-form-model-item>
-          <a-form-model-item :label="$t('email')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="email">
+          <a-form-model-item :label="$t('label_email')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="email">
             <a-input v-model.trim="user.email" :placeholder="$t('modalInputEmail')" />
           </a-form-model-item>
-          <a-form-model-item :label="$t('phone')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="phone">
+          <a-form-model-item :label="$t('label_phone')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="phone">
             <a-input v-model.trim="user.phone" :placeholder="$t('modalInputPhone')" />
           </a-form-model-item>
-          <a-form-model-item :label="$t('wechat')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="wechat">
+          <a-form-model-item :label="$t('label_wechat')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="wechat">
             <a-input v-model.trim="user.wechat" :placeholder="$t('modalInputWechat')" />
           </a-form-model-item>
-          <a-form-model-item :label="$t('wechat_robot_key')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="wechat_robot_key">
+          <a-form-model-item :label="$t('label_wechat_robot_key')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="wechat_robot_key">
             <a-input-password v-model.trim="user.wechat_robot_key" :placeholder="$t('modalInputWechatRobotKey')" />
           </a-form-model-item>
-          <a-form-model-item :label="$t('ding_talk')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="ding_talk">
+          <a-form-model-item :label="$t('label_ding_talk')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="ding_talk">
             <a-input v-model.trim="user.ding_talk" :placeholder="$t('modalInputDingTalk')" />
           </a-form-model-item>
         </a-form-model>
@@ -92,29 +92,29 @@
           <a-form-model-item :label="$t('modalUsername')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="username">
             <span>{{user.username}}</span>
           </a-form-model-item>
-          <a-form-model-item :label="$t('password')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="password">
+          <a-form-model-item :label="$t('label_password')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="password">
             <a-input-password v-model="user.password" :placeholder="$t('modalEditPassword')" />
           </a-form-model-item>
-          <a-form-model-item v-if="nowrole==='admin'" :label="$t('role')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="role">
+          <a-form-model-item v-if="nowrole==='admin'" :label="$t('label_role')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="role">
             <a-select v-model="user.role">
               <a-select-option v-for="(item, index) in roleOption" :key="index" :value="item.value" :label="item.label" :title="item.label">
                 {{ item.label }}
               </a-select-option>
             </a-select>
           </a-form-model-item>
-          <a-form-model-item :label="$t('email')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="email">
+          <a-form-model-item :label="$t('label_email')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="email">
             <a-input v-model.trim="user.email" :placeholder="$t('modalInputEmail')" />
           </a-form-model-item>
-          <a-form-model-item :label="$t('phone')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="phone">
+          <a-form-model-item :label="$t('label_phone')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="phone">
             <a-input v-model.trim="user.phone" :placeholder="$t('modalInputPhone')" />
           </a-form-model-item>
-          <a-form-model-item :label="$t('wechat')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="wechat">
+          <a-form-model-item :label="$t('label_wechat')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="wechat">
             <a-input v-model.trim="user.wechat" :placeholder="$t('modalInputWechat')" />
           </a-form-model-item>
-          <a-form-model-item :label="$t('wechat_robot_key')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="wechat_robot_key">
+          <a-form-model-item :label="$t('label_wechat_robot_key')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="wechat_robot_key">
             <a-input-password v-model.trim="user.wechat_robot_key" :placeholder="$t('modalInputWechatRobotKey')" />
           </a-form-model-item>
-          <a-form-model-item :label="$t('ding_talk')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="ding_talk">
+          <a-form-model-item :label="$t('label_ding_talk')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="ding_talk">
             <a-input v-model.trim="user.ding_talk" :placeholder="$t('modalInputDingTalk')" />
           </a-form-model-item>
         </a-form-model>
