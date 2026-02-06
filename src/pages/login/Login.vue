@@ -172,7 +172,44 @@ export default {
           
           // 保存到 localStorage，这样刷新页面时会自动加载
           localStorage.setItem(process.env.VUE_APP_SETTING_KEY, JSON.stringify(themeConfig))
-          console.log('用户主题配置已加载:', themeConfig)
+          
+          // 立即应用主题配置到 Vuex store
+          if (themeConfig.theme) {
+            this.$store.commit('setting/setTheme', themeConfig.theme)
+            // 应用主题颜色
+            const themeUtil = require('@/utils/themeUtil')
+            themeUtil.changeThemeColor(themeConfig.theme.color, themeConfig.theme.mode)
+          }
+          
+          // 应用动画配置
+          if (themeConfig.animate) {
+            this.$store.commit('setting/setAnimate', themeConfig.animate)
+          }
+          
+          // 应用其他配置
+          if (themeConfig.layout) {
+            this.$store.commit('setting/setLayout', themeConfig.layout)
+          }
+          if (themeConfig.multiPage !== undefined) {
+            this.$store.commit('setting/setMultiPage', themeConfig.multiPage)
+          }
+          if (themeConfig.weekMode !== undefined) {
+            this.$store.commit('setting/setWeekMode', themeConfig.weekMode)
+          }
+          if (themeConfig.fixedHeader !== undefined) {
+            this.$store.commit('setting/setFixedHeader', themeConfig.fixedHeader)
+          }
+          if (themeConfig.fixedSideBar !== undefined) {
+            this.$store.commit('setting/setFixedSideBar', themeConfig.fixedSideBar)
+          }
+          if (themeConfig.hideSetting !== undefined) {
+            this.$store.commit('setting/setHideSetting', themeConfig.hideSetting)
+          }
+          if (themeConfig.pageWidth) {
+            this.$store.commit('setting/setPageWidth', themeConfig.pageWidth)
+          }
+          
+          console.log('用户主题配置已加载并应用:', themeConfig)
         }
       } catch (error) {
         console.warn('加载用户主题配置失败，使用默认配置:', error)
