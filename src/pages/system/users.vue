@@ -19,7 +19,7 @@
       <a-table :loading="loading" :columns="columns" :data-source="list" @change="changePage" :pagination="pagination" :rowKey="(record) => { return record.hostid;}">
         <span slot="id" slot-scope="record">{{record.id}}</span>
         <div slot="username" slot-scope="record">{{record.username}}</div>
-        <div slot="role" slot-scope="record">{{record.role | renderRole}}</div>
+        <div slot="role" slot-scope="record">{{getRoleLabel(record.role)}}</div>
         <div slot="email" slot-scope="record">{{record.email}}</div>
         <div slot="phone" slot-scope="record">{{record.phone}}</div>
         <span slot="ding_talk" slot-scope="record">{{record.ding_talk}}</span>
@@ -158,28 +158,6 @@ export default {
       nowuser: "",
       nowrole: "",
       wechatRobotKeyVisible: {}, // 存储每行key的显示状态 {recordId: true/false}
-      statusOption: [
-	{ label: this.$t('state_enabled'), value: "0" },
-	{ label: this.$t('state_disabled'), value: "1" },
-      ],
-      roleOption: [
-        { label: this.$t('role_user'), value: "user" },
-        { label: this.$t('role_admin'), value: "admin" },
-      ],
-      columns: [
-        { title: "ID", key: "id", align: "left", scopedSlots: { customRender: "id" }, },
-        { title: this.$t('table_headers_username'), key: 'username', align: 'left', scopedSlots: { customRender: 'username' } },
-        { title: this.$t('table_headers_role'), key: 'role', align: 'left', scopedSlots: { customRender: 'role' } },
-        { title: this.$t('table_headers_email'), key: 'email', align: 'left', scopedSlots: { customRender: 'email' } },
-        { title: this.$t('table_headers_phone'), key: 'phone', align: 'left', scopedSlots: { customRender: 'phone' } },
-        { title: this.$t('table_headers_ding_talk'), key: 'ding_talk', align: 'left', scopedSlots: { customRender: 'ding_talk' } },
-        { title: this.$t('table_headers_wechat'), key: 'wechat', align: 'left', scopedSlots: { customRender: 'wechat' } },
-        { title: this.$t('table_headers_wechat_robot_key'), key: 'wechat_robot_key', align: 'left', scopedSlots: { customRender: 'wechat_robot_key' } },
-        { title: this.$t('table_headers_creation_date'), key: 'created', align: 'left', scopedSlots: { customRender: 'created' } },
-        { title: this.$t('table_headers_user_status'), key: 'status', align: 'left', scopedSlots: { customRender: 'status' } },
-        { title: this.$t('table_headers_operation'), key: 'operation', align: 'center', scopedSlots: { customRender: 'operation' } }
-
-      ],
       user: {
         username: "",
         password: "",
@@ -223,18 +201,47 @@ export default {
       },
     };
   },
+  computed: {
+    statusOption() {
+      return [
+        { label: this.$t('state_enabled'), value: "0" },
+        { label: this.$t('state_disabled'), value: "1" },
+      ];
+    },
+    roleOption() {
+      return [
+        { label: this.$t('role_user'), value: "user" },
+        { label: this.$t('role_admin'), value: "admin" },
+      ];
+    },
+    columns() {
+      return [
+        { title: "ID", key: "id", align: "left", scopedSlots: { customRender: "id" }, },
+        { title: this.$t('table_headers_username'), key: 'username', align: 'left', scopedSlots: { customRender: 'username' } },
+        { title: this.$t('table_headers_role'), key: 'role', align: 'left', scopedSlots: { customRender: 'role' } },
+        { title: this.$t('table_headers_email'), key: 'email', align: 'left', scopedSlots: { customRender: 'email' } },
+        { title: this.$t('table_headers_phone'), key: 'phone', align: 'left', scopedSlots: { customRender: 'phone' } },
+        { title: this.$t('table_headers_ding_talk'), key: 'ding_talk', align: 'left', scopedSlots: { customRender: 'ding_talk' } },
+        { title: this.$t('table_headers_wechat'), key: 'wechat', align: 'left', scopedSlots: { customRender: 'wechat' } },
+        { title: this.$t('table_headers_wechat_robot_key'), key: 'wechat_robot_key', align: 'left', scopedSlots: { customRender: 'wechat_robot_key' } },
+        { title: this.$t('table_headers_creation_date'), key: 'created', align: 'left', scopedSlots: { customRender: 'created' } },
+        { title: this.$t('table_headers_user_status'), key: 'status', align: 'left', scopedSlots: { customRender: 'status' } },
+        { title: this.$t('table_headers_operation'), key: 'operation', align: 'center', scopedSlots: { customRender: 'operation' } }
+      ];
+    },
+  },
   filters: {
     parsetime(v) {
       return parseTimeFun(v);
-    },
-    renderRole(v) {
-      return v === "admin" ? "管理员" : "普通用户";
     },
   },
   created() {
     this.init();
   },
   methods: {
+    getRoleLabel(role) {
+      return role === "admin" ? this.$t('role_admin') : this.$t('role_user');
+    },
     init() {
       this.nowuser = this.$store.getters['account/user'].name;
       this.nowrole = this.$store.getters['account/user'].role;

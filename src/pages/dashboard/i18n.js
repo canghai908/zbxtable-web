@@ -197,7 +197,7 @@ module.exports = {
 			label_IP: 'IP',
 			label_cpu_usage: 'CPU usage',
 			label_memory_usage: 'Memory usage',
-			label_num_erorrs: 'number of errors',
+			label_num_errors: 'Number of errors',
 			label_num_alarms: 'Number of alarms',
 			num_windows_hosts: 'Windows',
 			num_linux_hosts: 'Linux',

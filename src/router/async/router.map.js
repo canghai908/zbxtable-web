@@ -19,7 +19,7 @@ const routerMap = {
 	},
 	root: {
 		path: '/',
-		name: '首页',
+		name: '根路由',
 		redirect: '/login',
 		component: view.tabs,
 	},

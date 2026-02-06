@@ -92,7 +92,7 @@
                 </div>
               </div>
               <div class="homeLegent2">
-                <div class="homeLeItem" v-for="(v, i) in winM.slice(1)" :key="i">
+                <div class="homeLeItem" v-for="(v, i) in winM.slice(1)" :key="'winM-'+i">
                   <div class="homeLeTop">
                     <div class="homeLeTop1"><img :src="require('../../assets/img/top'+(i+2)+'.png')" alt=""></div>
                     <div class="homeLeTop2" :title="v.hostname + (v.instance_name ? ' [' + v.instance_name + ']' : '')">
@@ -105,7 +105,7 @@
                     <legent :rate="v.score"></legent>
                   </div>
                 </div>
-                <div class="homeLeItem" v-for="i in 5-winM.length" :key="i"></div>
+                <div class="homeLeItem" v-for="i in 5-winM.length" :key="'winM-empty-'+i"></div>
               </div>
             </div>
           </a-card>
@@ -149,7 +149,7 @@
                 </div>
               </div>
               <div class="homeLegent2">
-                <div class="homeLeItem" v-for="(v, i) in linM.slice(1)" :key="i">
+                <div class="homeLeItem" v-for="(v, i) in linM.slice(1)" :key="'linM-'+i">
                   <div class="homeLeTop">
                     <div class="homeLeTop1"><img :src="require('../../assets/img/top'+(i+2)+'.png')" alt=""></div>
                     <div class="homeLeTop2" :title="v.hostname + (v.instance_name ? ' [' + v.instance_name + ']' : '')">
@@ -162,7 +162,7 @@
                     <legent :rate="v.score"></legent>
                   </div>
                 </div>
-                <div class="homeLeItem" v-for="i in 5-linM.length" :key="i"></div>
+                <div class="homeLeItem" v-for="i in 5-linM.length" :key="'linM-empty-'+i"></div>
               </div>
             </div>
           </a-card>

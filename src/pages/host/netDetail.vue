@@ -302,25 +302,28 @@ export default {
         yAxis: '',
         legend: '',
         title: '',
-        list: ''
+        list: []
       },
       diescardedSeries: {
         xAxis: '',
         yAxis: '',
         legend: '',
-        title: ''
+        title: '',
+        list: []
       },
       errorsSeries: {
         xAxis: '',
         yAxis: '',
         legend: '',
-        title: ''
+        title: '',
+        list: []
       },
       operationalSeries: {
         xAxis: '',
         yAxis: '',
         legend: '',
-        title: ''
+        title: '',
+        list: []
       },
       columns: [],
       trafficeColumns: [],

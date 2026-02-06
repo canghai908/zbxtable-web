@@ -118,20 +118,20 @@
     <a-modal :title="$t('mutes_modal_title_edit')" :visible="visibleEdit" :confirm-loading="confirmLoading" @ok="updateRule" @cancel="handleEditCancel" width="1000px">
       <template>
         <a-form-model :model="rule">
-          <a-form-model-item :label="$t('title')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="name" :required="true">
-            <a-input v-model.trim="rule.name" :placeholder="$t('titleInput')" />
+          <a-form-model-item :label="$t('mutes_form_name')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="name" :required="true">
+            <a-input v-model.trim="rule.name" :placeholder="$t('mutes_form_name_placeholder')" />
           </a-form-model-item>
-          <a-form-model-item :label="$t('zid')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="zid">
+          <a-form-model-item :label="$t('mutes_form_instance')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="zid">
             <a-select v-model="rule.zid" mode="multiple" style="width: 100%" :placeholder="$t('mutes_form_instance_placeholder')" @change="handleTenantChange" :required="true">
               <a-select-option v-for="(item, index) in tenantlist" :key="index" :value="item.zid" :label="item.zid" :title="item.zid">
                 {{ item.zid }}
               </a-select-option>
             </a-select>
           </a-form-model-item>
-          <a-card class="card" :title="$t('task1')" :bordered="false">
+          <a-card class="card" :title="$t('mutes_form_condition_card_title')" :bordered="false">
             <a-row class="form-row" v-for="(itv, its) in rule.conditions" :key="its">
               <a-col :lg="6" :md="12" :sm="24">
-                <a-form-item :label="$t('rule')" :required="false">
+                <a-form-item :label="$t('mutes_form_field')" :required="false">
                   <a-select v-model="itv.r_type">
                     <a-select-option v-for="(item, index) in rTypeOptions" :key="index" :value="item.value" :label="item.label" :title="item.label">
                       {{ item.label }}
@@ -140,7 +140,7 @@
                 </a-form-item>
               </a-col>
               <a-col :xl="{span: 6, offset: 1}" :lg="{span: 8}" :md="{span: 12}" :sm="24">
-                <a-form-item :label="$t('operator')">
+                <a-form-item :label="$t('mutes_form_operator')">
                   <a-select v-model="itv.r_func">
                     <a-select-option v-for="(item, index) in rFuncOptions" :key="index" :value="item.value" :label="item.label" :title="item.label">
                       {{ item.label }}
@@ -149,27 +149,27 @@
                 </a-form-item>
               </a-col>
               <a-col :xl="{span: 6, offset: 1}" :lg="{span: 10}" :md="{span: 24}" :sm="24">
-                <a-form-item :label="$t('value')" :required="false">
-                  <a-input v-model="itv.r_value" :placeholder="$t('valueInput')" />
+                <a-form-item :label="$t('mutes_form_value')" :required="false">
+                  <a-input v-model="itv.r_value" :placeholder="$t('mutes_form_value_placeholder')" />
                 </a-form-item>
               </a-col>
               <a-col :span="2" :offset="1">
-                <a-form-item :label="$t('operation')" :required="false">
+                <a-form-item :label="$t('mutes_form_operation')" :required="false">
                   <a-button type="primary" style="margin-right: 10px" v-if="rule.conditions && rule.conditions.length > 1" icon="delete" shape="circle" @click="rule.conditions.splice(its, 1)" />
                   <a-button type="primary" v-if="its == 0" icon="plus" shape="circle" @click='rule.conditions.push({ r_type: "", r_func: "", r_value: "",})' />
                 </a-form-item>
               </a-col>
             </a-row>
           </a-card>
-          <a-card class="card" :title="$t('task')" :bordered="false">
+          <a-card class="card" :title="$t('mutes_form_time_card_title')" :bordered="false">
             <a-row>
               <a-col :span="8">
-                <a-form-model-item :label="$t('s_time')" :labelCol="{span: 8}" :wrapperCol="{span: 16}" :required="true">
+                <a-form-model-item :label="$t('mutes_form_start_time')" :labelCol="{span: 8}" :wrapperCol="{span: 16}" :required="true">
                   <a-date-picker show-time v-model="rule.s_time" @change="changeStime"></a-date-picker>
                 </a-form-model-item>
               </a-col>
               <a-col :span="8">
-                <a-form-model-item :label="$t('tduration')" :labelCol="{span: 8}" :wrapperCol="{span: 16}" :required="true">
+                <a-form-model-item :label="$t('mutes_form_duration')" :labelCol="{span: 8}" :wrapperCol="{span: 16}" :required="true">
                   <a-select @change="changeDuration">
                     <a-select-option v-for="(item, index) in tOptions" :key="index" :value="item.value" :label="item.label" :title="item.label">
                       {{ item.label }}
@@ -178,14 +178,14 @@
                 </a-form-model-item>
               </a-col>
               <a-col :span="8">
-                <a-form-model-item :label="$t('e_time')" :labelCol="{span: 8}" :wrapperCol="{span: 16}" :required="true">
+                <a-form-model-item :label="$t('mutes_form_end_time')" :labelCol="{span: 8}" :wrapperCol="{span: 16}" :required="true">
                   <a-date-picker show-time v-model="rule.e_time" @change="changeEtime"></a-date-picker>
                 </a-form-model-item>
               </a-col>
             </a-row>
             <a-row>
               <a-col :span="16">
-                <a-form-model-item :label="$t('mchannels')" :labelCol="{span: 4}" :wrapperCol="{span: 16}" :required="true">
+                <a-form-model-item :label="$t('mutes_form_mute_channels')" :labelCol="{span: 4}" :wrapperCol="{span: 16}" :required="true">
                   <a-checkbox-group v-model="rule.channel" :options="rChannelOptions" @change="onChannelChange">
                   </a-checkbox-group>
                 </a-form-model-item>
@@ -193,8 +193,8 @@
             </a-row>
             <a-row>
               <a-col :span="16">
-                <a-form-model-item :label="$t('mute_note')" :labelCol="{span:4}" :wrapperCol="{span: 18}" :required="true">
-                  <a-textarea v-model.trim="rule.note" :placeholder="$t('mute_noteInput')" :rows="2" />
+                <a-form-model-item :label="$t('mutes_form_mute_note')" :labelCol="{span:4}" :wrapperCol="{span: 18}" :required="true">
+                  <a-textarea v-model.trim="rule.note" :placeholder="$t('mutes_form_mute_note_placeholder')" :rows="2" />
                 </a-form-model-item>
               </a-col>
             </a-row>
@@ -239,7 +239,7 @@ export default {
         s_week: ['0', '1', '2', '3', '4', '5', '6'],
         s_time: parseTimeFun(new Date()),
         e_time: parseTimeFun(new Date().getTime() + 1 * 60 * 60 * 1000),
-        channel: "",
+        channel: [],
         user_ids: "",
         group_ids: "",
         note: "",
@@ -279,7 +279,6 @@ export default {
       this.rule = {
         name: this.host + " muted " + this.message,
         zid: this.zid,
-        channel: '',
         conditions: [{
           "r_type": "host",
           "r_func": "==",
@@ -293,7 +292,7 @@ export default {
         e_time: parseTimeFun(new Date().getTime() + 1 * 60 * 60 * 1000),
         note: this.host + " muted by " + this.$store.state.account['user'].name,
         duration: "1h",
-        channel: '',
+        channel: [],
         m_type: "3",
         status: "0"
       }
@@ -369,7 +368,7 @@ export default {
         },
         { title: this.$t('mutes_col_mute_condition'), dataIndex: "conditions", align: "left", },
         {
-          title: this.$t('mutes_col_mute_duration'), key: "duration", align: "left", customRender: (value, row, index) => {
+          title: this.$t('mutes_col_mute_duration'), dataIndex: "duration", key: "duration", align: "left", customRender: (value, row, index) => {
             var dateBegin = new Date(row.s_time);
             var dateEnd = new Date(row.e_time);
             var dateDiff = dateEnd.getTime() - dateBegin.getTime(); //时间差的毫秒数
@@ -390,11 +389,11 @@ export default {
             return obj;
           },
         },
-        { title: this.$t('mutes_col_start_time'), key: "s_time", align: "left", scopedSlots: { customRender: "s_time" }, },
-        { title: this.$t('mutes_col_end_time'), key: "e_time", align: "left", scopedSlots: { customRender: "e_time" }, },
-        { title: this.$t('mutes_col_add_time'), key: "created", align: "left", scopedSlots: { customRender: "created" }, },
-        { title: this.$t('mutes_col_policy_status'), key: "status", align: "left", scopedSlots: { customRender: "status" }, },
-        { title: this.$t('mutes_col_operation'), key: "operation", align: "left", scopedSlots: { customRender: "operation" } },
+        { title: this.$t('mutes_col_start_time'), dataIndex: "s_time", key: "s_time", align: "left", scopedSlots: { customRender: "s_time" }, },
+        { title: this.$t('mutes_col_end_time'), dataIndex: "e_time", key: "e_time", align: "left", scopedSlots: { customRender: "e_time" }, },
+        { title: this.$t('mutes_col_add_time'), dataIndex: "created", key: "created", align: "left", scopedSlots: { customRender: "created" }, },
+        { title: this.$t('mutes_col_policy_status'), dataIndex: "status", key: "status", align: "left", scopedSlots: { customRender: "status" }, },
+        { title: this.$t('mutes_col_operation'), dataIndex: "operation", key: "operation", align: "left", scopedSlots: { customRender: "operation" } },
       ];
       
       // 更新分页文本
@@ -460,7 +459,7 @@ export default {
         s_week: ['0', '1', '2', '3', '4', '5', '6'],
         s_time: parseTimeFun(new Date()),
         e_time: parseTimeFun(new Date().getTime() + 1 * 60 * 60 * 1000),
-        channel: "",
+        channel: [],
         note: "",
         duration: "1h",
         status: "0",

@@ -19,7 +19,7 @@
       </a-form-model-item>
     </a-form-model>
     <div class="linux-list">
-      <a-table :loading="loading" :columns="columns" :data-source="list" @change="changePage" :pagination="pagination" :rowKey="(record) => { return record.hostid;}">
+      <a-table :loading="loading" :columns="columns" :data-source="list" @change="changePage" :pagination="pagination" :rowKey="(record, index) => { return record.hostid ? `${record.hostid}-${index}` : `row-${index}`;}">
         <span slot="hostid" slot-scope="record">{{record.hostid}}</span>
         <div slot="name" slot-scope="record">{{record.name}}</div>
         <div slot="instance_name" slot-scope="record">

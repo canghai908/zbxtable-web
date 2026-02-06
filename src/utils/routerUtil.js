@@ -121,7 +121,10 @@ function loadRoutes(routesConfig) {
       formatRoutes(finalRoutes)
       router.options = {...router.options, routes: finalRoutes}
       router.matcher = new Router({...router.options, routes:[]}).matcher
-      router.addRoutes(finalRoutes)
+      // 使用 addRoute 替代已废弃的 addRoutes
+      finalRoutes.forEach(route => {
+        router.addRoute(route)
+      })
     }
   }
   // 提取路由国际化数据
