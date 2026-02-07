@@ -80,7 +80,12 @@
                 <div class="config-hint">{{ item.comment }}</div>
               </a-form-model-item>
               <a-form-model-item :wrapper-col="{ span: 14, offset: 6 }">
-                <a-button type="primary" @click="saveCategory('email')" :loading="saveLoading">{{$t('save')}}</a-button>
+                <a-space>
+                  <a-button type="primary" @click="saveCategory('email')" :loading="saveLoading">{{$t('save')}}</a-button>
+                  <a-button @click="showTestEmailModal">
+                    <a-icon type="mail" /> {{$t('testEmail')}}
+                  </a-button>
+                </a-space>
               </a-form-model-item>
             </a-form-model>
           </a-tab-pane>
@@ -99,7 +104,12 @@
                 <div class="config-hint">{{ item.comment }}</div>
               </a-form-model-item>
               <a-form-model-item :wrapper-col="{ span: 14, offset: 6 }">
-                <a-button type="primary" @click="saveCategory('wechat')" :loading="saveLoading">{{$t('save')}}</a-button>
+                <a-space>
+                  <a-button type="primary" @click="saveCategory('wechat')" :loading="saveLoading">{{$t('save')}}</a-button>
+                  <a-button @click="showTestWechatModal">
+                    <a-icon type="wechat" /> {{$t('testWechat')}}
+                  </a-button>
+                </a-space>
               </a-form-model-item>
             </a-form-model>
           </a-tab-pane>
@@ -193,6 +203,36 @@
         </a-tabs>
       </a-card>
     </div>
+
+    <!-- 测试邮件对话框 -->
+    <a-modal
+      :title="$t('testEmailTitle')"
+      :visible="testEmailVisible"
+      :confirm-loading="testingEmail"
+      @ok="handleTestEmail"
+      @cancel="testEmailVisible = false">
+      <div>
+        <a-input v-model="testEmailAddress" :placeholder="$t('testEmailPlaceholder')" size="large" />
+        <div class="config-hint" style="margin-top: 8px;">
+          <a-icon type="info-circle" /> {{$t('testEmailHint')}}
+        </div>
+      </div>
+    </a-modal>
+
+    <!-- 测试企业微信对话框 -->
+    <a-modal
+      :title="$t('testWechatTitle')"
+      :visible="testWechatVisible"
+      :confirm-loading="testingWechat"
+      @ok="handleTestWechat"
+      @cancel="testWechatVisible = false">
+      <div>
+        <a-input v-model="testWechatUserId" :placeholder="$t('testWechatPlaceholder')" size="large" />
+        <div class="config-hint" style="margin-top: 8px;">
+          <a-icon type="info-circle" /> {{$t('testWechatHint')}}
+        </div>
+      </div>
+    </a-modal>
   </page-layout>
 </template>
 
@@ -217,7 +257,13 @@ export default {
       saveLoading: false,
       logoUploading: false,
       isKeyVisible: false,  // 控制密钥是否可见
-      gettingUrl: false  // 控制获取地址按钮的加载状态
+      gettingUrl: false,  // 控制获取地址按钮的加载状态
+      testEmailVisible: false,  // 测试邮件对话框
+      testEmailAddress: '',  // 测试邮箱地址
+      testingEmail: false,  // 测试邮件加载状态
+      testWechatVisible: false,  // 测试企业微信对话框
+      testWechatUserId: '',  // 测试企业微信用户ID
+      testingWechat: false  // 测试企业微信加载状态
     }
   },
   computed: {
@@ -546,6 +592,75 @@ export default {
         this.$message.error(this.$t('urlGetFailed') + ': ' + error.message)
       } finally {
         this.gettingUrl = false
+      }
+    },
+    // 显示测试邮件对话框
+    showTestEmailModal() {
+      this.testEmailAddress = ''
+      this.testEmailVisible = true
+    },
+    // 处理测试邮件
+    async handleTestEmail() {
+      if (!this.testEmailAddress) {
+        this.$message.warning(this.$t('pleaseInputTestEmail'))
+        return
+      }
+      
+      // 简单的邮箱格式验证
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(this.testEmailAddress)) {
+        this.$message.warning('请输入有效的邮箱地址')
+        return
+      }
+      
+      this.testingEmail = true
+      try {
+        const axios = require('axios')
+        const response = await axios.post('/v1/system/test-email', {
+          test_email: this.testEmailAddress
+        })
+        
+        if (response.data.code === 200) {
+          this.$message.success(this.$t('testEmailSuccess'))
+          this.testEmailVisible = false
+        } else {
+          this.$message.error(response.data.message || this.$t('testFailed'))
+        }
+      } catch (error) {
+        this.$message.error(this.$t('testFailed') + ': ' + (error.response?.data?.message || error.message))
+      } finally {
+        this.testingEmail = false
+      }
+    },
+    // 显示测试企业微信对话框
+    showTestWechatModal() {
+      this.testWechatUserId = ''
+      this.testWechatVisible = true
+    },
+    // 处理测试企业微信
+    async handleTestWechat() {
+      if (!this.testWechatUserId) {
+        this.$message.warning(this.$t('pleaseInputTestUserId'))
+        return
+      }
+      
+      this.testingWechat = true
+      try {
+        const axios = require('axios')
+        const response = await axios.post('/v1/system/test-wechat', {
+          test_user_id: this.testWechatUserId
+        })
+        
+        if (response.data.code === 200) {
+          this.$message.success(this.$t('testWechatSuccess'))
+          this.testWechatVisible = false
+        } else {
+          this.$message.error(response.data.message || this.$t('testFailed'))
+        }
+      } catch (error) {
+        this.$message.error(this.$t('testFailed') + ': ' + (error.response?.data?.message || error.message))
+      } finally {
+        this.testingWechat = false
       }
     }
   }
