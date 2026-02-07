@@ -24,31 +24,16 @@ module.exports = {
 module.exports = {
   devServer: {
     proxy: {
-      "/v1": {
-        //此处要与 /services/api.js 中的 API_PROXY_PREFIX 值保持一致
-        target: process.env.VUE_APP_API_BASE_URL || "http://localhost:8085",
+      // 统一代理配置：/v1, /download, /public, /install
+      "^/(v1|download|public|install)": {
+        target: process.env.VUE_APP_API_BASE_URL || "http://localhost:8088",
         changeOrigin: true,
       },
-      "/download": {
-        // 报表下载
-        target: process.env.VUE_APP_API_BASE_URL || "http://localhost:8085",
-        changeOrigin: true,
-      },
+      // WebSocket 代理
       "/ws": {
-        // WebSocket 统一代理（包括认证和公开的 WebSocket）
-        target: process.env.VUE_APP_API_BASE_URL || "http://localhost:8085",
+        target: process.env.VUE_APP_API_BASE_URL || "http://localhost:8088",
         changeOrigin: true,
-        ws: true, // 开启 WebSocket 代理
-      },
-      "/public": {
-        // 公开 API 代理
-        target: process.env.VUE_APP_API_BASE_URL || "http://localhost:8085",
-        changeOrigin: true,
-      },
-      "/install": {
-        // 安装相关 API 代理到后端
-        target: process.env.VUE_APP_API_BASE_URL || "http://localhost:8085",
-        changeOrigin: true,
+        ws: true,
       },
     },
   },

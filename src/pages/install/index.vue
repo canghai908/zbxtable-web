@@ -171,11 +171,16 @@
 
         <!-- 步骤 4: 完成安装 -->
         <div v-show="currentStep === 3" class="step-content">
-          <a-result status="success" title="安装完成！" sub-title="配置文件已生成，数据库已初始化，请手动重启程序">
+          <a-result 
+            status="success" 
+            title="安装完成！" 
+            sub-title="配置文件已生成，数据库已初始化，请重启程序以加载配置"
+          >
             <template slot="extra">
               <div class="success-instructions">
+                <!-- 重启提示 -->
                 <a-alert
-                  message="请手动重启程序"
+                  message="请重启程序以加载配置"
                   type="warning"
                   show-icon
                   style="margin-bottom: 24px; text-align: left;"
@@ -186,12 +191,27 @@
                       <p style="margin-bottom: 8px;">✅ 数据库已初始化</p>
                       <p v-if="portChanged" style="margin-bottom: 8px;">🔄 HTTP 端口: {{ oldPort }} → {{ newPort }}</p>
                       <p v-else style="margin-bottom: 8px;">🔄 HTTP 端口: {{ newPort || '8088' }}</p>
-                      <p style="margin-bottom: 12px; font-weight: 500;">⚠️ 请重启程序以加载配置：</p>
-                      <div style="background: #f5f5f5; padding: 12px; border-radius: 4px; margin-bottom: 12px;">
-                        <code style="font-size: 14px; color: #d63031; font-weight: 500;">
-                          systemctl restart zbxtable
-                        </code>
-                      </div>
+                      
+                      <!-- systemd 重启命令 -->
+                      <template v-if="usingSystemd">
+                        <p style="margin-bottom: 12px; font-weight: 500;">⚠️ 请使用 systemd 重启程序：</p>
+                        <div style="background: #f5f5f5; padding: 12px; border-radius: 4px; margin-bottom: 12px;">
+                          <code style="font-size: 14px; color: #d63031; font-weight: 500;">
+                            systemctl restart zbxtable
+                          </code>
+                        </div>
+                      </template>
+                      
+                      <!-- 非 systemd 重启提示 -->
+                      <template v-else>
+                        <p style="margin-bottom: 12px; font-weight: 500;">⚠️ 请重启程序以加载配置：</p>
+                        <div style="background: #f5f5f5; padding: 12px; border-radius: 4px; margin-bottom: 12px;">
+                          <p style="margin: 0; color: #666; font-size: 13px;">
+                            请停止当前程序并重新启动
+                          </p>
+                        </div>
+                      </template>
+                      
                       <p style="margin-bottom: 12px; color: #666; font-size: 13px;">
                         重启完成后，点击下方按钮跳转到登录页面
                       </p>
@@ -201,6 +221,7 @@
                     </div>
                   </template>
                 </a-alert>
+
                 <div style="text-align: center;">
                   <a-button type="primary" size="large" icon="login" @click="goToLogin">
                     前往登录页面
@@ -243,6 +264,7 @@ export default {
       portChanged: false,
       oldPort: '',
       newPort: '',
+      usingSystemd: false,
       dbForm: {
         dbtype: 'mysql',
         dbhost: 'localhost',
@@ -474,18 +496,26 @@ export default {
           const oldPort = 
             (biz && biz.data && biz.data.old_port) || 
             (biz && biz.old_port) || 
-            '8085'
+            '8088'
           
           const newPort = 
             (biz && biz.data && biz.data.new_port) || 
             (biz && biz.new_port) || 
-            '8085'
+            '8088'
+          
+          // 获取 systemd 状态
+          const usingSystemd = 
+            (biz && biz.data && biz.data.using_systemd) || 
+            (biz && biz.using_systemd) || 
+            false
           
           this.portChanged = portChanged
           this.oldPort = oldPort
           this.newPort = newPort
+          this.usingSystemd = usingSystemd
           
-          this.$message.success('安装成功！请手动重启程序')
+          this.$message.success('安装成功！请重启程序以加载配置')
+          
           resetInstallStatusCache()
           this.currentStep = 3
         } else {
