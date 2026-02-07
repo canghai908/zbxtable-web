@@ -193,24 +193,12 @@
                       <p v-else style="margin-bottom: 8px;">🔄 HTTP 端口: {{ newPort || '8088' }}</p>
                       
                       <!-- systemd 重启命令 -->
-                      <template v-if="usingSystemd">
-                        <p style="margin-bottom: 12px; font-weight: 500;">⚠️ 请使用 systemd 重启程序：</p>
-                        <div style="background: #f5f5f5; padding: 12px; border-radius: 4px; margin-bottom: 12px;">
-                          <code style="font-size: 14px; color: #d63031; font-weight: 500;">
-                            systemctl restart zbxtable
-                          </code>
-                        </div>
-                      </template>
-                      
-                      <!-- 非 systemd 重启提示 -->
-                      <template v-else>
-                        <p style="margin-bottom: 12px; font-weight: 500;">⚠️ 请重启程序以加载配置：</p>
-                        <div style="background: #f5f5f5; padding: 12px; border-radius: 4px; margin-bottom: 12px;">
-                          <p style="margin: 0; color: #666; font-size: 13px;">
-                            请停止当前程序并重新启动
-                          </p>
-                        </div>
-                      </template>
+                      <p style="margin-bottom: 12px; font-weight: 500;">⚠️ 请使用 systemd 重启程序：</p>
+                      <div style="background: #f5f5f5; padding: 12px; border-radius: 4px; margin-bottom: 12px;">
+                        <code style="font-size: 14px; color: #d63031; font-weight: 500;">
+                          systemctl restart zbxtable
+                        </code>
+                      </div>
                       
                       <p style="margin-bottom: 12px; color: #666; font-size: 13px;">
                         重启完成后，点击下方按钮跳转到登录页面
@@ -264,7 +252,6 @@ export default {
       portChanged: false,
       oldPort: '',
       newPort: '',
-      usingSystemd: false,
       dbForm: {
         dbtype: 'mysql',
         dbhost: 'localhost',
@@ -503,16 +490,9 @@ export default {
             (biz && biz.new_port) || 
             '8088'
           
-          // 获取 systemd 状态
-          const usingSystemd = 
-            (biz && biz.data && biz.data.using_systemd) || 
-            (biz && biz.using_systemd) || 
-            false
-          
           this.portChanged = portChanged
           this.oldPort = oldPort
           this.newPort = newPort
-          this.usingSystemd = usingSystemd
           
           this.$message.success('安装成功！请重启程序以加载配置')
           

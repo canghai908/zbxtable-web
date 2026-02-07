@@ -1,5 +1,22 @@
 <template>
   <page-layout :noTitle="true">
+    <!-- 未配置实例提示 -->
+    <a-alert
+      v-if="!hasZabbixInstance && (loading1 || loading2)"
+      message="未配置 Zabbix 实例"
+      type="warning"
+      show-icon
+      closable
+      style="margin-bottom: 16px;"
+    >
+      <template slot="description">
+        <div>
+          <p style="margin-bottom: 8px;">系统检测到您还未配置 Zabbix 实例，无法获取监控数据。</p>
+          <p style="margin-bottom: 12px;">请前往 <a @click="goToZabbixConfig" style="font-weight: 600; cursor: pointer; color: #1890ff;">系统管理 → Zabbix 管理</a> 页面配置 Zabbix 实例。</p>
+        </div>
+      </template>
+    </a-alert>
+    
     <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="!loading1 &&!loading2 && !loading3">
       <a-row :gutter="16">
         <a-col :xl="{ span: 12 }" :lg="{ span: 24 }">
@@ -196,7 +213,12 @@ export default {
       loading1: false,
       loading2: false,
       loading3: false,
-      info: '',
+      info: {
+        net_count: 0,
+        srv_count: 0,
+        win_count: 0,
+        lin_count: 0
+      },
       egressData: [], // 改为数组，支持多个出口
       refreshTimer: null, // 定时刷新
       loading4: false,
@@ -206,7 +228,8 @@ export default {
       loading6: false,
       linC: [],
       loading7: false,
-      linM: []
+      linM: [],
+      hasZabbixInstance: null // 是否配置了 Zabbix 实例，初始为 null 表示未检测
     }
   },
   computed: {
@@ -250,6 +273,9 @@ export default {
     }
   },
   methods: {
+    goToZabbixConfig() {
+      this.$router.push('/system/zabbix')
+    },
     hexToRgba(hex, alpha = 1) {
       const r = parseInt(hex.slice(1, 3), 16)
       const g = parseInt(hex.slice(3, 5), 16)
@@ -260,7 +286,20 @@ export default {
       indexTrigger()
         .then((resp) => {
           let res = resp.data
-          this.triggerList = res.data.items || []
+          // 添加空值保护
+          this.triggerList = (res && res.data && res.data.items) ? res.data.items : []
+          // 如果有数据或者明确返回成功，认为实例已配置
+          if (res && (res.code === 200 || res.code === 0)) {
+            if (this.hasZabbixInstance === null) {
+              this.hasZabbixInstance = true
+            }
+          }
+        })
+        .catch((err) => {
+          console.error('获取告警信息失败:', err)
+          // 任何错误都可能是未配置实例导致的
+          this.hasZabbixInstance = false
+          this.triggerList = []
         })
         .finally(() => {
           this.loading1 = true
@@ -270,7 +309,31 @@ export default {
       indexInfo()
         .then((resp) => {
           let res = resp.data
-          this.info = res.data
+          // 确保数据有默认值
+          this.info = {
+            net_count: res.data?.net_count || 0,
+            srv_count: res.data?.srv_count || 0,
+            win_count: res.data?.win_count || 0,
+            lin_count: res.data?.lin_count || 0
+          }
+          // 如果有数据或者明确返回成功，认为实例已配置
+          if (res && (res.code === 200 || res.code === 0)) {
+            if (this.hasZabbixInstance === null) {
+              this.hasZabbixInstance = true
+            }
+          }
+        })
+        .catch((err) => {
+          console.error('获取主机统计信息失败:', err)
+          // 任何错误都可能是未配置实例导致的
+          this.hasZabbixInstance = false
+          // 保持默认值
+          this.info = {
+            net_count: 0,
+            srv_count: 0,
+            win_count: 0,
+            lin_count: 0
+          }
         })
         .finally(() => {
           this.loading2 = true
@@ -316,11 +379,15 @@ export default {
       indexRestop({ host_type: 'VM_WIN', metrics_type: 'CPU', top_num: '5' })
         .then((resp) => {
           let res = resp.data
-          let arr = res.data || []
+          let arr = (res && res.data) ? res.data : []
           arr.sort((a, b) => {
             return b.score - a.score
           })
           this.winC = arr.slice(0, 5)
+        })
+        .catch((err) => {
+          console.error('获取 Windows CPU Top5 失败:', err)
+          this.winC = []
         })
         .finally(() => {
           this.loading4 = true
@@ -328,11 +395,15 @@ export default {
       indexRestop({ host_type: 'VM_WIN', metrics_type: 'MEM', top_num: '5' })
         .then((resp) => {
           let res = resp.data
-          let arr = res.data || []
+          let arr = (res && res.data) ? res.data : []
           arr.sort((a, b) => {
             return b.score - a.score
           })
           this.winM = arr.slice(0, 5)
+        })
+        .catch((err) => {
+          console.error('获取 Windows 内存 Top5 失败:', err)
+          this.winM = []
         })
         .finally(() => {
           this.loading5 = true
@@ -340,11 +411,15 @@ export default {
       indexRestop({ host_type: 'VM_LIN', metrics_type: 'CPU', top_num: '5' })
         .then((resp) => {
           let res = resp.data
-          let arr = res.data || []
+          let arr = (res && res.data) ? res.data : []
           arr.sort((a, b) => {
             return b.score - a.score
           })
           this.linC = arr.slice(0, 5)
+        })
+        .catch((err) => {
+          console.error('获取 Linux CPU Top5 失败:', err)
+          this.linC = []
         })
         .finally(() => {
           this.loading6 = true
@@ -352,11 +427,15 @@ export default {
       indexRestop({ host_type: 'VM_LIN', metrics_type: 'MEM', top_num: '5' })
         .then((resp) => {
           let res = resp.data
-          let arr = res.data || []
+          let arr = (res && res.data) ? res.data : []
           arr.sort((a, b) => {
             return b.score - a.score
           })
           this.linM = arr.slice(0, 5)
+        })
+        .catch((err) => {
+          console.error('获取 Linux 内存 Top5 失败:', err)
+          this.linM = []
         })
         .finally(() => {
           this.loading7 = true

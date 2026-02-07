@@ -116,7 +116,11 @@
     </a-card>
 
     <!-- 编辑/新增对话框 -->
-    <a-modal :title="editingId ? $t('modal_title_edit') : $t('modal_title_add')" :visible="visible" @ok="save" @cancel="visible=false" :confirmLoading="saving" :okButtonProps="{ disabled: !testOk }">
+    <a-modal 
+      :title="editingId ? $t('modal_title_edit') : $t('modal_title_add')" 
+      :visible="visible" 
+      @cancel="handleModalCancel"
+      width="700px">
       <a-form-model :model="form" :label-col="{span: 7}" :wrapper-col="{span: 15}">
         <a-form-model-item :label="$t('form_instance_id')" required>
           <a-input v-model="form.instance" :placeholder="$t('form_instance_id_placeholder')" :disabled="!!editingId" />
@@ -154,15 +158,31 @@
           <a-switch v-model="form.enabled" />
         </a-form-model-item>
         <a-form-model-item :wrapper-col="{ span: 15, offset: 7 }">
-          <a-button :loading="testing" @click="testConnection">{{ $t('form_test_connection_btn') }}</a-button>
-          <span v-if="testMsg" :style="{ marginLeft: '12px', color: testOk ? '#52c41a' : '#f5222d' }">
-            {{ testMsg }}
-          </span>
+          <a-space>
+            <a-button :loading="testing" @click="testConnection">{{ $t('form_test_connection_btn') }}</a-button>
+          </a-space>
+          <div v-if="testMsg" :style="{ marginTop: '8px', color: testOk ? '#52c41a' : '#f5222d' }">
+            <a-icon :type="testOk ? 'check-circle' : 'close-circle'" /> {{ testMsg }}
+          </div>
           <div style="margin-top: 6px; color: #999; font-size: 12px;">
             {{ $t('form_test_connection_hint') }}
           </div>
         </a-form-model-item>
       </a-form-model>
+      
+      <!-- 自定义底部按钮 -->
+      <template slot="footer">
+        <a-button @click="handleModalCancel">{{ $t('btn_cancel') }}</a-button>
+        
+        <!-- 保存按钮 - 始终显示，测试通过前禁用 -->
+        <a-button 
+          type="primary" 
+          :loading="saving" 
+          :disabled="!testOk"
+          @click="saveOnly">
+          <a-icon type="save" /> {{ $t('btn_save') }}
+        </a-button>
+      </template>
     </a-modal>
 
     <!-- 安装进度对话框 -->
@@ -448,6 +468,12 @@ export default {
       },
       webhookInfoVisible: false,
       webhookInfo: null,
+      // 弹窗中安装webhook相关
+      installingInModal: false,
+      webhookInstalledInModal: false,
+      instanceSaved: false,
+      tempInstanceForInstall: null, // 临时保存实例信息用于安装
+      isFromGuide: false, // 标记是否来自引导流程
       columns: [
         { title: this.$t('col_id'), dataIndex: 'id', key: 'id', width: 60 },
         { title: this.$t('col_instance_id'), dataIndex: 'instance', key: 'instance', width: 120, scopedSlots: { customRender: 'instance' } },
@@ -464,6 +490,13 @@ export default {
   },
   mounted () {
     this.load()
+    
+    // 监听打开新增实例对话框的事件
+    this.$root.$on('open-zabbix-instance-modal', this.handleOpenCreateFromGuide)
+  },
+  beforeDestroy() {
+    // 移除事件监听
+    this.$root.$off('open-zabbix-instance-modal', this.handleOpenCreateFromGuide)
   },
   methods: {
     hexToRgba(hex, alpha = 1) {
@@ -497,7 +530,19 @@ export default {
       }
       this.testOk = false
       this.testMsg = ''
+      this.webhookInstalledInModal = false
+      this.instanceSaved = false
+      this.tempInstanceForInstall = null
+      // 不要重置 isFromGuide，因为它可能已经被 handleOpenCreateFromGuide 设置为 true
+      // this.isFromGuide = false
       this.visible = true
+    },
+    // 从引导流程打开新增对话框
+    handleOpenCreateFromGuide() {
+      console.log('handleOpenCreateFromGuide 被调用')
+      this.isFromGuide = true
+      console.log('设置 isFromGuide = true')
+      this.openCreate()
     },
     openEdit (record) {
       this.editingId = record.id
@@ -513,6 +558,9 @@ export default {
       }
       this.testOk = false
       this.testMsg = ''
+      this.webhookInstalledInModal = false
+      this.instanceSaved = true // 编辑时实例已保存
+      this.tempInstanceForInstall = null
       this.visible = true
     },
     async testConnection () {
@@ -537,7 +585,12 @@ export default {
         this.testing = false
       }
     },
-    async save () {
+    // 只保存实例（不安装Webhook）
+    async saveOnly() {
+      console.log('saveOnly 被调用')
+      console.log('isFromGuide:', this.isFromGuide)
+      console.log('editingId:', this.editingId)
+      
       if (!this.form.instance || !this.form.name || !this.form.url) {
         this.$message.warning(this.$t('msg_fill_required'))
         return
@@ -555,16 +608,117 @@ export default {
           res = await createZabbixInstance(this.form)
         }
         const biz = (res && res.data) ? res.data : res
+        console.log('保存结果:', biz)
+        
         if (biz && biz.code === 200) {
           this.$message.success(this.$t('msg_save_success'))
+          this.instanceSaved = true
+          
+          // 保存是否来自引导流程的标记
+          const wasFromGuide = this.isFromGuide
+          const instanceName = this.form.name
+          
+          console.log('wasFromGuide:', wasFromGuide)
+          console.log('instanceName:', instanceName)
+          console.log('editingId:', this.editingId)
+          
+          // 先关闭对话框
           this.visible = false
+          this.isFromGuide = false
+          
+          // 等待对话框完全关闭后再执行后续操作
+          await this.$nextTick()
+          
+          // 刷新列表
           await this.load()
+          
+          // 如果是从引导流程打开的，触发引导完成事件
+          console.log('检查条件: wasFromGuide =', wasFromGuide, ', !this.editingId =', !this.editingId)
+          if (wasFromGuide && !this.editingId) {
+            // 使用 nextTick 确保 DOM 更新完成
+            this.$nextTick(() => {
+              console.log('触发 instance-added-from-guide 事件，实例名称:', instanceName)
+              this.$root.$emit('instance-added-from-guide', instanceName)
+            })
+          } else {
+            console.log('条件不满足，不触发事件')
+          }
         } else {
           this.$message.error((biz && biz.message) || this.$t('msg_save_failed'))
         }
       } finally {
         this.saving = false
       }
+    },
+    // 保存并安装Webhook
+    // 在弹窗中安装Webhook（不保存实例）
+    async installWebhookInModal() {
+      // 先检查 webhook_url 是否配置
+      try {
+        const res = await configGetList()
+        const biz = (res && res.data) ? res.data : res
+        if (biz && biz.code === 200) {
+          const configs = biz.data.items || []
+          const webhookUrlConfig = configs.find(c => c.key === 'webhook_url')
+          
+          if (!webhookUrlConfig || !webhookUrlConfig.value || webhookUrlConfig.value.trim() === '') {
+            this.$warning({
+              title: this.$t('msg_webhook_config_missing'),
+              content: this.$t('msg_webhook_url_not_configured'),
+              okText: this.$t('msg_know')
+            })
+            return
+          }
+        }
+      } catch (error) {
+        console.error('检查 webhook_url 配置失败:', error)
+        this.$message.error(this.$t('msg_check_config_failed'))
+        return
+      }
+      
+      if (!this.testOk) {
+        this.$message.warning(this.$t('msg_test_first'))
+        return
+      }
+      
+      if (!this.editingId) {
+        this.$message.warning('请先保存实例')
+        return
+      }
+      
+      this.installingInModal = true
+      try {
+        const installRes = await installWebhook(this.editingId)
+        const installBiz = (installRes && installRes.data) ? installRes.data : installRes
+        
+        if (installBiz && installBiz.code === 200) {
+          this.webhookInstalledInModal = true
+          this.$message.success(this.$t('webhook_install_success'))
+          
+          // 刷新列表以更新状态
+          await this.load()
+        } else {
+          throw new Error((installBiz && installBiz.message) || this.$t('install_failed_title'))
+        }
+      } catch (error) {
+        console.error('安装Webhook失败:', error)
+        this.$message.error(this.$t('webhook_install_failed') + ': ' + (error.message || error))
+      } finally {
+        this.installingInModal = false
+      }
+    },
+    // 关闭弹窗
+    handleModalCancel() {
+      this.visible = false
+      this.webhookInstalledInModal = false
+      this.instanceSaved = false
+      this.tempInstanceForInstall = null
+      
+      // 如果是从引导流程打开的，且没有添加实例，通知引导组件
+      if (this.isFromGuide && !this.instanceSaved) {
+        // 用户取消了添加，不做任何操作
+      }
+      this.isFromGuide = false
     },
     async test (record) {
       const res = await testZabbixInstance(record.id)

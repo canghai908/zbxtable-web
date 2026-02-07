@@ -160,6 +160,7 @@ module.exports = {
       btn_edit: '编辑',
       btn_delete: '删除',
       btn_install: '安装',
+      btn_install_webhook: '安装Webhook',
       btn_view_config: '查看配置',
       btn_reinstall: '重装',
       btn_uninstall: '卸载',
@@ -270,6 +271,21 @@ module.exports = {
       msg_check_config_failed: '检查配置失败，请稍后重试',
       msg_copy_success: '已复制到剪贴板',
       msg_copy_failed: '复制失败，请手动复制',
+      
+      // 新增实例后安装提示
+      install_webhook_now_title: '是否立即安装 Webhook？',
+      install_webhook_now_content: '实例已创建成功！是否立即在 Zabbix 中安装 Webhook 配置？稍后也可以在列表中手动安装。',
+      install_now: '立即安装',
+      install_later: '稍后安装',
+      
+      // 弹窗中安装webhook
+      btn_install_webhook_now: '安装 Webhook',
+      webhook_installed_in_modal: 'Webhook 已成功安装到 Zabbix！保存后即可使用。',
+      webhook_install_success: 'Webhook 安装成功',
+      webhook_install_failed: 'Webhook 安装失败',
+      btn_save: '保存',
+      btn_save_only: '仅保存',
+      btn_save_and_install_webhook: '保存并安装Webhook',
     },
     HK: {
       title: 'Zabbix 實例管理',
@@ -431,6 +447,7 @@ module.exports = {
       btn_edit: '編輯',
       btn_delete: '刪除',
       btn_install: '安裝',
+      btn_install_webhook: '安裝Webhook',
       btn_view_config: '查看配置',
       btn_reinstall: '重裝',
       btn_uninstall: '卸載',
@@ -541,6 +558,21 @@ module.exports = {
       msg_check_config_failed: '檢查配置失敗，請稍後重試',
       msg_copy_success: '已複製到剪貼板',
       msg_copy_failed: '複製失敗，請手動複製',
+      
+      // 新增實例後安裝提示
+      install_webhook_now_title: '是否立即安裝 Webhook？',
+      install_webhook_now_content: '實例已創建成功！是否立即在 Zabbix 中安裝 Webhook 配置？稍後也可以在列表中手動安裝。',
+      install_now: '立即安裝',
+      install_later: '稍後安裝',
+      
+      // 彈窗中安裝webhook
+      btn_install_webhook_now: '安裝 Webhook',
+      webhook_installed_in_modal: 'Webhook 已成功安裝到 Zabbix！保存後即可使用。',
+      webhook_install_success: 'Webhook 安裝成功',
+      webhook_install_failed: 'Webhook 安裝失敗',
+      btn_save: '保存',
+      btn_save_only: '僅保存',
+      btn_save_and_install_webhook: '保存並安裝Webhook',
     },
     US: {
       title: 'Zabbix Instance Management',
@@ -702,6 +734,7 @@ module.exports = {
       btn_edit: 'Edit',
       btn_delete: 'Delete',
       btn_install: 'Install',
+      btn_install_webhook: 'Install Webhook',
       btn_view_config: 'View Config',
       btn_reinstall: 'Reinstall',
       btn_uninstall: 'Uninstall',
@@ -812,6 +845,21 @@ module.exports = {
       msg_check_config_failed: 'Check config failed, please try again later',
       msg_copy_success: 'Copied to clipboard',
       msg_copy_failed: 'Copy failed, please copy manually',
+      
+      // Install prompt after adding instance
+      install_webhook_now_title: 'Install Webhook Now?',
+      install_webhook_now_content: 'Instance created successfully! Would you like to install Webhook configuration in Zabbix now? You can also install it manually from the list later.',
+      install_now: 'Install Now',
+      install_later: 'Install Later',
+      
+      // Install webhook in modal
+      btn_install_webhook_now: 'Install Webhook',
+      webhook_installed_in_modal: 'Webhook has been successfully installed to Zabbix! You can use it after saving.',
+      webhook_install_success: 'Webhook installed successfully',
+      webhook_install_failed: 'Webhook installation failed',
+      btn_save: 'Save',
+      btn_save_only: 'Save Only',
+      btn_save_and_install_webhook: 'Save & Install Webhook',
     }
   }
 }

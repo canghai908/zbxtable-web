@@ -25,7 +25,12 @@
     </a-layout>
 
     <!-- 首次配置引导 -->
-    <setup-guide :visible="showSetupGuide" @finish="handleSetupFinish" @skip="handleSetupSkip" />
+    <setup-guide 
+      :visible="showSetupGuide" 
+      @finish="handleSetupFinish" 
+      @skip="handleSetupSkip"
+      @open-zabbix-modal="handleOpenZabbixModal"
+      ref="setupGuide" />
   </a-layout>
 </template>
 
@@ -132,23 +137,59 @@ export default {
       }
     },
     async handleSetupFinish() {
+      console.log('AdminLayout.handleSetupFinish 被调用')
+      // 先关闭引导界面，提升用户体验
+      this.showSetupGuide = false
+      console.log('引导界面已关闭，showSetupGuide =', this.showSetupGuide)
+      
       try {
         const res = await completeInitialSetup()
         const biz = (res && res.data) ? res.data : res
         if (biz && biz.code === 200) {
-          this.$message.success(this.$t('setupGuide.complete_success'))
-          this.showSetupGuide = false
+          this.$message.success(this.$t('setupGuide.complete_success') || '配置完成！')
         } else {
-          this.$message.error(this.$t('setupGuide.complete_mark_failed'))
+          this.$message.warning(this.$t('setupGuide.complete_mark_failed') || '标记完成状态失败，但引导已关闭')
         }
       } catch (error) {
         console.error('完成初始配置失败:', error)
-        this.$message.error(this.$t('setupGuide.complete_action_failed'))
+        // 即使标记失败，也不再显示引导（用户体验优先）
+        this.$message.warning(this.$t('setupGuide.complete_action_failed') || '标记完成状态失败，但引导已关闭')
       }
     },
-    handleSetupSkip() {
+    async handleSetupSkip() {
+      // 先关闭引导界面
       this.showSetupGuide = false
-      this.$message.info(this.$t('setupGuide.skip_tip'))
+      this.$message.info(this.$t('setupGuide.skip_tip') || '已跳过引导')
+      
+      // 跳过时也标记为已完成，避免刷新后再次出现
+      try {
+        await completeInitialSetup()
+      } catch (error) {
+        console.error('标记跳过状态失败:', error)
+      }
+    },
+    // 打开Zabbix实例对话框
+    handleOpenZabbixModal() {
+      // 跳转到Zabbix管理页面并触发打开新增对话框
+      this.$router.push('/system/zabbix').then(() => {
+        // 使用事件总线通知Zabbix管理页面打开新增对话框
+        this.$root.$emit('open-zabbix-instance-modal')
+      }).catch(err => {
+        // 如果已经在Zabbix管理页面，直接触发事件
+        if (err.name === 'NavigationDuplicated' || err.message.includes('Avoided redundant navigation')) {
+          this.$root.$emit('open-zabbix-instance-modal')
+        }
+      })
+    },
+    // 实例添加成功的回调
+    handleInstanceAdded(instanceName) {
+      console.log('AdminLayout 收到 instance-added-from-guide 事件，实例名称:', instanceName)
+      if (this.$refs.setupGuide) {
+        console.log('调用 setupGuide.onInstanceAdded')
+        this.$refs.setupGuide.onInstanceAdded(instanceName)
+      } else {
+        console.error('setupGuide ref 不存在')
+      }
     }
   },
   created() {
@@ -156,9 +197,14 @@ export default {
     this.setActivated(this.$route)
     // 检查是否需要显示初始配置引导
     this.checkSetupStatus()
+    
+    // 监听实例添加成功事件
+    this.$root.$on('instance-added-from-guide', this.handleInstanceAdded)
   },
   beforeDestroy() {
     this.correctPageMinHeight(-this.minHeight + 24)
+    // 移除事件监听
+    this.$root.$off('instance-added-from-guide', this.handleInstanceAdded)
   }
 }
 </script>

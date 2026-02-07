@@ -271,9 +271,9 @@ export default {
   // 初始引导
   setupGuide: {
     complete_success: '初始配置已完成！',
-    complete_mark_failed: '标记配置完成失败',
-    complete_action_failed: '操作失败',
-    skip_tip: '您可以稍后在系统管理中完成配置',
+    complete_mark_failed: '标记配置完成失败，但引导已关闭',
+    complete_action_failed: '标记完成状态失败，但引导已关闭',
+    skip_tip: '已跳过引导，您可以稍后在系统管理中完成配置',
   },
 
   // 设置
