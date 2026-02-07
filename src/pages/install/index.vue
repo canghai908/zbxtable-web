@@ -10,13 +10,13 @@
         </a>
         <a-menu slot="overlay" @click="handleLanguageChange">
           <a-menu-item key="zh-CN">
-            <span>简体中文</span>
+            <span>{{ t('language.zhCN') }}</span>
           </a-menu-item>
           <a-menu-item key="en-US">
-            <span>English</span>
+            <span>{{ t('language.enUS') }}</span>
           </a-menu-item>
           <a-menu-item key="zh-TW">
-            <span>繁體中文</span>
+            <span>{{ t('language.zhTW') }}</span>
           </a-menu-item>
         </a-menu>
       </a-dropdown>
@@ -25,24 +25,24 @@
     <a-card class="install-card" :bordered="false">
       <template slot="title">
         <div class="install-header">
-          <h1>{{ $t('install.title') }}</h1>
-          <p class="subtitle">{{ $t('install.subtitle') }}</p>
+          <h1>{{ t('title') }}</h1>
+          <p class="subtitle">{{ t('subtitle') }}</p>
         </div>
       </template>
 
       <a-steps :current="currentStep" class="install-steps">
-        <a-step :title="$t('install.steps.database')" />
-        <a-step :title="$t('install.steps.system')" />
-        <a-step :title="$t('install.steps.confirm')" />
-        <a-step :title="$t('install.steps.complete')" />
+        <a-step :title="t('steps.database')" />
+        <a-step :title="t('steps.system')" />
+        <a-step :title="t('steps.confirm')" />
+        <a-step :title="t('steps.complete')" />
       </a-steps>
 
       <div class="install-content">
         <!-- 步骤 1: 数据库配置 -->
         <div v-show="currentStep === 0" class="step-content">
           <a-form-model ref="dbForm" :model="dbForm" :rules="dbRules" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
-            <a-form-model-item :label="$t('install.database.type')" prop="dbtype">
-              <a-select v-model="dbForm.dbtype" :placeholder="$t('install.database.typePlaceholder')" @change="handleDbTypeChange">
+            <a-form-model-item :label="t('database.type')" prop="dbtype">
+              <a-select v-model="dbForm.dbtype" :placeholder="t('database.typePlaceholder')" @change="handleDbTypeChange">
                 <a-select-option value="mysql">MySQL</a-select-option>
                 <a-select-option value="postgresql">PostgreSQL</a-select-option>
                 <a-select-option value="sqlite">SQLite</a-select-option>
@@ -51,40 +51,40 @@
 
             <!-- SQLite 只显示数据库路径 -->
             <template v-if="dbForm.dbtype === 'sqlite'">
-              <a-form-model-item :label="$t('install.database.path')" prop="dbname">
-                <a-input v-model="dbForm.dbname" :placeholder="$t('install.database.pathPlaceholder')" />
+              <a-form-model-item :label="t('database.path')" prop="dbname">
+                <a-input v-model="dbForm.dbname" :placeholder="t('database.pathPlaceholder')" />
                 <div class="form-help-text">
-                  {{ $t('install.database.pathHint') }}
+                  {{ t('database.pathHint') }}
                 </div>
               </a-form-model-item>
             </template>
 
             <!-- MySQL/PostgreSQL 显示完整配置 -->
             <template v-else>
-              <a-form-model-item :label="$t('install.database.host')" prop="dbhost">
-                <a-input v-model="dbForm.dbhost" :placeholder="$t('install.database.hostPlaceholder')" />
+              <a-form-model-item :label="t('database.host')" prop="dbhost">
+                <a-input v-model="dbForm.dbhost" :placeholder="t('database.hostPlaceholder')" />
               </a-form-model-item>
 
-              <a-form-model-item :label="$t('install.database.port')" prop="dbport">
+              <a-form-model-item :label="t('database.port')" prop="dbport">
                 <a-input-number v-model="dbForm.dbport" :min="1" :max="65535" style="width: 100%" />
               </a-form-model-item>
 
-              <a-form-model-item :label="$t('install.database.name')" prop="dbname">
-                <a-input v-model="dbForm.dbname" :placeholder="$t('install.database.namePlaceholder')" />
+              <a-form-model-item :label="t('database.name')" prop="dbname">
+                <a-input v-model="dbForm.dbname" :placeholder="t('database.namePlaceholder')" />
               </a-form-model-item>
 
-              <a-form-model-item :label="$t('install.database.user')" prop="dbuser">
-                <a-input v-model="dbForm.dbuser" :placeholder="$t('install.database.userPlaceholder')" />
+              <a-form-model-item :label="t('database.user')" prop="dbuser">
+                <a-input v-model="dbForm.dbuser" :placeholder="t('database.userPlaceholder')" />
               </a-form-model-item>
 
-              <a-form-model-item :label="$t('install.database.password')" prop="dbpass">
-                <a-input-password v-model="dbForm.dbpass" :placeholder="$t('install.database.passwordPlaceholder')" />
+              <a-form-model-item :label="t('database.password')" prop="dbpass">
+                <a-input-password v-model="dbForm.dbpass" :placeholder="t('database.passwordPlaceholder')" />
               </a-form-model-item>
             </template>
 
             <a-form-model-item :wrapper-col="{ span: 14, offset: 6 }">
               <a-button type="primary" :loading="dbChecking" @click="checkDatabase" class="theme-button">
-                {{ $t('install.database.testConnection') }}
+                {{ t('database.testConnection') }}
               </a-button>
               <span v-if="dbCheckResult" :class="dbCheckResult.success ? 'success-text' : 'error-text'" style="margin-left: 16px">
                 {{ dbCheckResult.message }}
@@ -96,18 +96,18 @@
         <!-- 步骤 2: 系统配置 -->
         <div v-show="currentStep === 1" class="step-content">
           <a-form-model ref="systemForm" :model="systemForm" :rules="systemRules" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
-            <a-form-model-item :label="$t('install.system.httpPort')" prop="httpport">
+            <a-form-model-item :label="t('system.httpPort')" prop="httpport">
               <a-input-number v-model="systemForm.httpport" :min="1" :max="65535" style="width: 100%" />
             </a-form-model-item>
 
-            <a-form-model-item :label="$t('install.system.runMode')" prop="runmode">
-              <a-select v-model="systemForm.runmode" :placeholder="$t('install.system.runModePlaceholder')">
-                <a-select-option value="prod">{{ $t('install.system.runModeProd') }}</a-select-option>
-                <a-select-option value="dev">{{ $t('install.system.runModeDev') }}</a-select-option>
+            <a-form-model-item :label="t('system.runMode')" prop="runmode">
+              <a-select v-model="systemForm.runmode" :placeholder="t('system.runModePlaceholder')">
+                <a-select-option value="prod">{{ t('system.runModeProd') }}</a-select-option>
+                <a-select-option value="dev">{{ t('system.runModeDev') }}</a-select-option>
               </a-select>
             </a-form-model-item>
 
-            <a-form-model-item :label="$t('install.system.sessionTimeout')" prop="timeout">
+            <a-form-model-item :label="t('system.sessionTimeout')" prop="timeout">
               <a-input-number v-model="systemForm.timeout" :min="1" :max="24" style="width: 100%" />
             </a-form-model-item>
           </a-form-model>
@@ -117,8 +117,8 @@
         <div v-show="currentStep === 2" class="step-content">
           <div class="confirm-container">
             <a-alert
-              :message="$t('install.confirm.title')"
-              :description="$t('install.confirm.description')"
+              :message="t('confirm.title')"
+              :description="t('confirm.description')"
               type="info"
               show-icon
               style="margin-bottom: 24px"
@@ -127,35 +127,35 @@
             <div class="config-section">
               <h3 class="section-title">
                 <a-icon type="database" />
-                {{ $t('install.confirm.databaseConfig') }}
+                {{ t('confirm.databaseConfig') }}
               </h3>
               <a-descriptions bordered :column="1" size="small">
-                <a-descriptions-item :label="$t('install.confirm.dbType')">
+                <a-descriptions-item :label="t('confirm.dbType')">
                   <a-tag :color="getDbTypeColor(dbForm.dbtype)">
                     {{ getDbTypeName(dbForm.dbtype) }}
                   </a-tag>
                 </a-descriptions-item>
-                <a-descriptions-item v-if="dbForm.dbtype !== 'sqlite'" :label="$t('install.confirm.dbHost')">
+                <a-descriptions-item v-if="dbForm.dbtype !== 'sqlite'" :label="t('confirm.dbHost')">
                   {{ dbForm.dbhost }}
                 </a-descriptions-item>
-                <a-descriptions-item v-if="dbForm.dbtype !== 'sqlite'" :label="$t('install.confirm.dbPort')">
+                <a-descriptions-item v-if="dbForm.dbtype !== 'sqlite'" :label="t('confirm.dbPort')">
                   {{ dbForm.dbport }}
                 </a-descriptions-item>
-                <a-descriptions-item :label="$t('install.confirm.dbName')">
+                <a-descriptions-item :label="t('confirm.dbName')">
                   <span class="config-value">{{ dbForm.dbname }}</span>
                 </a-descriptions-item>
-                <a-descriptions-item v-if="dbForm.dbtype !== 'sqlite'" :label="$t('install.confirm.dbUser')">
+                <a-descriptions-item v-if="dbForm.dbtype !== 'sqlite'" :label="t('confirm.dbUser')">
                   {{ dbForm.dbuser }}
                 </a-descriptions-item>
-                <a-descriptions-item v-if="dbForm.dbtype !== 'sqlite'" :label="$t('install.confirm.dbPassword')">
-                  <span class="password-mask">{{ dbForm.dbpass ? '••••••••' : '(' + $t('install.confirm.notTested') + ')' }}</span>
+                <a-descriptions-item v-if="dbForm.dbtype !== 'sqlite'" :label="t('confirm.dbPassword')">
+                  <span class="password-mask">{{ dbForm.dbpass ? '••••••••' : '(' + t('confirm.notTested') + ')' }}</span>
                 </a-descriptions-item>
-                <a-descriptions-item :label="$t('install.confirm.connectionStatus')">
+                <a-descriptions-item :label="t('confirm.connectionStatus')">
                   <a-tag v-if="dbCheckResult && dbCheckResult.success" color="green">
-                    <a-icon type="check-circle" /> {{ $t('install.confirm.connected') }}
+                    <a-icon type="check-circle" /> {{ t('confirm.connected') }}
                   </a-tag>
                   <a-tag v-else color="orange">
-                    <a-icon type="warning" /> {{ $t('install.confirm.notTested') }}
+                    <a-icon type="warning" /> {{ t('confirm.notTested') }}
                   </a-tag>
                 </a-descriptions-item>
               </a-descriptions>
@@ -164,26 +164,26 @@
             <div class="config-section">
               <h3 class="section-title">
                 <a-icon type="setting" />
-                {{ $t('install.confirm.systemConfig') }}
+                {{ t('confirm.systemConfig') }}
               </h3>
               <a-descriptions bordered :column="1" size="small">
-                <a-descriptions-item :label="$t('install.confirm.httpPort')">
+                <a-descriptions-item :label="t('confirm.httpPort')">
                   <a-tag :color="themeColor">{{ systemForm.httpport }}</a-tag>
                 </a-descriptions-item>
-                <a-descriptions-item :label="$t('install.confirm.runMode')">
+                <a-descriptions-item :label="t('confirm.runMode')">
                   <a-tag :color="systemForm.runmode === 'prod' ? 'green' : 'orange'">
-                    {{ systemForm.runmode === 'prod' ? $t('install.system.runModeProd') : $t('install.system.runModeDev') }}
+                    {{ systemForm.runmode === 'prod' ? t('system.runModeProd') : t('system.runModeDev') }}
                   </a-tag>
                 </a-descriptions-item>
-                <a-descriptions-item :label="$t('install.confirm.sessionTimeout')">
-                  {{ systemForm.timeout }} {{ $t('install.confirm.hours') }}
+                <a-descriptions-item :label="t('confirm.sessionTimeout')">
+                  {{ systemForm.timeout }} {{ t('confirm.hours') }}
                 </a-descriptions-item>
               </a-descriptions>
             </div>
 
             <a-alert
-              :message="$t('install.confirm.warning')"
-              :description="$t('install.confirm.warningMessage')"
+              :message="t('confirm.warning')"
+              :description="t('confirm.warningMessage')"
               type="warning"
               show-icon
               style="margin-top: 24px"
@@ -195,27 +195,27 @@
         <div v-show="currentStep === 3" class="step-content">
           <a-result 
             status="success" 
-            :title="$t('install.complete.title')" 
-            :sub-title="$t('install.complete.subtitle')"
+            :title="t('complete.title')" 
+            :sub-title="t('complete.subtitle')"
           >
             <template slot="extra">
               <div class="success-instructions">
                 <!-- 重启提示 -->
                 <a-alert
-                  :message="$t('install.complete.restartTitle')"
+                  :message="t('complete.restartTitle')"
                   type="warning"
                   show-icon
                   style="margin-bottom: 24px; text-align: left;"
                 >
                   <template slot="description">
                     <div style="line-height: 1.8;">
-                      <p style="margin-bottom: 8px;">✅ {{ $t('install.complete.configGenerated') }}</p>
-                      <p style="margin-bottom: 8px;">✅ {{ $t('install.complete.databaseInitialized') }}</p>
-                      <p v-if="portChanged" style="margin-bottom: 8px;">🔄 {{ $t('install.complete.portChanged') }}: {{ oldPort }} → {{ newPort }}</p>
-                      <p v-else style="margin-bottom: 8px;">🔄 {{ $t('install.complete.portChanged') }}: {{ newPort || '8088' }}</p>
+                      <p style="margin-bottom: 8px;">✅ {{ t('complete.configGenerated') }}</p>
+                      <p style="margin-bottom: 8px;">✅ {{ t('complete.databaseInitialized') }}</p>
+                      <p v-if="portChanged" style="margin-bottom: 8px;">🔄 {{ t('complete.portChanged') }}: {{ oldPort }} → {{ newPort }}</p>
+                      <p v-else style="margin-bottom: 8px;">🔄 {{ t('complete.portChanged') }}: {{ newPort || '8088' }}</p>
                       
                       <!-- systemd 重启命令 -->
-                      <p style="margin-bottom: 12px; font-weight: bold; color: #d63031; font-size: 15px;">⚠️ {{ $t('install.complete.restartCommand') }}</p>
+                      <p style="margin-bottom: 12px; font-weight: bold; color: #d63031; font-size: 15px;">⚠️ {{ t('complete.restartCommand') }}</p>
                       <div style="background: #f5f5f5; padding: 12px; border-radius: 4px; margin-bottom: 12px; text-align: center;">
                         <code style="font-size: 16px; color: #d63031; font-weight: bold;">
                           systemctl restart zbxtable
@@ -223,10 +223,10 @@
                       </div>
                       
                       <p style="margin-bottom: 12px; color: #666; font-size: 13px;">
-                        {{ $t('install.complete.restartHint') }}
+                        {{ t('complete.restartHint') }}
                       </p>
                       <p style="margin: 0; color: #666; font-size: 13px;">
-                        💡 {{ $t('install.complete.defaultAccount') }}
+                        💡 {{ t('complete.defaultAccount') }}
                       </p>
                     </div>
                   </template>
@@ -234,10 +234,10 @@
 
                 <div style="text-align: center;">
                   <a-button type="primary" size="large" icon="login" @click="goToLogin" class="theme-button">
-                    {{ $t('install.complete.goToLogin') }}
+                    {{ t('complete.goToLogin') }}
                   </a-button>
                   <p style="margin-top: 12px; color: #999; font-size: 13px;">
-                    {{ $t('install.complete.loginAddress') }}: http://{{ getHostname() }}:{{ newPort || '8088' }}/login
+                    {{ t('complete.loginAddress') }}: http://{{ getHostname() }}:{{ newPort || '8088' }}/login
                   </p>
                 </div>
               </div>
@@ -247,12 +247,12 @@
       </div>
 
       <div class="install-footer">
-        <a-button v-if="currentStep > 0 && currentStep < 3" @click="prevStep">{{ $t('install.buttons.previous') }}</a-button>
+        <a-button v-if="currentStep > 0 && currentStep < 3" @click="prevStep">{{ t('buttons.previous') }}</a-button>
         <a-button v-if="currentStep < 2" type="primary" :loading="installing" @click="nextStep" style="margin-left: 8px" class="theme-button">
-          {{ $t('install.buttons.next') }}
+          {{ t('buttons.next') }}
         </a-button>
         <a-button v-if="currentStep === 2" type="primary" :loading="installing" @click="doInstall" style="margin-left: 8px" class="theme-button">
-          <a-icon type="rocket" /> {{ $t('install.buttons.install') }}
+          <a-icon type="rocket" /> {{ t('buttons.install') }}
         </a-button>
       </div>
     </a-card>
@@ -262,6 +262,7 @@
 <script>
 import { checkDatabase as checkDatabaseAPI, doInstall as doInstallAPI, getInstallStatus } from '@/services/install'
 import { resetInstallStatusCache } from '@/router/guards'
+import i18nMessages from './i18n'
 
 export default {
   name: 'Install',
@@ -284,78 +285,27 @@ export default {
         dbuser: 'zbxtable',
         dbpass: ''
       },
-      dbRules: {
-        dbtype: [{ required: true, message: this.$t('install.validation.dbTypeRequired'), trigger: 'change' }],
-        dbhost: [
-          { 
-            validator: (rule, value, callback) => {
-              if (this.dbForm.dbtype !== 'sqlite' && !value) {
-                callback(new Error(this.$t('install.validation.dbHostRequired')))
-              } else {
-                callback()
-              }
-            }, 
-            trigger: 'blur' 
-          }
-        ],
-        dbport: [
-          { 
-            validator: (rule, value, callback) => {
-              if (this.dbForm.dbtype !== 'sqlite' && !value) {
-                callback(new Error(this.$t('install.validation.dbPortRequired')))
-              } else {
-                callback()
-              }
-            }, 
-            trigger: 'blur' 
-          }
-        ],
-        dbname: [{ required: true, message: this.$t('install.validation.dbNameRequired'), trigger: 'blur' }],
-        dbuser: [
-          { 
-            validator: (rule, value, callback) => {
-              if (this.dbForm.dbtype !== 'sqlite' && !value) {
-                callback(new Error(this.$t('install.validation.dbUserRequired')))
-              } else {
-                callback()
-              }
-            }, 
-            trigger: 'blur' 
-          }
-        ],
-        dbpass: [
-          { 
-            validator: (rule, value, callback) => {
-              if (this.dbForm.dbtype !== 'sqlite' && !value) {
-                callback(new Error(this.$t('install.validation.dbPasswordRequired')))
-              } else {
-                callback()
-              }
-            }, 
-            trigger: 'blur' 
-          }
-        ]
-      },
+      dbRules: {},
       systemForm: {
         httpport: 8088,
         runmode: 'prod',
         timeout: 12
       },
-      systemRules: {
-        httpport: [{ required: true, message: this.$t('install.validation.httpPortRequired'), trigger: 'blur' }],
-        runmode: [{ required: true, message: this.$t('install.validation.runModeRequired'), trigger: 'change' }],
-        timeout: [{ required: true, message: this.$t('install.validation.sessionTimeoutRequired'), trigger: 'blur' }]
-      }
+      systemRules: {}
     }
   },
   computed: {
     currentLanguageName() {
       const langMap = {
-        'zh-CN': '简体中文',
-        'en-US': 'English',
-        'zh-TW': '繁體中文'
+        'zh-CN': this.t('language.zhCN'),
+        'en-US': this.t('language.enUS'),
+        'zh-TW': this.t('language.zhTW')
       }
-      return langMap[this.currentLocale] || '简体中文'
+      return langMap[this.currentLocale] || this.t('language.zhCN')
+    },
+    // 本地翻译函数
+    i18n() {
+      return i18nMessages[this.currentLocale] || i18nMessages['zh-CN']
     }
   },
   mounted() {
@@ -364,8 +314,20 @@ export default {
     document.documentElement.style.setProperty('--install-theme-color', this.themeColor)
     // 初始化语言 - 优先从 localStorage 读取，否则根据浏览器语言自动选择
     this.initLanguage()
+    // 初始化验证规则
+    this.initValidationRules()
   },
   methods: {
+    // 本地翻译方法
+    t(key) {
+      const keys = key.split('.')
+      let value = this.i18n
+      for (const k of keys) {
+        value = value[k]
+        if (!value) return key
+      }
+      return value
+    },
     // 初始化语言
     initLanguage() {
       // 1. 优先使用用户之前选择的语言
@@ -409,17 +371,19 @@ export default {
       localStorage.setItem('install_locale', key)
       // 重新初始化验证规则（因为验证消息需要更新）
       this.initValidationRules()
+      // 强制更新组件以刷新翻译
+      this.$forceUpdate()
     },
     
     // 初始化验证规则
     initValidationRules() {
       this.dbRules = {
-        dbtype: [{ required: true, message: this.$t('install.validation.dbTypeRequired'), trigger: 'change' }],
+        dbtype: [{ required: true, message: this.t('validation.dbTypeRequired'), trigger: 'change' }],
         dbhost: [
           { 
             validator: (rule, value, callback) => {
               if (this.dbForm.dbtype !== 'sqlite' && !value) {
-                callback(new Error(this.$t('install.validation.dbHostRequired')))
+                callback(new Error(this.t('validation.dbHostRequired')))
               } else {
                 callback()
               }
@@ -431,7 +395,7 @@ export default {
           { 
             validator: (rule, value, callback) => {
               if (this.dbForm.dbtype !== 'sqlite' && !value) {
-                callback(new Error(this.$t('install.validation.dbPortRequired')))
+                callback(new Error(this.t('validation.dbPortRequired')))
               } else {
                 callback()
               }
@@ -439,12 +403,12 @@ export default {
             trigger: 'blur' 
           }
         ],
-        dbname: [{ required: true, message: this.$t('install.validation.dbNameRequired'), trigger: 'blur' }],
+        dbname: [{ required: true, message: this.t('validation.dbNameRequired'), trigger: 'blur' }],
         dbuser: [
           { 
             validator: (rule, value, callback) => {
               if (this.dbForm.dbtype !== 'sqlite' && !value) {
-                callback(new Error(this.$t('install.validation.dbUserRequired')))
+                callback(new Error(this.t('validation.dbUserRequired')))
               } else {
                 callback()
               }
@@ -456,7 +420,7 @@ export default {
           { 
             validator: (rule, value, callback) => {
               if (this.dbForm.dbtype !== 'sqlite' && !value) {
-                callback(new Error(this.$t('install.validation.dbPasswordRequired')))
+                callback(new Error(this.t('validation.dbPasswordRequired')))
               } else {
                 callback()
               }
@@ -467,9 +431,9 @@ export default {
       }
       
       this.systemRules = {
-        httpport: [{ required: true, message: this.$t('install.validation.httpPortRequired'), trigger: 'blur' }],
-        runmode: [{ required: true, message: this.$t('install.validation.runModeRequired'), trigger: 'change' }],
-        timeout: [{ required: true, message: this.$t('install.validation.sessionTimeoutRequired'), trigger: 'blur' }]
+        httpport: [{ required: true, message: this.t('validation.httpPortRequired'), trigger: 'blur' }],
+        runmode: [{ required: true, message: this.t('validation.runModeRequired'), trigger: 'change' }],
+        timeout: [{ required: true, message: this.t('validation.sessionTimeoutRequired'), trigger: 'blur' }]
       }
     },
     async checkInstallStatus() {
@@ -487,7 +451,7 @@ export default {
         }
       } catch (error) {
         // 如果接口不存在或出错，说明可能未安装，继续安装流程
-        console.log(this.$t('install.messages.checkingStatus'))
+        console.log(this.t('messages.checkingStatus'))
       }
     },
     handleDbTypeChange(value) {
@@ -548,14 +512,15 @@ export default {
             (biz && typeof biz.success !== 'undefined' ? biz.success : undefined)
 
           if (ok && success) {
-            this.dbCheckResult = { success: true, message: biz.message || '数据库连接成功' }
+            // 始终使用 i18n 翻译，不使用后端返回的中文消息
+            this.dbCheckResult = { success: true, message: this.t('database.testSuccess') }
           } else {
-            this.dbCheckResult = { success: false, message: (biz && biz.message) || '数据库连接失败' }
+            // 始终使用 i18n 翻译，不使用后端返回的中文消息
+            this.dbCheckResult = { success: false, message: this.t('database.testFailed') }
           }
         } catch (error) {
-          // 错误可能是字符串或对象
-          const errorMessage = error.message || (typeof error === 'string' ? error : '数据库连接失败')
-          this.dbCheckResult = { success: false, message: errorMessage }
+          // 始终使用 i18n 翻译
+          this.dbCheckResult = { success: false, message: this.t('database.testFailed') }
         } finally {
           this.dbChecking = false
         }
@@ -566,7 +531,7 @@ export default {
         this.$refs.dbForm.validate((valid) => {
           if (valid) {
             if (!this.dbCheckResult || !this.dbCheckResult.success) {
-              this.$message.warning(this.$t('install.database.testRequired'))
+              this.$message.warning(this.t('database.testRequired'))
               return
             }
             this.currentStep++
@@ -638,17 +603,18 @@ export default {
           this.oldPort = oldPort
           this.newPort = newPort
           
-          this.$message.success(this.$t('install.messages.installSuccess'))
+          // 始终使用 i18n 翻译，不使用后端返回的中文消息
+          this.$message.success(this.t('messages.installSuccess'))
           
           resetInstallStatusCache()
           this.currentStep = 3
         } else {
-          this.$message.error((biz && biz.message) || this.$t('install.messages.installFailed'))
+          // 始终使用 i18n 翻译，不使用后端返回的中文消息
+          this.$message.error(this.t('messages.installFailed'))
         }
       } catch (error) {
-        // 错误可能是字符串或对象
-        const errorMessage = error.message || (typeof error === 'string' ? error : this.$t('install.messages.installFailed'))
-        this.$message.error(errorMessage)
+        // 始终使用 i18n 翻译
+        this.$message.error(this.t('messages.installFailed'))
       } finally {
         this.installing = false
       }
