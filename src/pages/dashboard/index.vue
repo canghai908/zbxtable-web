@@ -345,22 +345,26 @@ export default {
           let res = resp.data
           // 检查返回的数据格式
           if (res.data && Array.isArray(res.data)) {
-            // 新格式：数组
-            this.egressData = res.data
+            // 新格式：数组，确保每个项都有有效的值
+            this.egressData = res.data.map(item => ({
+              ...item,
+              in_value: item.in_value || 0,
+              out_value: item.out_value || 0
+            }))
           } else if (res.data && typeof res.data === 'object') {
             // 旧格式：对象，转换为数组格式（向后兼容）
             this.egressData = [
               {
                 id: 1,
                 name: res.data.name_one || '出口1',
-                in_value: res.data.in_one || '0',
-                out_value: res.data.out_one || '0'
+                in_value: res.data.in_one || 0,
+                out_value: res.data.out_one || 0
               },
               {
                 id: 2,
                 name: res.data.name_two || '出口2',
-                in_value: res.data.in_two || '0',
-                out_value: res.data.out_two || '0'
+                in_value: res.data.in_two || 0,
+                out_value: res.data.out_two || 0
               }
             ].filter(item => item.name && item.name !== '--')
           } else {

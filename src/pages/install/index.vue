@@ -193,9 +193,9 @@
                       <p v-else style="margin-bottom: 8px;">🔄 HTTP 端口: {{ newPort || '8088' }}</p>
                       
                       <!-- systemd 重启命令 -->
-                      <p style="margin-bottom: 12px; font-weight: 500;">⚠️ 请使用 systemd 重启程序：</p>
-                      <div style="background: #f5f5f5; padding: 12px; border-radius: 4px; margin-bottom: 12px;">
-                        <code style="font-size: 14px; color: #d63031; font-weight: 500;">
+                      <p style="margin-bottom: 12px; font-weight: bold; color: #d63031; font-size: 15px;">⚠️ 请使用 systemd 重启程序：</p>
+                      <div style="background: #f5f5f5; padding: 12px; border-radius: 4px; margin-bottom: 12px; text-align: center;">
+                        <code style="font-size: 16px; color: #d63031; font-weight: bold;">
                           systemctl restart zbxtable
                         </code>
                       </div>

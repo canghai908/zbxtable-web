@@ -99,9 +99,16 @@ export default {
       return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`
     },
     formatTraffic(bytes) {
-      if (!bytes || bytes === 0) return '0 B/s'
+      // 处理 undefined、null、空字符串等情况
+      if (bytes === undefined || bytes === null || bytes === '' || bytes === 0) {
+        return '0 B/s'
+      }
+      
       const value = parseFloat(bytes)
-      if (isNaN(value)) return '0 B/s'
+      // 如果转换后是 NaN 或者小于等于 0，返回 0
+      if (isNaN(value) || value <= 0) {
+        return '0 B/s'
+      }
       
       const k = 1024
       const sizes = ['B/s', 'KB/s', 'MB/s', 'GB/s', 'TB/s']
