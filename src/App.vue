@@ -22,9 +22,9 @@ export default {
     this.setHtmlTitle()
     this.setLanguage(this.lang)
     // 只在非安装页面加载系统配置
-    if (this.$route.path !== '/install') {
-      this.loadSystemConfig()
-    }
+    // if (this.$route.path !== '/install') {
+    //   this.loadSystemConfig()
+    // }
     enquireScreen(isMobile => this.setDevice(isMobile))
   },
   mounted() {
@@ -41,9 +41,9 @@ export default {
     $route(to, from) {
       this.setHtmlTitle()
       // 从安装页面跳转到其他页面时，加载系统配置
-      if (from.path === '/install' && to.path !== '/install') {
-        this.loadSystemConfig()
-      }
+      // if (from.path === '/install' && to.path !== '/install') {
+      //   this.loadSystemConfig()
+      // }
     },
     'theme.mode': function(val) {
       let closeMessage = this.$message.loading(`您选择了主题模式 ${val}, 正在切换...`)
