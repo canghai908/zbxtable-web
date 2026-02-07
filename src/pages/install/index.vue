@@ -1,26 +1,48 @@
 <template>
   <div class="install-container">
+    <!-- 语言切换器 -->
+    <div class="language-switcher">
+      <a-dropdown :trigger="['click']">
+        <a class="ant-dropdown-link" @click="e => e.preventDefault()">
+          <a-icon type="global" />
+          {{ currentLanguageName }}
+          <a-icon type="down" />
+        </a>
+        <a-menu slot="overlay" @click="handleLanguageChange">
+          <a-menu-item key="zh-CN">
+            <span>简体中文</span>
+          </a-menu-item>
+          <a-menu-item key="en-US">
+            <span>English</span>
+          </a-menu-item>
+          <a-menu-item key="zh-TW">
+            <span>繁體中文</span>
+          </a-menu-item>
+        </a-menu>
+      </a-dropdown>
+    </div>
+
     <a-card class="install-card" :bordered="false">
       <template slot="title">
         <div class="install-header">
-          <h1>ZbxTable 安装向导</h1>
-          <p class="subtitle">欢迎使用 ZbxTable，请按照以下步骤完成安装配置</p>
+          <h1>{{ $t('install.title') }}</h1>
+          <p class="subtitle">{{ $t('install.subtitle') }}</p>
         </div>
       </template>
 
       <a-steps :current="currentStep" class="install-steps">
-        <a-step title="数据库配置" />
-        <a-step title="系统配置" />
-        <a-step title="确认配置" />
-        <a-step title="完成安装" />
+        <a-step :title="$t('install.steps.database')" />
+        <a-step :title="$t('install.steps.system')" />
+        <a-step :title="$t('install.steps.confirm')" />
+        <a-step :title="$t('install.steps.complete')" />
       </a-steps>
 
       <div class="install-content">
         <!-- 步骤 1: 数据库配置 -->
         <div v-show="currentStep === 0" class="step-content">
           <a-form-model ref="dbForm" :model="dbForm" :rules="dbRules" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
-            <a-form-model-item label="数据库类型" prop="dbtype">
-              <a-select v-model="dbForm.dbtype" placeholder="请选择数据库类型" @change="handleDbTypeChange">
+            <a-form-model-item :label="$t('install.database.type')" prop="dbtype">
+              <a-select v-model="dbForm.dbtype" :placeholder="$t('install.database.typePlaceholder')" @change="handleDbTypeChange">
                 <a-select-option value="mysql">MySQL</a-select-option>
                 <a-select-option value="postgresql">PostgreSQL</a-select-option>
                 <a-select-option value="sqlite">SQLite</a-select-option>
@@ -29,40 +51,40 @@
 
             <!-- SQLite 只显示数据库路径 -->
             <template v-if="dbForm.dbtype === 'sqlite'">
-              <a-form-model-item label="数据库路径" prop="dbname">
-                <a-input v-model="dbForm.dbname" placeholder="./data/zbxtable.db" />
+              <a-form-model-item :label="$t('install.database.path')" prop="dbname">
+                <a-input v-model="dbForm.dbname" :placeholder="$t('install.database.pathPlaceholder')" />
                 <div class="form-help-text">
-                  SQLite 数据库文件路径，支持相对路径和绝对路径。例如：./data/zbxtable.db
+                  {{ $t('install.database.pathHint') }}
                 </div>
               </a-form-model-item>
             </template>
 
             <!-- MySQL/PostgreSQL 显示完整配置 -->
             <template v-else>
-              <a-form-model-item label="数据库地址" prop="dbhost">
-                <a-input v-model="dbForm.dbhost" placeholder="localhost" />
+              <a-form-model-item :label="$t('install.database.host')" prop="dbhost">
+                <a-input v-model="dbForm.dbhost" :placeholder="$t('install.database.hostPlaceholder')" />
               </a-form-model-item>
 
-              <a-form-model-item label="数据库端口" prop="dbport">
+              <a-form-model-item :label="$t('install.database.port')" prop="dbport">
                 <a-input-number v-model="dbForm.dbport" :min="1" :max="65535" style="width: 100%" />
               </a-form-model-item>
 
-              <a-form-model-item label="数据库名称" prop="dbname">
-                <a-input v-model="dbForm.dbname" placeholder="zbxtable" />
+              <a-form-model-item :label="$t('install.database.name')" prop="dbname">
+                <a-input v-model="dbForm.dbname" :placeholder="$t('install.database.namePlaceholder')" />
               </a-form-model-item>
 
-              <a-form-model-item label="数据库用户" prop="dbuser">
-                <a-input v-model="dbForm.dbuser" placeholder="zbxtable" />
+              <a-form-model-item :label="$t('install.database.user')" prop="dbuser">
+                <a-input v-model="dbForm.dbuser" :placeholder="$t('install.database.userPlaceholder')" />
               </a-form-model-item>
 
-              <a-form-model-item label="数据库密码" prop="dbpass">
-                <a-input-password v-model="dbForm.dbpass" placeholder="请输入数据库密码" />
+              <a-form-model-item :label="$t('install.database.password')" prop="dbpass">
+                <a-input-password v-model="dbForm.dbpass" :placeholder="$t('install.database.passwordPlaceholder')" />
               </a-form-model-item>
             </template>
 
             <a-form-model-item :wrapper-col="{ span: 14, offset: 6 }">
-              <a-button type="primary" :loading="dbChecking" @click="checkDatabase">
-                测试连接
+              <a-button type="primary" :loading="dbChecking" @click="checkDatabase" class="theme-button">
+                {{ $t('install.database.testConnection') }}
               </a-button>
               <span v-if="dbCheckResult" :class="dbCheckResult.success ? 'success-text' : 'error-text'" style="margin-left: 16px">
                 {{ dbCheckResult.message }}
@@ -74,18 +96,18 @@
         <!-- 步骤 2: 系统配置 -->
         <div v-show="currentStep === 1" class="step-content">
           <a-form-model ref="systemForm" :model="systemForm" :rules="systemRules" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
-            <a-form-model-item label="HTTP 端口" prop="httpport">
+            <a-form-model-item :label="$t('install.system.httpPort')" prop="httpport">
               <a-input-number v-model="systemForm.httpport" :min="1" :max="65535" style="width: 100%" />
             </a-form-model-item>
 
-            <a-form-model-item label="运行模式" prop="runmode">
-              <a-select v-model="systemForm.runmode" placeholder="请选择运行模式">
-                <a-select-option value="prod">生产环境</a-select-option>
-                <a-select-option value="dev">开发环境</a-select-option>
+            <a-form-model-item :label="$t('install.system.runMode')" prop="runmode">
+              <a-select v-model="systemForm.runmode" :placeholder="$t('install.system.runModePlaceholder')">
+                <a-select-option value="prod">{{ $t('install.system.runModeProd') }}</a-select-option>
+                <a-select-option value="dev">{{ $t('install.system.runModeDev') }}</a-select-option>
               </a-select>
             </a-form-model-item>
 
-            <a-form-model-item label="会话超时(小时)" prop="timeout">
+            <a-form-model-item :label="$t('install.system.sessionTimeout')" prop="timeout">
               <a-input-number v-model="systemForm.timeout" :min="1" :max="24" style="width: 100%" />
             </a-form-model-item>
           </a-form-model>
@@ -95,8 +117,8 @@
         <div v-show="currentStep === 2" class="step-content">
           <div class="confirm-container">
             <a-alert
-              message="请确认以下配置信息"
-              description="请仔细检查配置信息，确认无误后点击开始安装按钮进行安装"
+              :message="$t('install.confirm.title')"
+              :description="$t('install.confirm.description')"
               type="info"
               show-icon
               style="margin-bottom: 24px"
@@ -105,35 +127,35 @@
             <div class="config-section">
               <h3 class="section-title">
                 <a-icon type="database" />
-                数据库配置
+                {{ $t('install.confirm.databaseConfig') }}
               </h3>
               <a-descriptions bordered :column="1" size="small">
-                <a-descriptions-item label="数据库类型">
+                <a-descriptions-item :label="$t('install.confirm.dbType')">
                   <a-tag :color="getDbTypeColor(dbForm.dbtype)">
                     {{ getDbTypeName(dbForm.dbtype) }}
                   </a-tag>
                 </a-descriptions-item>
-                <a-descriptions-item v-if="dbForm.dbtype !== 'sqlite'" label="数据库地址">
+                <a-descriptions-item v-if="dbForm.dbtype !== 'sqlite'" :label="$t('install.confirm.dbHost')">
                   {{ dbForm.dbhost }}
                 </a-descriptions-item>
-                <a-descriptions-item v-if="dbForm.dbtype !== 'sqlite'" label="数据库端口">
+                <a-descriptions-item v-if="dbForm.dbtype !== 'sqlite'" :label="$t('install.confirm.dbPort')">
                   {{ dbForm.dbport }}
                 </a-descriptions-item>
-                <a-descriptions-item label="数据库名称/路径">
+                <a-descriptions-item :label="$t('install.confirm.dbName')">
                   <span class="config-value">{{ dbForm.dbname }}</span>
                 </a-descriptions-item>
-                <a-descriptions-item v-if="dbForm.dbtype !== 'sqlite'" label="数据库用户">
+                <a-descriptions-item v-if="dbForm.dbtype !== 'sqlite'" :label="$t('install.confirm.dbUser')">
                   {{ dbForm.dbuser }}
                 </a-descriptions-item>
-                <a-descriptions-item v-if="dbForm.dbtype !== 'sqlite'" label="数据库密码">
-                  <span class="password-mask">{{ dbForm.dbpass ? '••••••••' : '(未设置)' }}</span>
+                <a-descriptions-item v-if="dbForm.dbtype !== 'sqlite'" :label="$t('install.confirm.dbPassword')">
+                  <span class="password-mask">{{ dbForm.dbpass ? '••••••••' : '(' + $t('install.confirm.notTested') + ')' }}</span>
                 </a-descriptions-item>
-                <a-descriptions-item label="连接状态">
+                <a-descriptions-item :label="$t('install.confirm.connectionStatus')">
                   <a-tag v-if="dbCheckResult && dbCheckResult.success" color="green">
-                    <a-icon type="check-circle" /> 连接成功
+                    <a-icon type="check-circle" /> {{ $t('install.confirm.connected') }}
                   </a-tag>
                   <a-tag v-else color="orange">
-                    <a-icon type="warning" /> 未测试
+                    <a-icon type="warning" /> {{ $t('install.confirm.notTested') }}
                   </a-tag>
                 </a-descriptions-item>
               </a-descriptions>
@@ -142,26 +164,26 @@
             <div class="config-section">
               <h3 class="section-title">
                 <a-icon type="setting" />
-                系统配置
+                {{ $t('install.confirm.systemConfig') }}
               </h3>
               <a-descriptions bordered :column="1" size="small">
-                <a-descriptions-item label="HTTP 端口">
-                  <a-tag :color="$themeColor">{{ systemForm.httpport }}</a-tag>
+                <a-descriptions-item :label="$t('install.confirm.httpPort')">
+                  <a-tag :color="themeColor">{{ systemForm.httpport }}</a-tag>
                 </a-descriptions-item>
-                <a-descriptions-item label="运行模式">
+                <a-descriptions-item :label="$t('install.confirm.runMode')">
                   <a-tag :color="systemForm.runmode === 'prod' ? 'green' : 'orange'">
-                    {{ systemForm.runmode === 'prod' ? '生产环境' : '开发环境' }}
+                    {{ systemForm.runmode === 'prod' ? $t('install.system.runModeProd') : $t('install.system.runModeDev') }}
                   </a-tag>
                 </a-descriptions-item>
-                <a-descriptions-item label="会话超时">
-                  {{ systemForm.timeout }} 小时
+                <a-descriptions-item :label="$t('install.confirm.sessionTimeout')">
+                  {{ systemForm.timeout }} {{ $t('install.confirm.hours') }}
                 </a-descriptions-item>
               </a-descriptions>
             </div>
 
             <a-alert
-              message="提示"
-              description="安装过程将创建数据库表结构并初始化系统数据，请确保数据库配置正确且有足够的权限。"
+              :message="$t('install.confirm.warning')"
+              :description="$t('install.confirm.warningMessage')"
               type="warning"
               show-icon
               style="margin-top: 24px"
@@ -173,27 +195,27 @@
         <div v-show="currentStep === 3" class="step-content">
           <a-result 
             status="success" 
-            title="安装完成！" 
-            sub-title="配置文件已生成，数据库已初始化，请重启程序以加载配置"
+            :title="$t('install.complete.title')" 
+            :sub-title="$t('install.complete.subtitle')"
           >
             <template slot="extra">
               <div class="success-instructions">
                 <!-- 重启提示 -->
                 <a-alert
-                  message="请重启程序以加载配置"
+                  :message="$t('install.complete.restartTitle')"
                   type="warning"
                   show-icon
                   style="margin-bottom: 24px; text-align: left;"
                 >
                   <template slot="description">
                     <div style="line-height: 1.8;">
-                      <p style="margin-bottom: 8px;">✅ 配置文件已生成</p>
-                      <p style="margin-bottom: 8px;">✅ 数据库已初始化</p>
-                      <p v-if="portChanged" style="margin-bottom: 8px;">🔄 HTTP 端口: {{ oldPort }} → {{ newPort }}</p>
-                      <p v-else style="margin-bottom: 8px;">🔄 HTTP 端口: {{ newPort || '8088' }}</p>
+                      <p style="margin-bottom: 8px;">✅ {{ $t('install.complete.configGenerated') }}</p>
+                      <p style="margin-bottom: 8px;">✅ {{ $t('install.complete.databaseInitialized') }}</p>
+                      <p v-if="portChanged" style="margin-bottom: 8px;">🔄 {{ $t('install.complete.portChanged') }}: {{ oldPort }} → {{ newPort }}</p>
+                      <p v-else style="margin-bottom: 8px;">🔄 {{ $t('install.complete.portChanged') }}: {{ newPort || '8088' }}</p>
                       
                       <!-- systemd 重启命令 -->
-                      <p style="margin-bottom: 12px; font-weight: bold; color: #d63031; font-size: 15px;">⚠️ 请使用 systemd 重启程序：</p>
+                      <p style="margin-bottom: 12px; font-weight: bold; color: #d63031; font-size: 15px;">⚠️ {{ $t('install.complete.restartCommand') }}</p>
                       <div style="background: #f5f5f5; padding: 12px; border-radius: 4px; margin-bottom: 12px; text-align: center;">
                         <code style="font-size: 16px; color: #d63031; font-weight: bold;">
                           systemctl restart zbxtable
@@ -201,21 +223,21 @@
                       </div>
                       
                       <p style="margin-bottom: 12px; color: #666; font-size: 13px;">
-                        重启完成后，点击下方按钮跳转到登录页面
+                        {{ $t('install.complete.restartHint') }}
                       </p>
                       <p style="margin: 0; color: #666; font-size: 13px;">
-                        💡 提示：默认管理员账号 admin，密码 Zbxtable
+                        💡 {{ $t('install.complete.defaultAccount') }}
                       </p>
                     </div>
                   </template>
                 </a-alert>
 
                 <div style="text-align: center;">
-                  <a-button type="primary" size="large" icon="login" @click="goToLogin">
-                    前往登录页面
+                  <a-button type="primary" size="large" icon="login" @click="goToLogin" class="theme-button">
+                    {{ $t('install.complete.goToLogin') }}
                   </a-button>
                   <p style="margin-top: 12px; color: #999; font-size: 13px;">
-                    登录地址: http://{{ getHostname() }}:{{ newPort || '8088' }}/login
+                    {{ $t('install.complete.loginAddress') }}: http://{{ getHostname() }}:{{ newPort || '8088' }}/login
                   </p>
                 </div>
               </div>
@@ -225,12 +247,12 @@
       </div>
 
       <div class="install-footer">
-        <a-button v-if="currentStep > 0 && currentStep < 3" @click="prevStep">上一步</a-button>
-        <a-button v-if="currentStep < 2" type="primary" :loading="installing" @click="nextStep" style="margin-left: 8px">
-          下一步
+        <a-button v-if="currentStep > 0 && currentStep < 3" @click="prevStep">{{ $t('install.buttons.previous') }}</a-button>
+        <a-button v-if="currentStep < 2" type="primary" :loading="installing" @click="nextStep" style="margin-left: 8px" class="theme-button">
+          {{ $t('install.buttons.next') }}
         </a-button>
-        <a-button v-if="currentStep === 2" type="primary" :loading="installing" @click="doInstall" style="margin-left: 8px">
-          <a-icon type="rocket" /> 开始安装
+        <a-button v-if="currentStep === 2" type="primary" :loading="installing" @click="doInstall" style="margin-left: 8px" class="theme-button">
+          <a-icon type="rocket" /> {{ $t('install.buttons.install') }}
         </a-button>
       </div>
     </a-card>
@@ -252,6 +274,8 @@ export default {
       portChanged: false,
       oldPort: '',
       newPort: '',
+      themeColor: '#722ed1', // 默认主题颜色
+      currentLocale: 'zh-CN', // 当前语言
       dbForm: {
         dbtype: 'mysql',
         dbhost: 'localhost',
@@ -261,12 +285,12 @@ export default {
         dbpass: ''
       },
       dbRules: {
-        dbtype: [{ required: true, message: '请选择数据库类型', trigger: 'change' }],
+        dbtype: [{ required: true, message: this.$t('install.validation.dbTypeRequired'), trigger: 'change' }],
         dbhost: [
           { 
             validator: (rule, value, callback) => {
               if (this.dbForm.dbtype !== 'sqlite' && !value) {
-                callback(new Error('请输入数据库地址'))
+                callback(new Error(this.$t('install.validation.dbHostRequired')))
               } else {
                 callback()
               }
@@ -278,7 +302,7 @@ export default {
           { 
             validator: (rule, value, callback) => {
               if (this.dbForm.dbtype !== 'sqlite' && !value) {
-                callback(new Error('请输入数据库端口'))
+                callback(new Error(this.$t('install.validation.dbPortRequired')))
               } else {
                 callback()
               }
@@ -286,12 +310,12 @@ export default {
             trigger: 'blur' 
           }
         ],
-        dbname: [{ required: true, message: '请输入数据库名称或文件路径', trigger: 'blur' }],
+        dbname: [{ required: true, message: this.$t('install.validation.dbNameRequired'), trigger: 'blur' }],
         dbuser: [
           { 
             validator: (rule, value, callback) => {
               if (this.dbForm.dbtype !== 'sqlite' && !value) {
-                callback(new Error('请输入数据库用户'))
+                callback(new Error(this.$t('install.validation.dbUserRequired')))
               } else {
                 callback()
               }
@@ -303,7 +327,7 @@ export default {
           { 
             validator: (rule, value, callback) => {
               if (this.dbForm.dbtype !== 'sqlite' && !value) {
-                callback(new Error('请输入数据库密码'))
+                callback(new Error(this.$t('install.validation.dbPasswordRequired')))
               } else {
                 callback()
               }
@@ -318,16 +342,136 @@ export default {
         timeout: 12
       },
       systemRules: {
-        httpport: [{ required: true, message: '请输入 HTTP 端口', trigger: 'blur' }],
-        runmode: [{ required: true, message: '请选择运行模式', trigger: 'change' }],
-        timeout: [{ required: true, message: '请输入会话超时时间', trigger: 'blur' }]
+        httpport: [{ required: true, message: this.$t('install.validation.httpPortRequired'), trigger: 'blur' }],
+        runmode: [{ required: true, message: this.$t('install.validation.runModeRequired'), trigger: 'change' }],
+        timeout: [{ required: true, message: this.$t('install.validation.sessionTimeoutRequired'), trigger: 'blur' }]
       }
+    }
+  },
+  computed: {
+    currentLanguageName() {
+      const langMap = {
+        'zh-CN': '简体中文',
+        'en-US': 'English',
+        'zh-TW': '繁體中文'
+      }
+      return langMap[this.currentLocale] || '简体中文'
     }
   },
   mounted() {
     this.checkInstallStatus()
+    // 设置默认主题颜色
+    document.documentElement.style.setProperty('--install-theme-color', this.themeColor)
+    // 初始化语言 - 优先从 localStorage 读取，否则根据浏览器语言自动选择
+    this.initLanguage()
   },
   methods: {
+    // 初始化语言
+    initLanguage() {
+      // 1. 优先使用用户之前选择的语言
+      const savedLocale = localStorage.getItem('install_locale')
+      if (savedLocale) {
+        this.currentLocale = savedLocale
+        this.$i18n.locale = savedLocale
+        return
+      }
+      
+      // 2. 根据浏览器语言自动选择
+      const browserLang = navigator.language || navigator.userLanguage
+      let detectedLocale = 'zh-CN' // 默认简体中文
+      
+      // 浏览器语言映射
+      if (browserLang) {
+        const lang = browserLang.toLowerCase()
+        if (lang.startsWith('zh-tw') || lang.startsWith('zh-hk') || lang.startsWith('zh-mo')) {
+          // 繁体中文（台湾、香港、澳门）
+          detectedLocale = 'zh-TW'
+        } else if (lang.startsWith('zh')) {
+          // 其他中文默认为简体
+          detectedLocale = 'zh-CN'
+        } else if (lang.startsWith('en')) {
+          // 英文
+          detectedLocale = 'en-US'
+        } else {
+          // 其他语言默认使用英文
+          detectedLocale = 'en-US'
+        }
+      }
+      
+      this.currentLocale = detectedLocale
+      this.$i18n.locale = detectedLocale
+    },
+    // 语言切换
+    handleLanguageChange({ key }) {
+      this.currentLocale = key
+      this.$i18n.locale = key
+      // 保存到 localStorage
+      localStorage.setItem('install_locale', key)
+      // 重新初始化验证规则（因为验证消息需要更新）
+      this.initValidationRules()
+    },
+    
+    // 初始化验证规则
+    initValidationRules() {
+      this.dbRules = {
+        dbtype: [{ required: true, message: this.$t('install.validation.dbTypeRequired'), trigger: 'change' }],
+        dbhost: [
+          { 
+            validator: (rule, value, callback) => {
+              if (this.dbForm.dbtype !== 'sqlite' && !value) {
+                callback(new Error(this.$t('install.validation.dbHostRequired')))
+              } else {
+                callback()
+              }
+            }, 
+            trigger: 'blur' 
+          }
+        ],
+        dbport: [
+          { 
+            validator: (rule, value, callback) => {
+              if (this.dbForm.dbtype !== 'sqlite' && !value) {
+                callback(new Error(this.$t('install.validation.dbPortRequired')))
+              } else {
+                callback()
+              }
+            }, 
+            trigger: 'blur' 
+          }
+        ],
+        dbname: [{ required: true, message: this.$t('install.validation.dbNameRequired'), trigger: 'blur' }],
+        dbuser: [
+          { 
+            validator: (rule, value, callback) => {
+              if (this.dbForm.dbtype !== 'sqlite' && !value) {
+                callback(new Error(this.$t('install.validation.dbUserRequired')))
+              } else {
+                callback()
+              }
+            }, 
+            trigger: 'blur' 
+          }
+        ],
+        dbpass: [
+          { 
+            validator: (rule, value, callback) => {
+              if (this.dbForm.dbtype !== 'sqlite' && !value) {
+                callback(new Error(this.$t('install.validation.dbPasswordRequired')))
+              } else {
+                callback()
+              }
+            }, 
+            trigger: 'blur' 
+          }
+        ]
+      }
+      
+      this.systemRules = {
+        httpport: [{ required: true, message: this.$t('install.validation.httpPortRequired'), trigger: 'blur' }],
+        runmode: [{ required: true, message: this.$t('install.validation.runModeRequired'), trigger: 'change' }],
+        timeout: [{ required: true, message: this.$t('install.validation.sessionTimeoutRequired'), trigger: 'blur' }]
+      }
+    },
     async checkInstallStatus() {
       try {
         const res = await getInstallStatus()
@@ -343,7 +487,7 @@ export default {
         }
       } catch (error) {
         // 如果接口不存在或出错，说明可能未安装，继续安装流程
-        console.log('检查安装状态失败，继续安装流程')
+        console.log(this.$t('install.messages.checkingStatus'))
       }
     },
     handleDbTypeChange(value) {
@@ -422,7 +566,7 @@ export default {
         this.$refs.dbForm.validate((valid) => {
           if (valid) {
             if (!this.dbCheckResult || !this.dbCheckResult.success) {
-              this.$message.warning('请先测试数据库连接')
+              this.$message.warning(this.$t('install.database.testRequired'))
               return
             }
             this.currentStep++
@@ -494,16 +638,16 @@ export default {
           this.oldPort = oldPort
           this.newPort = newPort
           
-          this.$message.success('安装成功！请重启程序以加载配置')
+          this.$message.success(this.$t('install.messages.installSuccess'))
           
           resetInstallStatusCache()
           this.currentStep = 3
         } else {
-          this.$message.error((biz && biz.message) || '安装失败')
+          this.$message.error((biz && biz.message) || this.$t('install.messages.installFailed'))
         }
       } catch (error) {
         // 错误可能是字符串或对象
-        const errorMessage = error.message || (typeof error === 'string' ? error : '安装失败')
+        const errorMessage = error.message || (typeof error === 'string' ? error : this.$t('install.messages.installFailed'))
         this.$message.error(errorMessage)
       } finally {
         this.installing = false
@@ -539,6 +683,10 @@ export default {
 </script>
 
 <style scoped lang="less">
+:root {
+  --install-theme-color: #722ed1;
+}
+
 .install-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -546,6 +694,34 @@ export default {
   align-items: center;
   justify-content: center;
   padding: 20px;
+  position: relative;
+}
+
+.language-switcher {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
+  
+  .ant-dropdown-link {
+    color: #fff;
+    font-size: 14px;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .anticon {
+      font-size: 16px;
+    }
+  }
 }
 
 .install-card {
@@ -559,7 +735,7 @@ export default {
   h1 {
     margin: 0 0 8px 0;
     font-size: 28px;
-    color: #1890ff;
+    color: var(--install-theme-color, #722ed1);
   }
   .subtitle {
     margin: 0;
@@ -568,8 +744,49 @@ export default {
   }
 }
 
+// 主题按钮样式
+.theme-button {
+  background-color: var(--install-theme-color, #722ed1) !important;
+  border-color: var(--install-theme-color, #722ed1) !important;
+  
+  &:hover,
+  &:focus {
+    background-color: var(--install-theme-color, #722ed1) !important;
+    border-color: var(--install-theme-color, #722ed1) !important;
+    opacity: 0.8;
+  }
+  
+  &:active {
+    background-color: var(--install-theme-color, #722ed1) !important;
+    border-color: var(--install-theme-color, #722ed1) !important;
+    opacity: 0.9;
+  }
+}
+
 .install-steps {
   margin: 40px 0;
+  
+  // 覆盖 Ant Design Steps 组件的主题色
+  /deep/ .ant-steps-item-process .ant-steps-item-icon {
+    background-color: var(--install-theme-color, #722ed1);
+    border-color: var(--install-theme-color, #722ed1);
+  }
+  
+  /deep/ .ant-steps-item-finish .ant-steps-item-icon {
+    border-color: var(--install-theme-color, #722ed1);
+    
+    > .ant-steps-icon {
+      color: var(--install-theme-color, #722ed1);
+    }
+  }
+  
+  /deep/ .ant-steps-item-finish > .ant-steps-item-content > .ant-steps-item-title::after {
+    background-color: var(--install-theme-color, #722ed1);
+  }
+  
+  /deep/ .ant-steps-item-process > .ant-steps-item-content > .ant-steps-item-title {
+    color: var(--install-theme-color, #722ed1);
+  }
 }
 
 .install-content {
@@ -618,18 +835,18 @@ export default {
     color: #262626;
     margin-bottom: 16px;
     padding-bottom: 8px;
-    border-bottom: 2px solid #1890ff;
+    border-bottom: 2px solid var(--install-theme-color, #722ed1);
     
     .anticon {
       margin-right: 8px;
-      color: #1890ff;
+      color: var(--install-theme-color, #722ed1);
     }
   }
 }
 
 .config-value {
   font-family: 'Courier New', monospace;
-  color: #1890ff;
+  color: var(--install-theme-color, #722ed1);
   font-weight: 500;
 }
 

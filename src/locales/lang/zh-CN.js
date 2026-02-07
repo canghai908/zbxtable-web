@@ -278,4 +278,116 @@ export default {
     notificationSettings: '通知设置',
     securitySettings: '安全设置',
   },
+
+  // 安装页面
+  install: {
+    title: 'ZbxTable 安装向导',
+    subtitle: '欢迎使用 ZbxTable，请按照以下步骤完成安装配置',
+    
+    // 步骤
+    steps: {
+      database: '数据库配置',
+      system: '系统配置',
+      confirm: '确认配置',
+      complete: '完成安装',
+    },
+    
+    // 数据库配置
+    database: {
+      type: '数据库类型',
+      typePlaceholder: '请选择数据库类型',
+      host: '数据库地址',
+      hostPlaceholder: 'localhost',
+      port: '数据库端口',
+      name: '数据库名称',
+      namePlaceholder: 'zbxtable',
+      user: '数据库用户',
+      userPlaceholder: 'zbxtable',
+      password: '数据库密码',
+      passwordPlaceholder: '请输入数据库密码',
+      path: '数据库路径',
+      pathPlaceholder: './data/zbxtable.db',
+      pathHint: 'SQLite 数据库文件路径，支持相对路径和绝对路径。例如：./data/zbxtable.db',
+      testConnection: '测试连接',
+      testSuccess: '数据库连接成功',
+      testFailed: '数据库连接失败',
+      testRequired: '请先测试数据库连接',
+    },
+    
+    // 系统配置
+    system: {
+      httpPort: 'HTTP 端口',
+      runMode: '运行模式',
+      runModeProd: '生产环境',
+      runModeDev: '开发环境',
+      runModePlaceholder: '请选择运行模式',
+      sessionTimeout: '会话超时(小时)',
+    },
+    
+    // 确认配置
+    confirm: {
+      title: '请确认以下配置信息',
+      description: '请仔细检查配置信息，确认无误后点击开始安装按钮进行安装',
+      databaseConfig: '数据库配置',
+      systemConfig: '系统配置',
+      dbType: '数据库类型',
+      dbHost: '数据库地址',
+      dbPort: '数据库端口',
+      dbName: '数据库名称/路径',
+      dbUser: '数据库用户',
+      dbPassword: '数据库密码',
+      connectionStatus: '连接状态',
+      connected: '连接成功',
+      notTested: '未测试',
+      httpPort: 'HTTP 端口',
+      runMode: '运行模式',
+      sessionTimeout: '会话超时',
+      hours: '小时',
+      warning: '提示',
+      warningMessage: '安装过程将创建数据库表结构并初始化系统数据，请确保数据库配置正确且有足够的权限。',
+    },
+    
+    // 完成安装
+    complete: {
+      title: '安装完成！',
+      subtitle: '配置文件已生成，数据库已初始化，请重启程序以加载配置',
+      restartTitle: '请重启程序以加载配置',
+      configGenerated: '配置文件已生成',
+      databaseInitialized: '数据库已初始化',
+      portChanged: 'HTTP 端口',
+      restartCommand: '请使用 systemd 重启程序：',
+      restartHint: '重启完成后，点击下方按钮跳转到登录页面',
+      defaultAccount: '提示：默认管理员账号 admin，密码 Zbxtable',
+      goToLogin: '前往登录页面',
+      loginAddress: '登录地址',
+    },
+    
+    // 按钮
+    buttons: {
+      previous: '上一步',
+      next: '下一步',
+      install: '开始安装',
+      installing: '安装中...',
+    },
+    
+    // 验证消息
+    validation: {
+      dbTypeRequired: '请选择数据库类型',
+      dbHostRequired: '请输入数据库地址',
+      dbPortRequired: '请输入数据库端口',
+      dbNameRequired: '请输入数据库名称或文件路径',
+      dbUserRequired: '请输入数据库用户',
+      dbPasswordRequired: '请输入数据库密码',
+      httpPortRequired: '请输入 HTTP 端口',
+      runModeRequired: '请选择运行模式',
+      sessionTimeoutRequired: '请输入会话超时时间',
+    },
+    
+    // 消息提示
+    messages: {
+      installSuccess: '安装成功！请重启程序以加载配置',
+      installFailed: '安装失败',
+      checkingStatus: '检查安装状态失败，继续安装流程',
+    },
+  },
 }
