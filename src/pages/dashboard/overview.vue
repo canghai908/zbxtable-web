@@ -5,8 +5,8 @@
       <div class="stats-overview">
         <a-row :gutter="[24, 24]">
           <a-col :xl="6" :lg="12" :md="12" :sm="24" :xs="24" v-for="(stat, index) in statsCards" :key="index" class="stat-col">
-            <div class="stat-card" :class="`stat-card-${index}`">
-              <div class="stat-icon" :style="{ background: stat.gradient }">
+            <div class="stat-card" :class="`stat-card-${stat.type}`">
+              <div class="stat-icon" :class="`stat-icon-${stat.type}`">
                 <a-icon :type="stat.icon" />
               </div>
               <div class="stat-content">
@@ -218,7 +218,7 @@ export default {
           title: this.$t('num_windows_hosts'),
           value: this.win.length,
           icon: 'windows',
-          gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          type: 'windows',
           healthy: this.getHealthyCount(this.win),
           warning: this.getWarningCount(this.win),
           error: this.getErrorCount(this.win)
@@ -227,7 +227,7 @@ export default {
           title: this.$t('num_linux_hosts'),
           value: this.lin.length,
           icon: 'code',
-          gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+          type: 'linux',
           healthy: this.getHealthyCount(this.lin),
           warning: this.getWarningCount(this.lin),
           error: this.getErrorCount(this.lin)
@@ -236,7 +236,7 @@ export default {
           title: this.$t('num_networking_hosts'),
           value: this.net.length,
           icon: 'global',
-          gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+          type: 'network',
           healthy: this.getHealthyCount(this.net),
           warning: this.getWarningCount(this.net),
           error: this.getErrorCount(this.net)
@@ -245,7 +245,7 @@ export default {
           title: this.$t('num_hardware_hosts'),
           value: this.srv.length,
           icon: 'database',
-          gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+          type: 'server',
           healthy: this.getHealthyCount(this.srv),
           warning: this.getWarningCount(this.srv),
           error: this.getErrorCount(this.srv)
@@ -330,11 +330,11 @@ export default {
 
 .stat-card {
   background: @component-background;
-  border-radius: 16px;
+  border-radius: 12px;
   padding: 24px;
   display: flex;
   align-items: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
@@ -346,47 +346,73 @@ export default {
     top: 0;
     left: 0;
     right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    height: 3px;
     transform: scaleX(0);
     transform-origin: left;
     transition: transform 0.3s ease;
   }
   
   &:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    border-color: transparent;
     
     &::before {
       transform: scaleX(1);
     }
     
     .stat-icon {
-      transform: scale(1.1) rotate(5deg);
+      transform: scale(1.05);
     }
   }
 }
 
-.stat-card-0::before { background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); }
-.stat-card-1::before { background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%); }
-.stat-card-2::before { background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%); }
-.stat-card-3::before { background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%); }
+// 统一使用主题色
+.stat-card-windows,
+.stat-card-linux,
+.stat-card-network,
+.stat-card-server {
+  &::before { background: @primary-color; }
+  &:hover { box-shadow: 0 8px 24px fade(@primary-color, 20%); }
+}
 
 .stat-icon {
   width: 64px;
   height: 64px;
-  border-radius: 16px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 28px;
-  color: white;
   margin-right: 20px;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
   
   .anticon {
     font-size: 32px;
+    position: relative;
+    z-index: 1;
+  }
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    opacity: 0.12;
+    transition: opacity 0.3s ease;
+  }
+}
+
+// 统一使用主题色的图标配色
+.stat-icon-windows,
+.stat-icon-linux,
+.stat-icon-network,
+.stat-icon-server {
+  color: @primary-color;
+  &::before { background: @primary-color; }
+  .stat-card:hover & {
+    &::before { opacity: 0.18; }
   }
 }
 
@@ -399,7 +425,6 @@ export default {
   color: @text-color-secondary;
   margin-bottom: 8px;
   font-weight: 500;
-  letter-spacing: 0.5px;
 }
 
 .stat-value {
@@ -407,7 +432,7 @@ export default {
   font-weight: 700;
   color: @heading-color;
   margin-bottom: 8px;
-  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1;
 }
 
 .stat-detail {
@@ -421,47 +446,47 @@ export default {
   align-items: center;
   gap: 4px;
   font-size: 13px;
-  padding: 4px 10px;
-  border-radius: 12px;
+  padding: 2px 8px;
+  border-radius: 10px;
   font-weight: 500;
   
   &.healthy {
     color: #52c41a;
-    background: rgba(82, 196, 26, 0.1);
+    background: fade(#52c41a, 10%);
   }
   
   &.warning {
     color: #faad14;
-    background: rgba(250, 173, 20, 0.1);
+    background: fade(#faad14, 10%);
   }
   
   &.error {
     color: #f5222d;
-    background: rgba(245, 34, 45, 0.1);
+    background: fade(#f5222d, 10%);
   }
 }
 
 // 主卡片样式
 .main-card {
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   animation: fadeIn 0.8s ease-out 0.3s both;
-  border: none;
+  border: 1px solid @border-color-base;
   background: @component-background;
 }
 
 // 主机区域样式
 .host-section {
   background: @component-background;
-  border-radius: 12px;
+  border-radius: 8px;
   padding: 20px;
   min-height: 280px;
   transition: all 0.3s ease;
-  border: 1px solid @border-color-base;
+  border: 1px solid @border-color-split;
   
   &:hover {
-    border-color: @primary-color;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border-color: @border-color-base;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   }
 }
 
@@ -471,24 +496,8 @@ export default {
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 16px;
-  border-bottom: 2px solid transparent;
+  border-bottom: 2px solid fade(@primary-color, 30%);
   transition: all 0.3s ease;
-  
-  &.windows-header {
-    border-bottom-color: #667eea;
-  }
-  
-  &.linux-header {
-    border-bottom-color: #f5576c;
-  }
-  
-  &.network-header {
-    border-bottom-color: #00f2fe;
-  }
-  
-  &.server-header {
-    border-bottom-color: #43e97b;
-  }
 }
 
 .header-left {
@@ -498,20 +507,19 @@ export default {
 }
 
 .section-icon {
-  font-size: 24px;
-  color: #1890ff;
+  font-size: 22px;
+  color: @primary-color;
+  transition: all 0.3s ease;
+  
+  .host-section:hover & {
+    transform: scale(1.1);
+  }
 }
 
-.windows-header .section-icon { color: #667eea; }
-.linux-header .section-icon { color: #f5576c; }
-.network-header .section-icon { color: #00f2fe; }
-.server-header .section-icon { color: #43e97b; }
-
 .section-title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   color: @heading-color;
-  letter-spacing: 0.3px;
 }
 
 // 主机网格样式
@@ -547,11 +555,11 @@ export default {
 .host-dot {
   width: 28px;
   height: 28px;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   
   &::before {
     content: '';
@@ -559,32 +567,31 @@ export default {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 12px;
-    height: 12px;
-    border-radius: 3px;
-    background: white;
-    opacity: 0.3;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.4);
   }
   
   &:hover {
-    transform: scale(1.3) rotate(5deg);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    transform: scale(1.25);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
   
   &.status-healthy {
-    background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+    background: #52c41a;
   }
   
   &.status-warning {
-    background: linear-gradient(135deg, #faad14 0%, #ffc53d 100%);
+    background: #faad14;
   }
   
   &.status-error {
-    background: linear-gradient(135deg, #f5222d 0%, #ff4d4f 100%);
+    background: #f5222d;
   }
   
   &.status-unknown {
-    background: linear-gradient(135deg, #bfbfbf 0%, #d9d9d9 100%);
+    background: #d9d9d9;
   }
 }
 
@@ -596,7 +603,7 @@ export default {
   transform: translate(-50%, -50%);
   width: 100%;
   height: 100%;
-  border-radius: 8px;
+  border-radius: 6px;
   border: 2px solid #faad14;
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
@@ -703,42 +710,7 @@ export default {
   .host-dot {
     width: 24px;
     height: 24px;
-    border-radius: 6px;
-  }
-}
-
-// 深色模式支持（可选）
-@media (prefers-color-scheme: dark) {
-  .overview-container {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  }
-  
-  .stat-card {
-    background: #262626;
-    
-    .stat-title {
-      color: #bfbfbf;
-    }
-    
-    .stat-value {
-      color: #f0f0f0;
-    }
-  }
-  
-  .main-card {
-    background: #262626;
-  }
-  
-  .host-section {
-    background: #1f1f1f;
-    
-    &:hover {
-      background: #2a2a2a;
-    }
-  }
-  
-  .section-title {
-    color: #f0f0f0;
+    border-radius: 5px;
   }
 }
 </style>
