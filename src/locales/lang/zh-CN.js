@@ -148,7 +148,7 @@ export default {
     username: '用户名',
     email: '邮箱',
     phone: '手机号',
-    wechat: '微信',
+    wechat: '企业微信账号',
     wechatRobotKey: '企业微信群机器人Key',
     dingTalk: '钉钉',
     role: '角色',

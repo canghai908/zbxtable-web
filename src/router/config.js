@@ -214,7 +214,7 @@ const options = {
             },
             {
               path: "zabbix",
-              name: "Zabbix 管理",
+              name: "Zabbix管理",
               component: () => import("@/pages/system/zabbix"),
             },
             {

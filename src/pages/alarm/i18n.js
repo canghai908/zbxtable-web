@@ -214,7 +214,7 @@ module.exports = {
       
       // 通道选项
       channel_mail: '邮件',
-      channel_wechat: '微信',
+      channel_wechat: '企业微信',
       channel_wechat_robot: '企业微信群机器人',
       channel_dingding: '钉钉',
       channel_sms: '短信',
@@ -850,7 +850,7 @@ module.exports = {
       
       // 通道選項
       channel_mail: '郵件',
-      channel_wechat: '微信',
+      channel_wechat: '企業微信',
       channel_wechat_robot: '企業微信群機器人',
       channel_dingding: '釘釘',
       channel_sms: '短信',
