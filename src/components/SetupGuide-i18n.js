@@ -36,7 +36,11 @@ const messages = {
     skip_confirm_title: '确认跳过引导？',
     skip_confirm_content: '您可以稍后在系统管理中手动完成配置。确定要跳过引导吗？',
     skip_confirm_ok: '确定跳过',
-    skip_confirm_cancel: '继续引导'
+    skip_confirm_cancel: '继续引导',
+    complete_success: '初始配置已完成！',
+    complete_mark_failed: '标记配置完成失败，但引导已关闭',
+    complete_action_failed: '标记完成状态失败，但引导已关闭',
+    skip_tip: '已跳过引导，您可以稍后在系统管理中完成配置'
   },
   HK: {
     step1_title: '歡迎使用',
@@ -75,7 +79,11 @@ const messages = {
     skip_confirm_title: '確認跳過引導？',
     skip_confirm_content: '您可以稍後在系統管理中手動完成配置。確定要跳過引導嗎？',
     skip_confirm_ok: '確定跳過',
-    skip_confirm_cancel: '繼續引導'
+    skip_confirm_cancel: '繼續引導',
+    complete_success: '初始配置已完成！',
+    complete_mark_failed: '標記配置完成失敗，但引導已關閉',
+    complete_action_failed: '標記完成狀態失敗，但引導已關閉',
+    skip_tip: '已跳過引導，您可以稍後在系統管理中完成配置'
   },
   US: {
     step1_title: 'Welcome',
@@ -114,7 +122,11 @@ const messages = {
     skip_confirm_title: 'Skip the guide?',
     skip_confirm_content: 'You can manually complete the configuration in System Management later. Are you sure you want to skip?',
     skip_confirm_ok: 'Skip',
-    skip_confirm_cancel: 'Continue'
+    skip_confirm_cancel: 'Continue',
+    complete_success: 'Initial setup completed!',
+    complete_mark_failed: 'Failed to mark setup as completed, but guide is closed',
+    complete_action_failed: 'Failed to mark completion status, but guide is closed',
+    skip_tip: 'Guide skipped. You can complete the setup later in System Management.'
   }
 }
 

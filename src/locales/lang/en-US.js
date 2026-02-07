@@ -268,14 +268,6 @@ export default {
     saveTopology: 'Save Topology',
   },
 
-  // Setup Guide
-  setupGuide: {
-    complete_success: 'Initial setup completed!',
-    complete_mark_failed: 'Failed to mark setup as completed, but guide is closed',
-    complete_action_failed: 'Failed to mark completion status, but guide is closed',
-    skip_tip: 'Guide skipped. You can complete the setup later in System Management.',
-  },
-
   // Settings
   settings: {
     title: 'Settings',

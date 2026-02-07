@@ -1,6 +1,11 @@
 module.exports = {
 	messages: {
 		CN: {
+			alert_no_instance_title: '未配置Zabbix实例',
+			alert_no_instance_desc: '系统检测到您还未配置Zabbix实例，无法获取监控数据。',
+			alert_no_instance_action: '请前往',
+			alert_no_instance_link: '系统管理 → Zabbix管理',
+			alert_no_instance_action_end: '页面配置Zabbix实例。',
 			title_problems: '未恢复告警',
 			severity_informational: '信息',
 			severity_warning: '警告',
@@ -69,6 +74,11 @@ module.exports = {
 			num_hardware_hosts: '物理服务器',
 		},
 		HK: {
+			alert_no_instance_title: '未配置Zabbix實例',
+			alert_no_instance_desc: '系統檢測到您還未配置Zabbix實例，無法獲取監控數據。',
+			alert_no_instance_action: '請前往',
+			alert_no_instance_link: '系統管理 → Zabbix管理',
+			alert_no_instance_action_end: '頁面配置Zabbix實例。',
 			title_problems: '未恢復告警',
 			severity_informational: '信息',
 			severity_warning: '警告',
@@ -137,6 +147,11 @@ module.exports = {
 			num_hardware_hosts: '物理服務器',
 		},
 		US: {
+			alert_no_instance_title: 'No Zabbix Instance Configured',
+			alert_no_instance_desc: 'The system detected that you have not configured a Zabbix instance yet and cannot retrieve monitoring data.',
+			alert_no_instance_action: 'Please go to',
+			alert_no_instance_link: 'System Management → Zabbix Management',
+			alert_no_instance_action_end: 'page to configure a Zabbix instance.',
 			title_problems: 'Problems',
 			severity_informational: 'Informational',
 			severity_warning: 'Warning',

@@ -3,7 +3,7 @@
     <!-- 未配置实例提示 -->
     <a-alert
       v-if="!hasZabbixInstance && (loading1 || loading2)"
-      message="未配置 Zabbix 实例"
+      :message="$t('alert_no_instance_title')"
       type="warning"
       show-icon
       closable
@@ -11,8 +11,8 @@
     >
       <template slot="description">
         <div>
-          <p style="margin-bottom: 8px;">系统检测到您还未配置 Zabbix 实例，无法获取监控数据。</p>
-          <p style="margin-bottom: 12px;">请前往 <a @click="goToZabbixConfig" style="font-weight: 600; cursor: pointer; color: #1890ff;">系统管理 → Zabbix 管理</a> 页面配置 Zabbix 实例。</p>
+          <p style="margin-bottom: 8px;">{{ $t('alert_no_instance_desc') }}</p>
+          <p style="margin-bottom: 12px;">{{ $t('alert_no_instance_action') }} <a @click="goToZabbixConfig" style="font-weight: 600; cursor: pointer; color: #1890ff;">{{ $t('alert_no_instance_link') }}</a> {{ $t('alert_no_instance_action_end') }}</p>
         </div>
       </template>
     </a-alert>

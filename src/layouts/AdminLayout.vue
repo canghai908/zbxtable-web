@@ -48,6 +48,7 @@ import {getInitialSetupStatus, completeInitialSetup} from '@/services/admin'
 
 export default {
   name: 'AdminLayout',
+  i18n: require('./AdminLayout-i18n'),
   components: {Setting, SideMenu, Drawer, AdminHeader, SetupGuide},
   data () {
     return {
@@ -133,7 +134,7 @@ export default {
           }
         }
       } catch (error) {
-        console.error('检查初始配置状态失败:', error)
+        console.error(this.$t('setup_check_status_failed') + ':', error)
       }
     },
     async handleSetupFinish() {
@@ -146,26 +147,26 @@ export default {
         const res = await completeInitialSetup()
         const biz = (res && res.data) ? res.data : res
         if (biz && biz.code === 200) {
-          this.$message.success(this.$t('setupGuide.complete_success') || '配置完成！')
+          this.$message.success(this.$t('setup_complete_success'))
         } else {
-          this.$message.warning(this.$t('setupGuide.complete_mark_failed') || '标记完成状态失败，但引导已关闭')
+          this.$message.warning(this.$t('setup_complete_mark_failed'))
         }
       } catch (error) {
-        console.error('完成初始配置失败:', error)
+        console.error(this.$t('setup_complete_failed') + ':', error)
         // 即使标记失败，也不再显示引导（用户体验优先）
-        this.$message.warning(this.$t('setupGuide.complete_action_failed') || '标记完成状态失败，但引导已关闭')
+        this.$message.warning(this.$t('setup_complete_action_failed'))
       }
     },
     async handleSetupSkip() {
       // 先关闭引导界面
       this.showSetupGuide = false
-      this.$message.info(this.$t('setupGuide.skip_tip') || '已跳过引导')
+      this.$message.info(this.$t('setup_skip_tip'))
       
       // 跳过时也标记为已完成，避免刷新后再次出现
       try {
         await completeInitialSetup()
       } catch (error) {
-        console.error('标记跳过状态失败:', error)
+        console.error(this.$t('setup_skip_mark_failed') + ':', error)
       }
     },
     // 打开Zabbix实例对话框
