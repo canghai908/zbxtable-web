@@ -120,6 +120,8 @@
       :title="editingId ? $t('modal_title_edit') : $t('modal_title_add')" 
       :visible="visible" 
       @cancel="handleModalCancel"
+      :destroyOnClose="true"
+      :getContainer="() => $el"
       width="700px">
       <a-form-model :model="form" :label-col="{span: 7}" :wrapper-col="{span: 15}">
         <a-form-model-item :label="$t('form_instance_id')" required>
@@ -201,7 +203,7 @@
 
     <!-- 安装进度对话框 -->
     <a-modal :title="currentInstallType === 'webhook' ? $t('modal_title_install_webhook') : $t('modal_title_install_msagent')" :visible="installVisible" :footer="installCompleted ? null : []" :closable="installCompleted"
-      :maskClosable="false" width="800px" @cancel="closeInstallModal">
+      :maskClosable="false" :destroyOnClose="true" :getContainer="() => $el" width="800px" @cancel="closeInstallModal">
       <div style="min-height: 300px;">
         <!-- 安装说明 -->
         <a-alert v-if="!installStarted" :message="currentInstallType === 'webhook' ? $t('install_webhook_desc') : $t('install_msagent_desc')" type="info" show-icon style="margin-bottom: 16px;">
@@ -286,7 +288,7 @@
     </a-modal>
 
     <!-- Webhook 配置信息对话框 -->
-    <a-modal :title="$t('modal_title_webhook_info')" :visible="webhookInfoVisible" @cancel="webhookInfoVisible=false" :footer="null" width="800px">
+    <a-modal :title="$t('modal_title_webhook_info')" :visible="webhookInfoVisible" @cancel="webhookInfoVisible=false" :footer="null" :destroyOnClose="true" :getContainer="() => $el" width="800px">
       <div v-if="webhookInfo">
         <div :style="{ padding: '12px 16px', background: hexToRgba($themeColor, 0.1), border: `1px solid ${hexToRgba($themeColor, 0.3)}`, borderRadius: '4px', marginBottom: '16px' }">
           <div :style="{ display: 'flex', alignItems: 'center', marginBottom: '8px' }">
