@@ -103,10 +103,10 @@
         <!-- Realtime report: show start and end time -->
         <template v-if="formData.reportMode === 'realtime'">
           <a-form-model-item :label="$t('start_time')" prop="startTime">
-            <a-date-picker v-model="formData.startTime" show-time format="YYYY-MM-DD HH:mm:ss" :placeholder="$t('select_start_time')" style="width: 100%" />
+            <a-date-picker v-model="formData.startTime" show-time format="YYYY-MM-DD HH:mm:ss" :placeholder="$t('select_start_time')" style="width: 100%" @change="handleStartTimeChange" />
           </a-form-model-item>
           <a-form-model-item :label="$t('end_time')" prop="endTime">
-            <a-date-picker v-model="formData.endTime" show-time format="YYYY-MM-DD HH:mm:ss" :placeholder="$t('select_end_time')" style="width: 100%" />
+            <a-date-picker v-model="formData.endTime" show-time format="YYYY-MM-DD HH:mm:ss" :placeholder="$t('select_end_time')" style="width: 100%" @change="handleEndTimeChange" />
           </a-form-model-item>
         </template>
         <a-form-model-item :label="$t('host_selection')" prop="hostConfigs">
@@ -317,14 +317,23 @@ export default {
         ],
         startTime: [
           {
-            required: false,
-            message: this.$t('select_start_time'),
-            trigger: 'change',
+            trigger: ['change', 'blur'],
             validator: (rule, value, callback) => {
               // Realtime report needs start time
-              if (this.formData.reportMode === 'realtime' && !value) {
-                callback(new Error(this.$t('select_start_time')))
-                return
+              if (this.formData.reportMode === 'realtime') {
+                if (!value) {
+                  callback(new Error(this.$t('select_start_time')))
+                  return
+                }
+                // Validate start time is before end time
+                if (this.formData.endTime) {
+                  const startTime = value.valueOf()
+                  const endTime = this.formData.endTime.valueOf()
+                  if (startTime >= endTime) {
+                    callback(new Error(this.$t('start_time_before_end_time')))
+                    return
+                  }
+                }
               }
               callback()
             }
@@ -332,14 +341,23 @@ export default {
         ],
         endTime: [
           {
-            required: false,
-            message: this.$t('select_end_time'),
-            trigger: 'change',
+            trigger: ['change', 'blur'],
             validator: (rule, value, callback) => {
               // Realtime report needs end time
-              if (this.formData.reportMode === 'realtime' && !value) {
-                callback(new Error(this.$t('select_end_time')))
-                return
+              if (this.formData.reportMode === 'realtime') {
+                if (!value) {
+                  callback(new Error(this.$t('select_end_time')))
+                  return
+                }
+                // Validate end time is after start time
+                if (this.formData.startTime) {
+                  const startTime = this.formData.startTime.valueOf()
+                  const endTime = value.valueOf()
+                  if (endTime <= startTime) {
+                    callback(new Error(this.$t('end_time_after_start_time')))
+                    return
+                  }
+                }
               }
               callback()
             }
@@ -392,6 +410,23 @@ export default {
   created() {
     this.loadInstances()
     this.init()
+  },
+  watch: {
+    instanceList: {
+      handler(newVal) {
+        // 如果只有一个实例，自动为所有未选择实例的配置选中该实例
+        if (newVal && newVal.length === 1) {
+          this.formData.hostConfigs.forEach((config, index) => {
+            if (!config.zid) {
+              this.$set(config, 'zid', newVal[0].id)
+              // 自动加载该实例的主机列表
+              this.handleInstanceChange(newVal[0].id, index)
+            }
+          })
+        }
+      },
+      immediate: false
+    }
   },
   filters: {
     dateFormat(dateStr, pattern = "YYYY-MM-DD HH:mm:ss") {
@@ -538,12 +573,15 @@ export default {
       this.formModalVisible = true
     },
     resetFormData() {
+      // 如果只有一个实例，自动选中
+      const defaultZid = this.instanceList.length === 1 ? this.instanceList[0].id : undefined
+      
       this.formData = {
         name: '',
         reportMode: 'realtime', // Default to realtime report
         hostConfigs: [
           {
-            zid: undefined,
+            zid: defaultZid,
             host_id: '',
             item_ids: []
           }
@@ -563,6 +601,11 @@ export default {
       this.itemsFilterList = {}
       if (this.$refs.formModal) {
         this.$refs.formModal.resetFields()
+      }
+      
+      // 如果自动选中了实例，加载主机列表
+      if (defaultZid) {
+        this.handleInstanceChange(defaultZid, 0)
       }
     },
     loadFormData(id) {
@@ -641,55 +684,78 @@ export default {
     },
     handleFormSubmit() {
       this.$refs.formModal.validate((valid) => {
-        if (valid) {
-          this.formModalLoading = true
-          // Build host_ids and item_ids JSON string
-          const hostIds = JSON.stringify(this.formData.hostConfigs.map(c => ({
-            host_id: c.host_id,
-            item_ids: c.item_ids,
-            zid: c.zid
-          })))
-          const itemIds = JSON.stringify(this.formData.hostConfigs.flatMap(c => c.item_ids))
-          
-          // Format time
-          let startTimeStr = ''
-          let endTimeStr = ''
-          if (this.formData.startTime) {
-            startTimeStr = this.formData.startTime.format('YYYY-MM-DD HH:mm:ss')
-          }
-          if (this.formData.endTime) {
-            endTimeStr = this.formData.endTime.format('YYYY-MM-DD HH:mm:ss')
-          }
-          
-          const params = {
-            name: this.formData.name,
-            report_type: 'host',
-            report_mode: this.formData.reportMode,
-            host_ids: hostIds,
-            item_ids: itemIds,
-            cycle: this.formData.reportMode === 'scheduled' ? this.formData.cycle.join(',') : '', // Scheduled report needs cycle
-            status: this.formData.reportMode === 'scheduled' ? (this.formData.status ? '1' : '0') : '1', // Realtime report is enabled by default
-            emails: this.formData.emails,
-            desc: this.formData.desc,
-            start: startTimeStr,
-            end: endTimeStr
-          }
-          
-          const promise = this.isEditMode 
-            ? reportPut(this.editId, params)
-            : reportAdd(params)
-          
-          promise.then((resp) => {
-            let res = resp.data
-            if (res.code == 200) {
-              this.$message.success(this.isEditMode ? this.$t('message_task_edited') : this.$t('message_task_added'))
-              this.formModalVisible = false
-              this.init()
-            }
-          }).finally(() => {
-            this.formModalLoading = false
-          })
+        if (!valid) {
+          this.$message.error(this.$t('form_validation_error'))
+          return false
         }
+        
+        // 额外的时间验证（实时报表）
+        if (this.formData.reportMode === 'realtime') {
+          if (!this.formData.startTime) {
+            this.$message.error(this.$t('select_start_time'))
+            return false
+          }
+          if (!this.formData.endTime) {
+            this.$message.error(this.$t('select_end_time'))
+            return false
+          }
+          
+          const startTime = this.formData.startTime.valueOf()
+          const endTime = this.formData.endTime.valueOf()
+          
+          if (startTime >= endTime) {
+            this.$message.error(this.$t('start_time_before_end_time'))
+            return false
+          }
+        }
+        
+        this.formModalLoading = true
+        // Build host_ids and item_ids JSON string
+        const hostIds = JSON.stringify(this.formData.hostConfigs.map(c => ({
+          host_id: c.host_id,
+          item_ids: c.item_ids,
+          zid: c.zid
+        })))
+        const itemIds = JSON.stringify(this.formData.hostConfigs.flatMap(c => c.item_ids))
+        
+        // Format time
+        let startTimeStr = ''
+        let endTimeStr = ''
+        if (this.formData.startTime) {
+          startTimeStr = this.formData.startTime.format('YYYY-MM-DD HH:mm:ss')
+        }
+        if (this.formData.endTime) {
+          endTimeStr = this.formData.endTime.format('YYYY-MM-DD HH:mm:ss')
+        }
+        
+        const params = {
+          name: this.formData.name,
+          report_type: 'host',
+          report_mode: this.formData.reportMode,
+          host_ids: hostIds,
+          item_ids: itemIds,
+          cycle: this.formData.reportMode === 'scheduled' ? this.formData.cycle.join(',') : '', // Scheduled report needs cycle
+          status: this.formData.reportMode === 'scheduled' ? (this.formData.status ? '1' : '0') : '1', // Realtime report is enabled by default
+          emails: this.formData.emails,
+          desc: this.formData.desc,
+          start: startTimeStr,
+          end: endTimeStr
+        }
+        
+        const promise = this.isEditMode 
+          ? reportPut(this.editId, params)
+          : reportAdd(params)
+        
+        promise.then((resp) => {
+          let res = resp.data
+          if (res.code == 200) {
+            this.$message.success(this.isEditMode ? this.$t('message_task_edited') : this.$t('message_task_added'))
+            this.formModalVisible = false
+            this.init()
+          }
+        }).finally(() => {
+          this.formModalLoading = false
+        })
       })
     },
     handleFormCancel() {
@@ -714,6 +780,28 @@ export default {
       if (this.$refs.formModal) {
         this.$refs.formModal.validate()
       }
+    },
+    handleStartTimeChange(value) {
+      // Validate both start and end time when start time changes
+      this.$nextTick(() => {
+        if (this.$refs.formModal) {
+          this.$refs.formModal.validateField('startTime')
+          if (this.formData.endTime) {
+            this.$refs.formModal.validateField('endTime')
+          }
+        }
+      })
+    },
+    handleEndTimeChange(value) {
+      // Validate both start and end time when end time changes
+      this.$nextTick(() => {
+        if (this.$refs.formModal) {
+          this.$refs.formModal.validateField('endTime')
+          if (this.formData.startTime) {
+            this.$refs.formModal.validateField('startTime')
+          }
+        }
+      })
     },
     handleHostChange(config, index) {
       if (!config.host_id) {
@@ -753,15 +841,23 @@ export default {
     addHostConfig() {
       const newIndex = this.formData.hostConfigs.length
       
+      // 如果只有一个实例，自动选中
+      const defaultZid = this.instanceList.length === 1 ? this.instanceList[0].id : undefined
+      
       this.formData.hostConfigs.push({
-        zid: undefined,
+        zid: defaultZid,
         host_id: '',
         item_ids: []
       })
       
-        this.$set(this.configHostsList, newIndex, [])
-        this.$set(this.configHostsFilterList, newIndex, [])
+      this.$set(this.configHostsList, newIndex, [])
+      this.$set(this.configHostsFilterList, newIndex, [])
       this.$set(this.curItemsList, newIndex, [])
+      
+      // 如果自动选中了实例，加载主机列表
+      if (defaultZid) {
+        this.handleInstanceChange(defaultZid, newIndex)
+      }
     },
     removeHostConfig(index) {
       this.formData.hostConfigs.splice(index, 1)

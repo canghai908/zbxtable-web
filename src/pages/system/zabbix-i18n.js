@@ -137,7 +137,7 @@ module.exports = {
       form_visible_name_placeholder: '例如：生产环境',
       form_zabbix_url: 'Zabbix URL',
       form_zabbix_url_placeholder: 'http://zabbix.example.com',
-      form_username: '用户名',
+      form_username: '用户',
       form_username_placeholder: '可选（Token优先）',
       form_password: '密码',
       form_password_placeholder_add: '可选（Token优先）',

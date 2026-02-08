@@ -6,7 +6,7 @@
         <a-button @click="load">{{$t('refresh')}}</a-button>
       </div>
 
-      <a-table :loading="loading" :columns="columns" :data-source="list" :rowKey="r => r.id" :pagination="{ pageSize: 10 }">
+      <a-table :loading="loading" :columns="columns" :data-source="list" :rowKey="r => r.id" :pagination="{ pageSize: 10 }" :scroll="{ x: 'max-content' }">
         <template slot="instance" slot-scope="text">
           <a-tag :color="$themeColor">{{ text }}</a-tag>
         </template>
@@ -1106,5 +1106,19 @@ pre {
 
 .ant-alert {
   margin-bottom: 16px;
+}
+
+/* 防止表格在无数据时出现滚动条 */
+::v-deep .ant-table-wrapper {
+  overflow: visible;
+}
+
+::v-deep .ant-table {
+  overflow: visible;
+}
+
+::v-deep .ant-table-body {
+  overflow-x: auto !important;
+  overflow-y: visible !important;
 }
 </style>

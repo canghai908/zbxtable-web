@@ -108,6 +108,9 @@ module.exports = {
       load_hosts_failed:"加载主机列表失败",
       select_instance_for_each_config:"请为每个主机配置选择实例",
       total_records:"共 {total} 条数据",
+      start_time_before_end_time:"开始时间必须小于结束时间",
+      end_time_after_start_time:"结束时间必须大于开始时间",
+      form_validation_error:"请检查表单填写是否正确",
     },
     HK: {
       task:"任務名",
@@ -214,6 +217,9 @@ module.exports = {
       load_hosts_failed:"加載主機列表失敗",
       select_instance_for_each_config:"請為每個主機配置選擇實例",
       total_records:"共 {total} 條數據",
+      start_time_before_end_time:"開始時間必須小於結束時間",
+      end_time_after_start_time:"結束時間必須大於開始時間",
+      form_validation_error:"請檢查表單填寫是否正確",
     },
     US: {
       task:"Task",
@@ -324,6 +330,9 @@ module.exports = {
       load_hosts_failed:"Failed to load host list",
       select_instance_for_each_config:"Please select an instance for each host configuration",
       total_records:"Total {total} records",
+      start_time_before_end_time:"Start time must be before end time",
+      end_time_after_start_time:"End time must be after start time",
+      form_validation_error:"Please check if the form is filled correctly",
     },
   },
 }
