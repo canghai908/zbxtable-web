@@ -131,11 +131,25 @@
         <a-form-model-item :label="$t('form_zabbix_url')" required>
           <a-input v-model="form.url" :placeholder="$t('form_zabbix_url_placeholder')" />
         </a-form-model-item>
+        <a-form-model-item :wrapper-col="{ span: 24 }">
+          <div style="max-width: 600px; margin: 0 auto;">
+            <a-alert :message="$t('form_auth_tip_title')" type="info" show-icon :style="{ marginBottom: 0, background: hexToRgba($themeColor, 0.08), borderColor: hexToRgba($themeColor, 0.3) }">
+              <template slot="icon">
+                <a-icon type="info-circle" :style="{ color: $themeColor }" />
+              </template>
+              <template slot="description">
+                <div style="font-size: 13px;">
+                  {{ $t('form_auth_tip_desc') }}
+                </div>
+              </template>
+            </a-alert>
+          </div>
+        </a-form-model-item>
         <a-form-model-item :label="$t('form_username')">
           <a-input v-model="form.user" :placeholder="$t('form_username_placeholder')" />
         </a-form-model-item>
         <a-form-model-item :label="$t('form_password')">
-          <a-input-password v-model="form.pass" :placeholder="editingId ? $t('form_password_placeholder_edit') : $t('form_password_placeholder_add')" />
+          <a-input-password v-model="form.pass" :placeholder="$t('form_password_placeholder')" />
           <div v-if="editingId" style="margin-top: 4px; color: #999; font-size: 12px;">
             <a-icon type="info-circle" /> {{ $t('form_password_hint') }}
           </div>
@@ -254,21 +268,6 @@
               </template>
             </a-alert>
 
-            <!-- MS-Agent 安装成功后显示 curl 命令 -->
-            <div v-if="installSuccess && currentInstallType === 'msagent' && installScriptData" style="margin-bottom: 16px;">
-              <a-alert :message="$t('msagent_quick_install_cmd')" type="info" show-icon>
-                <template slot="description">
-                  <div style="margin-bottom: 8px;">{{ $t('msagent_quick_install_cmd_desc') }}</div>
-                  <div style="position: relative; background: #f5f5f5; padding: 12px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 13px;">
-                    <a-button size="small" icon="copy" style="position: absolute; right: 8px; top: 8px;" @click="copyToClipboard(installScriptData.install_command, $t('msagent_quick_install_cmd'))">
-                      {{ $t('btn_copy') }}
-                    </a-button>
-                    <pre style="margin: 0; padding-top: 30px; white-space: pre-wrap; word-break: break-all;">{{ installScriptData.install_command }}</pre>
-                  </div>
-                </template>
-              </a-alert>
-            </div>
-
             <div style="text-align: right;">
               <a-button v-if="installSuccess && currentInstallType === 'msagent'" type="primary" @click="handleGetScriptAfterInstall">
                 <a-icon type="code" /> {{ $t('btn_view_full_script') }}
@@ -349,60 +348,6 @@
             <div>{{ $t('webhook_verify_1') }}</div>
             <div>{{ $t('webhook_verify_2') }}</div>
             <div>{{ $t('webhook_verify_3') }}</div>
-          </div>
-        </div>
-      </div>
-    </a-modal>
-
-    <!-- MS-Agent 安装脚本对话框 -->
-    <a-modal :title="$t('modal_title_msagent_script')" :visible="scriptVisible" @cancel="scriptVisible=false" :footer="null" width="900px">
-      <div v-if="scriptData">
-        <a-alert :message="$t('msagent_install_desc')" type="info" show-icon style="margin-bottom: 16px;" />
-
-        <a-tabs default-active-key="1">
-          <a-tab-pane key="1" :tab="$t('msagent_tab_full_script')">
-            <div style="position: relative;">
-              <a-button type="primary" size="small" icon="copy" style="position: absolute; right: 8px; top: 8px; z-index: 1;" @click="copyToClipboard(scriptData.install_command, $t('msagent_tab_full_script'))">
-                {{ $t('btn_copy') }}
-              </a-button>
-              <pre style="background: #f5f5f5; padding: 16px; border-radius: 4px; max-height: 400px; overflow: auto; padding-top: 40px;">{{ scriptData.install_command }}</pre>
-            </div>
-            <a-alert :message="$t('msagent_execute_method')" type="warning" show-icon style="margin-top: 12px;">
-              <template slot="description">
-                <div>1. {{ $t('msagent_execute_step1') }}</div>
-                <div>2. {{ $t('msagent_execute_step2') }}</div>
-                <div>3. {{ $t('msagent_execute_step3') }}</div>
-              </template>
-            </a-alert>
-          </a-tab-pane>
-
-          <a-tab-pane key="2" :tab="$t('msagent_tab_config')">
-            <div style="position: relative;">
-              <a-button type="primary" size="small" icon="copy" style="position: absolute; right: 8px; top: 8px; z-index: 1;" @click="copyToClipboard(scriptData.config_content, $t('msagent_tab_config'))">
-                {{ $t('btn_copy') }}
-              </a-button>
-              <pre style="background: #f5f5f5; padding: 16px; border-radius: 4px; max-height: 400px; overflow: auto; padding-top: 40px;">{{ scriptData.config_content }}</pre>
-            </div>
-            <a-alert :message="$t('msagent_config_path')" description="/etc/ms-agent/config.yml" type="info" show-icon style="margin-top: 12px;" />
-          </a-tab-pane>
-
-          <a-tab-pane key="3" :tab="$t('msagent_tab_quick_install')">
-            <div style="position: relative;">
-              <a-button type="primary" size="small" icon="copy" style="position: absolute; right: 8px; top: 8px; z-index: 1;" @click="copyToClipboard(scriptData.curl_command, $t('msagent_tab_quick_install'))">
-                {{ $t('btn_copy') }}
-              </a-button>
-              <pre style="background: #f5f5f5; padding: 16px; border-radius: 4px; padding-top: 40px;">{{ scriptData.curl_command }}</pre>
-            </div>
-            <a-alert :message="$t('btn_cancel')" :description="$t('msagent_quick_install_note')" type="warning" show-icon style="margin-top: 12px;" />
-          </a-tab-pane>
-        </a-tabs>
-
-        <div style="margin-top: 16px; padding: 12px; background: #fafafa; border-radius: 4px;">
-          <h4 style="margin-bottom: 8px;">{{ $t('msagent_verify_title') }}</h4>
-          <div style="color: #666; font-size: 13px;">
-            <div>• {{ $t('msagent_verify_status') }}</div>
-            <div>• {{ $t('msagent_verify_log') }}</div>
-            <div>• {{ $t('msagent_verify_restart') }}</div>
           </div>
         </div>
       </div>
