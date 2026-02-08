@@ -1122,6 +1122,8 @@ export default {
                     height: bgConfig.naturalHeight || 0
                   }
                   this.form.backgroundImage = topologyData.background_image
+                  // 应用背景图
+                  this.applyBackground()
                 } else {
                   // 新格式：直接是图片路径
                   this.backgroundImage = topologyData.background_image
@@ -1131,19 +1133,22 @@ export default {
                   this.backgroundOpacity = 100
                   this.form.backgroundImage = topologyData.background_image
                   
-                  // 加载图片获取尺寸
+                  // 加载图片获取尺寸后再应用背景
                   const img = new Image()
                   img.onload = () => {
                     this.imageNaturalSize = {
                       width: img.naturalWidth,
                       height: img.naturalHeight
                     }
+                    // 在图片加载完成后应用背景图
+                    this.applyBackground()
+                  }
+                  img.onerror = () => {
+                    console.error('背景图加载失败:', topologyData.background_image)
+                    this.$message.error('背景图加载失败')
                   }
                   img.src = topologyData.background_image
                 }
-                
-                // 应用背景图
-                this.applyBackground()
               } catch (e) {
                 console.error('解析背景图配置失败', e)
               }
