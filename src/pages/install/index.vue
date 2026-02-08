@@ -121,6 +121,7 @@
               :description="t('confirm.description')"
               type="info"
               show-icon
+              class="theme-alert-info"
               style="margin-bottom: 24px"
             />
 
@@ -186,6 +187,7 @@
               :description="t('confirm.warningMessage')"
               type="warning"
               show-icon
+              class="theme-alert-warning"
               style="margin-top: 24px"
             />
           </div>
@@ -205,6 +207,7 @@
                   :message="t('complete.restartTitle')"
                   type="warning"
                   show-icon
+                  class="theme-alert-warning"
                   style="margin-bottom: 24px; text-align: left;"
                 >
                   <template slot="description">
@@ -461,13 +464,13 @@ export default {
       if (value === 'mysql') {
         this.dbForm.dbport = 3306
         this.dbForm.dbhost = 'localhost'
-        this.dbForm.dbuser = 'root'
+        this.dbForm.dbuser = 'zbxtable'
         this.dbForm.dbname = 'zbxtable'
         this.dbForm.dbpass = ''
       } else if (value === 'postgresql') {
         this.dbForm.dbport = 5432
         this.dbForm.dbhost = 'localhost'
-        this.dbForm.dbuser = 'postgres'
+        this.dbForm.dbuser = 'zbxtable'
         this.dbForm.dbname = 'zbxtable'
         this.dbForm.dbpass = ''
       } else if (value === 'sqlite') {
@@ -827,6 +830,43 @@ export default {
   
   p {
     font-size: 14px;
+  }
+}
+
+// 主题 Alert 样式
+/deep/ .theme-alert-info {
+  background: linear-gradient(135deg, rgba(114, 46, 209, 0.08) 0%, rgba(102, 126, 234, 0.08) 100%) !important;
+  border: 1px solid rgba(114, 46, 209, 0.25) !important;
+  
+  .ant-alert-icon {
+    color: var(--install-theme-color, #722ed1);
+  }
+  
+  .ant-alert-message {
+    color: var(--install-theme-color, #722ed1);
+    font-weight: 500;
+  }
+  
+  .ant-alert-description {
+    color: rgba(114, 46, 209, 0.85);
+  }
+}
+
+/deep/ .theme-alert-warning {
+  background: linear-gradient(135deg, rgba(114, 46, 209, 0.06) 0%, rgba(118, 75, 162, 0.06) 100%) !important;
+  border: 1px solid rgba(114, 46, 209, 0.2) !important;
+  
+  .ant-alert-icon {
+    color: #d4380d;
+  }
+  
+  .ant-alert-message {
+    color: var(--install-theme-color, #722ed1);
+    font-weight: 500;
+  }
+  
+  .ant-alert-description {
+    color: rgba(0, 0, 0, 0.75);
   }
 }
 </style>

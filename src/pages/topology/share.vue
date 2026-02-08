@@ -377,6 +377,78 @@ export default {
       const seconds = String(date.getSeconds()).padStart(2, '0')
       return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
     },
+    applyBackgroundImage(bgImage, bgSize, bgPosition, bgOpacity, naturalWidth, naturalHeight) {
+      // 移除旧的背景图
+      const oldBg = this.graph.getCellById('canvas-background')
+      if (oldBg) {
+        this.graph.removeCell(oldBg)
+      }
+      
+      if (naturalWidth && naturalHeight) {
+        // 计算背景图的位置和尺寸
+        let bgWidth, bgHeight, bgX, bgY
+        
+        if (bgSize === 'cover') {
+          const canvasRatio = this.form.canvasWidth / this.form.canvasHeight
+          const imageRatio = naturalWidth / naturalHeight
+          
+          if (imageRatio > canvasRatio) {
+            bgHeight = this.form.canvasHeight
+            bgWidth = bgHeight * imageRatio
+          } else {
+            bgWidth = this.form.canvasWidth
+            bgHeight = bgWidth / imageRatio
+          }
+        } else if (bgSize === 'contain') {
+          const canvasRatio = this.form.canvasWidth / this.form.canvasHeight
+          const imageRatio = naturalWidth / naturalHeight
+          
+          if (imageRatio > canvasRatio) {
+            bgWidth = this.form.canvasWidth
+            bgHeight = bgWidth / imageRatio
+          } else {
+            bgHeight = this.form.canvasHeight
+            bgWidth = bgHeight * imageRatio
+          }
+        } else {
+          bgWidth = naturalWidth
+          bgHeight = naturalHeight
+        }
+        
+        // 计算位置
+        if (bgPosition === 'center') {
+          bgX = (this.form.canvasWidth - bgWidth) / 2
+          bgY = (this.form.canvasHeight - bgHeight) / 2
+        } else if (bgPosition === 'top') {
+          bgX = (this.form.canvasWidth - bgWidth) / 2
+          bgY = 0
+        } else if (bgPosition === 'bottom') {
+          bgX = (this.form.canvasWidth - bgWidth) / 2
+          bgY = this.form.canvasHeight - bgHeight
+        }
+        
+        // 添加背景图节点
+        this.graph.addNode({
+          id: 'canvas-background',
+          shape: 'image',
+          x: bgX,
+          y: bgY,
+          width: bgWidth,
+          height: bgHeight,
+          zIndex: -2,
+          imageUrl: bgImage,
+          attrs: {
+            image: {
+              opacity: bgOpacity,
+            },
+          },
+          selectable: false,
+          movable: false,
+          resizable: false,
+          rotatable: false,
+        })
+      }
+    },
     
     initWebSocket() {
       // 防止重复初始化
@@ -452,7 +524,7 @@ export default {
       this.$message.error(this.$t('msg_websocket_error'))
     },
     
-    websocketonmessage(e) {
+    async websocketonmessage(e) {
       const redata = JSON.parse(e.data)
       let X6Data = {}
       // 注意：这里的 nodes 和 edges 字段名称与后端返回的对应
@@ -495,83 +567,39 @@ export default {
       // 然后加载背景图（在 fromJSON 之后）
       if (redata.background_image) {
         try {
-          const bgConfig = JSON.parse(redata.background_image)
-          const bgImage = bgConfig.image
-          const bgSize = bgConfig.size || 'cover'
-          const bgPosition = bgConfig.position || 'center'
-          const bgOpacity = (bgConfig.opacity || 100) / 100
-          const naturalWidth = bgConfig.naturalWidth || 0
-          const naturalHeight = bgConfig.naturalHeight || 0
+          let bgImage, bgSize, bgPosition, bgOpacity, naturalWidth, naturalHeight
           
-          // 移除旧的背景图
-          const oldBg = this.graph.getCellById('canvas-background')
-          if (oldBg) {
-            this.graph.removeCell(oldBg)
-          }
-          
-          if (naturalWidth && naturalHeight) {
-            // 计算背景图的位置和尺寸
-            let bgWidth, bgHeight, bgX, bgY
+          // 兼容新旧两种格式
+          if (redata.background_image.startsWith('{')) {
+            // 旧格式：JSON（包含 base64）
+            const bgConfig = JSON.parse(redata.background_image)
+            bgImage = bgConfig.image
+            bgSize = bgConfig.size || 'cover'
+            bgPosition = bgConfig.position || 'center'
+            bgOpacity = (bgConfig.opacity || 100) / 100
+            naturalWidth = bgConfig.naturalWidth || 0
+            naturalHeight = bgConfig.naturalHeight || 0
             
-            if (bgSize === 'cover') {
-              const canvasRatio = this.form.canvasWidth / this.form.canvasHeight
-              const imageRatio = naturalWidth / naturalHeight
-              
-              if (imageRatio > canvasRatio) {
-                bgHeight = this.form.canvasHeight
-                bgWidth = bgHeight * imageRatio
-              } else {
-                bgWidth = this.form.canvasWidth
-                bgHeight = bgWidth / imageRatio
-              }
-            } else if (bgSize === 'contain') {
-              const canvasRatio = this.form.canvasWidth / this.form.canvasHeight
-              const imageRatio = naturalWidth / naturalHeight
-              
-              if (imageRatio > canvasRatio) {
-                bgWidth = this.form.canvasWidth
-                bgHeight = bgWidth / imageRatio
-              } else {
-                bgHeight = this.form.canvasHeight
-                bgWidth = bgHeight * imageRatio
-              }
-            } else {
-              bgWidth = naturalWidth
-              bgHeight = naturalHeight
+            // 应用背景图
+            this.applyBackgroundImage(bgImage, bgSize, bgPosition, bgOpacity, naturalWidth, naturalHeight)
+          } else {
+            // 新格式：直接是图片路径
+            bgImage = redata.background_image
+            bgSize = 'cover'
+            bgPosition = 'center'
+            bgOpacity = 1
+            // 需要加载图片获取尺寸
+            const img = new Image()
+            img.onload = () => {
+              naturalWidth = img.naturalWidth
+              naturalHeight = img.naturalHeight
+              // 应用背景图
+              this.applyBackgroundImage(bgImage, bgSize, bgPosition, bgOpacity, naturalWidth, naturalHeight)
             }
-            
-            // 计算位置
-            if (bgPosition === 'center') {
-              bgX = (this.form.canvasWidth - bgWidth) / 2
-              bgY = (this.form.canvasHeight - bgHeight) / 2
-            } else if (bgPosition === 'top') {
-              bgX = (this.form.canvasWidth - bgWidth) / 2
-              bgY = 0
-            } else if (bgPosition === 'bottom') {
-              bgX = (this.form.canvasWidth - bgWidth) / 2
-              bgY = this.form.canvasHeight - bgHeight
+            img.onerror = () => {
+              console.error('背景图加载失败')
             }
-            
-            // 添加背景图节点
-            this.graph.addNode({
-              id: 'canvas-background',
-              shape: 'image',
-              x: bgX,
-              y: bgY,
-              width: bgWidth,
-              height: bgHeight,
-              zIndex: -2,
-              imageUrl: bgImage,
-              attrs: {
-                image: {
-                  opacity: bgOpacity,
-                },
-              },
-              selectable: false,
-              movable: false,
-              resizable: false,
-              rotatable: false,
-            })
+            img.src = redata.background_image
           }
         } catch (e) {
           console.error('解析背景图配置失败', e)
@@ -645,77 +673,39 @@ export default {
             // 然后加载背景图（在 fromJSON 之后）
             if (res.data.background_image) {
               try {
-                const bgConfig = JSON.parse(res.data.background_image)
-                const bgImage = bgConfig.image
-                const bgSize = bgConfig.size || 'cover'
-                const bgPosition = bgConfig.position || 'center'
-                const bgOpacity = (bgConfig.opacity || 100) / 100
-                const naturalWidth = bgConfig.naturalWidth || 0
-                const naturalHeight = bgConfig.naturalHeight || 0
+                let bgImage, bgSize, bgPosition, bgOpacity, naturalWidth, naturalHeight
                 
-                if (naturalWidth && naturalHeight) {
-                  // 计算背景图的位置和尺寸
-                  let bgWidth, bgHeight, bgX, bgY
+                // 兼容新旧两种格式
+                if (res.data.background_image.startsWith('{')) {
+                  // 旧格式：JSON（包含 base64）
+                  const bgConfig = JSON.parse(res.data.background_image)
+                  bgImage = bgConfig.image
+                  bgSize = bgConfig.size || 'cover'
+                  bgPosition = bgConfig.position || 'center'
+                  bgOpacity = (bgConfig.opacity || 100) / 100
+                  naturalWidth = bgConfig.naturalWidth || 0
+                  naturalHeight = bgConfig.naturalHeight || 0
                   
-                  if (bgSize === 'cover') {
-                    const canvasRatio = this.form.canvasWidth / this.form.canvasHeight
-                    const imageRatio = naturalWidth / naturalHeight
-                    
-                    if (imageRatio > canvasRatio) {
-                      bgHeight = this.form.canvasHeight
-                      bgWidth = bgHeight * imageRatio
-                    } else {
-                      bgWidth = this.form.canvasWidth
-                      bgHeight = bgWidth / imageRatio
-                    }
-                  } else if (bgSize === 'contain') {
-                    const canvasRatio = this.form.canvasWidth / this.form.canvasHeight
-                    const imageRatio = naturalWidth / naturalHeight
-                    
-                    if (imageRatio > canvasRatio) {
-                      bgWidth = this.form.canvasWidth
-                      bgHeight = bgWidth / imageRatio
-                    } else {
-                      bgHeight = this.form.canvasHeight
-                      bgWidth = bgHeight * imageRatio
-                    }
-                  } else {
-                    bgWidth = naturalWidth
-                    bgHeight = naturalHeight
+                  // 应用背景图
+                  this.applyBackgroundImage(bgImage, bgSize, bgPosition, bgOpacity, naturalWidth, naturalHeight)
+                } else {
+                  // 新格式：直接是图片路径
+                  bgImage = res.data.background_image
+                  bgSize = 'cover'
+                  bgPosition = 'center'
+                  bgOpacity = 1
+                  // 需要加载图片获取尺寸
+                  const img = new Image()
+                  img.onload = () => {
+                    naturalWidth = img.naturalWidth
+                    naturalHeight = img.naturalHeight
+                    // 应用背景图
+                    this.applyBackgroundImage(bgImage, bgSize, bgPosition, bgOpacity, naturalWidth, naturalHeight)
                   }
-                  
-                  // 计算位置
-                  if (bgPosition === 'center') {
-                    bgX = (this.form.canvasWidth - bgWidth) / 2
-                    bgY = (this.form.canvasHeight - bgHeight) / 2
-                  } else if (bgPosition === 'top') {
-                    bgX = (this.form.canvasWidth - bgWidth) / 2
-                    bgY = 0
-                  } else if (bgPosition === 'bottom') {
-                    bgX = (this.form.canvasWidth - bgWidth) / 2
-                    bgY = this.form.canvasHeight - bgHeight
+                  img.onerror = () => {
+                    console.error('背景图加载失败')
                   }
-                  
-                  // 添加背景图节点
-                  this.graph.addNode({
-                    id: 'canvas-background',
-                    shape: 'image',
-                    x: bgX,
-                    y: bgY,
-                    width: bgWidth,
-                    height: bgHeight,
-                    zIndex: -2,
-                    imageUrl: bgImage,
-                    attrs: {
-                      image: {
-                        opacity: bgOpacity,
-                      },
-                    },
-                    selectable: false,
-                    movable: false,
-                    resizable: false,
-                    rotatable: false,
-                  })
+                  img.src = res.data.background_image
                 }
               } catch (e) {
                 console.error('解析背景图配置失败', e)

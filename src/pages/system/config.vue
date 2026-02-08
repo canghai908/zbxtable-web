@@ -44,18 +44,18 @@
               <a-divider orientation="left">{{$t('systemSettings')}}</a-divider>
               
               <a-form-model-item v-for="item in systemOnlyConfigs" :key="item.id" :label="item.name">
-                <a-select v-if="isBooleanConfig(item.key)" v-model="systemForm[item.key]" :placeholder="item.comment" style="width: 100%">
-                  <a-select-option v-for="opt in getBooleanOptions(item.key)" :key="opt.value" :value="opt.value">
+                <a-select v-if="isBooleanConfig(item.config_key)" v-model="systemForm[item.config_key]" :placeholder="item.comment" style="width: 100%">
+                  <a-select-option v-for="opt in getBooleanOptions(item.config_key)" :key="opt.value" :value="opt.value">
                     {{ opt.label }}
                   </a-select-option>
                 </a-select>
-                <a-input-group v-else-if="item.key === 'webhook_url'" compact style="display: flex;">
-                  <a-input v-model="systemForm[item.key]" :placeholder="item.comment" style="flex: 1;" />
+                <a-input-group v-else-if="item.config_key === 'webhook_url'" compact style="display: flex;">
+                  <a-input v-model="systemForm[item.config_key]" :placeholder="item.comment" style="flex: 1;" />
                   <a-button type="primary" @click="getCurrentWebUrl" :loading="gettingUrl">
                     <a-icon type="link" /> {{gettingUrl ? $t('gettingUrl') : $t('getCurrentUrl')}}
                   </a-button>
                 </a-input-group>
-                <a-input v-else v-model="systemForm[item.key]" :placeholder="item.comment" />
+                <a-input v-else v-model="systemForm[item.config_key]" :placeholder="item.comment" />
                 <div class="config-hint">{{ item.comment }}</div>
               </a-form-model-item>
               
@@ -70,13 +70,13 @@
           <a-tab-pane key="email" :tab="$t('emailTab')">
             <a-form-model ref="emailForm" :model="emailForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
               <a-form-model-item v-for="item in emailConfigs" :key="item.id" :label="item.name">
-                <a-select v-if="isBooleanConfig(item.key)" v-model="emailForm[item.key]" :placeholder="item.comment" style="width: 100%">
-                  <a-select-option v-for="opt in getBooleanOptions(item.key)" :key="opt.value" :value="opt.value">
+                <a-select v-if="isBooleanConfig(item.config_key)" v-model="emailForm[item.config_key]" :placeholder="item.comment" style="width: 100%">
+                  <a-select-option v-for="opt in getBooleanOptions(item.config_key)" :key="opt.value" :value="opt.value">
                     {{ opt.label }}
                   </a-select-option>
                 </a-select>
-                <a-input-password v-else-if="item.key === 'email_secret'" v-model="emailForm[item.key]" :placeholder="item.comment" />
-                <a-input v-else v-model="emailForm[item.key]" :placeholder="item.comment" />
+                <a-input-password v-else-if="item.config_key === 'email_secret'" v-model="emailForm[item.config_key]" :placeholder="item.comment" />
+                <a-input v-else v-model="emailForm[item.config_key]" :placeholder="item.comment" />
                 <div class="config-hint">{{ item.comment }}</div>
               </a-form-model-item>
               <a-form-model-item :wrapper-col="{ span: 14, offset: 6 }">
@@ -94,13 +94,13 @@
           <a-tab-pane key="wechat" :tab="$t('wechatTab')">
             <a-form-model ref="wechatForm" :model="wechatForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
               <a-form-model-item v-for="item in wechatConfigs" :key="item.id" :label="item.name">
-                <a-select v-if="isBooleanConfig(item.key)" v-model="wechatForm[item.key]" :placeholder="item.comment" style="width: 100%">
-                  <a-select-option v-for="opt in getBooleanOptions(item.key)" :key="opt.value" :value="opt.value">
+                <a-select v-if="isBooleanConfig(item.config_key)" v-model="wechatForm[item.config_key]" :placeholder="item.comment" style="width: 100%">
+                  <a-select-option v-for="opt in getBooleanOptions(item.config_key)" :key="opt.value" :value="opt.value">
                     {{ opt.label }}
                   </a-select-option>
                 </a-select>
-                <a-input-password v-else-if="item.key === 'wechat_secret'" v-model="wechatForm[item.key]" :placeholder="item.comment" />
-                <a-input v-else v-model="wechatForm[item.key]" :placeholder="item.comment" />
+                <a-input-password v-else-if="item.config_key === 'wechat_secret'" v-model="wechatForm[item.config_key]" :placeholder="item.comment" />
+                <a-input v-else v-model="wechatForm[item.config_key]" :placeholder="item.comment" />
                 <div class="config-hint">{{ item.comment }}</div>
               </a-form-model-item>
               <a-form-model-item :wrapper-col="{ span: 14, offset: 6 }">
@@ -129,7 +129,7 @@
               <!-- Ollama 配置项 -->
               <template v-if="aiForm.ai_type === 'ollama'">
                 <a-form-model-item v-for="item in ollamaConfigs" :key="item.id" :label="item.name">
-                  <a-input v-model="aiForm[item.key]" :placeholder="item.comment" />
+                  <a-input v-model="aiForm[item.config_key]" :placeholder="item.comment" />
                   <div class="config-hint">{{ item.comment }}</div>
                 </a-form-model-item>
               </template>
@@ -137,8 +137,8 @@
               <!-- Deepseek 配置项 -->
               <template v-if="aiForm.ai_type === 'deepseek'">
                 <a-form-model-item v-for="item in deepseekConfigs" :key="item.id" :label="item.name">
-                  <a-input-password v-if="item.key === 'deepseek_api_key'" v-model="aiForm[item.key]" :placeholder="item.comment" />
-                  <a-input v-else v-model="aiForm[item.key]" :placeholder="item.comment" />
+                  <a-input-password v-if="item.config_key === 'deepseek_api_key'" v-model="aiForm[item.config_key]" :placeholder="item.comment" />
+                  <a-input v-else v-model="aiForm[item.config_key]" :placeholder="item.comment" />
                   <div class="config-hint">{{ item.comment }}</div>
                 </a-form-model-item>
               </template>
@@ -154,7 +154,7 @@
             <a-form-model ref="securityForm" :model="securityForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
               <a-form-model-item v-for="item in securityConfigs" :key="item.id" :label="item.name">
                 <a-input 
-                  :value="getDisplayValue(item.key)" 
+                  :value="getDisplayValue(item.config_key)" 
                   :placeholder="item.comment" 
                   disabled
                   style="font-family: 'Courier New', monospace; background-color: #f5f5f5;">
@@ -171,7 +171,7 @@
                   <a-icon type="lock" style="color: #faad14;" /> {{ item.comment }}
                 </div>
                 <a-alert 
-                  v-if="item.key === 'encryption_key'" 
+                  v-if="item.config_key === 'encryption_key'" 
                   :message="$t('securityWarning')" 
                   type="warning" 
                   show-icon 
@@ -269,50 +269,50 @@ export default {
   computed: {
     systemOnlyConfigs() {
       return this.list.filter(item => 
-        item.key === 'zbx_dash' || 
-        item.key === 'dash_id' || 
-        item.key === 'sync_inventory' ||
-        item.key === 'webhook_url'
+        item.config_key === 'zbx_dash' || 
+        item.config_key === 'dash_id' || 
+        item.config_key === 'sync_inventory' ||
+        item.config_key === 'webhook_url'
       )
     },
     allSystemConfigs() {
       return this.list.filter(item => 
-        item.key === 'system_name' || 
-        item.key === 'system_logo' ||
-        item.key === 'zbx_dash' || 
-        item.key === 'dash_id' || 
-        item.key === 'sync_inventory' ||
-        item.key === 'webhook_url'
+        item.config_key === 'system_name' || 
+        item.config_key === 'system_logo' ||
+        item.config_key === 'zbx_dash' || 
+        item.config_key === 'dash_id' || 
+        item.config_key === 'sync_inventory' ||
+        item.config_key === 'webhook_url'
       )
     },
     emailConfigs() {
       return this.list.filter(item => 
-        item.key && item.key.startsWith('email_')
+        item.config_key && item.config_key.startsWith('email_')
       )
     },
     wechatConfigs() {
       return this.list.filter(item => 
-        item.key && item.key.startsWith('wechat_')
+        item.config_key && item.config_key.startsWith('wechat_')
       )
     },
     aiConfigs() {
       return this.list.filter(item => 
-        item.key && (item.key.startsWith('ollama_') || item.key.startsWith('deepseek_') || item.key === 'ai_type')
+        item.config_key && (item.config_key.startsWith('ollama_') || item.config_key.startsWith('deepseek_') || item.config_key === 'ai_type')
       )
     },
     ollamaConfigs() {
       return this.list.filter(item => 
-        item.key && item.key.startsWith('ollama_')
+        item.config_key && item.config_key.startsWith('ollama_')
       )
     },
     deepseekConfigs() {
       return this.list.filter(item => 
-        item.key && item.key.startsWith('deepseek_')
+        item.config_key && item.config_key.startsWith('deepseek_')
       )
     },
     securityConfigs() {
       return this.list.filter(item => 
-        item.key === 'encryption_key'
+        item.config_key === 'encryption_key'
       )
     }
   },
@@ -346,9 +346,9 @@ export default {
       if (!translations) return
       
       this.list.forEach(item => {
-        if (item.key && translations[item.key]) {
-          item.name = translations[item.key].name
-          item.comment = translations[item.key].comment
+        if (item.config_key && translations[item.config_key]) {
+          item.name = translations[item.config_key].name
+          item.comment = translations[item.config_key].comment
         }
       })
     },
@@ -392,23 +392,23 @@ export default {
     initForms() {
       // 初始化各个表单的数据
       this.allSystemConfigs.forEach(item => {
-        this.$set(this.systemForm, item.key, item.value)
+        this.$set(this.systemForm, item.config_key, item.config_value)
       })
       this.emailConfigs.forEach(item => {
-        this.$set(this.emailForm, item.key, item.value)
+        this.$set(this.emailForm, item.config_key, item.config_value)
       })
       this.wechatConfigs.forEach(item => {
-        this.$set(this.wechatForm, item.key, item.value)
+        this.$set(this.wechatForm, item.config_key, item.config_value)
       })
       this.aiConfigs.forEach(item => {
-        this.$set(this.aiForm, item.key, item.value)
+        this.$set(this.aiForm, item.config_key, item.config_value)
       })
       // 如果没有设置 ai_type，默认为 ollama
       if (!this.aiForm.ai_type) {
         this.$set(this.aiForm, 'ai_type', 'ollama')
       }
       this.securityConfigs.forEach(item => {
-        this.$set(this.securityForm, item.key, item.value)
+        this.$set(this.securityForm, item.config_key, item.config_value)
       })
     },
     async saveCategory(category) {
@@ -438,7 +438,7 @@ export default {
         
         // 批量更新配置
         const promises = configs.map(item => {
-          return configUpdate(item.id, { value: form[item.key] || '' })
+          return configUpdate(item.id, { config_value: form[item.config_key] || '' })
         })
         
         await Promise.all(promises)
@@ -559,12 +559,12 @@ export default {
     },
     // 获取配置项的名称（用于动态获取翻译）
     getConfigName(key) {
-      const item = this.list.find(item => item.key === key)
+      const item = this.list.find(item => item.config_key === key)
       return item ? item.name : key
     },
     // 获取配置项的注释（用于动态获取翻译）
     getConfigComment(key) {
-      const item = this.list.find(item => item.key === key)
+      const item = this.list.find(item => item.config_key === key)
       return item ? item.comment : ''
     },
     // 获取当前 Web 访问地址

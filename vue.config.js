@@ -25,7 +25,7 @@ module.exports = {
   devServer: {
     proxy: {
       // 统一代理配置：/v1, /download, /public, /install
-      "^/(v1|download|public|install)": {
+      "^/(v1|download|public|upload|install)": {
         target: process.env.VUE_APP_API_BASE_URL || "http://localhost:8088",
         changeOrigin: true,
       },

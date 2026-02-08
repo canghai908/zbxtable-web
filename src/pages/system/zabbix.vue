@@ -606,9 +606,9 @@ export default {
         const biz = (res && res.data) ? res.data : res
         if (biz && biz.code === 200) {
           const configs = biz.data.items || []
-          const webhookUrlConfig = configs.find(c => c.key === 'webhook_url')
+          const webhookUrlConfig = configs.find(c => c.config_key === 'webhook_url')
           
-          if (!webhookUrlConfig || !webhookUrlConfig.value || webhookUrlConfig.value.trim() === '') {
+          if (!webhookUrlConfig || !webhookUrlConfig.config_value || webhookUrlConfig.config_value.trim() === '') {
             this.$warning({
               title: this.$t('msg_webhook_config_missing'),
               content: this.$t('msg_webhook_url_not_configured'),
@@ -721,9 +721,9 @@ export default {
         const biz = (res && res.data) ? res.data : res
         if (biz && biz.code === 200) {
           const configs = biz.data.items || []
-          const webhookUrlConfig = configs.find(c => c.key === 'webhook_url')
+          const webhookUrlConfig = configs.find(c => c.config_key === 'webhook_url')
           
-          if (!webhookUrlConfig || !webhookUrlConfig.value || webhookUrlConfig.value.trim() === '') {
+          if (!webhookUrlConfig || !webhookUrlConfig.config_value || webhookUrlConfig.config_value.trim() === '') {
             this.$warning({
               title: this.$t('msg_webhook_config_missing'),
               content: this.$t('msg_webhook_url_not_configured'),

@@ -1001,11 +1001,14 @@ export default {
           name: this.$t('chart_data_port_status')
         }))
         this.operationalSeries.title = this.$t('chart_interface_port_status', { name: this.record.name })
-        echarts.connect('group1')
-        this.initTrafficChart()
-        this.initDiscardedChart()
-        this.initErrorsChart()
-        this.initOperationalChart()
+        this.$nextTick(() => {
+          this.initTrafficChart()
+          this.initDiscardedChart()
+          this.initErrorsChart()
+          this.initOperationalChart()
+          // 在所有图表初始化完成后，连接它们
+          echarts.connect([this.firstChart, this.secondChart, this.thirdChart, this.fourthChart])
+        })
       })
     },
     onSelectChange(selectedRowKeys) {
@@ -1039,6 +1042,9 @@ export default {
       }
     },
     initTrafficChart() {
+      if (this.firstChart) {
+        this.firstChart.dispose()
+      }
       const chart = echarts.init(document.getElementById('trafficChat'))
       const option = {
         title: {
@@ -1208,15 +1214,12 @@ export default {
         series: this.trafficeSeries.yAxis
       }
       chart.setOption(option)
-      chart.dispatchAction({
-        type: 'takeGlobalCursor',
-        key: 'dataZoomSelect',
-        dataZoomSelectActive: true
-      })
-      chart.group = 'group1'
       this.firstChart = chart
     },
     initDiscardedChart() {
+      if (this.secondChart) {
+        this.secondChart.dispose()
+      }
       const chart = echarts.init(document.getElementById('discardedChart'))
       const option = {
         title: {
@@ -1366,15 +1369,12 @@ export default {
         series: this.diescardedSeries.yAxis
       }
       chart.setOption(option)
-      chart.dispatchAction({
-        type: 'takeGlobalCursor',
-        key: 'dataZoomSelect',
-        dataZoomSelectActive: true
-      })
-      chart.group = 'group1'
       this.secondChart = chart
     },
     initErrorsChart() {
+      if (this.thirdChart) {
+        this.thirdChart.dispose()
+      }
       const chart = echarts.init(document.getElementById('errorsChart'))
       const option = {
         title: {
@@ -1524,16 +1524,13 @@ export default {
         series: this.errorsSeries.yAxis
       }
       chart.setOption(option)
-      chart.dispatchAction({
-        type: 'takeGlobalCursor',
-        key: 'dataZoomSelect',
-        dataZoomSelectActive: true
-      })
-      chart.group = 'group1'
       this.thirdChart = chart
     },
     //端口状态
     initOperationalChart() {
+      if (this.fourthChart) {
+        this.fourthChart.dispose()
+      }
       const chart = echarts.init(document.getElementById('operationalChart'))
       const option = {
         title: {
@@ -1679,12 +1676,6 @@ export default {
         series: this.operationalSeries.yAxis
       }
       chart.setOption(option)
-      chart.dispatchAction({
-        type: 'takeGlobalCursor',
-        key: 'dataZoomSelect',
-        dataZoomSelectActive: true
-      })
-      chart.group = 'group1'
       this.fourthChart = chart
     },
     seeDetail(record) {
@@ -1750,11 +1741,14 @@ export default {
           name: this.$t('chart_data_port_status')
         }))
         this.operationalSeries.title = this.$t('chart_interface_port_status', { name: record.name })
-        echarts.connect('group1')
-        this.initTrafficChart()
-        this.initDiscardedChart()
-        this.initErrorsChart()
-        this.initOperationalChart()
+        this.$nextTick(() => {
+          this.initTrafficChart()
+          this.initDiscardedChart()
+          this.initErrorsChart()
+          this.initOperationalChart()
+          // 在所有图表初始化完成后，连接它们
+          echarts.connect([this.firstChart, this.secondChart, this.thirdChart, this.fourthChart])
+        })
       })
     },
     handleOk() {

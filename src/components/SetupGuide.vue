@@ -197,13 +197,13 @@ export default {
         
         if (listBiz && listBiz.code === 200) {
           const configs = listBiz.data.items || []
-          const webhookConfig = configs.find(c => c.key === 'webhook_url')
+          const webhookConfig = configs.find(c => c.config_key === 'webhook_url')
           
           if (webhookConfig) {
             // 更新配置
             const updateRes = await configUpdate(webhookConfig.id, {
-              key: 'webhook_url',
-              value: this.webhookUrl,
+              config_key: 'webhook_url',
+              config_value: this.webhookUrl,
               name: webhookConfig.name,
               comment: webhookConfig.comment,
               category: webhookConfig.category

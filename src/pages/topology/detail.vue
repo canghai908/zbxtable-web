@@ -193,6 +193,7 @@
         <a-form-item :label="$t('label_background_image')">
           <a-upload
             :before-upload="beforeUpload"
+            :customRequest="() => {}"
             :show-upload-list="false"
             accept="image/*"
           >
@@ -755,49 +756,74 @@ export default {
       this.backgroundModalVisible = true
     },
     
-    beforeUpload(file) {
+    async beforeUpload(file) {
       const isImage = file.type.startsWith('image/')
       if (!isImage) {
         this.$message.error('只能上传图片文件!')
         return false
       }
       
-      const isLt5M = file.size / 1024 / 1024 < 5
-      if (!isLt5M) {
-        this.$message.error('图片大小不能超过 5MB!')
+      const isLt10M = file.size / 1024 / 1024 < 10
+      if (!isLt10M) {
+        this.$message.error('图片大小不能超过 10MB!')
         return false
       }
       
-      // 读取图片并转换为 base64，同时获取图片尺寸
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        const img = new Image()
-        img.onload = () => {
-          // 保存图片原始尺寸
-          this.imageNaturalSize = {
-            width: img.naturalWidth,
-            height: img.naturalHeight
-          }
-          this.backgroundImage = e.target.result
-          
-          // 检查图片尺寸是否超过画布
-          if (img.naturalWidth > this.form.canvasWidth || img.naturalHeight > this.form.canvasHeight) {
-            this.$warning({
-              title: this.$t('msg_image_size_warning_title'),
-              content: this.$t('msg_image_size_warning_content', {
-                imageWidth: img.naturalWidth,
-                imageHeight: img.naturalHeight,
-                canvasWidth: this.form.canvasWidth,
-                canvasHeight: this.form.canvasHeight
-              }),
-            })
-          }
-        }
-        img.src = e.target.result
-      }
-      reader.readAsDataURL(file)
+      // 上传到服务器
+      const formData = new FormData()
+      formData.append('file', file)
       
-      return false // 阻止自动上传
+      try {
+        // 使用 axios 直接上传
+        const axios = require('axios')
+        const response = await axios.post('/v1/topology/upload-background', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+        
+        if (response.data.code === 200) {
+          const imagePath = response.data.data.path
+          
+          // 加载图片以获取尺寸
+          const img = new Image()
+          img.onload = () => {
+            this.imageNaturalSize = {
+              width: img.naturalWidth,
+              height: img.naturalHeight
+            }
+            // 使用服务器返回的路径
+            this.backgroundImage = imagePath
+            
+            // 检查图片尺寸是否超过画布
+            if (img.naturalWidth > this.form.canvasWidth || img.naturalHeight > this.form.canvasHeight) {
+              this.$warning({
+                title: this.$t('msg_image_size_warning_title'),
+                content: this.$t('msg_image_size_warning_content', {
+                  imageWidth: img.naturalWidth,
+                  imageHeight: img.naturalHeight,
+                  canvasWidth: this.form.canvasWidth,
+                  canvasHeight: this.form.canvasHeight
+                }),
+              })
+            }
+            
+            this.$message.success('图片上传成功')
+          }
+          img.onerror = () => {
+            this.$message.error('图片加载失败')
+          }
+          // 使用完整的 URL 加载图片
+          img.src = imagePath
+        } else {
+          this.$message.error(response.data.message || '上传失败')
+        }
+      } catch (error) {
+        console.error('上传失败:', error)
+        this.$message.error('上传失败: ' + (error.response?.data?.message || error.message || '未知错误'))
+      }
+      
+      return false // 阻止默认上传行为
     },
     
     handleBackgroundOk() {
@@ -893,20 +919,25 @@ export default {
           },
         })
         
-        // 保存到 form 中
-        this.form.backgroundImage = JSON.stringify({
-          image: this.backgroundImage,
-          size: this.backgroundSize,
-          position: this.backgroundPosition,
-          repeat: this.backgroundRepeat,
-          opacity: this.backgroundOpacity,
-          naturalWidth: this.imageNaturalSize.width,
-          naturalHeight: this.imageNaturalSize.height,
-        })
+        // 保存到 form 中（只保存路径，不保存 base64）
+        this.form.backgroundImage = this.backgroundImage
       }
     },
     
-    removeBackground() {
+    async removeBackground() {
+      // 如果是服务器路径，先删除服务器上的文件
+      if (this.backgroundImage && this.backgroundImage.startsWith('/upload/background/')) {
+        try {
+          const axios = require('axios')
+          await axios.delete('/v1/topology/delete-background', {
+            params: { path: this.backgroundImage }
+          })
+        } catch (error) {
+          console.error('删除服务器文件失败:', error)
+          // 继续执行，即使删除失败也要清除本地状态
+        }
+      }
+      
       this.backgroundImage = ''
       this.backgroundSize = 'cover'
       this.backgroundPosition = 'center'
@@ -1077,16 +1108,38 @@ export default {
             // 然后加载背景图（在 fromJSON 之后，避免被清除）
             if (topologyData.background_image) {
               try {
-                this.form.backgroundImage = topologyData.background_image
-                const bgConfig = JSON.parse(topologyData.background_image)
-                this.backgroundImage = bgConfig.image
-                this.backgroundSize = bgConfig.size || 'cover'
-                this.backgroundPosition = bgConfig.position || 'center'
-                this.backgroundRepeat = bgConfig.repeat || 'no-repeat'
-                this.backgroundOpacity = bgConfig.opacity || 100
-                this.imageNaturalSize = {
-                  width: bgConfig.naturalWidth || 0,
-                  height: bgConfig.naturalHeight || 0
+                // 兼容新旧两种格式
+                if (topologyData.background_image.startsWith('{')) {
+                  // 旧格式：JSON（包含 base64）
+                  const bgConfig = JSON.parse(topologyData.background_image)
+                  this.backgroundImage = bgConfig.image
+                  this.backgroundSize = bgConfig.size || 'cover'
+                  this.backgroundPosition = bgConfig.position || 'center'
+                  this.backgroundRepeat = bgConfig.repeat || 'no-repeat'
+                  this.backgroundOpacity = bgConfig.opacity || 100
+                  this.imageNaturalSize = {
+                    width: bgConfig.naturalWidth || 0,
+                    height: bgConfig.naturalHeight || 0
+                  }
+                  this.form.backgroundImage = topologyData.background_image
+                } else {
+                  // 新格式：直接是图片路径
+                  this.backgroundImage = topologyData.background_image
+                  this.backgroundSize = 'cover'
+                  this.backgroundPosition = 'center'
+                  this.backgroundRepeat = 'no-repeat'
+                  this.backgroundOpacity = 100
+                  this.form.backgroundImage = topologyData.background_image
+                  
+                  // 加载图片获取尺寸
+                  const img = new Image()
+                  img.onload = () => {
+                    this.imageNaturalSize = {
+                      width: img.naturalWidth,
+                      height: img.naturalHeight
+                    }
+                  }
+                  img.src = topologyData.background_image
                 }
                 
                 // 应用背景图

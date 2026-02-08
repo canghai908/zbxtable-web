@@ -224,15 +224,15 @@ export default {
         
         if (configRes && configRes.code === 200 && configRes.data && configRes.data.items) {
           const configs = configRes.data.items
-          const systemNameConfig = configs.find(item => item.key === 'system_name')
-          const systemLogoConfig = configs.find(item => item.key === 'system_logo')
+          const systemNameConfig = configs.find(item => item.config_key === 'system_name')
+          const systemLogoConfig = configs.find(item => item.config_key === 'system_logo')
           
-          if (systemNameConfig && systemNameConfig.value) {
-            this.$store.commit('setting/setSystemName', systemNameConfig.value)
+          if (systemNameConfig && systemNameConfig.config_value) {
+            this.$store.commit('setting/setSystemName', systemNameConfig.config_value)
           }
           
-          if (systemLogoConfig && systemLogoConfig.value) {
-            this.$store.commit('setting/setSystemLogo', systemLogoConfig.value)
+          if (systemLogoConfig && systemLogoConfig.config_value) {
+            this.$store.commit('setting/setSystemLogo', systemLogoConfig.config_value)
           }
         }
       } catch (error) {
