@@ -1,7 +1,7 @@
 <template>
   <a-dropdown>
     <div class="header-avatar" style="cursor: pointer">
-      <a-avatar class="avatar" size="small" shape="circle" :src="user.avatar" />
+      <a-avatar class="avatar" size="small" shape="circle" :src="avatarUrl" />
       <span class="name">{{user.name}}</span>
     </div>
     <a-menu :class="['avatar-menu']" slot="overlay">
@@ -31,6 +31,13 @@ export default {
   version: '',
   computed: {
     ...mapGetters('account', ['user']),
+    avatarUrl() {
+      // 如果用户头像为空或未定义，使用默认头像
+      if (!this.user.avatar || this.user.avatar.trim() === '') {
+        return require('@/assets/img/avatar.gif')
+      }
+      return this.user.avatar
+    }
   },
   methods: {
     logout() {
