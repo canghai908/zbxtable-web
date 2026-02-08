@@ -45,42 +45,28 @@
               <a-select v-model="dbForm.dbtype" :placeholder="t('database.typePlaceholder')" @change="handleDbTypeChange">
                 <a-select-option value="mysql">MySQL</a-select-option>
                 <a-select-option value="postgresql">PostgreSQL</a-select-option>
-                <a-select-option value="sqlite">SQLite</a-select-option>
               </a-select>
             </a-form-model-item>
 
-            <!-- SQLite 只显示数据库路径 -->
-            <template v-if="dbForm.dbtype === 'sqlite'">
-              <a-form-model-item :label="t('database.path')" prop="dbname">
-                <a-input v-model="dbForm.dbname" :placeholder="t('database.pathPlaceholder')" />
-                <div class="form-help-text">
-                  {{ t('database.pathHint') }}
-                </div>
-              </a-form-model-item>
-            </template>
+            <a-form-model-item :label="t('database.host')" prop="dbhost">
+              <a-input v-model="dbForm.dbhost" :placeholder="t('database.hostPlaceholder')" />
+            </a-form-model-item>
 
-            <!-- MySQL/PostgreSQL 显示完整配置 -->
-            <template v-else>
-              <a-form-model-item :label="t('database.host')" prop="dbhost">
-                <a-input v-model="dbForm.dbhost" :placeholder="t('database.hostPlaceholder')" />
-              </a-form-model-item>
+            <a-form-model-item :label="t('database.port')" prop="dbport">
+              <a-input-number v-model="dbForm.dbport" :min="1" :max="65535" style="width: 100%" />
+            </a-form-model-item>
 
-              <a-form-model-item :label="t('database.port')" prop="dbport">
-                <a-input-number v-model="dbForm.dbport" :min="1" :max="65535" style="width: 100%" />
-              </a-form-model-item>
+            <a-form-model-item :label="t('database.name')" prop="dbname">
+              <a-input v-model="dbForm.dbname" :placeholder="t('database.namePlaceholder')" />
+            </a-form-model-item>
 
-              <a-form-model-item :label="t('database.name')" prop="dbname">
-                <a-input v-model="dbForm.dbname" :placeholder="t('database.namePlaceholder')" />
-              </a-form-model-item>
+            <a-form-model-item :label="t('database.user')" prop="dbuser">
+              <a-input v-model="dbForm.dbuser" :placeholder="t('database.userPlaceholder')" />
+            </a-form-model-item>
 
-              <a-form-model-item :label="t('database.user')" prop="dbuser">
-                <a-input v-model="dbForm.dbuser" :placeholder="t('database.userPlaceholder')" />
-              </a-form-model-item>
-
-              <a-form-model-item :label="t('database.password')" prop="dbpass">
-                <a-input-password v-model="dbForm.dbpass" :placeholder="t('database.passwordPlaceholder')" />
-              </a-form-model-item>
-            </template>
+            <a-form-model-item :label="t('database.password')" prop="dbpass">
+              <a-input-password v-model="dbForm.dbpass" :placeholder="t('database.passwordPlaceholder')" />
+            </a-form-model-item>
 
             <a-form-model-item :wrapper-col="{ span: 14, offset: 6 }">
               <a-button type="primary" :loading="dbChecking" @click="checkDatabase" class="theme-button">
@@ -136,19 +122,19 @@
                     {{ getDbTypeName(dbForm.dbtype) }}
                   </a-tag>
                 </a-descriptions-item>
-                <a-descriptions-item v-if="dbForm.dbtype !== 'sqlite'" :label="t('confirm.dbHost')">
+                <a-descriptions-item :label="t('confirm.dbHost')">
                   {{ dbForm.dbhost }}
                 </a-descriptions-item>
-                <a-descriptions-item v-if="dbForm.dbtype !== 'sqlite'" :label="t('confirm.dbPort')">
+                <a-descriptions-item :label="t('confirm.dbPort')">
                   {{ dbForm.dbport }}
                 </a-descriptions-item>
                 <a-descriptions-item :label="t('confirm.dbName')">
                   <span class="config-value">{{ dbForm.dbname }}</span>
                 </a-descriptions-item>
-                <a-descriptions-item v-if="dbForm.dbtype !== 'sqlite'" :label="t('confirm.dbUser')">
+                <a-descriptions-item :label="t('confirm.dbUser')">
                   {{ dbForm.dbuser }}
                 </a-descriptions-item>
-                <a-descriptions-item v-if="dbForm.dbtype !== 'sqlite'" :label="t('confirm.dbPassword')">
+                <a-descriptions-item :label="t('confirm.dbPassword')">
                   <span class="password-mask">{{ dbForm.dbpass ? '••••••••' : '(' + t('confirm.notTested') + ')' }}</span>
                 </a-descriptions-item>
                 <a-descriptions-item :label="t('confirm.connectionStatus')">
@@ -382,55 +368,11 @@ export default {
     initValidationRules() {
       this.dbRules = {
         dbtype: [{ required: true, message: this.t('validation.dbTypeRequired'), trigger: 'change' }],
-        dbhost: [
-          { 
-            validator: (rule, value, callback) => {
-              if (this.dbForm.dbtype !== 'sqlite' && !value) {
-                callback(new Error(this.t('validation.dbHostRequired')))
-              } else {
-                callback()
-              }
-            }, 
-            trigger: 'blur' 
-          }
-        ],
-        dbport: [
-          { 
-            validator: (rule, value, callback) => {
-              if (this.dbForm.dbtype !== 'sqlite' && !value) {
-                callback(new Error(this.t('validation.dbPortRequired')))
-              } else {
-                callback()
-              }
-            }, 
-            trigger: 'blur' 
-          }
-        ],
+        dbhost: [{ required: true, message: this.t('validation.dbHostRequired'), trigger: 'blur' }],
+        dbport: [{ required: true, message: this.t('validation.dbPortRequired'), trigger: 'blur' }],
         dbname: [{ required: true, message: this.t('validation.dbNameRequired'), trigger: 'blur' }],
-        dbuser: [
-          { 
-            validator: (rule, value, callback) => {
-              if (this.dbForm.dbtype !== 'sqlite' && !value) {
-                callback(new Error(this.t('validation.dbUserRequired')))
-              } else {
-                callback()
-              }
-            }, 
-            trigger: 'blur' 
-          }
-        ],
-        dbpass: [
-          { 
-            validator: (rule, value, callback) => {
-              if (this.dbForm.dbtype !== 'sqlite' && !value) {
-                callback(new Error(this.t('validation.dbPasswordRequired')))
-              } else {
-                callback()
-              }
-            }, 
-            trigger: 'blur' 
-          }
-        ]
+        dbuser: [{ required: true, message: this.t('validation.dbUserRequired'), trigger: 'blur' }],
+        dbpass: [{ required: true, message: this.t('validation.dbPasswordRequired'), trigger: 'blur' }]
       }
       
       this.systemRules = {
@@ -473,13 +415,6 @@ export default {
         this.dbForm.dbuser = 'zbxtable'
         this.dbForm.dbname = 'zbxtable'
         this.dbForm.dbpass = ''
-      } else if (value === 'sqlite') {
-        // SQLite 不需要端口、主机、用户和密码
-        this.dbForm.dbport = null
-        this.dbForm.dbhost = ''
-        this.dbForm.dbuser = ''
-        this.dbForm.dbpass = ''
-        this.dbForm.dbname = './data/zbxtable.db'
       }
     },
     async checkDatabase() {
@@ -492,20 +427,11 @@ export default {
         try {
           const dbData = {
             dbtype: this.dbForm.dbtype,
-            dbname: this.dbForm.dbname
-          }
-          // SQLite 不需要这些字段
-          if (this.dbForm.dbtype !== 'sqlite') {
-            dbData.dbhost = this.dbForm.dbhost
-            dbData.dbport = String(this.dbForm.dbport)
-            dbData.dbuser = this.dbForm.dbuser
-            dbData.dbpass = this.dbForm.dbpass
-          } else {
-            // SQLite 使用空值
-            dbData.dbhost = ''
-            dbData.dbport = ''
-            dbData.dbuser = ''
-            dbData.dbpass = ''
+            dbname: this.dbForm.dbname,
+            dbhost: this.dbForm.dbhost,
+            dbport: String(this.dbForm.dbport),
+            dbuser: this.dbForm.dbuser,
+            dbpass: this.dbForm.dbpass
           }
           const res = await checkDatabaseAPI(dbData)
           const biz = (res && res.data) ? res.data : res
@@ -565,18 +491,10 @@ export default {
         // 数据库配置
         installData.dbtype = this.dbForm.dbtype
         installData.dbname = this.dbForm.dbname
-        if (this.dbForm.dbtype !== 'sqlite') {
-          installData.dbhost = this.dbForm.dbhost
-          installData.dbport = String(this.dbForm.dbport)
-          installData.dbuser = this.dbForm.dbuser
-          installData.dbpass = this.dbForm.dbpass
-        } else {
-          // SQLite 使用空值
-          installData.dbhost = ''
-          installData.dbport = ''
-          installData.dbuser = ''
-          installData.dbpass = ''
-        }
+        installData.dbhost = this.dbForm.dbhost
+        installData.dbport = String(this.dbForm.dbport)
+        installData.dbuser = this.dbForm.dbuser
+        installData.dbpass = this.dbForm.dbpass
 
         const res = await doInstallAPI(installData)
         const biz = (res && res.data) ? res.data : res
@@ -634,16 +552,14 @@ export default {
     getDbTypeName(type) {
       const names = {
         mysql: 'MySQL',
-        postgresql: 'PostgreSQL',
-        sqlite: 'SQLite'
+        postgresql: 'PostgreSQL'
       }
       return names[type] || type
     },
     getDbTypeColor(type) {
       const colors = {
         mysql: 'blue',
-        postgresql: 'cyan',
-        sqlite: 'green'
+        postgresql: 'cyan'
       }
       return colors[type] || 'default'
     }
