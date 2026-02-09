@@ -199,7 +199,7 @@ module.exports = {
       net_label_remarks: '备注',
       net_tab_runtime_info: '运行信息',
       net_tab_interface: '接口',
-      net_card_interface_list: '网卡列表',
+      net_card_interface_list: '接口列表',
       net_col_interface_index: '接口索引',
       
       // Windows详情页

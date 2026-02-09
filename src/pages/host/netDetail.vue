@@ -107,7 +107,7 @@
         onChange: onSelectChange,
         onSelect: onSelect,
         onSelectAll: onSelectAll,
-      }" :scroll="{ y: 600 }" :rowKey="(record) => { return record.index;}">
+      }" :scroll="{ y: 600 }" :rowKey="(record, index) => { return record.index || `row-${index}`;}">
                 <span slot="operational_status" slot-scope="record">
                   <template slot="title">
                     {{record.operational_status||'--'}}
@@ -642,7 +642,7 @@ export default {
       hostDetail(this.id, this.zid)
         .then((resp) => {
           let res = resp.data
-          this.detail = res
+          this.detail = res.data
         })
         .finally(() => {
           this.loading = false
