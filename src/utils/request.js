@@ -143,9 +143,22 @@ function loadInterceptors(interceptors, options) {
 				const biz = isBizObject ? response : (response && response.data ? response.data : undefined)
 
 				// token 失效（统一用业务 code 判断）
-				if (biz && biz.code == 50014) {
-					window.loginNoAuth()
-					return Promise.reject(response)
+				if (biz && (biz.code === 50014 || biz.code === '50014')) {
+					// 清除 token
+					removeAuthorization()
+					// 跳转到登录页
+					if (window.loginNoAuth && typeof window.loginNoAuth === 'function') {
+						window.loginNoAuth()
+					} else {
+						// 如果 window.loginNoAuth 还未定义，直接跳转
+						const router = options && options.router
+						if (router) {
+							router.push({ path: '/login' })
+						} else {
+							window.location.href = '/login'
+						}
+					}
+					return Promise.reject(new Error('token过期或非法的token'))
 				} else {
 					// 向后兼容：项目里大量地方使用 resp.data.code
 					// 因此始终返回 axios-like 结构：{ data: <biz> }
@@ -157,8 +170,30 @@ function loadInterceptors(interceptors, options) {
 				}
 			},
 			(error) => {
-				// 错误处理：保持 axios-like 结构，避免调用方既有代码崩溃
-				if (error.response && error.response.data) {
+				// 错误处理：检查是否是 401 未授权错误
+				if (error.response) {
+					const status = error.response.status
+					const data = error.response.data
+					
+					// 处理 401 或 code 为 50014 的情况
+					if (status === 401 || (data && (data.code === 50014 || data.code === '50014'))) {
+						// 清除 token
+						removeAuthorization()
+						// 跳转到登录页
+						if (window.loginNoAuth && typeof window.loginNoAuth === 'function') {
+							window.loginNoAuth()
+						} else {
+							// 如果 window.loginNoAuth 还未定义，直接跳转
+							const router = options && options.router
+							if (router) {
+								router.push({ path: '/login' })
+							} else {
+								window.location.href = '/login'
+							}
+						}
+						return Promise.reject(new Error('token过期或非法的token'))
+					}
+					
 					return onRejected({ ...error.response, data: error.response.data }, options)
 				}
 				// 如果没有 response，创建一个错误对象

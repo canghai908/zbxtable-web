@@ -10,7 +10,7 @@ const resp401 = {
   onFulfilled(response, options) {
     const {message} = options
     // response 现在已经是 response.data 了
-    if (response && response.code === 401) {
+    if (response && response.data && response.data.code === 401) {
       message.error('无此权限')
     }
     return response
@@ -23,9 +23,10 @@ const resp401 = {
    */
   onRejected(error, options) {
     const {message} = options
-    const {response} = error
-    // 检查 response 是否存在，避免访问 undefined 的属性
-    if (response && response.status === 401) {
+    const {data} = error
+    // 检查 data 是否存在，避免访问 undefined 的属性
+    // 注意：这里的 error 已经被 request.js 转换为 { data: ... } 格式
+    if (data && data.status === 401) {
       message.error('无此权限')
     }
     return Promise.reject(error)
@@ -36,16 +37,17 @@ const resp403 = {
   onFulfilled(response, options) {
     const {message} = options
     // response 现在已经是 response.data 了
-    if (response && response.code === 403) {
+    if (response && response.data && response.data.code === 403) {
       message.error('请求被拒绝')
     }
     return response
   },
   onRejected(error, options) {
     const {message} = options
-    const {response} = error
-    // 检查 response 是否存在，避免访问 undefined 的属性
-    if (response && response.status === 403) {
+    const {data} = error
+    // 检查 data 是否存在，避免访问 undefined 的属性
+    // 注意：这里的 error 已经被 request.js 转换为 { data: ... } 格式
+    if (data && data.status === 403) {
       message.error('请求被拒绝')
     }
     return Promise.reject(error)
