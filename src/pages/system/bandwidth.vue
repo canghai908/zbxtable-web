@@ -287,6 +287,11 @@ export default {
         itemList: [],
         isNew: true,
       }
+      // 如果只有一个实例，默认选中
+      if (this.instanceList.length === 1) {
+        newData.zid = this.instanceList[0].id
+        this.loadHostList(newData)
+      }
       this.dataSource = [...this.dataSource, newData]
     },
     handleEdit(record) {

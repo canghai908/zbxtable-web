@@ -6,15 +6,11 @@
     <div v-else class="egress-list">
       <div 
         v-for="(egress, index) in egressList" 
-        :key="egress.id"
-        class="egress-item"
-        :class="{ 'full-width': egressList.length === 1 }"
+        :key="egress.id || index"
+        class="egress-item full-width"
         :style="egressItemStyle"
       >
-        <div class="egress-header">
-          <span class="egress-name">{{ egress.name }}</span>
-          <span class="egress-time">{{ updateTime }}</span>
-        </div>
+        <div class="egress-name-single">{{ egress.name }}</div>
         <div class="egress-stats">
           <div class="stat-item in" :style="inStyle">
             <span class="label">入流量</span>
@@ -165,22 +161,15 @@ export default {
   }
 }
 
-.egress-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.egress-name-single {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  line-height: 20px;
   margin-bottom: 8px;
-  
-  .egress-name {
-    font-size: 14px;
-    font-weight: 600;
-    color: #333;
-  }
-  
-  .egress-time {
-    font-size: 11px;
-    color: #999;
-  }
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .egress-stats {

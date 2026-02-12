@@ -268,7 +268,7 @@ export default {
       currentLocale: 'zh-CN', // 当前语言
       dbForm: {
         dbtype: 'mysql',
-        dbhost: 'localhost',
+        dbhost: '127.0.0.1',
         dbport: 3306,
         dbname: 'zbxtable',
         dbuser: 'zbxtable',
@@ -405,13 +405,13 @@ export default {
       
       if (value === 'mysql') {
         this.dbForm.dbport = 3306
-        this.dbForm.dbhost = 'localhost'
+        this.dbForm.dbhost = '127.0.0.1'
         this.dbForm.dbuser = 'zbxtable'
         this.dbForm.dbname = 'zbxtable'
         this.dbForm.dbpass = ''
       } else if (value === 'postgresql') {
         this.dbForm.dbport = 5432
-        this.dbForm.dbhost = 'localhost'
+        this.dbForm.dbhost = '127.0.0.1'
         this.dbForm.dbuser = 'zbxtable'
         this.dbForm.dbname = 'zbxtable'
         this.dbForm.dbpass = ''

@@ -325,6 +325,23 @@ export async function metricMappingHistory(params) {
 	return request(METRIC_MAPPING + '/history', METHOD.GET, params)
 }
 
+// 指标映射规则相关 API
+export async function mappingRuleList(params) {
+	return request(METRIC_MAPPING + '/rules', METHOD.GET, params)
+}
+export async function mappingRuleCreate(params) {
+	return request(METRIC_MAPPING + '/rules', METHOD.POST, params)
+}
+export async function mappingRuleUpdate(id, params) {
+	return request(METRIC_MAPPING + '/rules/' + id, METHOD.PUT, params)
+}
+export async function mappingRuleDelete(id) {
+	return request(METRIC_MAPPING + '/rules/' + id, METHOD.DELETE)
+}
+export async function metricMappingSyncTemplates(params) {
+	return request(METRIC_MAPPING + '/sync/templates', METHOD.POST, params)
+}
+
 // 系统更新相关 API
 export async function systemVersion() {
 	return request(SYSTEM_UPDATE + '/version', METHOD.GET)
@@ -437,6 +454,11 @@ export default {
 	metricMappingDelete,
 	metricMappingExecute,
 	metricMappingHistory,
+	mappingRuleList,
+	mappingRuleCreate,
+	mappingRuleUpdate,
+	mappingRuleDelete,
+	metricMappingSyncTemplates,
 	systemVersion,
 	systemCheckUpdate,
 	systemDoUpdate,

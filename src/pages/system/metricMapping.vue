@@ -254,6 +254,81 @@
         </span>
       </a-table>
     </a-modal>
+
+    <!-- 规则管理弹窗 -->
+    <a-modal :title="$t('rule_management')" :visible="ruleDialogVisible" width="950px" @cancel="ruleDialogVisible = false" :footer="null">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
+        <a-space>
+          <a-button type="primary" icon="plus" @click="showRuleEdit()">{{ $t('create_mapping') }}</a-button>
+        </a-space>
+        <a-space>
+          <a-select v-model="syncZid" :placeholder="$t('placeholder_select_instance')" style="width: 200px">
+            <a-select-option v-for="instance in instances" :key="instance.id" :value="instance.id">
+              {{ instance.name }}
+            </a-select-option>
+          </a-select>
+          <a-button type="primary" icon="sync" :disabled="!syncZid" @click="confirmSyncTemplates">{{ $t('btn_sync_template') }}</a-button>
+        </a-space>
+      </div>
+      <a-table :loading="ruleLoading" :columns="ruleColumns" :data-source="ruleList" :rowKey="record => record.id" :pagination="false">
+        <span slot="status" slot-scope="text">
+          <a-tag :color="text === 1 ? 'green' : 'default'">{{ text === 1 ? $t('auto_init_enabled') : $t('auto_init_disabled') }}</a-tag>
+        </span>
+        <span slot="builtin" slot-scope="text">
+          <a-tag :color="text === 1 ? 'orange' : 'default'">{{ text === 1 ? $t('rule_builtin') : '-' }}</a-tag>
+        </span>
+        <span slot="operation" slot-scope="text, record">
+          <a-button type="link" size="small" @click="showRuleEdit(record)">{{ $t('btn_edit') }}</a-button>
+          <a-divider type="vertical" />
+          <a-button type="link" size="small" :disabled="record.is_builtin === 1" @click="deleteRule(record)">{{ $t('btn_delete') }}</a-button>
+        </span>
+      </a-table>
+    </a-modal>
+
+    <!-- 规则编辑弹窗 -->
+    <a-modal :title="ruleEditTitle" :visible="ruleEditVisible" width="700px" @ok="submitRuleForm" @cancel="ruleEditVisible = false">
+      <a-form-model ref="ruleFormRef" :model="ruleForm" :rules="ruleRules" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
+        <a-form-model-item :label="$t('rule_table_name')" prop="rule_name">
+          <a-input v-model="ruleForm.rule_name" :placeholder="$t('placeholder_rule_name')" />
+        </a-form-model-item>
+        
+        <a-form-model-item :label="$t('rule_target_field')" prop="target_field">
+          <a-select v-model="ruleForm.target_field" :placeholder="$t('placeholder_select_target_field')">
+            <a-select-option v-for="field in targetFields" :key="field.value" :value="field.value">
+              {{ field.label }}
+            </a-select-option>
+          </a-select>
+        </a-form-model-item>
+
+        <a-form-model-item :label="$t('rule_match_type')" prop="match_type">
+          <a-radio-group v-model="ruleForm.match_type">
+            <a-radio value="key">{{ $t('rule_type_key') }}</a-radio>
+            <a-radio value="name">{{ $t('rule_type_name') }}</a-radio>
+            <a-radio value="regex">{{ $t('rule_type_regex') }}</a-radio>
+          </a-radio-group>
+        </a-form-model-item>
+
+        <a-form-model-item :label="$t('rule_match_value')" prop="match_value">
+          <a-input v-model="ruleForm.match_value" :placeholder="$t('placeholder_match_value')" />
+        </a-form-model-item>
+
+        <a-form-model-item :label="$t('rule_priority')" prop="priority">
+          <a-input-number v-model="ruleForm.priority" :min="1" :max="100" />
+        </a-form-model-item>
+
+        <a-form-model-item :label="$t('rule_scope_instances')">
+          <a-select v-model="selectedRuleZids" mode="multiple" :placeholder="$t('placeholder_all_instances')">
+            <a-select-option v-for="instance in instances" :key="instance.id" :value="instance.id.toString()">
+              {{ instance.name }}
+            </a-select-option>
+          </a-select>
+        </a-form-model-item>
+
+        <a-form-model-item :label="$t('rule_status')">
+          <a-switch v-model="ruleForm.is_enabled" :checked-value="1" :un-checked-value="0" />
+        </a-form-model-item>
+      </a-form-model>
+    </a-modal>
   </page-layout>
 </template>
 
@@ -270,7 +345,12 @@ import {
   metricMappingUpdate,
   metricMappingDelete,
   metricMappingExecute,
-  metricMappingHistory
+  metricMappingHistory,
+  mappingRuleList,
+  mappingRuleCreate,
+  mappingRuleUpdate,
+  mappingRuleDelete,
+  metricMappingSyncTemplates
 } from '@/services/admin'
 
 const i18nMessages = require('./metricMapping-i18n')
@@ -347,11 +427,47 @@ export default {
         showTotal: total => this.$t('history_total', { total }),
         showSizeChanger: true,
         pageSizeOptions: ['10', '20', '50', '100']
-      }
+      },
+      // 规则管理相关数据
+      ruleDialogVisible: false,
+      ruleLoading: false,
+      ruleList: [],
+      ruleColumns: [],
+      ruleEditVisible: false,
+      ruleForm: {
+        id: '',
+        rule_name: '',
+        target_field: '',
+        match_type: 'key',
+        match_value: '',
+        priority: 10,
+        is_enabled: 1,
+        zids: '',
+        template_ids: ''
+      },
+      selectedRuleZids: [],
+      selectedRuleTemplateIds: [],
+      syncZid: undefined,
+      ruleEditTitle: '',
+      ruleRules: {
+        rule_name: [{ required: true, message: '请输入规则名称', trigger: 'blur' }],
+        target_field: [{ required: true, message: '请选择目标字段', trigger: 'change' }],
+        match_value: [{ required: true, message: '请输入匹配值', trigger: 'blur' }]
+      },
+      targetFields: [
+        { label: '运行时间', value: 'uptime' },
+        { label: 'CPU核心数', value: 'cpu_core' },
+        { label: 'CPU使用率', value: 'cpu_utilization' },
+        { label: '内存使用率', value: 'memory_utilization' },
+        { label: '内存总量', value: 'memory_total' },
+        { label: '内存已用', value: 'memory_used' },
+        { label: '设备型号', value: 'model' }
+      ]
     }
   },
   created() {
     this.initColumns()
+    this.initRuleColumns()
     this.initRules()
     this.fetchInstances()
     this.fetchMappings()
@@ -378,6 +494,17 @@ export default {
         { title: this.$t('history_error_message'), dataIndex: 'error_message', ellipsis: true }
       ]
     },
+    initRuleColumns() {
+      this.ruleColumns = [
+        { title: this.$t('rule_table_name'), dataIndex: 'rule_name', width: 150 },
+        { title: this.$t('rule_target_field'), dataIndex: 'target_field', width: 120 },
+        { title: this.$t('rule_match_type'), dataIndex: 'match_type', width: 120 },
+        { title: this.$t('rule_priority'), dataIndex: 'priority', width: 80 },
+        { title: this.$t('rule_builtin'), dataIndex: 'is_builtin', width: 80, scopedSlots: { customRender: 'builtin' } },
+        { title: this.$t('rule_status'), dataIndex: 'is_enabled', width: 100, scopedSlots: { customRender: 'status' } },
+        { title: this.$t('table_operation'), key: 'operation', width: 150, scopedSlots: { customRender: 'operation' } }
+      ]
+    },
     initRules() {
       this.rules = {
         zid: [{ required: true, message: this.$t('validate_instance_required'), trigger: 'change' }],
@@ -390,6 +517,11 @@ export default {
         if (res.code === 200) {
           console.log(res.data)
           this.instances = res.data || []
+          // 如果只有一个实例，默认选中
+          if (this.instances.length === 1 && !this.form.id) {
+            this.form.zid = this.instances[0].id
+            this.handleInstanceChange(this.form.zid)
+          }
         }
       }).catch(err => {
         console.error(this.$t('msg_get_instances_failed'), err)
@@ -467,6 +599,7 @@ export default {
     },
     showCreateDialog() {
       this.resetForm()
+      this.fetchInstances()
       this.dialogTitle = this.$t('create_mapping')
       this.dialogVisible = true
     },
@@ -702,7 +835,139 @@ export default {
     formatTime(time) {
       if (!time) return '-'
       return new Date(time).toLocaleString('zh-CN')
-    }
+    },
+
+    // ===== 规则管理 =====
+    showRuleDialog() {
+      this.ruleDialogVisible = true
+      this.fetchRuleList()
+    },
+    fetchRuleList() {
+      this.ruleLoading = true
+      mappingRuleList({}).then(resp => {
+        const res = resp.data
+        if (res.code === 200) {
+          this.ruleList = res.data || []
+        } else {
+          this.$message.error(res.message || this.$t('msg_save_failed'))
+        }
+      }).catch(err => {
+        console.error(err)
+        this.$message.error(this.$t('msg_save_failed'))
+      }).finally(() => {
+        this.ruleLoading = false
+      })
+    },
+    confirmSyncTemplates() {
+      if (!this.form.zid) {
+        this.$message.warning(this.$t('tip_select_instance_first'))
+        return
+      }
+      this.$confirm({
+        title: this.$t('confirm_sync_template_title'),
+        content: this.$t('confirm_sync_template_content'),
+        onOk: () => {
+          metricMappingSyncTemplates({ zid: this.form.zid }).then(resp => {
+            const res = resp.data
+            if (res.code === 200) {
+              this.$message.success(res.message || this.$t('msg_sync_submitted'))
+            } else {
+              this.$message.error(res.message || this.$t('msg_sync_failed'))
+            }
+          }).catch(err => {
+            console.error(err)
+            this.$message.error(this.$t('msg_sync_failed'))
+          })
+        }
+      })
+    },
+    deleteRule(row) {
+      this.$confirm({
+        title: this.$t('confirm_delete_title'),
+        content: this.$t('confirm_delete_content'),
+        onOk: () => {
+          mappingRuleDelete(row.id).then(resp => {
+            const res = resp.data
+            if (res.code === 200) {
+              this.$message.success(this.$t('msg_delete_success'))
+              this.fetchRuleList()
+            } else {
+              this.$message.error(res.message || this.$t('msg_delete_failed'))
+            }
+          }).catch(err => {
+            console.error(err)
+            this.$message.error(this.$t('msg_delete_failed'))
+          })
+        }
+      })
+    },
+    showRuleEdit(row) {
+      if (row) {
+        this.ruleEditTitle = this.$t('edit_mapping')
+        this.ruleForm = { ...row }
+        this.selectedRuleZids = row.zids ? row.zids.split(',') : []
+      } else {
+        this.ruleEditTitle = this.$t('create_mapping')
+        this.ruleForm = {
+          id: '',
+          rule_name: '',
+          target_field: '',
+          match_type: 'key',
+          match_value: '',
+          priority: 10,
+          is_enabled: 1,
+          zids: '',
+          template_ids: ''
+        }
+        this.selectedRuleZids = []
+      }
+      this.ruleEditVisible = true
+    },
+    submitRuleForm() {
+      this.$refs.ruleFormRef.validate(valid => {
+        if (!valid) return false
+        
+        this.ruleForm.zids = this.selectedRuleZids.join(',')
+        const apiCall = this.ruleForm.id ? mappingRuleUpdate(this.ruleForm.id, this.ruleForm) : mappingRuleCreate(this.ruleForm)
+        
+        apiCall.then(resp => {
+          const res = resp.data
+          if (res.code === 200) {
+            this.$message.success(this.$t('msg_save_success'))
+            this.ruleEditVisible = false
+            this.fetchRuleList()
+          } else {
+            this.$message.error(res.message || this.$t('msg_save_failed'))
+          }
+        }).catch(err => {
+          console.error(err)
+          this.$message.error(this.$t('msg_save_failed'))
+        })
+      })
+    },
+    confirmSyncTemplates() {
+      if (!this.syncZid) {
+        this.$message.warning(this.$t('tip_select_instance_first'))
+        return
+      }
+      this.$confirm({
+        title: this.$t('confirm_sync_template_title'),
+        content: this.$t('confirm_sync_template_content'),
+        onOk: () => {
+          metricMappingSyncTemplates({ zid: this.syncZid }).then(resp => {
+            const res = resp.data
+            if (res.code === 200) {
+              this.$message.success(res.message || this.$t('msg_sync_submitted'))
+            } else {
+              this.$message.error(res.message || this.$t('msg_sync_failed'))
+            }
+          }).catch(err => {
+            console.error(err)
+            this.$message.error(this.$t('msg_sync_failed'))
+          })
+        }
+      })
+    },
   }
 }
 </script>

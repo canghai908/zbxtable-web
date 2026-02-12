@@ -490,7 +490,7 @@ export default {
     init() {
       hostDetail(this.id, this.zid).then((resp) => {
         let res = resp.data;
-        this.detail = res;
+        this.detail = res.data;
       }).finally(() => {
         this.initBaseChart();
         this.loading1 = false;
