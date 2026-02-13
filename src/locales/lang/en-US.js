@@ -278,4 +278,11 @@ export default {
     notificationSettings: 'Notification Settings',
     securitySettings: 'Security Settings',
   },
+
+  // Egress Bandwidth
+  egress: {
+    no_egress_config: 'No egress configured',
+    in_traffic: 'Inbound',
+    out_traffic: 'Outbound',
+  },
 }

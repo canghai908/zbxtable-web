@@ -278,4 +278,11 @@ export default {
     notificationSettings: '通知設置',
     securitySettings: '安全設置',
   },
+
+  // 出口帶寬
+  egress: {
+    no_egress_config: '暫無出口配置',
+    in_traffic: '入流量',
+    out_traffic: '出流量',
+  },
 }

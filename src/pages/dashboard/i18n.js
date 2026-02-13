@@ -5,7 +5,7 @@ module.exports = {
 			alert_no_instance_desc: '系统检测到您还未配置Zabbix实例，无法获取监控数据。',
 			alert_no_instance_action: '请前往',
 			alert_no_instance_link: '系统管理 → Zabbix管理',
-			alert_no_instance_action_end: '页面配置Zabbix实例。',
+			alert_no_instance_action_end: '页面配置Zabbix实例',
 			title_problems: '未恢复告警',
 			severity_informational: '信息',
 			severity_warning: '警告',
@@ -32,9 +32,6 @@ module.exports = {
 			top_header_mem: '内存使用率',
 			bandwidth: '出口带宽',
 			polling_date: '采集时间：',
-			no_egress_config: '暂无出口配置',
-			in_traffic: '入流量',
-			out_traffic: '出流量',
 
 			overview: '资产树',
 			information: '资产信息',
@@ -115,9 +112,6 @@ module.exports = {
 			top_header_mem: '內存使用率',
 			bandwidth: '出口帶寬',
 			polling_date: '採集時間：',
-			no_egress_config: '暫無出口配置',
-			in_traffic: '入流量',
-			out_traffic: '出流量',
 
 			overview: '資產樹',
 			information: '資產信息',
@@ -198,9 +192,6 @@ module.exports = {
 			top_header_mem: 'Memory utilization',
 			bandwidth: 'Egress ', 
 			polling_date: 'Polling Time: ',
-			no_egress_config: 'No egress configured',
-			in_traffic: 'Inbound',
-			out_traffic: 'Outbound',
 
 			overview: 'Overview',
 			information: 'Information',

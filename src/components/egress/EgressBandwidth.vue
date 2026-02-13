@@ -1,7 +1,7 @@
 <template>
   <div class="egress-bandwidth">
     <div v-if="egressList.length === 0" class="no-data">
-      <a-empty :description="$t('no_egress_config')" />
+      <a-empty :description="$t('egress.no_egress_config')" />
     </div>
     <div v-else class="egress-list">
       <div 
@@ -13,11 +13,11 @@
         <div class="egress-name-single">{{ egress.name }}</div>
         <div class="egress-stats">
           <div class="stat-item in" :style="inStyle">
-            <span class="label">{{ renderLabel('in_traffic') }}</span>
+            <span class="label">{{ $t('egress.in_traffic') }}</span>
             <span class="value">{{ formatTraffic(egress.in_value) }}</span>
           </div>
           <div class="stat-item out" :style="outStyle">
-            <span class="label">{{ renderLabel('out_traffic') }}</span>
+            <span class="label">{{ $t('egress.out_traffic') }}</span>
             <span class="value">{{ formatTraffic(egress.out_value) }}</span>
           </div>
         </div>
@@ -132,17 +132,6 @@ export default {
       }
       return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
     },
-    renderLabel(key) {
-      const label = this.$t(key)
-      if (label === key) {
-        const dict = {
-          'in_traffic': '入流量',
-          'out_traffic': '出流量'
-        }
-        return dict[key] || key
-      }
-      return label
-    }
   }
 }
 </script>
