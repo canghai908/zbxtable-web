@@ -1,7 +1,9 @@
 <template>
-  <v-chart v-if="showPage" :data="mock" :forceFit="true" :height="height" :padding="padding" :scale="scale">
-    <v-polygon position="name*inx" :color="color" :vStyle="style"></v-polygon>
-  </v-chart>
+  <div class="legent-chart-wrapper" :style="{height: height + 'px'}">
+    <v-chart v-if="showPage" :key="rate" :data="mock" :forceFit="true" :height="height" :padding="padding" :scale="scale">
+      <v-polygon position="name*inx" :color="color" :vStyle="style"></v-polygon>
+    </v-chart>
+  </div>
 </template>
 
 <script>
@@ -31,6 +33,29 @@ export default {
     }
   },
   methods: {
+    init() {
+      if ((this.rate && this.rate > 0) || this.rate == 0) {
+        let source = [];
+        for (let i = 0; i < 20; i++) {
+          let count = 0;
+          if (this.rate >= 0 && this.rate > i * 5) {
+            if (this.rate < 100 && i == 19) {
+              count = 0;
+            } else {
+              count = 100;
+            }
+          }
+          source.push({ name: i, inx: 0, sales: count });
+        }
+        this.mock = source;
+        const ys = "ABCDEFGHIJKLMNOPQRST";
+        this.scale = [
+          { dataKey: 'name', type: 'cat', values: ys.split('') },
+          { dataKey: 'inx', type: 'cat', values: ["Y"] }
+        ];
+        this.showPage = true;
+      }
+    },
     hexToRgba(hex, alpha = 1) {
       const r = parseInt(hex.slice(1, 3), 16)
       const g = parseInt(hex.slice(3, 5), 16)
@@ -46,24 +71,23 @@ export default {
       return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`
     }
   },
-  created () {
-    if((this.rate && this.rate > 0) || this.rate == 0) {
-      let source = [];
-      for(let i=0; i<20; i++) {
-        let count = 0;
-        if(this.rate >= 0 && this.rate > i*5) {
-          if(this.rate < 100 && i==19) {count = 0} else {count = 100;}
-        }
-        source.push({name: i, inx: 0, sales: count});
+  watch: {
+    rate: {
+      immediate: true,
+      handler() {
+        this.init()
       }
-      this.mock = source;
-      const ys = "ABCDEFGHIJKLMNOPQRST";
-      this.scale = [
-        {dataKey: 'name', type: 'cat', values: ys.split('')},
-        {dataKey: 'inx', type: 'cat', values: ["Y"]}
-      ];
-      this.showPage = true;
     }
+  },
+  created () {
+    this.init()
   }
 };
 </script>
+
+<style scoped>
+.legent-chart-wrapper {
+  width: 100%;
+  display: block;
+}
+</style>

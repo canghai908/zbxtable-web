@@ -93,6 +93,10 @@ module.exports = {
       deepseek_base_url: {
         name: 'Deepseek Base URL',
         comment: 'Deepseek API 地址，默认为 https://api.deepseek.com'
+      },
+      dash_top_num: {
+        name: '首页 Top 数量',
+        comment: '首页 CPU、内存排行显示的数量'
       }
     },
     HK: {
@@ -187,6 +191,10 @@ module.exports = {
       deepseek_base_url: {
         name: 'Deepseek Base URL',
         comment: 'Deepseek API 地址，默認為 https://api.deepseek.com'
+      },
+      dash_top_num: {
+        name: '首頁 Top 數量',
+        comment: '首頁 CPU、內存排行顯示的數量'
       }
     },
     US: {
@@ -281,6 +289,10 @@ module.exports = {
       deepseek_base_url: {
         name: 'Deepseek Base URL',
         comment: 'Deepseek API base URL, default is https://api.deepseek.com'
+      },
+      dash_top_num: {
+        name: 'Dashboard Top Number',
+        comment: 'The number of Top items to display for CPU and memory'
       }
     }
   },
