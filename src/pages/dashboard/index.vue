@@ -64,7 +64,13 @@
               </a-card>
             </a-col>
             <a-col :lg="24" :md="24" style="margin-top: 8px;">
-              <a-card :title="$t('bandwidth')" :headStyle="cardHeadStyle" :bodyStyle="{height: '220px', padding: '12px'}" size="small" :loading="!loading3">
+              <a-card :headStyle="cardHeadStyle" :bodyStyle="{padding: '12px'}" size="small" :loading="!loading3">
+                <template slot="title">
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                    <span>{{ $t('bandwidth') }}</span>
+                    <span style="font-size: 12px; font-weight: 400; color: rgba(0,0,0,0.45); white-space: nowrap;">{{ egressUpdateTime ? (egressUpdateTime) : '' }}</span>
+                  </div>
+                </template>
                 <egress-bandwidth :data="egressData" />
               </a-card>
             </a-col>
@@ -220,6 +226,7 @@ export default {
         lin_count: 0
       },
       egressData: [], // 改为数组，支持多个出口
+      egressUpdateTime: '', // 出口带宽采集时间
       refreshTimer: null, // 定时刷新
       loading4: false,
       winC: [],
@@ -351,6 +358,15 @@ export default {
               in_value: item.in_value || 0,
               out_value: item.out_value || 0
             }))
+            
+            // 从数据中提取最新的采集时间 (取最大的 timestamp)
+            const timestamps = res.data.map(item => item.timestamp).filter(t => t > 0)
+            if (timestamps.length > 0) {
+              const maxTimestamp = Math.max(...timestamps)
+              // 接口返回的是秒级时间戳，需要乘以 1000
+              const date = new Date(maxTimestamp * 1000)
+              this.egressUpdateTime = parseTimeFun(date)
+            }
           } else if (res.data && typeof res.data === 'object') {
             // 旧格式：对象，转换为数组格式（向后兼容）
             this.egressData = [

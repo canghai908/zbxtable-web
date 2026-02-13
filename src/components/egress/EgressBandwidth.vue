@@ -1,7 +1,7 @@
 <template>
   <div class="egress-bandwidth">
     <div v-if="egressList.length === 0" class="no-data">
-      <a-empty description="暂无出口配置" />
+      <a-empty :description="$t('no_egress_config')" />
     </div>
     <div v-else class="egress-list">
       <div 
@@ -13,11 +13,11 @@
         <div class="egress-name-single">{{ egress.name }}</div>
         <div class="egress-stats">
           <div class="stat-item in" :style="inStyle">
-            <span class="label">入流量</span>
+            <span class="label">{{ renderLabel('in_traffic') }}</span>
             <span class="value">{{ formatTraffic(egress.in_value) }}</span>
           </div>
           <div class="stat-item out" :style="outStyle">
-            <span class="label">出流量</span>
+            <span class="label">{{ renderLabel('out_traffic') }}</span>
             <span class="value">{{ formatTraffic(egress.out_value) }}</span>
           </div>
         </div>
@@ -72,7 +72,14 @@ export default {
       handler(newData) {
         if (newData && newData.length > 0) {
           this.egressList = newData
-          this.updateTime = this.formatTime(new Date())
+          // 取最新的后端采集时间（timestamp 为秒级）
+          const timestamps = newData.map(item => item.timestamp).filter(t => t > 0)
+          if (timestamps.length > 0) {
+            const maxTimestamp = Math.max(...timestamps)
+            this.updateTime = this.formatTime(new Date(maxTimestamp * 1000))
+          } else {
+            this.updateTime = '--'
+          }
         }
       },
       immediate: true,
@@ -124,6 +131,17 @@ export default {
         return `${hours}:${minutes}:${seconds}`
       }
       return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+    },
+    renderLabel(key) {
+      const label = this.$t(key)
+      if (label === key) {
+        const dict = {
+          'in_traffic': '入流量',
+          'out_traffic': '出流量'
+        }
+        return dict[key] || key
+      }
+      return label
     }
   }
 }
@@ -145,19 +163,21 @@ export default {
 .egress-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 12px;
 }
 
 .egress-item {
-  flex: 0 0 calc(50% - 4px);
+  flex: 1 1 300px; /* 最小宽度300px，自动平分剩余空间 */
   background: var(--egress-bg);
   border: 1px solid var(--egress-border);
-  border-radius: 6px;
-  padding: 8px;
+  border-radius: 8px;
+  padding: 12px;
   box-sizing: border-box;
-  
-  &.full-width {
-    flex: 0 0 100%;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
   }
 }
 
