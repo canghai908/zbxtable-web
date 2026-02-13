@@ -346,8 +346,8 @@ export default {
       return indexRestop({ host_type: 'VM_WIN', metrics_type: this.winSortBy, top_num: String(this.topNum) })
         .then((resp) => {
           const res = resp.data
-          const arr = (res && res.data) ? res.data : []
-          this.winTop = arr.map(item => ({
+          const arr = (res && Array.isArray(res.data)) ? res.data : []
+          this.winTop = arr.filter(Boolean).map(item => ({
             ...item,
             displayScore: item.score
           }))
@@ -361,8 +361,8 @@ export default {
       return indexRestop({ host_type: 'VM_LIN', metrics_type: this.linSortBy, top_num: String(this.topNum) })
         .then((resp) => {
           const res = resp.data
-          const arr = (res && res.data) ? res.data : []
-          this.linTop = arr.map(item => ({
+          const arr = (res && Array.isArray(res.data)) ? res.data : []
+          this.linTop = arr.filter(Boolean).map(item => ({
             ...item,
             displayScore: item.score
           }))
@@ -461,14 +461,14 @@ export default {
           // 检查返回的数据格式
           if (res.data && Array.isArray(res.data)) {
             // 新格式：数组，确保每个项都有有效的值
-            this.egressData = res.data.map(item => ({
+            this.egressData = res.data.filter(Boolean).map(item => ({
               ...item,
-              in_value: item.in_value || 0,
-              out_value: item.out_value || 0
+              in_value: item?.in_value || 0,
+              out_value: item?.out_value || 0
             }))
             
             // 从数据中提取最新的采集时间 (取最大的 timestamp)
-            const timestamps = res.data.map(item => item.timestamp).filter(t => t > 0)
+            const timestamps = res.data.filter(Boolean).map(item => item?.timestamp).filter(t => t > 0)
             if (timestamps.length > 0) {
               const maxTimestamp = Math.max(...timestamps)
               // 接口返回的是秒级时间戳，需要乘以 1000
