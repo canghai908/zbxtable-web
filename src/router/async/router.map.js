@@ -37,6 +37,9 @@ const routerMap = {
 	overview: {
 		component: () => import('@/pages/dashboard/overview'),
 	},
+	dash: {
+		component: () => import('@/pages/dashboard/dash'),
+	},
 	//host
 	host: {
 		component: view.blank,

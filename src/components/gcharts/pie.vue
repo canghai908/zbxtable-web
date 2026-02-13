@@ -21,7 +21,6 @@ export default {
   data() {
     return {
       data: [],
-      mock: [],
       named: "",
       showPage: false,
       scale: [{ dataKey: 'percent', min: 0, formatter: '.0%',}]

@@ -36,8 +36,8 @@
           </a-form-model-item>
           <a-form-model-item :label="$t('mutes_form_instance')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="zid" :required="true">
             <a-select v-model="rule.zid" mode="multiple" style="width: 100%" :placeholder="$t('mutes_form_instance_placeholder')" @change="handleTenantChange">
-              <a-select-option v-for="(item, index) in instanceList" :key="index" :value="item.id.toString()" :label="item.name" :title="item.name">
-                {{ item.name }}
+              <a-select-option v-for="(item, index) in tenantlist" :key="index" :value="item.zid" :label="item.zid" :title="item.zid">
+                {{ item.zid }}
               </a-select-option>
             </a-select>
           </a-form-model-item>
@@ -123,8 +123,8 @@
           </a-form-model-item>
           <a-form-model-item :label="$t('mutes_form_instance')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="zid">
             <a-select v-model="rule.zid" mode="multiple" style="width: 100%" :placeholder="$t('mutes_form_instance_placeholder')" @change="handleTenantChange" :required="true">
-              <a-select-option v-for="(item, index) in instanceList" :key="index" :value="item.id.toString()" :label="item.name" :title="item.name">
-                {{ item.name }}
+              <a-select-option v-for="(item, index) in tenantlist" :key="index" :value="item.zid" :label="item.zid" :title="item.zid">
+                {{ item.zid }}
               </a-select-option>
             </a-select>
           </a-form-model-item>
@@ -208,8 +208,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import PageLayout from "@/layouts/PageLayout";
-import { ruleList, ruleAdd, rulePut, ruleStatusPut, ruleDelete } from "@/services/admin";
-import { listZabbixInstance } from '@/services/zabbix'
+import { ruleList, ruleAdd, rulePut, alarmTenantGet, ruleStatusPut, ruleDelete } from "@/services/admin";
 import { parseTimeFun } from "@/utils/formatter";
 import moment from "moment";
 import "moment/locale/zh-cn";
@@ -252,7 +251,7 @@ export default {
       rTypeOptions: [],
       columns: [],
       tOptions: [],
-      instanceList: [],
+      tenantlist: [],
       list: [],
       pagination: {
         total: 0,
@@ -351,13 +350,20 @@ export default {
         { title: this.$t('mutes_col_policy_name'), dataIndex: "name", align: "left" },
         {
           title: this.$t('mutes_col_instance'), dataIndex: "zid", align: "left", customRender: (value, row, index) => {
-            if (!value) return this.$t('status_not_selected')
-            const ids = value.toString().split(',')
-            const names = ids.map(id => {
-              const instance = this.instanceList.find(item => item.id.toString() === id.trim())
-              return instance ? instance.name : id
-            })
-            return { children: names.join(', '), attrs: {} }
+            let allist = []
+            value.split(",").forEach(items => {
+              this.tenantlist.forEach(tid => {
+                if (items == tid.zid) {
+                  allist.push(tid.zid);
+                }
+              });
+
+            });
+            const obj = {
+              children: allist.join(","),
+              attrs: {},
+            };
+            return obj;
           },
         },
         { title: this.$t('mutes_col_mute_condition'), dataIndex: "conditions", align: "left", },
@@ -411,10 +417,10 @@ export default {
       }).finally(() => {
         this.loading = false;
       });
-      listZabbixInstance().then((resp) => {
+      alarmTenantGet().then((resp) => {
         let res = resp.data
         if (res.code == 200) {
-          this.instanceList = res.data || []
+          this.tenantlist = res.data.items || []
         }
       }).finally(() => { this.loading2 = false })
     },
@@ -458,10 +464,6 @@ export default {
         duration: "1h",
         status: "0",
       };
-      // 如果只有一个实例，默认选中
-      if (this.instanceList.length === 1) {
-        this.rule.zid = [this.instanceList[0].id.toString()];
-      }
     },
     seeEdit(record) {
       this.visibleEdit = true;
@@ -560,6 +562,15 @@ export default {
       this.pageSize = e.pageSize;
       this.init();
     },
+    // changeCreationTime(e) {
+    //   if (e.length) {
+    //     this.beginTime = parseTimeFun(new Date(e[0]));
+    //     this.endTime = parseTimeFun(new Date(e[1]));
+    //   } else {
+    //     this.beginTime = "";
+    //     this.endTime = "";
+    //   }
+    // },
     resetData() {
       this.hosts = "";
       this.tenantid = "";

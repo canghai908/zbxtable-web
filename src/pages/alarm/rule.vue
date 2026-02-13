@@ -395,10 +395,6 @@ export default {
     addRecord() {
       this.editingId = null
       this.resetEditRule()
-      // 如果只有一个实例，默认选中
-      if (this.instanceList.length === 1) {
-        this.editRule.z_ids = [this.instanceList[0].id.toString()];
-      }
       this.modalVisible = true
     },
     seeEdit(record) {

@@ -118,31 +118,6 @@ module.exports = {
 			// 表单验证
 			validate_instance_required: '请选择实例',
 			validate_system_type_required: '请选择系统类型',
-
-			// 规则管理相关
-			rule_management: '规则管理',
-			btn_sync_template: '按模板同步',
-			rule_table_name: '规则名称',
-			rule_target_field: '目标字段',
-			rule_match_type: '匹配方式',
-			rule_match_value: '匹配值',
-			rule_priority: '优先级',
-			rule_status: '状态',
-			rule_builtin: '内置',
-			rule_scope_instances: '适用实例',
-			rule_scope_templates: '适用模板',
-			rule_type_key: 'Key完全匹配',
-			rule_type_name: '名称包含',
-			rule_type_regex: '正则匹配',
-			placeholder_rule_name: '请输入规则名称',
-			placeholder_match_value: '请输入匹配值或正则表达式',
-			placeholder_select_target_field: '请选择目标字段',
-			placeholder_all_instances: '全部实例',
-			placeholder_all_templates: '全部模板',
-			msg_sync_submitted: '模板同步任务已提交',
-			msg_sync_failed: '模板同步提交失败',
-			confirm_sync_template_title: '按模板同步',
-			confirm_sync_template_content: '确定要根据当前规则对所有模板执行自动指标绑定吗？这会直接修改模板配置并影响关联主机。',
 		},
 		HK: {
 			// 頁面標題和按鈕
