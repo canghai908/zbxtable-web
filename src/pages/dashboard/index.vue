@@ -1,5 +1,20 @@
 <template>
   <page-layout :noTitle="true">
+    <a-modal
+      :visible="topConfigModalVisible"
+      :confirmLoading="topNumSaving"
+      title="Top 设置"
+      okText="保存"
+      cancelText="取消"
+      @ok="saveTopNum"
+      @cancel="closeTopConfigModal"
+    >
+      <a-form :layout="'vertical'">
+        <a-form-item label="Top 数量">
+          <a-input-number v-model="topNumDraft" :min="1" :max="50" style="width: 100%;" />
+        </a-form-item>
+      </a-form>
+    </a-modal>
     <!-- 未配置实例提示 -->
     <a-alert
       v-if="!hasZabbixInstance && (loading1 || loading2)"
@@ -79,10 +94,9 @@
       </a-row>
     </a-card>
     <div style="width: 100%;height: 12px;"></div>
-    <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="!loading4">
+    <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="false">
       <a-row :gutter="16">
         <a-col :xl="{ span: 24 }" :lg="{ span: 24 }">
-          <h2 class="homeH2" :style="{ color: theme.color }">{{ $t('windows_systems_title') }}</h2>
           <a-card :headStyle="cardHeadStyle" :bodyStyle="{ padding: 0 }" size="small" :loading="!loading4">
             <template slot="title">
               <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
@@ -93,7 +107,7 @@
                     <a-radio-button value="MEM">{{ $t('sort_by_mem') }}</a-radio-button>
                   </a-radio-group>
                   <a-tooltip :title="$t('top_settings')">
-                    <a-button size="small" icon="setting" @click="goToHomeConfig" />
+                    <a-button size="small" icon="setting" @click="openTopConfigModal" />
                   </a-tooltip>
                 </div>
               </div>
@@ -109,8 +123,8 @@
                   <div class="col-name" :title="hostTitle(v)">
                     <div class="rank-icon"><img :src="require('../../assets/img/top'+(i+1)+'.png')" v-if="i < 3" /><span v-else>{{i+1}}</span></div>
                     <div class="host-info">
-                      <div class="hostname">{{v.hostname}}</div>
                       <a-tag v-if="v.instance_name" :color="theme.color" class="instance-tag-small">{{v.instance_name}}</a-tag>
+                      <span class="hostname">{{v.hostname}}</span>
                     </div>
                   </div>
                   <div class="col-metric">
@@ -130,10 +144,9 @@
       </a-row>
     </a-card>
     <div style="width: 100%;height: 12px;"></div>
-    <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="!loading6">
+    <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="false">
       <a-row :gutter="16">
         <a-col :xl="{ span: 24 }" :lg="{ span: 24 }">
-          <h2 class="homeH2" :style="{ color: theme.color }">{{ $t('linux_systems_title') }}</h2>
           <a-card :headStyle="cardHeadStyle" :bodyStyle="{ padding: 0 }" size="small" :loading="!loading6">
             <template slot="title">
               <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
@@ -144,7 +157,7 @@
                     <a-radio-button value="MEM">{{ $t('sort_by_mem') }}</a-radio-button>
                   </a-radio-group>
                   <a-tooltip :title="$t('top_settings')">
-                    <a-button size="small" icon="setting" @click="goToHomeConfig" />
+                    <a-button size="small" icon="setting" @click="openTopConfigModal" />
                   </a-tooltip>
                 </div>
               </div>
@@ -160,8 +173,8 @@
                   <div class="col-name" :title="hostTitle(v)">
                     <div class="rank-icon"><img :src="require('../../assets/img/top'+(i+1)+'.png')" v-if="i < 3" /><span v-else>{{i+1}}</span></div>
                     <div class="host-info">
-                      <div class="hostname">{{v.hostname}}</div>
                       <a-tag v-if="v.instance_name" :color="theme.color" class="instance-tag-small">{{v.instance_name}}</a-tag>
+                      <span class="hostname">{{v.hostname}}</span>
                     </div>
                   </div>
                   <div class="col-metric">
@@ -191,8 +204,10 @@ import {
   indexInfo,
   indexRestop,
   indexEgress,
-  configGetList
+  configGetList,
+  configUpdate
 } from '@/services/admin'
+import { message } from 'ant-design-vue'
 import { parseTimeFun } from '@/utils/formatter'
 import pie from '@/components/gcharts/pie'
 import legent from '@/components/gcharts/legent'
@@ -208,9 +223,13 @@ export default {
       loading1: false,
       loading2: false,
       loading3: false,
-      loading4: false,
+      loading4: true,
       loading5: false,
-      loading6: false,
+      loading6: true,
+      topConfigModalVisible: false,
+      topNumDraft: 5,
+      topNumSaving: false,
+      dashTopNumConfigId: null,
       info: {
         net_count: 0,
         srv_count: 0,
@@ -274,8 +293,36 @@ export default {
     goToZabbixConfig() {
       this.$router.push('/system/zabbix')
     },
-    goToHomeConfig() {
-      this.$router.push('/system/config')
+    openTopConfigModal() {
+      this.topNumDraft = this.topNum
+      this.topConfigModalVisible = true
+    },
+    closeTopConfigModal() {
+      this.topConfigModalVisible = false
+    },
+    async saveTopNum() {
+      const n = parseInt(this.topNumDraft, 10)
+      if (!Number.isFinite(n) || n <= 0 || n > 50) {
+        message.error('Top 数量请输入 1-50 的整数')
+        return
+      }
+      if (!this.dashTopNumConfigId) {
+        message.error('未找到 dash_top_num 配置项')
+        return
+      }
+      this.topNumSaving = true
+      try {
+        await configUpdate(this.dashTopNumConfigId, { config_value: String(n) })
+        this.topNum = n
+        this.topConfigModalVisible = false
+        this.initTop()
+        message.success('已更新 Top 数量')
+      } catch (e) {
+        console.error('更新 Top 数量失败:', e)
+        message.error('更新失败')
+      } finally {
+        this.topNumSaving = false
+      }
     },
     hostTitle(v) {
       if (!v) return ''
@@ -296,7 +343,6 @@ export default {
       this.loadLinTop()
     },
     loadWinTop() {
-      this.loading4 = false
       return indexRestop({ host_type: 'VM_WIN', metrics_type: this.winSortBy, top_num: String(this.topNum) })
         .then((resp) => {
           const res = resp.data
@@ -310,12 +356,8 @@ export default {
           console.error('获取 Windows Top 失败:', err)
           this.winTop = []
         })
-        .finally(() => {
-          this.loading4 = true
-        })
     },
     loadLinTop() {
-      this.loading6 = false
       return indexRestop({ host_type: 'VM_LIN', metrics_type: this.linSortBy, top_num: String(this.topNum) })
         .then((resp) => {
           const res = resp.data
@@ -329,17 +371,20 @@ export default {
           console.error('获取 Linux Top 失败:', err)
           this.linTop = []
         })
-        .finally(() => {
-          this.loading6 = true
-        })
     },
     initConfig() {
       return configGetList().then(resp => {
         const res = resp.data
         if (res.code === 200 && res.data && res.data.items) {
           const cfg = res.data.items.find(item => item.config_key === 'dash_top_num')
+          if (cfg) {
+            this.dashTopNumConfigId = cfg.id || cfg.config_id || null
+          }
           if (cfg && cfg.config_value) {
             this.topNum = parseInt(cfg.config_value) || 5
+          }
+          if (!this.topNumDraft) {
+            this.topNumDraft = this.topNum
           }
         }
       }).catch(err => {
@@ -538,7 +583,7 @@ export default {
   .topListItem {
     display: flex;
     align-items: center;
-    padding: 12px 0;
+    padding: 8px 0;
     border-bottom: 1px solid #f0f0f0;
     transition: all 0.3s;
     &:hover {
@@ -571,6 +616,9 @@ export default {
       .host-info {
         flex: 1;
         min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
         .hostname {
           font-size: 13px;
           color: #262626;
@@ -578,6 +626,8 @@ export default {
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
+          flex: 1;
+          min-width: 0;
         }
       }
     }
