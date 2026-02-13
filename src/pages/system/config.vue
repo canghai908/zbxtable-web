@@ -61,7 +61,6 @@
               
               <a-form-model-item :wrapper-col="{ span: 14, offset: 6 }">
                 <a-button type="primary" @click="saveCategory('system')" :loading="saveLoading">{{$t('save')}}</a-button>
-                <a-button style="margin-left: 10px;" @click="previewAppearance">{{$t('previewEffect')}}</a-button>
               </a-form-model-item>
             </a-form-model>
           </a-tab-pane>
@@ -145,58 +144,6 @@
 
               <a-form-model-item :wrapper-col="{ span: 14, offset: 6 }">
                 <a-button type="primary" @click="saveCategory('ai')" :loading="saveLoading">{{$t('save')}}</a-button>
-              </a-form-model-item>
-            </a-form-model>
-          </a-tab-pane>
-
-          <!-- 安全配置 -->
-          <a-tab-pane key="security" :tab="$t('securityTab')">
-            <a-form-model ref="securityForm" :model="securityForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
-              <a-form-model-item v-for="item in securityConfigs" :key="item.id" :label="item.name">
-                <a-input 
-                  :value="getDisplayValue(item.config_key)" 
-                  :placeholder="item.comment" 
-                  disabled
-                  style="font-family: 'Courier New', monospace; background-color: #f5f5f5;">
-                  <template slot="suffix">
-                    <a-tooltip :title="isKeyVisible ? $t('hideKey') : $t('showKey')">
-                      <a-icon 
-                        :type="isKeyVisible ? 'eye-invisible' : 'eye'" 
-                        style="cursor: pointer; color: #1890ff;" 
-                        @click="toggleKeyVisibility" />
-                    </a-tooltip>
-                  </template>
-                </a-input>
-                <div class="config-hint">
-                  <a-icon type="lock" style="color: #faad14;" /> {{ item.comment }}
-                </div>
-                <a-alert 
-                  v-if="item.config_key === 'encryption_key'" 
-                  :message="$t('securityWarning')" 
-                  type="warning" 
-                  show-icon 
-                  style="margin-top: 12px;">
-                  <template slot="description">
-                    <div style="font-size: 12px; line-height: 1.6;">
-                      <div>• {{$t('keyDesc1', {defaultMessage: '此密钥用于加密存储 Zabbix 密码和 Token 等敏感信息'})}}</div>
-                      <div>• {{$t('keyDesc2', {defaultMessage: '系统初始化时自动生成，不可通过界面修改'})}}</div>
-                      <div>• {{$t('keyDesc3', {defaultMessage: '请妥善保管此密钥，丢失将导致已加密数据无法解密'})}}</div>
-                      <div>• {{$t('keyDesc4', {defaultMessage: '建议定期备份数据库，包含此密钥配置'})}}</div>
-                      <div style="margin-top: 8px;">
-                        <a-button 
-                          size="small" 
-                          icon="copy" 
-                          @click="copyEncryptionKey"
-                          :disabled="!isKeyVisible">
-                          {{ $t('copyKey') }}
-                        </a-button>
-                        <span v-if="!isKeyVisible" style="margin-left: 8px; color: #999; font-size: 11px;">
-                          {{ $t('needShowKeyFirst') }}
-                        </span>
-                      </div>
-                    </div>
-                  </template>
-                </a-alert>
               </a-form-model-item>
             </a-form-model>
           </a-tab-pane>
@@ -549,10 +496,6 @@ export default {
       } finally {
         this.logoUploading = false
       }
-    },
-    // 预览外观效果
-    previewAppearance() {
-      this.$message.info(this.$t('previewHint'))
     },
     // AI 类型切换
     onAiTypeChange(value) {

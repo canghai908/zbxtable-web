@@ -96,7 +96,6 @@ export default {
     
     // Buttons
     saveConfig: 'Save',
-    previewEffect: 'Preview',
     saveSuccess: 'Save Success',
     saveFailed: 'Save Failed',
     

@@ -116,62 +116,62 @@ export default {
         {
           title: this.$t('col_hostid'),
           key: 'hostid',
-          align: 'center',
+          align: 'left',
           scopedSlots: { customRender: 'hostid' }
         },
         {
           title: this.$t('col_hostname'),
           key: 'name',
-          align: 'center',
+          align: 'left',
           scopedSlots: { customRender: 'name' }
         },
         {
           title: this.$t('col_instance'),
           key: 'instance_name',
-          align: 'center',
+          align: 'left',
           width: 120,
           scopedSlots: { customRender: 'instance_name' }
         },
         {
           title: this.$t('col_model'),
           key: 'model',
-          align: 'center',
+          align: 'left',
           scopedSlots: { customRender: 'model' }
         },
         {
           title: this.$t('col_serial_no'),
           key: 'serial_no',
-          align: 'center',
+          align: 'left',
           scopedSlots: { customRender: 'serial_no' }
         },
         {
           title: this.$t('col_management_address'),
           key: 'interfaces',
-          align: 'center',
+          align: 'left',
           scopedSlots: { customRender: 'interfaces' }
         },
         {
           title: this.$t('col_device_location'),
           key: 'location',
-          align: 'center',
+          align: 'left',
           scopedSlots: { customRender: 'location' }
         },
         {
           title: this.$t('col_ping'),
           key: 'ping',
-          align: 'center',
+          align: 'left',
           scopedSlots: { customRender: 'ping' }
         },
         {
           title: this.$t('col_collection_status'),
           key: 'available',
-          align: 'center',
+          align: 'left',
           scopedSlots: { customRender: 'available' }
         },
         {
           title: this.$t('col_operation'),
           key: 'operation',
-          align: 'center',
+          align: 'left',
           scopedSlots: { customRender: 'operation' }
         }
       ]

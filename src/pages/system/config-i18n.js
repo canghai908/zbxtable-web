@@ -324,7 +324,6 @@ module.exports = {
       
       // 按钮
       save: '保存',
-      previewEffect: '预览效果',
       saveSuccess: '保存成功',
       saveFailed: '保存失败',
       
@@ -407,7 +406,6 @@ module.exports = {
       
       // 按鈕
       save: '保存',
-      previewEffect: '預覽效果',
       saveSuccess: '保存成功',
       saveFailed: '保存失敗',
       
@@ -490,7 +488,6 @@ module.exports = {
       
       // Buttons
       save: 'Save',
-      previewEffect: 'Preview',
       saveSuccess: 'Save Success',
       saveFailed: 'Save Failed',
       

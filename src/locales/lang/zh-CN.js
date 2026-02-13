@@ -96,7 +96,6 @@ export default {
     
     // 按钮
     saveConfig: '保存',
-    previewEffect: '预览效果',
     saveSuccess: '保存成功',
     saveFailed: '保存失败',
     
