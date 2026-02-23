@@ -115,8 +115,14 @@
             <div class="homeTopList" :style="cssVars">
               <div class="topListHeader">
                 <span class="col-name">{{ $t('column_hostname') }}</span>
-                <span class="col-metric">{{ $t('top_header_cpu') }}</span>
-                <span class="col-metric">{{ $t('top_header_mem') }}</span>
+                <template v-if="winSortBy === 'CPU'">
+                  <span class="col-metric">{{ $t('top_header_cpu') }}</span>
+                  <span class="col-metric">{{ $t('top_header_mem') }}</span>
+                </template>
+                <template v-else>
+                  <span class="col-metric">{{ $t('top_header_mem') }}</span>
+                  <span class="col-metric">{{ $t('top_header_cpu') }}</span>
+                </template>
               </div>
               <div class="beauty-scroll listBody">
                 <div class="topListItem" v-for="(v, i) in winTop" :key="'winTop-'+i">
@@ -127,14 +133,26 @@
                       <span class="hostname">{{v.hostname}}</span>
                     </div>
                   </div>
-                  <div class="col-metric">
-                  <legent :rate="v.cpu" :height="20"></legent>
-                  <span class="metric-value">{{fmtPercent(v.cpu)}}</span>
-                  </div>
-                  <div class="col-metric">
-                  <legent :rate="v.mem" :height="20"></legent>
-                  <span class="metric-value">{{fmtPercent(v.mem)}}</span>
-                  </div>
+                  <template v-if="winSortBy === 'CPU'">
+                    <div class="col-metric">
+                      <legent :rate="v.cpu" :height="20"></legent>
+                      <span class="metric-value">{{fmtPercent(v.cpu)}}</span>
+                    </div>
+                    <div class="col-metric">
+                      <legent :rate="v.mem" :height="20"></legent>
+                      <span class="metric-value">{{fmtPercent(v.mem)}}</span>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div class="col-metric">
+                      <legent :rate="v.mem" :height="20"></legent>
+                      <span class="metric-value">{{fmtPercent(v.mem)}}</span>
+                    </div>
+                    <div class="col-metric">
+                      <legent :rate="v.cpu" :height="20"></legent>
+                      <span class="metric-value">{{fmtPercent(v.cpu)}}</span>
+                    </div>
+                  </template>
                   </div>
                   <div class="topListItem empty" v-for="i in winTopNum-winTop.length" :key="'winTop-empty-'+i"></div>
                   </div>
@@ -165,8 +183,14 @@
             <div class="homeTopList" :style="cssVars">
               <div class="topListHeader">
                 <span class="col-name">{{ $t('column_hostname') }}</span>
-                <span class="col-metric">{{ $t('top_header_cpu') }}</span>
-                <span class="col-metric">{{ $t('top_header_mem') }}</span>
+                <template v-if="linSortBy === 'CPU'">
+                  <span class="col-metric">{{ $t('top_header_cpu') }}</span>
+                  <span class="col-metric">{{ $t('top_header_mem') }}</span>
+                </template>
+                <template v-else>
+                  <span class="col-metric">{{ $t('top_header_mem') }}</span>
+                  <span class="col-metric">{{ $t('top_header_cpu') }}</span>
+                </template>
               </div>
               <div class="beauty-scroll listBody">
                 <div class="topListItem" v-for="(v, i) in linTop" :key="'linTop-'+i">
@@ -177,14 +201,26 @@
                       <span class="hostname">{{v.hostname}}</span>
                     </div>
                   </div>
-                  <div class="col-metric">
-                  <legent :rate="v.cpu" :height="20"></legent>
-                  <span class="metric-value">{{fmtPercent(v.cpu)}}</span>
-                  </div>
-                  <div class="col-metric">
-                  <legent :rate="v.mem" :height="20"></legent>
-                  <span class="metric-value">{{fmtPercent(v.mem)}}</span>
-                  </div>
+                  <template v-if="linSortBy === 'CPU'">
+                    <div class="col-metric">
+                      <legent :rate="v.cpu" :height="20"></legent>
+                      <span class="metric-value">{{fmtPercent(v.cpu)}}</span>
+                    </div>
+                    <div class="col-metric">
+                      <legent :rate="v.mem" :height="20"></legent>
+                      <span class="metric-value">{{fmtPercent(v.mem)}}</span>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div class="col-metric">
+                      <legent :rate="v.mem" :height="20"></legent>
+                      <span class="metric-value">{{fmtPercent(v.mem)}}</span>
+                    </div>
+                    <div class="col-metric">
+                      <legent :rate="v.cpu" :height="20"></legent>
+                      <span class="metric-value">{{fmtPercent(v.cpu)}}</span>
+                    </div>
+                  </template>
                   </div>
                   <div class="topListItem empty" v-for="i in linTopNum-linTop.length" :key="'linTop-empty-'+i"></div>
                   </div>
