@@ -96,7 +96,6 @@ export default {
     
     // 按钮
     saveConfig: '保存',
-    previewEffect: '预览效果',
     saveSuccess: '保存成功',
     saveFailed: '保存失败',
     
@@ -277,5 +276,12 @@ export default {
     languageSettings: '语言设置',
     notificationSettings: '通知设置',
     securitySettings: '安全设置',
+  },
+
+  // 出口带宽
+  egress: {
+    no_egress_config: '暂无出口配置',
+    in_traffic: '入流量',
+    out_traffic: '出流量',
   },
 }

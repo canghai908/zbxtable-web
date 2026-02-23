@@ -489,7 +489,7 @@ export default {
     },
     init() {
       hostDetail(this.id, this.zid).then((resp) => {
-        let res = resp.data;
+        let res = resp.data.data;
         this.detail = res;
       }).finally(() => {
         this.initBaseChart();

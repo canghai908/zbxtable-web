@@ -73,7 +73,7 @@
         </span>
         
         <!-- 展开行的嵌套表格 -->
-        <a-table slot="expandedRowRender" :columns="innerColumns" :data-source="innerData" :pagination="false">
+        <a-table slot="expandedRowRender" slot-scope="record" :columns="innerColumns" :data-source="(record && record.innerData) ? record.innerData : []" :loading="record ? record.innerLoading : false" :pagination="false" :rowKey="(r) => r.id || r.notify_time || r.rule + '-' + r.user + '-' + r.channel">
           <span slot="notify_time" slot-scope="record">{{ record.notify_time | parsetime }}</span>
           <span slot="status" slot-scope="record">
             <a-badge v-if="record.status==0" status="success"></a-badge>
@@ -259,7 +259,6 @@ export default {
       innerColumns: [],
       // tenantlist/tenantid 已取消：跟随“当前 Zabbix 连接”
       list: [],
-      innerData: [],
       pagination: {
         total: 0,
         current: 1,
@@ -454,12 +453,22 @@ export default {
     },
     getEvent(exp, record) {
       console.log(exp, record)
-      this.innerData = []
+      if (!exp) {
+        return
+      }
+
+      if (record.innerData && record.innerData.length) {
+        return
+      }
+
+      this.$set(record, 'innerLoading', true)
       eventLogGet(record.id).then((resp) => {
         let res = resp.data;
         if (res.code == 200) {
-          this.innerData = res.data.items || [];
+          this.$set(record, 'innerData', res.data.items || [])
         }
+      }).finally(() => {
+        this.$set(record, 'innerLoading', false)
       })
     },
     // 打开 AI 助手分析

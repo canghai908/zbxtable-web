@@ -34,6 +34,10 @@ function initI18n(locale, fallback) {
   // 加载语言包
   Object.keys(locales).forEach(lang => {
     i18nOptions.messages[lang] = locales[lang]
+    // 同时也映射到简写 key 以确保兼容性
+    if (lang === 'zh-CN') i18nOptions.messages['CN'] = locales[lang]
+    if (lang === 'zh-TW') i18nOptions.messages['HK'] = locales[lang]
+    if (lang === 'en-US') i18nOptions.messages['US'] = locales[lang]
   })
   
   return new VueI18n(i18nOptions)
@@ -49,7 +53,10 @@ function initI18n(locale, fallback) {
 function generateI18n(lang, routes, valueKey) {
   routes.forEach(route => {
     let keys = getI18nKey(route.fullPath).split('.')
-    let value = valueKey === 'path' ? route[valueKey].split('/').filter(item => !item.startsWith(':') && item != '').join('.') : route[valueKey]
+    const raw = route && route[valueKey]
+    let value = valueKey === 'path'
+      ? (typeof raw === 'string' ? raw.split('/').filter(item => !item.startsWith(':') && item != '').join('.') : '')
+      : (raw == null ? '' : raw)
     lang.assignProps(keys, value)
     if (route.children) {
       generateI18n(lang, route.children, valueKey)

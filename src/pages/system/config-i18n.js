@@ -93,6 +93,14 @@ module.exports = {
       deepseek_base_url: {
         name: 'Deepseek Base URL',
         comment: 'Deepseek API 地址，默认为 https://api.deepseek.com'
+      },
+      dash_top_lin_num: {
+        name: 'Linux Top 数量',
+        comment: '首页 Linux CPU、内存排行显示的数量'
+      },
+      dash_top_win_num: {
+        name: 'Windows Top 数量',
+        comment: '首页 Windows CPU、内存排行显示的数量'
       }
     },
     HK: {
@@ -187,6 +195,14 @@ module.exports = {
       deepseek_base_url: {
         name: 'Deepseek Base URL',
         comment: 'Deepseek API 地址，默認為 https://api.deepseek.com'
+      },
+      dash_top_lin_num: {
+        name: 'Linux Top 數量',
+        comment: '首頁 Linux CPU、內存排行顯示的數量'
+      },
+      dash_top_win_num: {
+        name: 'Windows Top 數量',
+        comment: '首頁 Windows CPU、內存排行顯示的數量'
       }
     },
     US: {
@@ -281,6 +297,14 @@ module.exports = {
       deepseek_base_url: {
         name: 'Deepseek Base URL',
         comment: 'Deepseek API base URL, default is https://api.deepseek.com'
+      },
+      dash_top_lin_num: {
+        name: 'Linux Top Number',
+        comment: 'The number of Top items to display for Linux CPU and memory'
+      },
+      dash_top_win_num: {
+        name: 'Windows Top Number',
+        comment: 'The number of Top items to display for Windows CPU and memory'
       }
     }
   },
@@ -312,7 +336,6 @@ module.exports = {
       
       // 按钮
       save: '保存',
-      previewEffect: '预览效果',
       saveSuccess: '保存成功',
       saveFailed: '保存失败',
       
@@ -395,7 +418,6 @@ module.exports = {
       
       // 按鈕
       save: '保存',
-      previewEffect: '預覽效果',
       saveSuccess: '保存成功',
       saveFailed: '保存失敗',
       
@@ -478,7 +500,6 @@ module.exports = {
       
       // Buttons
       save: 'Save',
-      previewEffect: 'Preview',
       saveSuccess: 'Save Success',
       saveFailed: 'Save Failed',
       

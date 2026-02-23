@@ -96,7 +96,6 @@ export default {
     
     // Buttons
     saveConfig: 'Save',
-    previewEffect: 'Preview',
     saveSuccess: 'Save Success',
     saveFailed: 'Save Failed',
     
@@ -277,5 +276,12 @@ export default {
     languageSettings: 'Language Settings',
     notificationSettings: 'Notification Settings',
     securitySettings: 'Security Settings',
+  },
+
+  // Egress Bandwidth
+  egress: {
+    no_egress_config: 'No egress configured',
+    in_traffic: 'Inbound',
+    out_traffic: 'Outbound',
   },
 }

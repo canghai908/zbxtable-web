@@ -1,5 +1,20 @@
 <template>
   <page-layout :noTitle="true">
+    <a-modal
+      :visible="topConfigModalVisible"
+      :confirmLoading="topNumSaving"
+      :title="topConfigTitle"
+      :okText="$t('btn_ok')"
+      :cancelText="$t('btn_cancel')"
+      @ok="saveTopNum"
+      @cancel="closeTopConfigModal"
+    >
+      <a-form :layout="'vertical'">
+        <a-form-item :label="$t('top_settings_label_num')">
+          <a-input-number v-model="topNumDraft" :min="1" :max="50" style="width: 100%;" />
+        </a-form-item>
+      </a-form>
+    </a-modal>
     <!-- 未配置实例提示 -->
     <a-alert
       v-if="!hasZabbixInstance && (loading1 || loading2)"
@@ -64,7 +79,13 @@
               </a-card>
             </a-col>
             <a-col :lg="24" :md="24" style="margin-top: 8px;">
-              <a-card :title="$t('bandwidth')" :headStyle="cardHeadStyle" :bodyStyle="{height: '220px', padding: '12px'}" size="small" :loading="!loading3">
+              <a-card :headStyle="cardHeadStyle" :bodyStyle="{padding: '12px'}" size="small" :loading="!loading3">
+                <template slot="title">
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                    <span>{{ $t('bandwidth') }}</span>
+                    <span style="font-size: 12px; font-weight: 400; color: rgba(0,0,0,0.45); white-space: nowrap;">{{ egressUpdateTime ? (egressUpdateTime) : '' }}</span>
+                  </div>
+                </template>
                 <egress-bandwidth :data="egressData" />
               </a-card>
             </a-col>
@@ -73,115 +94,137 @@
       </a-row>
     </a-card>
     <div style="width: 100%;height: 12px;"></div>
-    <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="!loading4 && !loading5">
+    <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="false">
       <a-row :gutter="16">
-        <a-col :xl="{ span: 12 }" :lg="{ span: 24 }">
-          <h2 class="homeH2" :style="{ color: theme.color }">{{ $t('windows_systems_title') }}</h2>
-          <a-card :title="$t('cpu_top5_title')" :headStyle="cardHeadStyle" size="small" :loading="!loading4">
-            <div class="homePies">
-              <div class="homePied" v-for="(v, i) in winC" :key="'1'+i">
-                <div class="homePie">
-                  <pie :name="v.hostname" :rate="v.score" :height="130"></pie>
-                </div>
-                <div class="homePieN" :title="v.hostname + (v.instance_name ? ' [' + v.instance_name + ']' : '')">
-                  <div>{{v.hostname}}</div>
-                  <a-tag v-if="v.instance_name" :color="theme.color" class="instance-tag">{{v.instance_name}}</a-tag>
-                </div>
-              </div>
-            </div>
-          </a-card>
-        </a-col>
-        <a-col :xl="{ span: 12 }" :lg="{ span: 24 }">
-          <a-card :title="$t('memory_top5_title')" :headStyle="cardHeadStyle" :bodyStyle="{ padding: 0 }" size="small" :loading="!loading5">
-            <div class="homeLegent" v-if="winM.length > 0" :style="cssVars">
-              <div class="homeLegent1">
-                <div class="homeLeItem1">
-                  <div class="homeLeLeft">
-                    <div class="homeLeLeft1"><img src="../../assets/img/top1.png" alt=""><span>{{winM[0].score}}%</span></div>
-                    <div class="homeLeLeft2" :title="winM[0].hostname + (winM[0].instance_name ? ' [' + winM[0].instance_name + ']' : '')">
-                      <div>{{winM[0].hostname}}</div>
-                      <a-tag v-if="winM[0].instance_name" :color="theme.color" class="instance-tag-small">{{winM[0].instance_name}}</a-tag>
-                    </div>
-                  </div>
-                  <div class="homeLeRight">
-                    <legent :rate="winM[0].score" :height="38"></legent>
-                  </div>
+        <a-col :xl="{ span: 24 }" :lg="{ span: 24 }">
+          <a-card :headStyle="cardHeadStyle" :bodyStyle="{ padding: 0 }" size="small" :loading="!loading4">
+            <template slot="title">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                <span>{{ $t('windows_systems_title') }}</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <a-radio-group size="small" :value="winSortBy" @change="onWinSortChange">
+                    <a-radio-button value="CPU">{{ $t('sort_by_cpu') }}</a-radio-button>
+                    <a-radio-button value="MEM">{{ $t('sort_by_mem') }}</a-radio-button>
+                  </a-radio-group>
+                  <a-tooltip :title="$t('top_settings')">
+                    <a-button size="small" icon="setting" @click="openTopConfigModal('VM_WIN')" />
+                  </a-tooltip>
                 </div>
               </div>
-              <div class="homeLegent2">
-                <div class="homeLeItem" v-for="(v, i) in winM.slice(1)" :key="'winM-'+i">
-                  <div class="homeLeTop">
-                    <div class="homeLeTop1"><img :src="require('../../assets/img/top'+(i+2)+'.png')" alt=""></div>
-                    <div class="homeLeTop2" :title="v.hostname + (v.instance_name ? ' [' + v.instance_name + ']' : '')">
-                      <div>{{v.hostname}}</div>
+            </template>
+            <div class="homeTopList" :style="cssVars">
+              <div class="topListHeader">
+                <span class="col-name">{{ $t('column_hostname') }}</span>
+                <template v-if="winSortBy === 'CPU'">
+                  <span class="col-metric">{{ $t('top_header_cpu') }}</span>
+                  <span class="col-metric">{{ $t('top_header_mem') }}</span>
+                </template>
+                <template v-else>
+                  <span class="col-metric">{{ $t('top_header_mem') }}</span>
+                  <span class="col-metric">{{ $t('top_header_cpu') }}</span>
+                </template>
+              </div>
+              <div class="beauty-scroll listBody">
+                <div class="topListItem" v-for="(v, i) in winTop" :key="'winTop-'+i">
+                  <div class="col-name" :title="hostTitle(v)">
+                    <div class="rank-icon"><img :src="require('../../assets/img/top'+(i+1)+'.png')" v-if="i < 3" /><span v-else>{{i+1}}</span></div>
+                    <div class="host-info">
                       <a-tag v-if="v.instance_name" :color="theme.color" class="instance-tag-small">{{v.instance_name}}</a-tag>
+                      <span class="hostname">{{v.hostname}}</span>
                     </div>
-                    <div class="homeLeTop3">{{v.score}}%</div>
                   </div>
-                  <div class="homeLeBot">
-                    <legent :rate="v.score"></legent>
+                  <template v-if="winSortBy === 'CPU'">
+                    <div class="col-metric">
+                      <legent :rate="v.cpu" :height="20"></legent>
+                      <span class="metric-value">{{fmtPercent(v.cpu)}}</span>
+                    </div>
+                    <div class="col-metric">
+                      <legent :rate="v.mem" :height="20"></legent>
+                      <span class="metric-value">{{fmtPercent(v.mem)}}</span>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div class="col-metric">
+                      <legent :rate="v.mem" :height="20"></legent>
+                      <span class="metric-value">{{fmtPercent(v.mem)}}</span>
+                    </div>
+                    <div class="col-metric">
+                      <legent :rate="v.cpu" :height="20"></legent>
+                      <span class="metric-value">{{fmtPercent(v.cpu)}}</span>
+                    </div>
+                  </template>
                   </div>
-                </div>
-                <div class="homeLeItem" v-for="i in 5-winM.length" :key="'winM-empty-'+i"></div>
-              </div>
-            </div>
+                  <div class="topListItem empty" v-for="i in winTopNum-winTop.length" :key="'winTop-empty-'+i"></div>
+                  </div>
+                  </div>
           </a-card>
         </a-col>
       </a-row>
     </a-card>
     <div style="width: 100%;height: 12px;"></div>
-    <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="!loading6 && !loading7">
+    <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="false">
       <a-row :gutter="16">
-        <a-col :xl="{ span: 12 }" :lg="{ span: 24 }">
-          <h2 class="homeH2" :style="{ color: theme.color }">{{ $t('linux_systems_title') }}</h2>
-          <a-card :title="$t('cpu_top5_title')" :headStyle="cardHeadStyle" size="small" :loading="!loading6">
-            <div class="homePies">
-              <div class="homePied" v-for="(v, i) in linC" :key="'2'+i">
-                <div class="homePie">
-                  <pie :name="v.hostname" :rate="v.score" :height="130"></pie>
-                </div>
-                <div class="homePieN" :title="v.hostname + (v.instance_name ? ' [' + v.instance_name + ']' : '')">
-                  <div>{{v.hostname}}</div>
-                  <a-tag v-if="v.instance_name" :color="theme.color" class="instance-tag">{{v.instance_name}}</a-tag>
-                </div>
-              </div>
-            </div>
-          </a-card>
-        </a-col>
-        <a-col :xl="{ span: 12 }" :lg="{ span: 24 }">
-          <a-card :title="$t('memory_top5_title')" :headStyle="cardHeadStyle" :bodyStyle="{ padding: 0 }" size="small" :loading="!loading5">
-            <div class="homeLegent" v-if="linM.length > 0" :style="cssVars">
-              <div class="homeLegent1">
-                <div class="homeLeItem1">
-                  <div class="homeLeLeft">
-                    <div class="homeLeLeft1"><img src="../../assets/img/top1.png" alt=""><span>{{linM[0].score}}%</span></div>
-                    <div class="homeLeLeft2" :title="linM[0].hostname + (linM[0].instance_name ? ' [' + linM[0].instance_name + ']' : '')">
-                      <div>{{linM[0].hostname}}</div>
-                      <a-tag v-if="linM[0].instance_name" :color="theme.color" class="instance-tag-small">{{linM[0].instance_name}}</a-tag>
-                    </div>
-                  </div>
-                  <div class="homeLeRight">
-                    <legent :rate="linM[0].score" :height="38"></legent>
-                  </div>
+        <a-col :xl="{ span: 24 }" :lg="{ span: 24 }">
+          <a-card :headStyle="cardHeadStyle" :bodyStyle="{ padding: 0 }" size="small" :loading="!loading6">
+            <template slot="title">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                <span>{{ $t('linux_systems_title') }}</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <a-radio-group size="small" :value="linSortBy" @change="onLinSortChange">
+                    <a-radio-button value="CPU">{{ $t('sort_by_cpu') }}</a-radio-button>
+                    <a-radio-button value="MEM">{{ $t('sort_by_mem') }}</a-radio-button>
+                  </a-radio-group>
+                  <a-tooltip :title="$t('top_settings')">
+                    <a-button size="small" icon="setting" @click="openTopConfigModal('VM_LIN')" />
+                  </a-tooltip>
                 </div>
               </div>
-              <div class="homeLegent2">
-                <div class="homeLeItem" v-for="(v, i) in linM.slice(1)" :key="'linM-'+i">
-                  <div class="homeLeTop">
-                    <div class="homeLeTop1"><img :src="require('../../assets/img/top'+(i+2)+'.png')" alt=""></div>
-                    <div class="homeLeTop2" :title="v.hostname + (v.instance_name ? ' [' + v.instance_name + ']' : '')">
-                      <div>{{v.hostname}}</div>
+            </template>
+            <div class="homeTopList" :style="cssVars">
+              <div class="topListHeader">
+                <span class="col-name">{{ $t('column_hostname') }}</span>
+                <template v-if="linSortBy === 'CPU'">
+                  <span class="col-metric">{{ $t('top_header_cpu') }}</span>
+                  <span class="col-metric">{{ $t('top_header_mem') }}</span>
+                </template>
+                <template v-else>
+                  <span class="col-metric">{{ $t('top_header_mem') }}</span>
+                  <span class="col-metric">{{ $t('top_header_cpu') }}</span>
+                </template>
+              </div>
+              <div class="beauty-scroll listBody">
+                <div class="topListItem" v-for="(v, i) in linTop" :key="'linTop-'+i">
+                  <div class="col-name" :title="hostTitle(v)">
+                    <div class="rank-icon"><img :src="require('../../assets/img/top'+(i+1)+'.png')" v-if="i < 3" /><span v-else>{{i+1}}</span></div>
+                    <div class="host-info">
                       <a-tag v-if="v.instance_name" :color="theme.color" class="instance-tag-small">{{v.instance_name}}</a-tag>
+                      <span class="hostname">{{v.hostname}}</span>
                     </div>
-                    <div class="homeLeTop3">{{v.score}}%</div>
                   </div>
-                  <div class="homeLeBot">
-                    <legent :rate="v.score"></legent>
+                  <template v-if="linSortBy === 'CPU'">
+                    <div class="col-metric">
+                      <legent :rate="v.cpu" :height="20"></legent>
+                      <span class="metric-value">{{fmtPercent(v.cpu)}}</span>
+                    </div>
+                    <div class="col-metric">
+                      <legent :rate="v.mem" :height="20"></legent>
+                      <span class="metric-value">{{fmtPercent(v.mem)}}</span>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div class="col-metric">
+                      <legent :rate="v.mem" :height="20"></legent>
+                      <span class="metric-value">{{fmtPercent(v.mem)}}</span>
+                    </div>
+                    <div class="col-metric">
+                      <legent :rate="v.cpu" :height="20"></legent>
+                      <span class="metric-value">{{fmtPercent(v.cpu)}}</span>
+                    </div>
+                  </template>
                   </div>
-                </div>
-                <div class="homeLeItem" v-for="i in 5-linM.length" :key="'linM-empty-'+i"></div>
-              </div>
-            </div>
+                  <div class="topListItem empty" v-for="i in linTopNum-linTop.length" :key="'linTop-empty-'+i"></div>
+                  </div>
+                  </div>
           </a-card>
         </a-col>
       </a-row>
@@ -196,8 +239,11 @@ import {
   indexTrigger,
   indexInfo,
   indexRestop,
-  indexEgress
+  indexEgress,
+  configGetList,
+  configUpdate
 } from '@/services/admin'
+import { message } from 'ant-design-vue'
 import { parseTimeFun } from '@/utils/formatter'
 import pie from '@/components/gcharts/pie'
 import legent from '@/components/gcharts/legent'
@@ -213,6 +259,15 @@ export default {
       loading1: false,
       loading2: false,
       loading3: false,
+      loading4: true,
+      loading5: false,
+      loading6: true,
+      topConfigModalVisible: false,
+      topConfigType: '', // 'VM_WIN' 或 'VM_LIN'
+      topNumDraft: 10,
+      topNumSaving: false,
+      linTopNumConfigId: null,
+      winTopNumConfigId: null,
       info: {
         net_count: 0,
         srv_count: 0,
@@ -220,15 +275,14 @@ export default {
         lin_count: 0
       },
       egressData: [], // 改为数组，支持多个出口
+      egressUpdateTime: '', // 出口带宽采集时间
       refreshTimer: null, // 定时刷新
-      loading4: false,
-      winC: [],
-      loading5: false,
-      winM: [],
-      loading6: false,
-      linC: [],
-      loading7: false,
-      linM: [],
+      linTop: [],
+      winTop: [],
+      winSortBy: 'CPU',
+      linSortBy: 'CPU',
+      linTopNum: 10,
+      winTopNum: 10,
       hasZabbixInstance: null // 是否配置了 Zabbix 实例，初始为 null 表示未检测
     }
   },
@@ -248,6 +302,9 @@ export default {
         '--primary-bg': this.hexToRgba(this.theme.color || '#1890ff', 0.08),
         '--primary-bg-hover': this.hexToRgba(this.theme.color || '#1890ff', 0.12)
       }
+    },
+    topConfigTitle() {
+      return this.topConfigType === 'VM_WIN' ? this.$t('top_settings_title_win') : this.$t('top_settings_title_lin')
     }
   },
   components: {
@@ -260,7 +317,9 @@ export default {
     this.initTrigger()
     this.initInfo()
     this.initEgress()
-    this.initTop()
+    this.initConfig().then(() => {
+      this.initTop()
+    })
     // 每30秒刷新一次出口数据
     this.refreshTimer = setInterval(() => {
       this.initEgress()
@@ -275,6 +334,115 @@ export default {
   methods: {
     goToZabbixConfig() {
       this.$router.push('/system/zabbix')
+    },
+    openTopConfigModal(type) {
+      this.topConfigType = type
+      this.topNumDraft = type === 'VM_WIN' ? this.winTopNum : this.linTopNum
+      this.topConfigModalVisible = true
+    },
+    closeTopConfigModal() {
+      this.topConfigModalVisible = false
+    },
+    async saveTopNum() {
+      const n = parseInt(this.topNumDraft, 10)
+      if (!Number.isFinite(n) || n <= 0 || n > 50) {
+        message.error(this.$t('top_settings_msg_range'))
+        return
+      }
+
+      const configId = this.topConfigType === 'VM_WIN' ? this.winTopNumConfigId : this.linTopNumConfigId
+      if (!configId) {
+        message.error(this.$t('top_settings_msg_not_found'))
+        return
+      }
+
+      this.topNumSaving = true
+      try {
+        await configUpdate(configId, { config_value: String(n) })
+        if (this.topConfigType === 'VM_WIN') {
+          this.winTopNum = n
+        } else {
+          this.linTopNum = n
+        }
+        this.topConfigModalVisible = false
+        this.initTop()
+        message.success(this.$t('top_settings_msg_update_success'))
+      } catch (e) {
+        console.error('更新 Top 数量失败:', e)
+        message.error(this.$t('top_settings_msg_update_failed'))
+      } finally {
+        this.topNumSaving = false
+      }
+    },
+    hostTitle(v) {
+      if (!v) return ''
+      return v.hostname + (v.instance_name ? ' [' + v.instance_name + ']' : '')
+    },
+    displayScore(v) {
+      return v ? (v.displayScore || 0) : 0
+    },
+    fmtPercent(v) {
+      return (v || 0) + '%'
+    },
+    onWinSortChange(e) {
+      this.winSortBy = e.target.value
+      this.loadWinTop()
+    },
+    onLinSortChange(e) {
+      this.linSortBy = e.target.value
+      this.loadLinTop()
+    },
+    loadWinTop() {
+      return indexRestop({ host_type: 'VM_WIN', metrics_type: this.winSortBy, top_num: String(this.winTopNum) })
+        .then((resp) => {
+          const res = resp.data
+          const arr = (res && Array.isArray(res.data)) ? res.data : []
+          this.winTop = arr.filter(Boolean).map(item => ({
+            ...item,
+            displayScore: item.score
+          }))
+        })
+        .catch((err) => {
+          console.error('获取 Windows Top 失败:', err)
+          this.winTop = []
+        })
+    },
+    loadLinTop() {
+      return indexRestop({ host_type: 'VM_LIN', metrics_type: this.linSortBy, top_num: String(this.linTopNum) })
+        .then((resp) => {
+          const res = resp.data
+          const arr = (res && Array.isArray(res.data)) ? res.data : []
+          this.linTop = arr.filter(Boolean).map(item => ({
+            ...item,
+            displayScore: item.score
+          }))
+        })
+        .catch((err) => {
+          console.error('获取 Linux Top 失败:', err)
+          this.linTop = []
+        })
+    },
+    initConfig() {
+      return configGetList().then(resp => {
+        const res = resp.data
+        if (res.code === 200 && res.data && res.data.items) {
+          const cfgLin = res.data.items.find(item => item.config_key === 'dash_top_lin_num')
+          const cfgWin = res.data.items.find(item => item.config_key === 'dash_top_win_num')
+          
+          if (cfgLin) {
+            this.linTopNumConfigId = cfgLin.id || cfgLin.config_id || null
+            this.linTopNum = parseInt(cfgLin.config_value) || 10
+            this.linTopNumDraft = this.linTopNum
+          }
+          if (cfgWin) {
+            this.winTopNumConfigId = cfgWin.id || cfgWin.config_id || null
+            this.winTopNum = parseInt(cfgWin.config_value) || 10
+            this.winTopNumDraft = this.winTopNum
+          }
+        }
+      }).catch(err => {
+        console.error('获取配置失败:', err)
+      })
     },
     hexToRgba(hex, alpha = 1) {
       const r = parseInt(hex.slice(1, 3), 16)
@@ -346,11 +514,20 @@ export default {
           // 检查返回的数据格式
           if (res.data && Array.isArray(res.data)) {
             // 新格式：数组，确保每个项都有有效的值
-            this.egressData = res.data.map(item => ({
+            this.egressData = res.data.filter(Boolean).map(item => ({
               ...item,
-              in_value: item.in_value || 0,
-              out_value: item.out_value || 0
+              in_value: item?.in_value || 0,
+              out_value: item?.out_value || 0
             }))
+            
+            // 从数据中提取最新的采集时间 (取最大的 timestamp)
+            const timestamps = res.data.filter(Boolean).map(item => item?.timestamp).filter(t => t > 0)
+            if (timestamps.length > 0) {
+              const maxTimestamp = Math.max(...timestamps)
+              // 接口返回的是秒级时间戳，需要乘以 1000
+              const date = new Date(maxTimestamp * 1000)
+              this.egressUpdateTime = parseTimeFun(date)
+            }
           } else if (res.data && typeof res.data === 'object') {
             // 旧格式：对象，转换为数组格式（向后兼容）
             this.egressData = [
@@ -380,70 +557,9 @@ export default {
         })
     },
     initTop() {
-      indexRestop({ host_type: 'VM_WIN', metrics_type: 'CPU', top_num: '5' })
-        .then((resp) => {
-          let res = resp.data
-          let arr = (res && res.data) ? res.data : []
-          arr.sort((a, b) => {
-            return b.score - a.score
-          })
-          this.winC = arr.slice(0, 5)
-        })
-        .catch((err) => {
-          console.error('获取 Windows CPU Top5 失败:', err)
-          this.winC = []
-        })
-        .finally(() => {
-          this.loading4 = true
-        })
-      indexRestop({ host_type: 'VM_WIN', metrics_type: 'MEM', top_num: '5' })
-        .then((resp) => {
-          let res = resp.data
-          let arr = (res && res.data) ? res.data : []
-          arr.sort((a, b) => {
-            return b.score - a.score
-          })
-          this.winM = arr.slice(0, 5)
-        })
-        .catch((err) => {
-          console.error('获取 Windows 内存 Top5 失败:', err)
-          this.winM = []
-        })
-        .finally(() => {
-          this.loading5 = true
-        })
-      indexRestop({ host_type: 'VM_LIN', metrics_type: 'CPU', top_num: '5' })
-        .then((resp) => {
-          let res = resp.data
-          let arr = (res && res.data) ? res.data : []
-          arr.sort((a, b) => {
-            return b.score - a.score
-          })
-          this.linC = arr.slice(0, 5)
-        })
-        .catch((err) => {
-          console.error('获取 Linux CPU Top5 失败:', err)
-          this.linC = []
-        })
-        .finally(() => {
-          this.loading6 = true
-        })
-      indexRestop({ host_type: 'VM_LIN', metrics_type: 'MEM', top_num: '5' })
-        .then((resp) => {
-          let res = resp.data
-          let arr = (res && res.data) ? res.data : []
-          arr.sort((a, b) => {
-            return b.score - a.score
-          })
-          this.linM = arr.slice(0, 5)
-        })
-        .catch((err) => {
-          console.error('获取 Linux 内存 Top5 失败:', err)
-          this.linM = []
-        })
-        .finally(() => {
-          this.loading7 = true
-        })
+      // A2：按当前选择的排序字段分别请求 Windows/Linux 的 TopN，后端返回已包含 cpu/mem 两项
+      this.loadWinTop()
+      this.loadLinTop()
     }
   },
   filters: {
@@ -492,6 +608,103 @@ export default {
 </script>
 
 <style lang="less">
+.homeTopList {
+  width: 100%;
+  padding: 10px 20px;
+  .topListHeader {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+    color: rgba(0, 0, 0, 0.45);
+    font-size: 12px;
+    font-weight: 500;
+    .col-name {
+      flex: 0 0 35%;
+      padding-left: 45px;
+    }
+    .col-metric {
+      flex: 1;
+      text-align: left;
+      padding-left: 10px;
+    }
+  }
+  .listBody {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  .topListItem {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+    transition: all 0.3s;
+    &:hover {
+      background: var(--primary-bg);
+    }
+    &.empty {
+      height: 50px;
+      border-bottom: none;
+    }
+    .col-name {
+      flex: 0 0 35%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      .rank-icon {
+        flex: 0 0 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 600;
+        color: #999;
+        img {
+          width: 24px;
+          height: auto;
+        }
+      }
+      .host-info {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        .hostname {
+          font-size: 13px;
+          color: #262626;
+          font-weight: 500;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          flex: 1;
+          min-width: 0;
+        }
+      }
+    }
+    .col-metric {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 10px;
+      .metric-value {
+        flex: 0 0 60px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--primary-color);
+        text-align: right;
+      }
+      /deep/ .legent {
+        flex: 1;
+        min-width: 160px;
+        display: block;
+      }
+    }
+  }
+}
 .homeMain {
   height: 430px;
   overflow-y: auto;

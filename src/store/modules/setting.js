@@ -19,6 +19,7 @@ export default {
     menuData: [],
     activatedFirst: undefined,
     customTitles,
+    demoMode: false,
     ...config,
     ...localSetting
   },
@@ -136,6 +137,9 @@ export default {
       const localSetting = JSON.parse(localStorage.getItem(process.env.VUE_APP_SETTING_KEY) || '{}')
       localSetting.systemLogo = systemLogo
       localStorage.setItem(process.env.VUE_APP_SETTING_KEY, JSON.stringify(localSetting))
+    },
+    setDemoMode(state, demoMode) {
+      state.demoMode = demoMode
     }
   }
 }

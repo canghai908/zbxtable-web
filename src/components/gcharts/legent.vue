@@ -1,69 +1,70 @@
 <template>
-  <v-chart v-if="showPage" :data="mock" :forceFit="true" :height="height" :padding="padding" :scale="scale">
-    <v-polygon position="name*inx" :color="color" :vStyle="style"></v-polygon>
-  </v-chart>
+  <div class="legent" :style="{ height: height + 'px' }">
+    <div
+      v-for="i in 20"
+      :key="i"
+      class="block"
+      :style="blockStyle(i - 1)"
+    ></div>
+  </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
+
 export default {
   props: {
     height: { type: Number, default: 14 },
     rate: { type: Number, default: 0 }
   },
-  data() {
-    return {
-      mock: [],
-      scale: [],
-      padding:[0,0,0,0],
-      label:['sales',{offset: -2,textStyle: {fill: '#fff', shadowBlur: 2, shadowColor: 'rgba(0, 0, 0, .45)'}}],
-      style:{ lineWidth: 2, stroke: '#fff'},
-      showPage: false
-    };
-  },
   computed: {
     ...mapState('setting', ['theme']),
-    color() {
-      const themeColor = this.theme.color || '#1890ff'
-      // 未使用部分用调整后的主题色（亮度+80），已使用部分用主题色
-      const lightColor = this.adjustColor(themeColor, 80)
-      return ['sales', `${lightColor}-${themeColor}`]
+    themeColor() {
+      return this.theme.color || '#1890ff'
+    },
+    lightColor() {
+      return this.adjustColor(this.themeColor, 80)
+    },
+    clampedRate() {
+      const n = Number(this.rate)
+      if (Number.isNaN(n)) return 0
+      return Math.max(0, Math.min(100, n))
     }
   },
   methods: {
-    hexToRgba(hex, alpha = 1) {
-      const r = parseInt(hex.slice(1, 3), 16)
-      const g = parseInt(hex.slice(3, 5), 16)
-      const b = parseInt(hex.slice(5, 7), 16)
-      return `rgba(${r}, ${g}, ${b}, ${alpha})`
-    },
     adjustColor(hex, amount) {
-      // 调整颜色亮度
       const num = parseInt(hex.slice(1), 16)
       const r = Math.min(255, Math.max(0, (num >> 16) + amount))
-      const g = Math.min(255, Math.max(0, ((num >> 8) & 0x00FF) + amount))
-      const b = Math.min(255, Math.max(0, (num & 0x0000FF) + amount))
+      const g = Math.min(255, Math.max(0, ((num >> 8) & 0x00ff) + amount))
+      const b = Math.min(255, Math.max(0, (num & 0x0000ff) + amount))
       return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`
-    }
-  },
-  created () {
-    if((this.rate && this.rate > 0) || this.rate == 0) {
-      let source = [];
-      for(let i=0; i<20; i++) {
-        let count = 0;
-        if(this.rate >= 0 && this.rate > i*5) {
-          if(this.rate < 100 && i==19) {count = 0} else {count = 100;}
-        }
-        source.push({name: i, inx: 0, sales: count});
+    },
+    isActive(index) {
+      return this.clampedRate > index * 5
+    },
+    blockStyle(index) {
+      const active = this.isActive(index)
+      return {
+        background: active ? this.themeColor : this.lightColor,
+        height: this.height + 'px',
+        width: '100%'
       }
-      this.mock = source;
-      const ys = "ABCDEFGHIJKLMNOPQRST";
-      this.scale = [
-        {dataKey: 'name', type: 'cat', values: ys.split('')},
-        {dataKey: 'inx', type: 'cat', values: ["Y"]}
-      ];
-      this.showPage = true;
     }
   }
-};
+}
 </script>
+
+<style scoped>
+.legent {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.block {
+  flex: 1;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-sizing: border-box;
+}
+</style>
