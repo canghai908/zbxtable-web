@@ -3,14 +3,14 @@
     <a-modal
       :visible="topConfigModalVisible"
       :confirmLoading="topNumSaving"
-      title="Top 设置"
+      :title="topConfigTitle"
       okText="保存"
       cancelText="取消"
       @ok="saveTopNum"
       @cancel="closeTopConfigModal"
     >
       <a-form :layout="'vertical'">
-        <a-form-item label="Top 数量">
+        <a-form-item :label="topConfigLabel">
           <a-input-number v-model="topNumDraft" :min="1" :max="50" style="width: 100%;" />
         </a-form-item>
       </a-form>
@@ -107,7 +107,7 @@
                     <a-radio-button value="MEM">{{ $t('sort_by_mem') }}</a-radio-button>
                   </a-radio-group>
                   <a-tooltip :title="$t('top_settings')">
-                    <a-button size="small" icon="setting" @click="openTopConfigModal" />
+                    <a-button size="small" icon="setting" @click="openTopConfigModal('VM_WIN')" />
                   </a-tooltip>
                 </div>
               </div>
@@ -128,17 +128,17 @@
                     </div>
                   </div>
                   <div class="col-metric">
-                    <legent :rate="v.cpu" :height="20"></legent>
-                    <span class="metric-value">{{fmtPercent(v.cpu)}}</span>
+                  <legent :rate="v.cpu" :height="20"></legent>
+                  <span class="metric-value">{{fmtPercent(v.cpu)}}</span>
                   </div>
                   <div class="col-metric">
-                    <legent :rate="v.mem" :height="20"></legent>
-                    <span class="metric-value">{{fmtPercent(v.mem)}}</span>
+                  <legent :rate="v.mem" :height="20"></legent>
+                  <span class="metric-value">{{fmtPercent(v.mem)}}</span>
                   </div>
-                </div>
-                <div class="topListItem empty" v-for="i in topNum-winTop.length" :key="'winTop-empty-'+i"></div>
-              </div>
-            </div>
+                  </div>
+                  <div class="topListItem empty" v-for="i in winTopNum-winTop.length" :key="'winTop-empty-'+i"></div>
+                  </div>
+                  </div>
           </a-card>
         </a-col>
       </a-row>
@@ -157,7 +157,7 @@
                     <a-radio-button value="MEM">{{ $t('sort_by_mem') }}</a-radio-button>
                   </a-radio-group>
                   <a-tooltip :title="$t('top_settings')">
-                    <a-button size="small" icon="setting" @click="openTopConfigModal" />
+                    <a-button size="small" icon="setting" @click="openTopConfigModal('VM_LIN')" />
                   </a-tooltip>
                 </div>
               </div>
@@ -178,17 +178,17 @@
                     </div>
                   </div>
                   <div class="col-metric">
-                    <legent :rate="v.cpu" :height="20"></legent>
-                    <span class="metric-value">{{fmtPercent(v.cpu)}}</span>
+                  <legent :rate="v.cpu" :height="20"></legent>
+                  <span class="metric-value">{{fmtPercent(v.cpu)}}</span>
                   </div>
                   <div class="col-metric">
-                    <legent :rate="v.mem" :height="20"></legent>
-                    <span class="metric-value">{{fmtPercent(v.mem)}}</span>
+                  <legent :rate="v.mem" :height="20"></legent>
+                  <span class="metric-value">{{fmtPercent(v.mem)}}</span>
                   </div>
-                </div>
-                <div class="topListItem empty" v-for="i in topNum-linTop.length" :key="'linTop-empty-'+i"></div>
-              </div>
-            </div>
+                  </div>
+                  <div class="topListItem empty" v-for="i in linTopNum-linTop.length" :key="'linTop-empty-'+i"></div>
+                  </div>
+                  </div>
           </a-card>
         </a-col>
       </a-row>
@@ -227,9 +227,11 @@ export default {
       loading5: false,
       loading6: true,
       topConfigModalVisible: false,
-      topNumDraft: 5,
+      topConfigType: '', // 'VM_WIN' 或 'VM_LIN'
+      topNumDraft: 10,
       topNumSaving: false,
-      dashTopNumConfigId: null,
+      linTopNumConfigId: null,
+      winTopNumConfigId: null,
       info: {
         net_count: 0,
         srv_count: 0,
@@ -243,7 +245,8 @@ export default {
       winTop: [],
       winSortBy: 'CPU',
       linSortBy: 'CPU',
-      topNum: 5,
+      linTopNum: 10,
+      winTopNum: 10,
       hasZabbixInstance: null // 是否配置了 Zabbix 实例，初始为 null 表示未检测
     }
   },
@@ -263,6 +266,12 @@ export default {
         '--primary-bg': this.hexToRgba(this.theme.color || '#1890ff', 0.08),
         '--primary-bg-hover': this.hexToRgba(this.theme.color || '#1890ff', 0.12)
       }
+    },
+    topConfigTitle() {
+      return this.topConfigType === 'VM_WIN' ? 'Windows Top 设置' : 'Linux Top 设置'
+    },
+    topConfigLabel() {
+      return 'Top 数量'
     }
   },
   components: {
@@ -293,8 +302,9 @@ export default {
     goToZabbixConfig() {
       this.$router.push('/system/zabbix')
     },
-    openTopConfigModal() {
-      this.topNumDraft = this.topNum
+    openTopConfigModal(type) {
+      this.topConfigType = type
+      this.topNumDraft = type === 'VM_WIN' ? this.winTopNum : this.linTopNum
       this.topConfigModalVisible = true
     },
     closeTopConfigModal() {
@@ -306,14 +316,21 @@ export default {
         message.error('Top 数量请输入 1-50 的整数')
         return
       }
-      if (!this.dashTopNumConfigId) {
-        message.error('未找到 dash_top_num 配置项')
+
+      const configId = this.topConfigType === 'VM_WIN' ? this.winTopNumConfigId : this.linTopNumConfigId
+      if (!configId) {
+        message.error('未找到 Top 数量配置项')
         return
       }
+
       this.topNumSaving = true
       try {
-        await configUpdate(this.dashTopNumConfigId, { config_value: String(n) })
-        this.topNum = n
+        await configUpdate(configId, { config_value: String(n) })
+        if (this.topConfigType === 'VM_WIN') {
+          this.winTopNum = n
+        } else {
+          this.linTopNum = n
+        }
         this.topConfigModalVisible = false
         this.initTop()
         message.success('已更新 Top 数量')
@@ -343,7 +360,7 @@ export default {
       this.loadLinTop()
     },
     loadWinTop() {
-      return indexRestop({ host_type: 'VM_WIN', metrics_type: this.winSortBy, top_num: String(this.topNum) })
+      return indexRestop({ host_type: 'VM_WIN', metrics_type: this.winSortBy, top_num: String(this.winTopNum) })
         .then((resp) => {
           const res = resp.data
           const arr = (res && Array.isArray(res.data)) ? res.data : []
@@ -358,7 +375,7 @@ export default {
         })
     },
     loadLinTop() {
-      return indexRestop({ host_type: 'VM_LIN', metrics_type: this.linSortBy, top_num: String(this.topNum) })
+      return indexRestop({ host_type: 'VM_LIN', metrics_type: this.linSortBy, top_num: String(this.linTopNum) })
         .then((resp) => {
           const res = resp.data
           const arr = (res && Array.isArray(res.data)) ? res.data : []
@@ -376,15 +393,18 @@ export default {
       return configGetList().then(resp => {
         const res = resp.data
         if (res.code === 200 && res.data && res.data.items) {
-          const cfg = res.data.items.find(item => item.config_key === 'dash_top_num')
-          if (cfg) {
-            this.dashTopNumConfigId = cfg.id || cfg.config_id || null
+          const cfgLin = res.data.items.find(item => item.config_key === 'dash_top_lin_num')
+          const cfgWin = res.data.items.find(item => item.config_key === 'dash_top_win_num')
+          
+          if (cfgLin) {
+            this.linTopNumConfigId = cfgLin.id || cfgLin.config_id || null
+            this.linTopNum = parseInt(cfgLin.config_value) || 10
+            this.linTopNumDraft = this.linTopNum
           }
-          if (cfg && cfg.config_value) {
-            this.topNum = parseInt(cfg.config_value) || 5
-          }
-          if (!this.topNumDraft) {
-            this.topNumDraft = this.topNum
+          if (cfgWin) {
+            this.winTopNumConfigId = cfgWin.id || cfgWin.config_id || null
+            this.winTopNum = parseInt(cfgWin.config_value) || 10
+            this.winTopNumDraft = this.winTopNum
           }
         }
       }).catch(err => {

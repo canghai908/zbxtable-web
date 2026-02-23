@@ -218,7 +218,8 @@ export default {
       return this.list.filter(item => 
         item.config_key === 'zbx_dash' || 
         item.config_key === 'dash_id' || 
-        item.config_key === 'dash_top_num' || 
+        item.config_key === 'dash_top_lin_num' ||
+        item.config_key === 'dash_top_win_num' ||
         item.config_key === 'sync_inventory' ||
         item.config_key === 'webhook_url'
       )
@@ -229,7 +230,8 @@ export default {
         item.config_key === 'system_logo' ||
         item.config_key === 'zbx_dash' || 
         item.config_key === 'dash_id' || 
-        item.config_key === 'dash_top_num' || 
+        item.config_key === 'dash_top_lin_num' ||
+        item.config_key === 'dash_top_win_num' ||
         item.config_key === 'sync_inventory' ||
         item.config_key === 'webhook_url'
       )
