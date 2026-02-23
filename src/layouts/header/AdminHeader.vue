@@ -11,6 +11,18 @@
         <i-menu class="head-menu" :theme="headerTheme" mode="horizontal" :options="menuData" @select="onSelect" />
       </div>
       <div :class="['admin-header-right', headerTheme]">
+        <!-- GitHub 链接（仅演示模式显示） -->
+        <a
+          v-if="demoMode"
+          class="header-item github-link"
+          href="https://github.com/canghai908/zbxtable"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="GitHub"
+        >
+          <a-icon type="github" />
+        </a>
+
         <header-avatar class="header-item" />
         <a-dropdown class="lang header-item">
           <div>
@@ -55,6 +67,7 @@ export default {
       "systemLogo",
       "lang",
       "pageWidth",
+      "demoMode",
     ]),
     headerTheme() {
       if (

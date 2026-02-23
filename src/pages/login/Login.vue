@@ -1,7 +1,13 @@
 <template>
   <div class="login-container">
-    <!-- GitHub 开源项目链接 - 右上角 -->
-    <a href="https://github.com/canghai908/zbxtable" target="_blank" class="github-corner" aria-label="View source on GitHub">
+    <!-- GitHub 开源项目链接 - 右上角（仅演示模式显示） -->
+    <a
+      v-if="demoMode"
+      href="https://github.com/canghai908/zbxtable"
+      target="_blank"
+      class="github-corner"
+      aria-label="View source on GitHub"
+    >
       <svg width="80" height="80" viewBox="0 0 250 250" class="github-corner-svg" aria-hidden="true">
         <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z" class="octo-background"></path>
         <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" class="octo-arm"></path>
@@ -107,14 +113,16 @@ export default {
       error: '',
       form: this.$form.createForm(this),
       systemName: 'ZbxTable',
-      logoUrl: require('@/assets/img/logo.png')
+      logoUrl: require('@/assets/img/logo.png'),
+      demoMode: false
     }
   },
-  computed: {
-    // systemName() {
-    //   return this.$store.state.setting.systemName
-    // }
-  },
+  // computed: {
+  //   systemName() {
+  //     return this.$store.state.setting.systemName
+  //   }
+  // },
+
   mounted() {
     // 加载系统公开信息
     this.loadPublicSystemInfo()
@@ -151,6 +159,20 @@ export default {
           }
           if (infoRes.data.system_logo) {
             this.$store.commit('setting/setSystemLogo', infoRes.data.system_logo)
+          }
+          // 识别演示模式并自动填充账号密码
+          if (infoRes.data.demo_mode) {
+            this.demoMode = true
+            this.$store.commit('setting/setDemoMode', true)
+            this.$nextTick(() => {
+              this.form.setFieldsValue({
+                name: 'admin',
+                password: 'Zbxtable'
+              })
+            })
+          } else {
+            this.demoMode = false
+            this.$store.commit('setting/setDemoMode', false)
           }
         }
       } catch (error) {
