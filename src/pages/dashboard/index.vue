@@ -4,13 +4,13 @@
       :visible="topConfigModalVisible"
       :confirmLoading="topNumSaving"
       :title="topConfigTitle"
-      okText="保存"
-      cancelText="取消"
+      :okText="$t('btn_ok')"
+      :cancelText="$t('btn_cancel')"
       @ok="saveTopNum"
       @cancel="closeTopConfigModal"
     >
       <a-form :layout="'vertical'">
-        <a-form-item :label="topConfigLabel">
+        <a-form-item :label="$t('top_settings_label_num')">
           <a-input-number v-model="topNumDraft" :min="1" :max="50" style="width: 100%;" />
         </a-form-item>
       </a-form>
@@ -304,10 +304,7 @@ export default {
       }
     },
     topConfigTitle() {
-      return this.topConfigType === 'VM_WIN' ? 'Windows Top 设置' : 'Linux Top 设置'
-    },
-    topConfigLabel() {
-      return 'Top 数量'
+      return this.topConfigType === 'VM_WIN' ? this.$t('top_settings_title_win') : this.$t('top_settings_title_lin')
     }
   },
   components: {
@@ -349,13 +346,13 @@ export default {
     async saveTopNum() {
       const n = parseInt(this.topNumDraft, 10)
       if (!Number.isFinite(n) || n <= 0 || n > 50) {
-        message.error('Top 数量请输入 1-50 的整数')
+        message.error(this.$t('top_settings_msg_range'))
         return
       }
 
       const configId = this.topConfigType === 'VM_WIN' ? this.winTopNumConfigId : this.linTopNumConfigId
       if (!configId) {
-        message.error('未找到 Top 数量配置项')
+        message.error(this.$t('top_settings_msg_not_found'))
         return
       }
 
@@ -369,10 +366,10 @@ export default {
         }
         this.topConfigModalVisible = false
         this.initTop()
-        message.success('已更新 Top 数量')
+        message.success(this.$t('top_settings_msg_update_success'))
       } catch (e) {
         console.error('更新 Top 数量失败:', e)
-        message.error('更新失败')
+        message.error(this.$t('top_settings_msg_update_failed'))
       } finally {
         this.topNumSaving = false
       }
