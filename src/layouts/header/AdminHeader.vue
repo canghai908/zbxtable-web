@@ -11,6 +11,14 @@
         <i-menu class="head-menu" :theme="headerTheme" mode="horizontal" :options="menuData" @select="onSelect" />
       </div>
       <div :class="['admin-header-right', headerTheme]">
+        <!-- 演示模式提示（悬浮说明） -->
+        <a-tooltip v-if="demoMode" placement="bottom">
+          <template slot="title">
+            <span>当前为只读演示环境，禁止修改数据</span>
+          </template>
+          <a-tag color="orange" class="header-item demo-tag">演示模式</a-tag>
+        </a-tooltip>
+
         <!-- GitHub 链接（仅演示模式显示） -->
         <a
           v-if="demoMode"
@@ -104,4 +112,10 @@ export default {
 
 <style lang="less" scoped>
 @import "index";
+
+.demo-tag {
+  margin-right: 8px;
+  border-radius: 10px;
+  font-weight: 500;
+}
 </style>

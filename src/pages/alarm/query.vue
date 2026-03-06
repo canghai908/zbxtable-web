@@ -74,6 +74,7 @@
         
         <!-- 展开行的嵌套表格 -->
         <a-table slot="expandedRowRender" slot-scope="record" :columns="innerColumns" :data-source="(record && record.innerData) ? record.innerData : []" :loading="record ? record.innerLoading : false" :pagination="false" :rowKey="(r) => r.id || r.notify_time || r.rule + '-' + r.user + '-' + r.channel">
+          <span slot="channel" slot-scope="text">{{ formatChannel(text) }}</span>
           <span slot="notify_time" slot-scope="record">{{ record.notify_time | parsetime }}</span>
           <span slot="status" slot-scope="record">
             <a-badge v-if="record.status==0" status="success"></a-badge>
@@ -330,7 +331,7 @@ export default {
       ];
       this.innerColumns = [
         { title: this.$t('col_rule_name'), dataIndex: "rule", align: "left" },
-        { title: this.$t('col_receiving_channel'), dataIndex: "channel", align: "left" },
+        { title: this.$t('col_alarm_channel'), dataIndex: "channel", align: "left", scopedSlots: { customRender: "channel" } },
         { title: this.$t('col_receiving_user'), dataIndex: "user", align: "left" },
         { title: this.$t('col_receiving_account'), dataIndex: "account", align: "left" },
         { title: this.$t('col_notification_time'), key: "notify_time", align: "left", scopedSlots: { customRender: "notify_time" } },
@@ -358,6 +359,17 @@ export default {
     getInstanceName(zid) {
       if (!zid) return this.$t('msg_unknown')
       return this.instanceMap[zid] || this.$t('msg_unknown')
+    },
+    formatChannel(channel) {
+      const key = String(channel || '').trim().toLowerCase()
+      const channelMap = {
+        mail: this.$t('channel_mail'),
+        wechat: this.$t('channel_wechat'),
+        wechat_robot: this.$t('channel_wechat_robot'),
+        dingding: this.$t('channel_dingding'),
+        sms: this.$t('channel_sms'),
+      }
+      return channelMap[key] || channel || this.$t('msg_unknown')
     },
     init() {
       this.loading = true;

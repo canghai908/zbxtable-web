@@ -311,6 +311,7 @@ export default {
       this.rChannelOptions = [
         { value: "mail", label: this.$t('channel_mail') },
         { value: "wechat", label: this.$t('channel_wechat') },
+        { value: "wechat_robot", label: this.$t('channel_wechat_robot') },
         // { value: "dingding", label: this.$t('channel_dingding') },
         // { value: "sms", label: this.$t('channel_sms') },
       ];
