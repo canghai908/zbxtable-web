@@ -74,6 +74,10 @@ module.exports = {
         name: 'AI 类型',
         comment: '选择使用的 AI 服务类型：ollama 或 deepseek'
       },
+      alarm_analysis_prompt: {
+        name: '告警分析提示词',
+        comment: '用于“AI助手分析”默认发送给模型的提示词模板，支持占位符：{{hostname}} {{host_ip}} {{message}} {{detail}} {{level}} {{status}} {{alarm_context}}'
+      },
       ollama_host: {
         name: 'Ollama Host',
         comment: 'Ollama 服务地址，如 http://127.0.0.1:11434'
@@ -176,6 +180,10 @@ module.exports = {
         name: 'AI 類型',
         comment: '選擇使用的 AI 服務類型：ollama 或 deepseek'
       },
+      alarm_analysis_prompt: {
+        name: '告警分析提示詞',
+        comment: '用於「AI助手分析」默認發送給模型的提示詞模板，支持佔位符：{{hostname}} {{host_ip}} {{message}} {{detail}} {{level}} {{status}} {{alarm_context}}'
+      },
       ollama_host: {
         name: 'Ollama Host',
         comment: 'Ollama 服務地址，如 http://127.0.0.1:11434'
@@ -277,6 +285,10 @@ module.exports = {
       ai_type: {
         name: 'AI Type',
         comment: 'Select AI service type: ollama or deepseek'
+      },
+      alarm_analysis_prompt: {
+        name: 'Alarm Analysis Prompt',
+        comment: 'Prompt template sent by default when clicking "AI Assistant Analysis", supports placeholders: {{hostname}} {{host_ip}} {{message}} {{detail}} {{level}} {{status}} {{alarm_context}}'
       },
       ollama_host: {
         name: 'Ollama Host',
@@ -390,6 +402,7 @@ module.exports = {
       pleaseInputTestUserId: '请输入测试用户ID',
       testEmailSuccess: '测试邮件发送成功，请检查邮箱',
       testWechatSuccess: '测试消息发送成功，请检查企业微信',
+      defaultAlarmAnalysisPrompt: '你是专业运维分析师。请基于以下告警信息进行分析：\n\n设备名称：{{hostname}}\nIP：{{host_ip}}\n告警描述：{{message}}\n告警详情：{{detail}}\n告警级别：{{level}}\n告警状态：{{status}}\n\n请输出：\n1. 可能根因（按概率排序）\n2. 排查步骤（关键命令/检查项）\n3. 修复方案与风险\n4. 防复发建议',
     },
     HK: {
       title: '系統配置',
@@ -472,6 +485,7 @@ module.exports = {
       pleaseInputTestUserId: '請輸入測試用戶ID',
       testEmailSuccess: '測試郵件發送成功，請檢查郵箱',
       testWechatSuccess: '測試消息發送成功，請檢查企業微信',
+      defaultAlarmAnalysisPrompt: '你是專業運維分析師。請基於以下告警信息進行分析：\n\n設備名稱：{{hostname}}\nIP：{{host_ip}}\n告警描述：{{message}}\n告警詳情：{{detail}}\n告警級別：{{level}}\n告警狀態：{{status}}\n\n請輸出：\n1. 可能根因（按概率排序）\n2. 排查步驟（關鍵命令/檢查項）\n3. 修復方案與風險\n4. 防復發建議',
     },
     US: {
       title: 'System Configuration',
@@ -554,6 +568,7 @@ module.exports = {
       pleaseInputTestUserId: 'Please enter test user ID',
       testEmailSuccess: 'Test email sent successfully, please check your inbox',
       testWechatSuccess: 'Test message sent successfully, please check WeChat Work',
+      defaultAlarmAnalysisPrompt: 'You are a professional operations analyst. Please analyze the following alarm information:\n\nDevice Name: {{hostname}}\nIP: {{host_ip}}\nAlarm Description: {{message}}\nAlarm Detail: {{detail}}\nAlarm Severity: {{level}}\nAlarm Status: {{status}}\n\nPlease output:\n1. Possible root causes (sorted by probability)\n2. Troubleshooting steps (key commands/check items)\n3. Fix plan and risks\n4. Prevention recommendations',
     }
   }
 }

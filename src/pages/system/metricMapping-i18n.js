@@ -77,6 +77,8 @@ module.exports = {
 			confirm_execute_content: '确定要立即执行此映射配置吗？',
 			confirm_delete_title: '提示',
 			confirm_delete_content: '确定要删除此映射配置吗？',
+			confirm_duplicate_title: '存在同类型配置',
+			confirm_duplicate_content: '当前实例下已存在相同系统类型的映射配置，是否继续新增？',
 			
 			// 历史记录
 			history_title: '执行历史',
@@ -196,6 +198,8 @@ module.exports = {
 			confirm_execute_content: '確定要立即執行此映射配置嗎？',
 			confirm_delete_title: '提示',
 			confirm_delete_content: '確定要刪除此映射配置嗎？',
+			confirm_duplicate_title: '存在同類型配置',
+			confirm_duplicate_content: '當前實例下已存在相同系統類型的映射配置，是否繼續新增？',
 			
 			// 歷史記錄
 			history_title: '執行歷史',
@@ -315,6 +319,8 @@ module.exports = {
 			confirm_execute_content: 'Are you sure you want to execute this mapping configuration now?',
 			confirm_delete_title: 'Confirm',
 			confirm_delete_content: 'Are you sure you want to delete this mapping configuration?',
+			confirm_duplicate_title: 'Similar configuration exists',
+			confirm_duplicate_content: 'A mapping with the same system type already exists for this instance. Continue creating a new one?',
 			
 			// History
 			history_title: 'Execution History',

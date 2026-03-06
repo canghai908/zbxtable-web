@@ -92,9 +92,14 @@ module.exports = {
       chat_send: '发送',
       chat_stop: '停止',
       chat_clear: '清空对话',
+      chat_preview_prompt: '预览提示词',
+      chat_prompt_preview_title: '提示词预览',
+      chat_prompt_preview_hint: '以下内容为本次将发送给 AI 的实际提示词内容',
       chat_user: '我',
       chat_assistant: 'AI 助手',
       chat_alarm_context: '告警上下文',
+      chat_context_expand: '展开详情',
+      chat_context_collapse: '收起详情',
       confirm_clear_chat_title: '确认清空',
       confirm_clear_chat_content: '是否确认清空所有对话记录？',
       
@@ -314,10 +319,14 @@ module.exports = {
       msg_analysis_prompt: '请分析以下告警详情，说明可能的原因并给出具体的解决方案：',
       msg_unknown_error: '未知错误',
       msg_request_timeout: '请求超时，请稍后重试',
+      msg_preview_no_alarm_context: '请先选择一条告警再预览提示词',
+      msg_preview_using_default_prompt: '当前未配置自定义提示词，正在使用默认提示词',
+      msg_unknown_prompt_variables: '检测到未识别占位符：{vars}',
       
       // rule.vue 额外翻译
       msg_save_success: '保存成功',
       msg_save_failed: '保存失败',
+      msg_load_ai_prompt_failed: '加载AI提示词失败',
     },
     US: {
       // Search form
@@ -411,9 +420,14 @@ module.exports = {
       chat_send: 'Send',
       chat_stop: 'Stop',
       chat_clear: 'Clear Chat',
+      chat_preview_prompt: 'Preview Prompt',
+      chat_prompt_preview_title: 'Prompt Preview',
+      chat_prompt_preview_hint: 'The content below is the actual prompt that will be sent to AI',
       chat_user: 'You',
       chat_assistant: 'AI Assistant',
       chat_alarm_context: 'Alarm Context',
+      chat_context_expand: 'Expand details',
+      chat_context_collapse: 'Collapse details',
       confirm_clear_chat_title: 'Confirm Clear',
       confirm_clear_chat_content: 'Are you sure to clear all chat history?',
       
@@ -633,10 +647,14 @@ module.exports = {
       msg_analysis_prompt: 'Please analyze the following alarm details, explain possible causes and provide specific solutions:',
       msg_unknown_error: 'Unknown Error',
       msg_request_timeout: 'Request Timeout, Please Try Again Later',
+      msg_preview_no_alarm_context: 'Please select an alarm first, then preview the prompt',
+      msg_preview_using_default_prompt: 'No custom prompt is configured currently, using default prompt',
+      msg_unknown_prompt_variables: 'Detected unknown placeholders: {vars}',
       
       // rule.vue additional translations
       msg_save_success: 'Save Successful',
       msg_save_failed: 'Save Failed',
+      msg_load_ai_prompt_failed: 'Failed to load AI prompt',
     },
     HK: {
       // 搜索表單
@@ -730,9 +748,14 @@ module.exports = {
       chat_send: '發送',
       chat_stop: '停止',
       chat_clear: '清空對話',
+      chat_preview_prompt: '預覽提示詞',
+      chat_prompt_preview_title: '提示詞預覽',
+      chat_prompt_preview_hint: '以下內容為本次將發送給 AI 的實際提示詞內容',
       chat_user: '我',
       chat_assistant: 'AI 助手',
       chat_alarm_context: '告警上下文',
+      chat_context_expand: '展開詳情',
+      chat_context_collapse: '收起詳情',
       confirm_clear_chat_title: '確認清空',
       confirm_clear_chat_content: '是否確認清空所有對話記錄？',
       
@@ -952,10 +975,14 @@ module.exports = {
       msg_analysis_prompt: '請分析以下告警詳情，說明可能的原因並給出具體的解決方案：',
       msg_unknown_error: '未知錯誤',
       msg_request_timeout: '請求超時，請稍後重試',
+      msg_preview_no_alarm_context: '請先選擇一條告警再預覽提示詞',
+      msg_preview_using_default_prompt: '當前未配置自定義提示詞，正在使用默認提示詞',
+      msg_unknown_prompt_variables: '檢測到未識別佔位符：{vars}',
       
       // rule.vue 額外翻譯
       msg_save_success: '保存成功',
       msg_save_failed: '保存失敗',
+      msg_load_ai_prompt_failed: '加載AI提示詞失敗',
     },
   },
 };
