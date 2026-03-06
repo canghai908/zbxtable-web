@@ -13,13 +13,16 @@
     </a-form-model>
     <div>
       <a-table :loading="loading" :columns="columns" :data-source="list" @change="changePage" :pagination="pagination" :rowKey="(record) => { return record.id;}">
-        <span slot="status" slot-scope="record">
+        <div slot="instance_name" slot-scope="text">
+          <a-tag :color="themeColor">{{ getInstanceNames(text) || '-' }}</a-tag>
+        </div>
+        <span slot="status" slot-scope="text, record">
           <a-switch :checked="record.status == '0' ? true : false" :checked-children="$t('status_enabled')" :un-checked-children="$t('status_disabled')" @change="onStatusChange($event, record)" />
         </span>
-        <span slot="s_time" slot-scope="record">{{record.s_time | parsetime }}</span>
-        <span slot="e_time" slot-scope="record">{{record.e_time | parsetime }}</span>
-        <span slot="created" slot-scope="record">{{record.created | parsetime }}</span>
-        <span slot="operation" slot-scope="record">
+        <span slot="s_time" slot-scope="text">{{ text | parsetime }}</span>
+        <span slot="e_time" slot-scope="text">{{ text | parsetime }}</span>
+        <span slot="created" slot-scope="text">{{ text | parsetime }}</span>
+        <span slot="operation" slot-scope="text, record">
           <!-- <a-button class="pd20 paddingleft0" type="link" size="small" @click="seeDetail(record)">详细信息</a-button> -->
           <a-button class="pd20 paddingleft0" type="link" size="small" @click="seeEdit(record)">{{ $t('btn_edit') }}</a-button>
           <a-popconfirm :title="$t('confirm_delete_title')" :ok-text="$t('confirm_delete_ok')" :cancel-text="$t('confirm_delete_cancel')" @confirm="deleteRecord(record)">
@@ -36,8 +39,8 @@
           </a-form-model-item>
           <a-form-model-item :label="$t('mutes_form_instance')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="zid" :required="true">
             <a-select v-model="rule.zid" mode="multiple" style="width: 100%" :placeholder="$t('mutes_form_instance_placeholder')" @change="handleTenantChange">
-              <a-select-option v-for="(item, index) in tenantlist" :key="index" :value="item.zid" :label="item.zid" :title="item.zid">
-                {{ item.zid }}
+              <a-select-option v-for="(item, index) in tenantlist" :key="index" :value="String(item.id != null ? item.id : item.zid)" :label="item.name || String(item.id != null ? item.id : item.zid)" :title="item.name || String(item.id != null ? item.id : item.zid)">
+                {{ item.name || item.id || item.zid }}
               </a-select-option>
             </a-select>
           </a-form-model-item>
@@ -123,8 +126,8 @@
           </a-form-model-item>
           <a-form-model-item :label="$t('mutes_form_instance')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="zid">
             <a-select v-model="rule.zid" mode="multiple" style="width: 100%" :placeholder="$t('mutes_form_instance_placeholder')" @change="handleTenantChange" :required="true">
-              <a-select-option v-for="(item, index) in tenantlist" :key="index" :value="item.zid" :label="item.zid" :title="item.zid">
-                {{ item.zid }}
+              <a-select-option v-for="(item, index) in tenantlist" :key="index" :value="String(item.id != null ? item.id : item.zid)" :label="item.name || String(item.id != null ? item.id : item.zid)" :title="item.name || String(item.id != null ? item.id : item.zid)">
+                {{ item.name || item.id || item.zid }}
               </a-select-option>
             </a-select>
           </a-form-model-item>
@@ -208,13 +211,16 @@
 <script>
 import { mapGetters } from 'vuex'
 import PageLayout from "@/layouts/PageLayout";
-import { ruleList, ruleAdd, rulePut, alarmTenantGet, ruleStatusPut, ruleDelete } from "@/services/admin";
+import { ruleList, ruleAdd, rulePut, ruleStatusPut, ruleDelete } from "@/services/admin";
+import { listZabbixInstance } from "@/services/zabbix";
 import { parseTimeFun } from "@/utils/formatter";
 import moment from "moment";
 import "moment/locale/zh-cn";
+import themeMixin from '@/mixins/themeMixin'
 export default {
   name: "LinuxList",
   i18n: require('./i18n'),
+  mixins: [themeMixin],
   computed: {
     ...mapGetters('account', ['user']),
   },
@@ -348,24 +354,7 @@ export default {
       this.columns = [
         { title: this.$t('mutes_col_id'), dataIndex: "id", align: "center" },
         { title: this.$t('mutes_col_policy_name'), dataIndex: "name", align: "left" },
-        {
-          title: this.$t('mutes_col_instance'), dataIndex: "zid", align: "left", customRender: (value, row, index) => {
-            let allist = []
-            value.split(",").forEach(items => {
-              this.tenantlist.forEach(tid => {
-                if (items == tid.zid) {
-                  allist.push(tid.zid);
-                }
-              });
-
-            });
-            const obj = {
-              children: allist.join(","),
-              attrs: {},
-            };
-            return obj;
-          },
-        },
+        { title: this.$t('mutes_col_instance'), dataIndex: "z_ids", key: "instance_name", align: "left", scopedSlots: { customRender: "instance_name" } },
         { title: this.$t('mutes_col_mute_condition'), dataIndex: "conditions", align: "left", },
         {
           title: this.$t('mutes_col_mute_duration'), dataIndex: "duration", key: "duration", align: "left", customRender: (value, row, index) => {
@@ -417,12 +406,25 @@ export default {
       }).finally(() => {
         this.loading = false;
       });
-      alarmTenantGet().then((resp) => {
-        let res = resp.data
+      listZabbixInstance().then((resp) => {
+        const res = resp.data
         if (res.code == 200) {
-          this.tenantlist = res.data.items || []
+          const allItems = Array.isArray(res.data) ? res.data : []
+          this.tenantlist = allItems.filter(item => item && item.enabled)
         }
-      }).finally(() => { this.loading2 = false })
+      })
+    },
+    getInstanceNames(zids) {
+      const zidsText = zids == null ? "" : String(zids)
+      const sourceList = zidsText.split(",").map(v => v.trim()).filter(Boolean)
+      if (!sourceList.length) {
+        return ""
+      }
+      const mapped = sourceList.map((item) => {
+        const hit = this.tenantlist.find((tid) => String(item) === String(tid && (tid.id != null ? tid.id : tid.zid)))
+        return hit ? (hit.name || String(item)) : String(item)
+      })
+      return mapped.join(",")
     },
     onStatusChange(e, record) {
       if (e) {
@@ -467,20 +469,29 @@ export default {
     },
     seeEdit(record) {
       this.visibleEdit = true;
-      let lten = []
-      let lchan = []
-      if (record.zid != "") {
-        lten = record.zid.split(",")
+      const rawZids = record && (record.z_ids != null ? record.z_ids : record.zid)
+      const zidText = rawZids != null ? String(rawZids) : ""
+      const channelText = record && record.channel != null ? String(record.channel) : ""
+      const lten = zidText ? zidText.split(",").filter(Boolean) : []
+      const lchan = channelText ? channelText.split(",").filter(Boolean) : []
+
+      let parsedConditions = []
+      if (Array.isArray(record.conditions)) {
+        parsedConditions = record.conditions
+      } else if (record.conditions) {
+        try {
+          parsedConditions = JSON.parse(record.conditions)
+        } catch (e) {
+          parsedConditions = []
+        }
       }
-      if (record.channel != "") {
-        lchan = record.channel.split(",")
-      }
+
       this.rule = {
         id: record.id,
         name: record.name,
         zid: lten,
         channel: lchan,
-        conditions: record.conditions ? JSON.parse(record.conditions) : [],
+        conditions: parsedConditions,
         s_time: parseTimeFun(record.s_time),
         e_time: parseTimeFun(record.e_time),
         note: record.note,
@@ -500,7 +511,11 @@ export default {
       this.rule.e_time = moment(value).format("YYYY-MM-DD HH:mm:ss")
     },
     updateRule() {
-      rulePut(this.rule.id, this.rule).then((resp) => {
+      const payload = {
+        ...this.rule,
+        z_ids: Array.isArray(this.rule.zid) ? this.rule.zid : (this.rule.zid ? [this.rule.zid] : []),
+      }
+      rulePut(this.rule.id, payload).then((resp) => {
         let res = resp.data
         if (res.code == 200) {
           this.$message.success(res.message)
@@ -518,7 +533,11 @@ export default {
       this.visible = false;
     },
     createRule() {
-      ruleAdd(this.rule).then((resp) => {
+      const payload = {
+        ...this.rule,
+        z_ids: Array.isArray(this.rule.zid) ? this.rule.zid : (this.rule.zid ? [this.rule.zid] : []),
+      }
+      ruleAdd(payload).then((resp) => {
         let res = resp.data
         if (res.code == 200) {
           this.$message.success(res.message)
