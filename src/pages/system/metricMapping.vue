@@ -509,23 +509,39 @@ export default {
     submitForm() {
       this.$refs.formRef.validate(valid => {
         if (!valid) return false
-        
-        this.form.metric_config = JSON.stringify(this.metricConfig)
-        const apiCall = this.form.id ? metricMappingUpdate(this.form.id, this.form) : metricMappingCreate(this.form)
-        apiCall.then(resp => {
-          const res = resp.data
-          if (res.code === 200) {
-            this.$message.success(this.$t('msg_save_success'))
-            this.dialogVisible = false
-            this.fetchMappings()
-          } else {
-            this.$message.error(res.message || this.$t('msg_save_failed'))
-          }
-        }).catch(err => {
-          this.$message.error(this.$t('msg_save_failed'))
-          console.error(err)
-        })
+
+        // 新增场景下，如果已存在同实例+同系统类型，先二次确认，避免误操作
+        if (!this.form.id && this.hasSameMappingExists()) {
+          this.$confirm({
+            title: this.$t('confirm_duplicate_title'),
+            content: this.$t('confirm_duplicate_content'),
+            onOk: () => this.doSubmitForm()
+          })
+          return
+        }
+
+        this.doSubmitForm()
       })
+    },
+    doSubmitForm() {
+      this.form.metric_config = JSON.stringify(this.metricConfig)
+      const apiCall = this.form.id ? metricMappingUpdate(this.form.id, this.form) : metricMappingCreate(this.form)
+      apiCall.then(resp => {
+        const res = resp.data
+        if (res.code === 200) {
+          this.$message.success(this.$t('msg_save_success'))
+          this.dialogVisible = false
+          this.fetchMappings()
+        } else {
+          this.$message.error(res.message || this.$t('msg_save_failed'))
+        }
+      }).catch(err => {
+        this.$message.error(this.$t('msg_save_failed'))
+        console.error(err)
+      })
+    },
+    hasSameMappingExists() {
+      return this.mappings.some(item => item.zid === this.form.zid && item.system_type === this.form.system_type)
     },
     handleCancel() {
       this.dialogVisible = false

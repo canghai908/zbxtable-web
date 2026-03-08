@@ -18,6 +18,9 @@
     </a-form-model>
     <div class="linux-list">
       <a-table :loading="loading" :columns="columns" :data-source="list" @change="changePage" :pagination="pagination" :rowKey="(record) => { return record.id;}">
+        <div slot="instance_tag" slot-scope="text">
+          <a-tag :color="themeColor">{{ getInstanceNames(text) || $t('status_not_selected') }}</a-tag>
+        </div>
         <span slot="created" slot-scope="record">{{record.created | parsetime }}</span>
         <span slot="status" slot-scope="record">
           <a-switch :checked="record.status == '0' ? true : false" :checked-children="$t('status_enabled')" :un-checked-children="$t('status_disabled')" @change="onStatusChange($event, record)" />
@@ -135,9 +138,11 @@ import { listZabbixInstance } from "@/services/zabbix";
 import { parseTimeFun } from "@/utils/formatter";
 import moment from "moment";
 import "moment/locale/zh-cn";
+import themeMixin from '@/mixins/themeMixin'
 export default {
   i18n: require('./i18n'),
   name: "LinuxList",
+  mixins: [themeMixin],
   components: {
     PageLayout,
   },
@@ -217,6 +222,18 @@ export default {
     this.init();
   },
   methods: {
+    getInstanceNames(zids) {
+      const zidsText = zids == null ? "" : String(zids)
+      const sourceList = zidsText.split(",").map(v => v.trim()).filter(Boolean)
+      if (!sourceList.length) {
+        return ""
+      }
+      const mapped = sourceList.map((id) => {
+        const hit = this.instanceList.find(item => String(item && item.id) === String(id))
+        return hit ? (hit.name || String(id)) : String(id)
+      })
+      return mapped.join(", ")
+    },
     initOptions() {
       // 初始化字段选项
       this.rTypeOptions = [
@@ -252,17 +269,7 @@ export default {
       this.columns = [
         { title: this.$t('col_id'), dataIndex: "id", align: "left" },
         { title: this.$t('col_name'), dataIndex: "name", align: "left" },
-        {
-          title: this.$t('col_instances'), dataIndex: "z_ids", align: "left", customRender: (value) => {
-            if (!value) return this.$t('status_not_selected')
-            const ids = value.toString().split(',')
-            const names = ids.map(id => {
-              const instance = this.instanceList.find(item => item.id.toString() === id.trim())
-              return instance ? instance.name : id
-            })
-            return { children: names.join(', '), attrs: {} }
-          },
-        },
+        { title: this.$t('col_instances'), dataIndex: "z_ids", key: "instance_tag", align: "left", scopedSlots: { customRender: "instance_tag" } },
         { title: this.$t('col_distribution_conditions'), dataIndex: "conditions", align: "left" },
         {
           title: this.$t('col_distribution_channel'), dataIndex: "channel", align: "left", customRender: (value, row, index) => {

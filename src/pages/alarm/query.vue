@@ -74,6 +74,7 @@
         
         <!-- 展开行的嵌套表格 -->
         <a-table slot="expandedRowRender" slot-scope="record" :columns="innerColumns" :data-source="(record && record.innerData) ? record.innerData : []" :loading="record ? record.innerLoading : false" :pagination="false" :rowKey="(r) => r.id || r.notify_time || r.rule + '-' + r.user + '-' + r.channel">
+          <span slot="channel" slot-scope="text">{{ formatChannel(text) }}</span>
           <span slot="notify_time" slot-scope="record">{{ record.notify_time | parsetime }}</span>
           <span slot="status" slot-scope="record">
             <a-badge v-if="record.status==0" status="success"></a-badge>
@@ -92,19 +93,25 @@
       placement="right"
       :closable="true"
       :visible="aiDrawerVisible"
-      :width="720"
+      :width="560"
       @close="handleDrawerClose"
       :bodyStyle="{ padding: 0, height: 'calc(100vh - 55px)', overflow: 'hidden' }">
       
       <div class="ai-chat-container">
         <!-- 告警上下文信息 -->
         <div v-if="currentAlarmContext" class="alarm-context">
-          <a-alert :message="$t('chat_alarm_context')" type="info" show-icon closable @close="currentAlarmContext = null">
+          <a-alert :message="$t('chat_alarm_context')" type="info" show-icon>
             <template slot="description">
-              <div class="context-content">
-                <div><strong>{{ $t('col_device_name') }}:</strong> {{ currentAlarmContext.hostname }}</div>
-                <div><strong>{{ $t('col_ip') }}:</strong> {{ currentAlarmContext.host_ip }}</div>
-                <div><strong>{{ $t('col_alarm_description') }}:</strong> {{ currentAlarmContext.message }}</div>
+              <div class="context-content compact">
+                <div class="context-summary">{{ contextSummary }}</div>
+                <a-button type="link" size="small" class="context-toggle" @click="contextExpanded = !contextExpanded">
+                  {{ contextExpanded ? $t('chat_context_collapse') : $t('chat_context_expand') }}
+                </a-button>
+                <div v-if="contextExpanded" class="context-detail">
+                  <div><strong>{{ $t('col_device_name') }}:</strong> {{ currentAlarmContext.hostname }}</div>
+                  <div><strong>{{ $t('col_ip') }}:</strong> {{ currentAlarmContext.host_ip }}</div>
+                  <div><strong>{{ $t('col_alarm_description') }}:</strong> {{ currentAlarmContext.message }}</div>
+                </div>
               </div>
             </template>
           </a-alert>
@@ -165,12 +172,14 @@
         </div>
       </div>
     </a-drawer>
+
+
   </page-layout>
 </template>
 
 <script>
 import PageLayout from "@/layouts/PageLayout";
-import { alarm, alarmExport, eventLogGet, alarmDeepseekAnalysis } from "@/services/admin";
+import { alarm, alarmExport, eventLogGet, alarmDeepseekAnalysis, configGetList } from "@/services/admin";
 import { listZabbixInstance } from '@/services/zabbix'
 import { parseTimeFun } from "@/utils/formatter";
 import { reduce } from "lodash";
@@ -282,8 +291,20 @@ export default {
       currentAlarmContext: null,
       abortController: null,
       currentRequestId: null,
+      alarmAnalysisPrompt: '',
+      contextExpanded: false,
       hostIp: "",
     };
+  },
+  computed: {
+    contextSummary() {
+      if (!this.currentAlarmContext) return ''
+      const hostname = this.currentAlarmContext.hostname || '-'
+      const ip = this.currentAlarmContext.host_ip || '-'
+      const message = this.currentAlarmContext.message || ''
+      const brief = message.length > 30 ? `${message.slice(0, 30)}...` : message
+      return `${hostname} | ${ip} | ${brief}`
+    }
   },
   created() {
     let ntime = new Date(),
@@ -297,6 +318,7 @@ export default {
     this.initOptions();
     this.initColumns();
     this.loadInstances();
+    this.loadAlarmAnalysisPrompt();
     this.init();
   },
   methods: {
@@ -330,7 +352,7 @@ export default {
       ];
       this.innerColumns = [
         { title: this.$t('col_rule_name'), dataIndex: "rule", align: "left" },
-        { title: this.$t('col_receiving_channel'), dataIndex: "channel", align: "left" },
+        { title: this.$t('col_alarm_channel'), dataIndex: "channel", align: "left", scopedSlots: { customRender: "channel" } },
         { title: this.$t('col_receiving_user'), dataIndex: "user", align: "left" },
         { title: this.$t('col_receiving_account'), dataIndex: "account", align: "left" },
         { title: this.$t('col_notification_time'), key: "notify_time", align: "left", scopedSlots: { customRender: "notify_time" } },
@@ -358,6 +380,67 @@ export default {
     getInstanceName(zid) {
       if (!zid) return this.$t('msg_unknown')
       return this.instanceMap[zid] || this.$t('msg_unknown')
+    },
+    formatChannel(channel) {
+      const key = String(channel || '').trim().toLowerCase()
+      const channelMap = {
+        mail: this.$t('channel_mail'),
+        wechat: this.$t('channel_wechat'),
+        wechat_robot: this.$t('channel_wechat_robot'),
+        dingding: this.$t('channel_dingding'),
+        sms: this.$t('channel_sms'),
+      }
+      return channelMap[key] || channel || this.$t('msg_unknown')
+    },
+    loadAlarmAnalysisPrompt() {
+      configGetList().then((resp) => {
+        const res = resp.data
+        if (res.code === 200) {
+          const items = (res.data && res.data.items) || []
+          const promptItem = items.find(item => item.config_key === 'alarm_analysis_prompt')
+          this.alarmAnalysisPrompt = (promptItem && promptItem.config_value) || ''
+        }
+      }).catch((err) => {
+        console.error(this.$t('msg_load_ai_prompt_failed'), err)
+      })
+    },
+    buildAlarmContextText(context = {}) {
+      return `${this.$t('chat_alarm_context')}:\n` +
+        `${this.$t('col_device_name')}: ${context.hostname || ''}\n` +
+        `${this.$t('col_ip')}: ${context.host_ip || ''}\n` +
+        `${this.$t('col_alarm_description')}: ${context.message || ''}\n` +
+        `${this.$t('col_alarm_detail')}: ${context.detail || ''}`
+    },
+    renderAlarmPromptTemplate(template, context = {}) {
+      if (!template) return ''
+      const mapping = {
+        hostname: context.hostname || '',
+        host_ip: context.host_ip || '',
+        message: context.message || '',
+        detail: context.detail || '',
+        level: context.level !== undefined && context.level !== null ? String(context.level) : '',
+        status: context.status !== undefined && context.status !== null ? String(context.status) : '',
+        alarm_context: this.buildAlarmContextText(context),
+      }
+      return String(template).replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, (all, key) => {
+        return Object.prototype.hasOwnProperty.call(mapping, key) ? mapping[key] : all
+      })
+    },
+    getSupportedPromptVariables() {
+      return ['hostname', 'host_ip', 'message', 'detail', 'level', 'status', 'alarm_context']
+    },
+    extractPromptVariables(template = '') {
+      const vars = []
+      String(template).replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, (all, key) => {
+        vars.push(key)
+        return all
+      })
+      return Array.from(new Set(vars))
+    },
+    getUnknownPromptVariables(template = '') {
+      const usedVars = this.extractPromptVariables(template)
+      const supported = this.getSupportedPromptVariables()
+      return usedVars.filter(v => !supported.includes(v))
     },
     init() {
       this.loading = true;
@@ -485,18 +568,27 @@ export default {
         level: record.level,
         status: record.status
       };
+      this.contextExpanded = false;
       
-      // 如果是首次打开或者聊天记录为空，自动发送初始分析请求
-      if (this.chatMessages.length === 0) {
-        this.chatInput = this.$t('msg_analysis_prompt');
-        this.$nextTick(() => {
-          this.handleSendMessage();
-        });
+      // 点击“AI助手分析”自动填入提示词并立即发送分析
+      const customPromptTemplate = (this.alarmAnalysisPrompt || '').trim()
+      const hasCustomPrompt = !!customPromptTemplate
+      if (hasCustomPrompt) {
+        const unknownVars = this.getUnknownPromptVariables(customPromptTemplate)
+        if (unknownVars.length > 0) {
+          this.$message.warning(this.$t('msg_unknown_prompt_variables', { vars: unknownVars.join(', ') }))
+        }
       }
+      this.chatInput = hasCustomPrompt
+        ? this.renderAlarmPromptTemplate(customPromptTemplate, this.currentAlarmContext)
+        : this.$t('msg_analysis_prompt')
+      this.$nextTick(() => {
+        this.handleSendMessage(null, { includeAlarmContext: !hasCustomPrompt });
+      });
     },
     
     // 发送消息
-    handleSendMessage(e) {
+    handleSendMessage(e, options = {}) {
       // 如果是按 Enter 键且没有按 Shift，则发送消息
       if (e && e.shiftKey) {
         return;
@@ -527,11 +619,11 @@ export default {
       });
       
       // 发送到 AI
-      this.sendToAI(message);
+      this.sendToAI(message, options);
     },
     
     // 发送到 AI
-    sendToAI(userMessage) {
+    sendToAI(userMessage, options = {}) {
       this.isTyping = true;
       
       // 确保上一个请求被取消
@@ -546,15 +638,11 @@ export default {
       // 创建新的 AbortController
       this.abortController = new AbortController();
       
-      // 构建完整的消息（包含告警上下文）
+      // 构建完整的消息（按需包含告警上下文）
+      const includeAlarmContext = options.includeAlarmContext !== false
       let fullMessage = userMessage;
-      if (this.currentAlarmContext) {
-        fullMessage = `${this.$t('chat_alarm_context')}:\n` +
-          `${this.$t('col_device_name')}: ${this.currentAlarmContext.hostname}\n` +
-          `${this.$t('col_ip')}: ${this.currentAlarmContext.host_ip}\n` +
-          `${this.$t('col_alarm_description')}: ${this.currentAlarmContext.message}\n` +
-          `${this.$t('col_alarm_detail')}: ${this.currentAlarmContext.detail}\n\n` +
-          `${userMessage}`;
+      if (includeAlarmContext && this.currentAlarmContext) {
+        fullMessage = `${this.buildAlarmContextText(this.currentAlarmContext)}\n\n${userMessage}`;
       }
       
       // 创建 AI 消息占位符
@@ -570,6 +658,14 @@ export default {
       
       const analysisData = {
         message: fullMessage,
+        alarm_context: this.currentAlarmContext ? {
+          hostname: this.currentAlarmContext.hostname || '',
+          host_ip: this.currentAlarmContext.host_ip || '',
+          message: this.currentAlarmContext.message || '',
+          detail: this.currentAlarmContext.detail || '',
+          level: this.currentAlarmContext.level !== undefined && this.currentAlarmContext.level !== null ? String(this.currentAlarmContext.level) : '',
+          status: this.currentAlarmContext.status !== undefined && this.currentAlarmContext.status !== null ? String(this.currentAlarmContext.status) : '',
+        } : null,
         requestId: this.currentRequestId,
         onProgress: (text, responseRequestId) => {
           try {
@@ -817,6 +913,7 @@ export default {
   text-overflow: ellipsis;
   display: -webkit-box;
   height: 64px;
+  line-clamp: 3;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
 }
@@ -831,25 +928,43 @@ export default {
 }
 
 .alarm-context {
-  padding: 16px;
+  padding: 8px 12px;
   background: #fff;
   border-bottom: 1px solid #e8e8e8;
-  
+
   .context-content {
-    font-size: 13px;
-    line-height: 1.8;
-    
-    div {
-      margin-bottom: 4px;
-      
-      &:last-child {
-        margin-bottom: 0;
+    font-size: 12px;
+    line-height: 1.6;
+
+    &.compact {
+      .context-summary {
+        color: #595959;
+        word-break: break-all;
+        margin-bottom: 2px;
+      }
+
+      .context-toggle {
+        padding: 0;
+        height: 20px;
+        font-size: 12px;
+      }
+
+      .context-detail {
+        margin-top: 4px;
+
+        div {
+          margin-bottom: 2px;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+        }
       }
     }
-    
+
     strong {
       color: #595959;
-      margin-right: 8px;
+      margin-right: 6px;
     }
   }
 }

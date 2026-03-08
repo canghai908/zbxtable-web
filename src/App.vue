@@ -21,10 +21,10 @@ export default {
   created () {
     this.setHtmlTitle()
     this.setLanguage(this.lang)
-    // 只在非安装页面加载系统配置
-    // if (this.$route.path !== '/install') {
-    //   this.loadSystemConfig()
-    // }
+    // 只在非安装页面加载系统配置（包含 demoMode）
+    if (this.$route.path !== '/install') {
+      this.loadSystemConfig()
+    }
     enquireScreen(isMobile => this.setDevice(isMobile))
   },
   mounted() {
@@ -61,7 +61,7 @@ export default {
     ...mapState('setting', ['layout', 'theme', 'weekMode', 'lang'])
   },
   methods: {
-    ...mapMutations('setting', ['setDevice', 'setSystemName', 'setSystemLogo']),
+    ...mapMutations('setting', ['setDevice', 'setSystemName', 'setSystemLogo', 'setDemoMode']),
     async loadSystemConfig() {
       try {
         const res = await getPublicSystemInfo()
@@ -74,6 +74,7 @@ export default {
           if (infoRes.data.system_logo) {
             this.setSystemLogo(infoRes.data.system_logo)
           }
+          this.setDemoMode(!!infoRes.data.demo_mode)
         }
       } catch (error) {
         console.warn('加载系统配置失败，使用默认配置:', error)

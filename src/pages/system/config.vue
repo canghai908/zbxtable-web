@@ -142,6 +142,15 @@
                 </a-form-model-item>
               </template>
 
+              <!-- 告警分析提示词（独立显示，不随 AI 类型切换隐藏） -->
+              <a-form-model-item :label="getConfigName('alarm_analysis_prompt')">
+                <a-textarea
+                  v-model="aiForm.alarm_analysis_prompt"
+                  :placeholder="getConfigComment('alarm_analysis_prompt')"
+                  :auto-size="{ minRows: 4, maxRows: 10 }" />
+                <div class="config-hint">{{ getConfigComment('alarm_analysis_prompt') }}</div>
+              </a-form-model-item>
+
               <a-form-model-item :wrapper-col="{ span: 14, offset: 6 }">
                 <a-button type="primary" @click="saveCategory('ai')" :loading="saveLoading">{{$t('save')}}</a-button>
               </a-form-model-item>
@@ -248,7 +257,12 @@ export default {
     },
     aiConfigs() {
       return this.list.filter(item => 
-        item.config_key && (item.config_key.startsWith('ollama_') || item.config_key.startsWith('deepseek_') || item.config_key === 'ai_type')
+        item.config_key && (
+          item.config_key.startsWith('ollama_') ||
+          item.config_key.startsWith('deepseek_') ||
+          item.config_key === 'ai_type' ||
+          item.config_key === 'alarm_analysis_prompt'
+        )
       )
     },
     ollamaConfigs() {
@@ -357,6 +371,10 @@ export default {
       // 如果没有设置 ai_type，默认为 ollama
       if (!this.aiForm.ai_type) {
         this.$set(this.aiForm, 'ai_type', 'ollama')
+      }
+      // 告警分析提示词默认值（当配置为空时自动填充，支持 i18n）
+      if (!this.aiForm.alarm_analysis_prompt) {
+        this.$set(this.aiForm, 'alarm_analysis_prompt', this.$t('defaultAlarmAnalysisPrompt'))
       }
       this.securityConfigs.forEach(item => {
         this.$set(this.securityForm, item.config_key, item.config_value)
