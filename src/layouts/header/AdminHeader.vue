@@ -36,6 +36,17 @@
           <a-icon type="github" />
         </a>
 
+        <a-button
+          v-if="showEnterScreen"
+          class="header-item enter-screen-btn"
+          type="primary"
+          ghost
+          icon="fullscreen"
+          size="small"
+          @click="goToScreen"
+        >
+          {{ $t('topology.enterScreen') }}
+        </a-button>
         <header-avatar class="header-item" />
         <a-dropdown class="lang header-item">
           <div>
@@ -96,6 +107,9 @@ export default {
       let lang = this.langList.find((item) => item.key == this.lang);
       return lang.alias;
     },
+    showEnterScreen() {
+      return this.$route.path !== '/screen/dashboard'
+    },
     menuWidth() {
       const { layout, searchActive } = this;
       const headWidth = layout === "head" ? "100% - 188px" : "100%";
@@ -109,6 +123,9 @@ export default {
     },
     onSelect(obj) {
       this.$emit("menuSelect", obj);
+    },
+    goToScreen() {
+      this.$router.push('/screen/dashboard')
     },
     ...mapMutations("setting", ["setLang"]),
   },
@@ -127,5 +144,11 @@ export default {
 .header-search-item {
   padding-right: 4px;
   padding-left: 4px;
+}
+
+.enter-screen-btn {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
 }
 </style>

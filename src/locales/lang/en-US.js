@@ -260,6 +260,7 @@ export default {
     editTopology: 'Edit Topology',
     topologyName: 'Topology Name',
     share: 'Share',
+    enterScreen: 'Big Screen',
     fullscreen: 'Fullscreen',
     zoomIn: 'Zoom In',
     zoomOut: 'Zoom Out',
