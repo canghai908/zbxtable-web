@@ -11,6 +11,11 @@
         <i-menu class="head-menu" :theme="headerTheme" mode="horizontal" :options="menuData" @select="onSelect" />
       </div>
       <div :class="['admin-header-right', headerTheme]">
+        <header-search
+          v-if="!isMobile"
+          class="header-item header-search-item"
+          @active="searchActive = $event"
+        />
         <!-- 演示模式提示（悬浮说明） -->
         <a-tooltip v-if="demoMode" placement="bottom">
           <template slot="title">
@@ -46,7 +51,7 @@
 </template>
 
 <script>
-// import HeaderSearch from './HeaderSearch'
+import HeaderSearch from './HeaderSearch'
 // import HeaderNotice from './HeaderNotice'
 import HeaderAvatar from "./HeaderAvatar";
 import IMenu from "@/components/menu/menu";
@@ -54,7 +59,7 @@ import { mapState, mapMutations } from "vuex";
 
 export default {
   name: "AdminHeader",
-  components: { IMenu, HeaderAvatar },
+  components: { HeaderSearch, IMenu, HeaderAvatar },
   props: ["collapsed", "menuData"],
   data() {
     return {
@@ -117,5 +122,10 @@ export default {
   margin-right: 8px;
   border-radius: 10px;
   font-weight: 500;
+}
+
+.header-search-item {
+  padding-right: 4px;
+  padding-left: 4px;
 }
 </style>

@@ -65,6 +65,49 @@
             </a-form-model>
           </a-tab-pane>
 
+          <!-- 计划任务配置 -->
+          <a-tab-pane key="task" :tab="$t('taskTab')">
+            <a-form-model ref="taskForm" :model="taskForm" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }">
+              <a-divider orientation="left">{{$t('taskSettings')}}</a-divider>
+
+              <div class="task-config-grid">
+                <a-row :gutter="24">
+                  <a-col :xs="24" :xl="12" v-for="(column, columnIndex) in taskConfigColumns" :key="`task-column-${columnIndex}`">
+                    <div
+                      v-for="(group, groupIndex) in column"
+                      :key="`task-group-${columnIndex}-${groupIndex}`"
+                      class="task-config-card"
+                    >
+                      <div class="task-config-card__header">
+                        <div class="task-config-card__title">{{ group.title }}</div>
+                      </div>
+                      <a-row :gutter="16">
+                        <a-col :xs="24" :md="12" v-for="item in group.items" :key="item.id">
+                          <a-form-model-item :label="getTaskFieldLabel(item.config_key)">
+                            <a-select v-if="isBooleanConfig(item.config_key)" v-model="taskForm[item.config_key]" :placeholder="item.comment" style="width: 100%">
+                              <a-select-option v-for="opt in getBooleanOptions(item.config_key)" :key="opt.value" :value="opt.value">
+                                {{ opt.label }}
+                              </a-select-option>
+                            </a-select>
+                            <a-input
+                              v-else
+                              v-model="taskForm[item.config_key]"
+                              :placeholder="`${item.comment}（${$t('taskCronFormatShort')}）`"
+                            />
+                          </a-form-model-item>
+                        </a-col>
+                      </a-row>
+                    </div>
+                  </a-col>
+                </a-row>
+              </div>
+
+              <a-form-model-item :wrapper-col="{ span: 14, offset: 6 }">
+                <a-button type="primary" @click="saveCategory('task')" :loading="saveLoading">{{$t('save')}}</a-button>
+              </a-form-model-item>
+            </a-form-model>
+          </a-tab-pane>
+
           <!-- 邮件配置 -->
           <a-tab-pane key="email" :tab="$t('emailTab')">
             <a-form-model ref="emailForm" :model="emailForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
@@ -206,6 +249,7 @@ export default {
       list: [],
       activeTab: 'system',
       systemForm: {},
+      taskForm: {},
       emailForm: {},
       wechatForm: {},
       aiForm: {},
@@ -229,7 +273,6 @@ export default {
         item.config_key === 'dash_id' || 
         item.config_key === 'dash_top_lin_num' ||
         item.config_key === 'dash_top_win_num' ||
-        item.config_key === 'sync_inventory' ||
         item.config_key === 'webhook_url'
       )
     },
@@ -241,9 +284,44 @@ export default {
         item.config_key === 'dash_id' || 
         item.config_key === 'dash_top_lin_num' ||
         item.config_key === 'dash_top_win_num' ||
-        item.config_key === 'sync_inventory' ||
         item.config_key === 'webhook_url'
       )
+    },
+    taskConfigs() {
+      return this.list.filter(item => this.isTaskConfig(item.config_key))
+    },
+    taskConfigColumns() {
+      const groups = this.taskConfigGroups
+
+      const columns = [[], []]
+      groups.forEach((group, index) => {
+        columns[index % 2].push(group)
+      })
+      return columns
+    },
+    taskConfigGroups() {
+      const groupMap = new Map()
+
+      this.taskConfigs.forEach(item => {
+        const groupKey = this.getTaskGroupKey(item.config_key)
+        if (!groupMap.has(groupKey)) {
+          groupMap.set(groupKey, {
+            key: groupKey,
+            title: this.getTaskGroupTitle(item),
+            items: []
+          })
+        }
+        groupMap.get(groupKey).items.push(item)
+      })
+
+      return Array.from(groupMap.values()).map(group => {
+        group.items.sort((a, b) => {
+          const orderA = a.config_key.endsWith('_enabled') || a.config_key === 'sync_inventory' ? 0 : 1
+          const orderB = b.config_key.endsWith('_enabled') || b.config_key === 'sync_inventory' ? 0 : 1
+          return orderA - orderB
+        })
+        return group
+      })
     },
     emailConfigs() {
       return this.list.filter(item => 
@@ -320,7 +398,31 @@ export default {
     isBooleanConfig(key) {
       // 判断是否为布尔类型的配置项（开启/关闭）
       const booleanKeys = ['zbx_dash', 'sync_inventory', 'wechat_enabled', 'email_isSSl']
-      return booleanKeys.includes(key)
+      return booleanKeys.includes(key) || key.endsWith('_enabled')
+    },
+    isTaskConfig(key) {
+      if (!key) {
+        return false
+      }
+      if (key === 'wechat_enabled') {
+        return false
+      }
+      return key === 'sync_inventory' || key.endsWith('_enabled') || key.endsWith('_cron')
+    },
+    getTaskGroupKey(key) {
+      if (key === 'sync_inventory' || key === 'sync_inventory_cron') {
+        return 'sync_inventory'
+      }
+      return key.replace(/_(enabled|cron)$/, '')
+    },
+    getTaskGroupTitle(item) {
+      return item.name.replace(/\s*(开关|Cron|Switch)$/u, '').trim()
+    },
+    getTaskFieldLabel(key) {
+      if (key === 'sync_inventory' || key.endsWith('_enabled')) {
+        return this.$t('taskEnabledLabel')
+      }
+      return this.$t('taskCronLabel')
     },
     getBooleanOptions(key) {
       // email_isSSl 使用 true/false，其他使用 1/0
@@ -359,6 +461,9 @@ export default {
       this.allSystemConfigs.forEach(item => {
         this.$set(this.systemForm, item.config_key, item.config_value)
       })
+      this.taskConfigs.forEach(item => {
+        this.$set(this.taskForm, item.config_key, item.config_value)
+      })
       this.emailConfigs.forEach(item => {
         this.$set(this.emailForm, item.config_key, item.config_value)
       })
@@ -394,6 +499,10 @@ export default {
           case 'email':
             configs = this.emailConfigs
             form = this.emailForm
+            break
+          case 'task':
+            configs = this.taskConfigs
+            form = this.taskForm
             break
           case 'wechat':
             configs = this.wechatConfigs
@@ -741,6 +850,40 @@ export default {
   line-height: 1.5;
 }
 
+.task-config-grid {
+  margin-bottom: 4px;
+}
+
+.task-config-card {
+  padding: 16px 16px 0;
+  margin-bottom: 16px;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+.task-config-card__header {
+  margin-bottom: 8px;
+}
+
+.task-config-card__title {
+  color: #262626;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+/deep/ .task-config-card .ant-form-item-label > label {
+  min-width: 44px;
+  color: #595959;
+  font-weight: 500;
+}
+
+/deep/ .task-config-card .ant-form-item {
+  margin-bottom: 14px;
+}
+
 /deep/ .ant-input-group {
   display: flex;
   
@@ -753,6 +896,12 @@ export default {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
     white-space: nowrap;
+  }
+}
+
+@media (max-width: 1199px) {
+  .task-config-card {
+    padding: 14px 14px 0;
   }
 }
 </style>

@@ -18,7 +18,7 @@
                 >
                   <template slot="title" slot-scope="node">
                     <span class="tree-node-title">
-                      <a-icon :type="getNodeIcon(node.id)" :style="{ fontSize: '16px', color: getNodeColor(node.id), marginRight: '8px' }" />
+                      <a-icon :type="getNodeIcon(node)" :style="{ fontSize: '16px', color: getNodeColorByCode(node.type_code), marginRight: '8px' }" />
                       <span>{{ node.name }}</span>
                     </span>
                   </template>
@@ -115,7 +115,7 @@
 
 <script>
 import PageLayout from "@/layouts/PageLayout";
-import { inventoryTree, inventoryExport, hostUpdate, hostList } from '@/services/admin'
+import { inventoryTree, inventoryExport, hostUpdate, hostList, getAssetTypes } from '@/services/admin'
 import DetailList from "@/components/tool/DetailList";
 const DetailListItem = DetailList.Item;
 export default {
@@ -126,6 +126,7 @@ export default {
     return {
       loading: false,
       treeData: "",
+      assetTypes: [],
       replaceFields: {
         children: 'children',
         title: 'name',
@@ -178,8 +179,27 @@ export default {
   components: {
     PageLayout,
   },
+  computed: {
+    nodeTypeMap() {
+      const map = {};
+      if (!this.treeData || !Array.isArray(this.treeData)) return map;
+      const flatten = (nodes) => {
+        nodes.forEach(node => {
+          if (node.type_code) {
+            map[node.id] = node.type_code;
+          }
+          if (node.children && node.children.length > 0) {
+            flatten(node.children);
+          }
+        });
+      };
+      flatten(this.treeData);
+      return map;
+    },
+  },
   created() {
     this.initree()
+    this.loadAssetTypes()
     // 默认选中Linux操作系统节点并加载数据
     this.$nextTick(() => {
       this.onSelect([10])
@@ -221,23 +241,30 @@ export default {
       
       return this.treeData.map(node => translateNode(node))
     },
-    getNodeIcon(nodeId) {
-      const iconMap = {
-        10: 'desktop',        // Linux操作系统
-        11: 'windows',        // Windows操作系统
-        12: 'cluster',        // 网络设备
-        13: 'database',       // 服务器硬件
+    async loadAssetTypes() {
+      try {
+        const res = await getAssetTypes()
+        const biz = (res && res.data) ? res.data : res
+        if (biz && biz.code === 200) {
+          this.assetTypes = biz.data || []
+        }
+      } catch (e) {
+        console.error('加载资产类型失败', e)
       }
-      return iconMap[nodeId] || 'folder'
     },
-    getNodeColor(nodeId) {
+    getNodeIcon(node) {
+      if (node.icon) return node.icon;
+      const map = { VM_LIN: 'desktop', VM_WIN: 'windows', HW_NET: 'cluster', HW_SRV: 'database' };
+      return map[node.type_code] || 'folder';
+    },
+    getNodeColorByCode(typeCode) {
       const colorMap = {
-        10: '#52c41a',        // Linux - 绿色
-        11: '#1890ff',        // Windows - 蓝色
-        12: '#faad14',        // 网络设备 - 橙色
-        13: '#722ed1',        // 服务器硬件 - 紫色
+        VM_LIN: '#52c41a',
+        VM_WIN: '#1890ff',
+        HW_NET: '#faad14',
+        HW_SRV: '#722ed1',
       }
-      return colorMap[nodeId] || '#666'
+      return colorMap[typeCode] || '#666'
     },
     initree() {
       inventoryTree().then((resp) => {
@@ -296,29 +323,8 @@ export default {
       })
     },
     onSelect(selectedKeys) {
-      // this.hostid = selectedKeys[0]
-
-      // hostDetail(this.hostid).then((resp) => {
-      //   let res = resp.data;
-      //   this.detail = res;
-
-      // });
       this.hostid = selectedKeys[0]
-      this.hostType = "VM_LIN";
-      switch (selectedKeys[0]) {
-        case 10:
-          this.hostType = "VM_LIN";
-          break;
-        case 11:
-          this.hostType = "VM_WIN";
-          break;
-        case 12:
-          this.hostType = "HW_NET";
-          break;
-        case 13:
-          this.hostType = "HW_SRV";
-          break;
-      }
+      this.hostType = this.nodeTypeMap[selectedKeys[0]] || 'VM_LIN';
       this.loading = true;
       hostList({
         page: this.page,

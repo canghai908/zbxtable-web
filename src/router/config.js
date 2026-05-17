@@ -26,6 +26,11 @@ const options = {
       component: () => import("@/pages/exception/403"),
     },
     {
+      path: "/screen/dashboard",
+      name: "运维大屏",
+      component: () => import("@/pages/screen/index"),
+    },
+    {
       path: "/",
       name: "首页",
       component: TabsView,
@@ -218,14 +223,31 @@ const options = {
               component: () => import("@/pages/system/zabbix"),
             },
             {
-              path: "chpwd",
-              name: "密码修改",
-              component: () => import("@/pages/system/chpwd"),
-            },
-            {
               path: "config",
               name: "参数配置",
               component: () => import("@/pages/system/config"),
+            },
+            {
+              path: "asset-management",
+              name: "资产管理",
+              component: () => import("@/pages/system/asset-management"),
+            },
+            {
+              path: "version",
+              name: "版本信息",
+              component: () => import("@/pages/system/version"),
+            },
+            {
+              path: "asset-type",
+              name: "资产类型",
+              meta: { invisible: true, highlight: "/system/asset-management" },
+              component: () => import("@/pages/system/asset-type"),
+            },
+            {
+              path: "asset-binding",
+              name: "资产绑定",
+              meta: { invisible: true, highlight: "/system/asset-management" },
+              component: () => import("@/pages/system/asset-binding"),
             },
           ],
         },

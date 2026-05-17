@@ -1,9 +1,3 @@
-//跨域代理前缀
-const API_PROXY_PREFIX = '/api'
-const BASE_URL =
-	process.env.NODE_ENV === 'production'
-		? process.env.VUE_APP_API_BASE_URL
-		: API_PROXY_PREFIX
 module.exports = {
 	LOGIN: '/v1/login',
 	ROUTES: '/v1/index/routers',
@@ -29,6 +23,7 @@ module.exports = {
 	INVENTORY_LIST: '/v1/index/inventory',
 	SYSTEM_LIST: '/v1/system',
 	HOST_GROUP: '/v1/host_group',
+	HOST_FILTER_BY_TAG: '/v1/host/filter-by-tag',
 	TEMPLATE_lIST: '/v1/template',
 	REPORT: '/v1/report',
 	ITEM_TRAFFIC: '/v1/item/traffic',
@@ -46,4 +41,6 @@ module.exports = {
 	METRIC_MAPPING: '/v1/metric_mapping',
 	SYSTEM_UPDATE: '/v1/system',
 	SYSTEM_PUBLIC_INFO: '/v1/info',
+	ASSET_TYPE: '/v1/asset-type',
+	SYSTEM_BINDING: '/v1/system',
 }

@@ -118,6 +118,10 @@ const routerMap = {
 		path: '/share/topology',
 		component: () => import('@/pages/topology/share'),
 	},
+	screenDashboard: {
+		path: '/screen/dashboard',
+		component: () => import('@/pages/screen/index'),
+	},
 	//report
 	report: {
 		component: view.blank,
@@ -138,9 +142,6 @@ const routerMap = {
 	systemBandwidth: {
 		component: () => import('@/pages/system/bandwidth'),
 	},
-	systemChpwd: {
-		component: () => import('@/pages/system/chpwd'),
-	},
 	sysConfig: {
 		component: () => import('@/pages/system/config'),
 	},
@@ -154,11 +155,17 @@ const routerMap = {
 	version: {
 		component: () => import('@/pages/system/version'),
 	},
-	metricMapping: {
-		component: () => import('@/pages/system/metricMapping'),
-	},
 	menuManagement: {
 		component: () => import('@/pages/system/menu'),
+	},
+	assetManagement: {
+		component: () => import('@/pages/system/asset-management'),
+	},
+	assetTypeManagement: {
+		component: () => import('@/pages/system/asset-type'),
+	},
+	assetBinding: {
+		component: () => import('@/pages/system/asset-binding'),
 	},
 
 	form: {

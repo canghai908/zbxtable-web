@@ -104,6 +104,7 @@ import { getPublicSystemInfo } from '@/services/admin'
 import { setAuthorization } from '@/utils/request'
 import { loadRoutes } from '@/utils/routerUtil'
 import { mapMutations } from 'vuex'
+import { startTokenRefresher } from '@/utils/tokenRefresher'
 export default {
   name: 'Login',
   i18n: require('./i18n'),
@@ -314,7 +315,8 @@ export default {
         // this.setPermissions(premissions);
         this.setRoles(roles)
         setAuthorization({ token: loginRes && loginRes.data && loginRes.data.token })
-        
+        startTokenRefresher()
+
         // 加载用户主题配置
         this.loadUserTheme(user)
         

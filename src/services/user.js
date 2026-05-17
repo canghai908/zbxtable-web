@@ -23,6 +23,12 @@ export async function getRoutesConfig() {
  */
 export function logout() {
   removeAuthorization();
+  [
+    process.env.VUE_APP_USER_KEY,
+    process.env.VUE_APP_PERMISSIONS_KEY,
+    process.env.VUE_APP_ROLES_KEY,
+    process.env.VUE_APP_ROUTES_KEY
+  ].filter(Boolean).forEach((key) => localStorage.removeItem(key))
 }
 
 export default {

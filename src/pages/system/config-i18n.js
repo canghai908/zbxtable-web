@@ -26,6 +26,66 @@ module.exports = {
         name: '主机分类同步',
         comment: '主机分类同步计划任务是否启用：1 启用,0 不启用'
       },
+      sync_inventory_cron: {
+        name: '主机分类同步 Cron',
+        comment: '主机分类同步执行周期，格式：秒 分 时 日 月 周'
+      },
+      top_sync_enabled: {
+        name: '首页 Top 数据同步开关',
+        comment: '首页 Top 数据同步计划任务是否启用：1 启用,0 停用'
+      },
+      top_sync_cron: {
+        name: '首页 Top 数据同步 Cron',
+        comment: '首页 Top 数据同步执行周期，格式：秒 分 时 日 月 周'
+      },
+      day_report_enabled: {
+        name: '日报生成开关',
+        comment: '日报生成计划任务是否启用：1 启用,0 停用'
+      },
+      day_report_cron: {
+        name: '日报生成 Cron',
+        comment: '日报生成执行周期，格式：秒 分 时 日 月 周'
+      },
+      week_report_enabled: {
+        name: '周报生成开关',
+        comment: '周报生成计划任务是否启用：1 启用,0 停用'
+      },
+      week_report_cron: {
+        name: '周报生成 Cron',
+        comment: '周报生成执行周期，格式：秒 分 时 日 月 周'
+      },
+      auto_metric_mapping_enabled: {
+        name: '自动指标映射开关',
+        comment: '自动指标映射计划任务是否启用：1 启用,0 停用'
+      },
+      auto_metric_mapping_cron: {
+        name: '自动指标映射 Cron',
+        comment: '自动指标映射执行周期，格式：秒 分 时 日 月 周'
+      },
+      retry_failed_mapping_enabled: {
+        name: '失败指标映射重试开关',
+        comment: '失败指标映射重试计划任务是否启用：1 启用,0 停用'
+      },
+      retry_failed_mapping_cron: {
+        name: '失败指标映射重试 Cron',
+        comment: '失败指标映射重试执行周期，格式：秒 分 时 日 月 周'
+      },
+      egress_collect_enabled: {
+        name: '出口数据采集开关',
+        comment: '出口数据采集计划任务是否启用：1 启用,0 停用'
+      },
+      egress_collect_cron: {
+        name: '出口数据采集 Cron',
+        comment: '出口数据采集执行周期，格式：秒 分 时 日 月 周'
+      },
+      overview_sync_enabled: {
+        name: '状态总览同步开关',
+        comment: '状态总览同步计划任务是否启用：1 启用,0 停用'
+      },
+      overview_sync_cron: {
+        name: '状态总览同步 Cron',
+        comment: '状态总览同步执行周期，格式：秒 分 时 日 月 周'
+      },
       webhook_url: {
         name: 'Webhook回调地址',
         comment: 'webhook通知地址'
@@ -131,6 +191,66 @@ module.exports = {
       sync_inventory: {
         name: '主機分類同步',
         comment: '主機分類同步計劃任務是否啟用：1 啟用,0 不啟用'
+      },
+      sync_inventory_cron: {
+        name: '主機分類同步 Cron',
+        comment: '主機分類同步執行週期，格式：秒 分 時 日 月 周'
+      },
+      top_sync_enabled: {
+        name: '首頁 Top 數據同步開關',
+        comment: '首頁 Top 數據同步計劃任務是否啟用：1 啟用,0 停用'
+      },
+      top_sync_cron: {
+        name: '首頁 Top 數據同步 Cron',
+        comment: '首頁 Top 數據同步執行週期，格式：秒 分 時 日 月 周'
+      },
+      day_report_enabled: {
+        name: '日報生成開關',
+        comment: '日報生成計劃任務是否啟用：1 啟用,0 停用'
+      },
+      day_report_cron: {
+        name: '日報生成 Cron',
+        comment: '日報生成執行週期，格式：秒 分 時 日 月 周'
+      },
+      week_report_enabled: {
+        name: '週報生成開關',
+        comment: '週報生成計劃任務是否啟用：1 啟用,0 停用'
+      },
+      week_report_cron: {
+        name: '週報生成 Cron',
+        comment: '週報生成執行週期，格式：秒 分 時 日 月 周'
+      },
+      auto_metric_mapping_enabled: {
+        name: '自動指標映射開關',
+        comment: '自動指標映射計劃任務是否啟用：1 啟用,0 停用'
+      },
+      auto_metric_mapping_cron: {
+        name: '自動指標映射 Cron',
+        comment: '自動指標映射執行週期，格式：秒 分 時 日 月 周'
+      },
+      retry_failed_mapping_enabled: {
+        name: '失敗指標映射重試開關',
+        comment: '失敗指標映射重試計劃任務是否啟用：1 啟用,0 停用'
+      },
+      retry_failed_mapping_cron: {
+        name: '失敗指標映射重試 Cron',
+        comment: '失敗指標映射重試執行週期，格式：秒 分 時 日 月 周'
+      },
+      egress_collect_enabled: {
+        name: '出口數據採集開關',
+        comment: '出口數據採集計劃任務是否啟用：1 啟用,0 停用'
+      },
+      egress_collect_cron: {
+        name: '出口數據採集 Cron',
+        comment: '出口數據採集執行週期，格式：秒 分 時 日 月 周'
+      },
+      overview_sync_enabled: {
+        name: '狀態總覽同步開關',
+        comment: '狀態總覽同步計劃任務是否啟用：1 啟用,0 停用'
+      },
+      overview_sync_cron: {
+        name: '狀態總覽同步 Cron',
+        comment: '狀態總覽同步執行週期，格式：秒 分 時 日 月 周'
       },
       webhook_url: {
         name: 'Webhook回調地址',
@@ -238,6 +358,66 @@ module.exports = {
         name: 'Host Inventory Sync',
         comment: 'Enable host inventory sync task: 1 enable, 0 disable'
       },
+      sync_inventory_cron: {
+        name: 'Host Inventory Sync Cron',
+        comment: 'Execution schedule for host inventory sync. Format: second minute hour day month weekday'
+      },
+      top_sync_enabled: {
+        name: 'Top Sync Switch',
+        comment: 'Enable dashboard Top sync task: 1 enable, 0 disable'
+      },
+      top_sync_cron: {
+        name: 'Top Sync Cron',
+        comment: 'Execution schedule for dashboard Top sync. Format: second minute hour day month weekday'
+      },
+      day_report_enabled: {
+        name: 'Daily Report Switch',
+        comment: 'Enable daily report task: 1 enable, 0 disable'
+      },
+      day_report_cron: {
+        name: 'Daily Report Cron',
+        comment: 'Execution schedule for daily report generation. Format: second minute hour day month weekday'
+      },
+      week_report_enabled: {
+        name: 'Weekly Report Switch',
+        comment: 'Enable weekly report task: 1 enable, 0 disable'
+      },
+      week_report_cron: {
+        name: 'Weekly Report Cron',
+        comment: 'Execution schedule for weekly report generation. Format: second minute hour day month weekday'
+      },
+      auto_metric_mapping_enabled: {
+        name: 'Auto Metric Mapping Switch',
+        comment: 'Enable automatic metric mapping task: 1 enable, 0 disable'
+      },
+      auto_metric_mapping_cron: {
+        name: 'Auto Metric Mapping Cron',
+        comment: 'Execution schedule for automatic metric mapping. Format: second minute hour day month weekday'
+      },
+      retry_failed_mapping_enabled: {
+        name: 'Retry Failed Mapping Switch',
+        comment: 'Enable failed metric mapping retry task: 1 enable, 0 disable'
+      },
+      retry_failed_mapping_cron: {
+        name: 'Retry Failed Mapping Cron',
+        comment: 'Execution schedule for failed metric mapping retry. Format: second minute hour day month weekday'
+      },
+      egress_collect_enabled: {
+        name: 'Egress Collection Switch',
+        comment: 'Enable egress data collection task: 1 enable, 0 disable'
+      },
+      egress_collect_cron: {
+        name: 'Egress Collection Cron',
+        comment: 'Execution schedule for egress data collection. Format: second minute hour day month weekday'
+      },
+      overview_sync_enabled: {
+        name: 'Overview Sync Switch',
+        comment: 'Enable overview sync task: 1 enable, 0 disable'
+      },
+      overview_sync_cron: {
+        name: 'Overview Sync Cron',
+        comment: 'Execution schedule for overview sync. Format: second minute hour day month weekday'
+      },
       webhook_url: {
         name: 'Webhook URL',
         comment: 'Webhook notification URL'
@@ -324,6 +504,7 @@ module.exports = {
     CN: {
       title: '系统配置',
       systemTab: '系统配置',
+      taskTab: '计划任务',
       emailTab: '邮件配置',
       wechatTab: '企业微信配置',
       aiTab: 'AI 配置',
@@ -342,6 +523,10 @@ module.exports = {
       
       // 系统配置
       systemSettings: '系统配置',
+      taskSettings: '计划任务',
+      taskEnabledLabel: '开关',
+      taskCronLabel: 'Cron',
+      taskCronFormatShort: '秒 分 时 日 月 周',
       webhookUrl: 'Webhook地址',
       getCurrentUrl: '获取当前地址',
       gettingUrl: '获取中...',
@@ -407,6 +592,7 @@ module.exports = {
     HK: {
       title: '系統配置',
       systemTab: '系統配置',
+      taskTab: '計劃任務',
       emailTab: '郵件配置',
       wechatTab: '企業微信配置',
       aiTab: 'AI 配置',
@@ -425,6 +611,10 @@ module.exports = {
       
       // 系統配置
       systemSettings: '系統配置',
+      taskSettings: '計劃任務',
+      taskEnabledLabel: '開關',
+      taskCronLabel: 'Cron',
+      taskCronFormatShort: '秒 分 時 日 月 周',
       webhookUrl: 'Webhook地址',
       getCurrentUrl: '獲取當前地址',
       gettingUrl: '獲取中...',
@@ -490,6 +680,7 @@ module.exports = {
     US: {
       title: 'System Configuration',
       systemTab: 'System',
+      taskTab: 'Tasks',
       emailTab: 'Email',
       wechatTab: 'WeChat',
       aiTab: 'AI',
@@ -508,6 +699,10 @@ module.exports = {
       
       // System Settings
       systemSettings: 'System Settings',
+      taskSettings: 'Scheduled Tasks',
+      taskEnabledLabel: 'Switch',
+      taskCronLabel: 'Cron',
+      taskCronFormatShort: 'sec min hour day mon wk',
       webhookUrl: 'Webhook URL',
       getCurrentUrl: 'Get Current URL',
       gettingUrl: 'Getting...',

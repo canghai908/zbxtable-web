@@ -15,6 +15,11 @@
         </a-form-item>
       </a-form>
     </a-modal>
+    <div style="display:flex; justify-content:flex-end; margin-bottom: 8px;">
+      <a-button type="primary" ghost icon="fullscreen" @click="$router.push('/screen/dashboard')">
+        {{ $t('enter_screen') }}
+      </a-button>
+    </div>
     <!-- 未配置实例提示 -->
     <a-alert
       v-if="!hasZabbixInstance && (loading1 || loading2)"
@@ -59,21 +64,9 @@
             <a-col :lg="24" :md="24">
               <a-card :title="$t('title_hosttypecount')" :headStyle="cardHeadStyle" :bodyStyle="{height: '180px'}" size="small" :loading="!loading2">
                 <div class="homeHost beauty-scroll" :style="cssVars">
-                  <div class="homeHItem">
-                    <span class="device-name">{{ $t('device_network_devices') }}</span>
-                    <em class="device-count">{{ info.net_count }}</em>
-                  </div>
-                  <div class="homeHItem">
-                    <span class="device-name">{{ $t('device_server_devices') }}</span>
-                    <em class="device-count">{{ info.srv_count }}</em>
-                  </div>
-                  <div class="homeHItem">
-                    <span class="device-name">{{ $t('device_windows_hosts') }}</span>
-                    <em class="device-count">{{ info.win_count }}</em>
-                  </div>
-                  <div class="homeHItem">
-                    <span class="device-name">{{ $t('device_linux_hosts') }}</span>
-                    <em class="device-count">{{ info.lin_count }}</em>
+                  <div class="homeHItem" v-for="item in deviceStats" :key="item.type_code">
+                    <span class="device-name">{{ item.name }}</span>
+                    <em class="device-count">{{ item.count }}</em>
                   </div>
                 </div>
               </a-card>
@@ -245,7 +238,6 @@ import {
 } from '@/services/admin'
 import { message } from 'ant-design-vue'
 import { parseTimeFun } from '@/utils/formatter'
-import pie from '@/components/gcharts/pie'
 import legent from '@/components/gcharts/legent'
 import EgressBandwidth from '@/components/egress/EgressBandwidth'
 import { mapState } from 'vuex'
@@ -272,7 +264,9 @@ export default {
         net_count: 0,
         srv_count: 0,
         win_count: 0,
-        lin_count: 0
+        lin_count: 0,
+        total_count: 0,
+        asset_type_counts: []
       },
       egressData: [], // 改为数组，支持多个出口
       egressUpdateTime: '', // 出口带宽采集时间
@@ -305,11 +299,27 @@ export default {
     },
     topConfigTitle() {
       return this.topConfigType === 'VM_WIN' ? this.$t('top_settings_title_win') : this.$t('top_settings_title_lin')
+    },
+    deviceStats() {
+      const counts = Array.isArray(this.info.asset_type_counts) ? this.info.asset_type_counts : []
+      if (counts.length) {
+        return counts.map(item => ({
+          type_code: item.type_code,
+          name: this.getPrimaryName(item.name || item.type_code),
+          count: item.count || 0
+        }))
+      }
+
+      return [
+        { type_code: 'HW_NET', name: this.$t('device_network_devices'), count: this.info.net_count || 0 },
+        { type_code: 'HW_SRV', name: this.$t('device_server_devices'), count: this.info.srv_count || 0 },
+        { type_code: 'VM_WIN', name: this.$t('device_windows_hosts'), count: this.info.win_count || 0 },
+        { type_code: 'VM_LIN', name: this.$t('device_linux_hosts'), count: this.info.lin_count || 0 }
+      ]
     }
   },
   components: {
     PageLayout,
-    pie,
     legent,
     EgressBandwidth
   },
@@ -332,6 +342,10 @@ export default {
     }
   },
   methods: {
+    getPrimaryName(name) {
+      if (!name) return ''
+      return String(name).replace(/\s*[（(][^（）()]*[）)]\s*$/u, '').trim()
+    },
     goToZabbixConfig() {
       this.$router.push('/system/zabbix')
     },
@@ -477,12 +491,15 @@ export default {
       indexInfo()
         .then((resp) => {
           let res = resp.data
+          const data = (res && res.data) || {}
           // 确保数据有默认值
           this.info = {
-            net_count: res.data?.net_count || 0,
-            srv_count: res.data?.srv_count || 0,
-            win_count: res.data?.win_count || 0,
-            lin_count: res.data?.lin_count || 0
+            net_count: data.net_count || 0,
+            srv_count: data.srv_count || 0,
+            win_count: data.win_count || 0,
+            lin_count: data.lin_count || 0,
+            total_count: data.total_count || 0,
+            asset_type_counts: Array.isArray(data.asset_type_counts) ? data.asset_type_counts : []
           }
           // 如果有数据或者明确返回成功，认为实例已配置
           if (res && (res.code === 200 || res.code === 0)) {
@@ -500,7 +517,9 @@ export default {
             net_count: 0,
             srv_count: 0,
             win_count: 0,
-            lin_count: 0
+            lin_count: 0,
+            total_count: 0,
+            asset_type_counts: []
           }
         })
         .finally(() => {
