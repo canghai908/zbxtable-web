@@ -38,7 +38,7 @@ export default {
       this.setLanguage(val)
       this.setHtmlTitle()
     },
-    $route(to, from) {
+    $route() {
       this.setHtmlTitle()
       // 从安装页面跳转到其他页面时，加载系统配置
       // if (from.path === '/install' && to.path !== '/install') {

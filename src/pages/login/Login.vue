@@ -302,7 +302,7 @@ export default {
       const code = loginRes && loginRes.code
       // 兼容历史 mock 返回 code = 0，以及当前后端返回 code = 200
       if (loginRes && (code === 200 || code === 0 || code === '200' || code === '0')) {
-        const { user, permissions, roles } = (loginRes && loginRes.data) || {}
+        const { user, roles } = (loginRes && loginRes.data) || {}
         // let premissions = [{ id: "queryForm", operation: ["add", "edit", 'delete'] }]
         // roles = [{ id: "admin", operation: ["add", "edit", "delete"] }],
         // user = {

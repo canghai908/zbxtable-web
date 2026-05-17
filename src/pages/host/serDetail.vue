@@ -104,8 +104,6 @@
 
 <script>
 import PageLayout from "@/layouts/PageLayout";
-import DetailList from "@/components/tool/DetailList";
-const DetailListItem = DetailList.Item;
 import { hostDetail } from "@/services/admin";
 import { parseTimeFun } from "@/utils/formatter";
 import themeMixin from '@/mixins/themeMixin';
@@ -114,7 +112,7 @@ export default {
   i18n: require('./i18n'),
   name: "SerDetail",
   mixins: [themeMixin],
-  components: { PageLayout, DetailListItem, DetailList },
+  components: { PageLayout },
   data() {
     return {
       id: "",

@@ -272,7 +272,7 @@ export default {
         { title: this.$t('col_instances'), dataIndex: "z_ids", key: "instance_tag", align: "left", scopedSlots: { customRender: "instance_tag" } },
         { title: this.$t('col_distribution_conditions'), dataIndex: "conditions", align: "left" },
         {
-          title: this.$t('col_distribution_channel'), dataIndex: "channel", align: "left", customRender: (value, row, index) => {
+          title: this.$t('col_distribution_channel'), dataIndex: "channel", align: "left", customRender: (value) => {
             let allist = []
             const channelMap = {
               "wechat": this.$t('channel_wechat'),
@@ -293,7 +293,7 @@ export default {
           },
         },
         {
-          title: this.$t('col_receiver'), dataIndex: "user_ids", align: "left", customRender: (value, row, index) => {
+          title: this.$t('col_receiver'), dataIndex: "user_ids", align: "left", customRender: (value) => {
             let allist = []
             value.split(",").forEach(items => {
               this.userlist.forEach(tid => {
@@ -310,7 +310,7 @@ export default {
           },
         },
         {
-          title: this.$t('col_receiver_group'), dataIndex: "group_ids", align: "left", customRender: (value, row, index) => {
+          title: this.$t('col_receiver_group'), dataIndex: "group_ids", align: "left", customRender: (value) => {
             let allist = []
             value.split(",").forEach(items => {
               this.grouplist.forEach(tid => {

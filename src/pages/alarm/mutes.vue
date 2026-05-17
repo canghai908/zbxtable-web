@@ -266,7 +266,7 @@ export default {
         "page-size-options": ["10", "20", "30", "40", "50", "100", "200"],
         pageSize: 10,
         "show-size-changer": true,
-        "show-total": (total) => ``,
+        "show-total": () => ``,
       },
       duration: "1h",
       moment,
@@ -358,7 +358,7 @@ export default {
         { title: this.$t('mutes_col_instance'), dataIndex: "z_ids", key: "instance_name", align: "left", scopedSlots: { customRender: "instance_name" } },
         { title: this.$t('mutes_col_mute_condition'), dataIndex: "conditions", align: "left", },
         {
-          title: this.$t('mutes_col_mute_duration'), dataIndex: "duration", key: "duration", align: "left", customRender: (value, row, index) => {
+          title: this.$t('mutes_col_mute_duration'), dataIndex: "duration", key: "duration", align: "left", customRender: (value, row) => {
             var dateBegin = new Date(row.s_time);
             var dateEnd = new Date(row.e_time);
             var dateDiff = dateEnd.getTime() - dateBegin.getTime(); //时间差的毫秒数

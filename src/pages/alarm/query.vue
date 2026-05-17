@@ -182,7 +182,6 @@ import PageLayout from "@/layouts/PageLayout";
 import { alarm, alarmExport, eventLogGet, alarmDeepseekAnalysis, configGetList } from "@/services/admin";
 import { listZabbixInstance } from '@/services/zabbix'
 import { parseTimeFun } from "@/utils/formatter";
-import { reduce } from "lodash";
 import moment from "moment";
 import "moment/locale/zh-cn";
 import { marked } from 'marked';

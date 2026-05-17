@@ -244,8 +244,6 @@
 
 <script>
 import PageLayout from '@/layouts/PageLayout'
-import DetailList from '@/components/tool/DetailList'
-const DetailListItem = DetailList.Item
 import FileSaver from 'file-saver'
 import XLSX from 'xlsx'
 import {
@@ -253,7 +251,7 @@ import {
   netInterfaceList,
   netInterfaceData
 } from '@/services/admin'
-import { parseTimeFun, trafficeFormat } from '@/utils/formatter'
+import { parseTimeFun } from '@/utils/formatter'
 import moment from 'moment'
 import echarts from 'echarts'
 require('echarts-liquidfill')
@@ -263,7 +261,7 @@ export default {
   i18n: require('./i18n'),
   name: 'NetDetail',
   mixins: [themeMixin],
-  components: { PageLayout, DetailListItem, DetailList },
+  components: { PageLayout },
   data() {
     return {
       moment,
@@ -1088,9 +1086,9 @@ export default {
                   '<table id="Mytable" border="1" class="table table-bordered table-striped table-hover" style="width:100%;text-align:center" ><tbody><tr>' +
                   tdHeads +
                   ' </tr>'
-                for (var i = 0, l = axisData.length; i < l; i++) {
+                for (let axisIndex = 0, l = axisData.length; axisIndex < l; axisIndex++) {
                   for (var j = 0; j < series.length; j++) {
-                    var temp = series[j].data[i]
+                    var temp = series[j].data[axisIndex]
                     if (temp != null && temp != undefined) {
                       tdBodys += '<td>' + temp + '</td>'
                     } else {
@@ -1099,7 +1097,7 @@ export default {
                   }
                   table +=
                     '<tr><td style="padding: 0 10px">' +
-                    axisData[i] +
+                    axisData[axisIndex] +
                     '</td>' +
                     tdBodys +
                     '</tr>'
@@ -1128,7 +1126,7 @@ export default {
                       new Date().toLocaleString() +
                       '.xlsx'
                   )
-                } catch (e) {}
+                } catch (e) { void e }
                 return etout
               }
             }
@@ -1263,9 +1261,9 @@ export default {
                   '<table id="Mytable" border="1" class="table table-bordered table-striped table-hover" style="width:100%;text-align:center" ><tbody><tr>' +
                   tdHeads +
                   ' </tr>'
-                for (var i = 0, l = axisData.length; i < l; i++) {
+                for (let axisIndex = 0, l = axisData.length; axisIndex < l; axisIndex++) {
                   for (var j = 0; j < series.length; j++) {
-                    var temp = series[j].data[i]
+                    var temp = series[j].data[axisIndex]
                     if (temp != null && temp != undefined) {
                       tdBodys += '<td>' + temp + '</td>'
                     } else {
@@ -1274,7 +1272,7 @@ export default {
                   }
                   table +=
                     '<tr><td style="padding: 0 10px">' +
-                    axisData[i] +
+                    axisData[axisIndex] +
                     '</td>' +
                     tdBodys +
                     '</tr>'
@@ -1303,7 +1301,7 @@ export default {
                       new Date().toLocaleString() +
                       '.xlsx'
                   )
-                } catch (e) {}
+                } catch (e) { void e }
                 return etout
               }
             }
@@ -1418,9 +1416,9 @@ export default {
                   '<table id="Mytable" border="1" class="table table-bordered table-striped table-hover" style="width:100%;text-align:center" ><tbody><tr>' +
                   tdHeads +
                   ' </tr>'
-                for (var i = 0, l = axisData.length; i < l; i++) {
+                for (let axisIndex = 0, l = axisData.length; axisIndex < l; axisIndex++) {
                   for (var j = 0; j < series.length; j++) {
-                    var temp = series[j].data[i]
+                    var temp = series[j].data[axisIndex]
                     if (temp != null && temp != undefined) {
                       tdBodys += '<td>' + temp + '</td>'
                     } else {
@@ -1429,7 +1427,7 @@ export default {
                   }
                   table +=
                     '<tr><td style="padding: 0 10px">' +
-                    axisData[i] +
+                    axisData[axisIndex] +
                     '</td>' +
                     tdBodys +
                     '</tr>'
@@ -1458,7 +1456,7 @@ export default {
                       new Date().toLocaleString() +
                       '.xlsx'
                   )
-                } catch (e) {}
+                } catch (e) { void e }
                 return etout
               }
             }
@@ -1574,9 +1572,9 @@ export default {
                   '<table id="Mytable" border="1" class="table table-bordered table-striped table-hover" style="width:100%;text-align:center" ><tbody><tr>' +
                   tdHeads +
                   ' </tr>'
-                for (var i = 0, l = axisData.length; i < l; i++) {
+                for (let axisIndex = 0, l = axisData.length; axisIndex < l; axisIndex++) {
                   for (var j = 0; j < series.length; j++) {
-                    var temp = series[j].data[i]
+                    var temp = series[j].data[axisIndex]
                     if (temp != null && temp != undefined) {
                       tdBodys += '<td>' + temp + '</td>'
                     } else {
@@ -1585,7 +1583,7 @@ export default {
                   }
                   table +=
                     '<tr><td style="padding: 0 10px">' +
-                    axisData[i] +
+                    axisData[axisIndex] +
                     '</td>' +
                     tdBodys +
                     '</tr>'
@@ -1614,7 +1612,7 @@ export default {
                       new Date().toLocaleString() +
                       '.xlsx'
                   )
-                } catch (e) {}
+                } catch (e) { void e }
                 return etout
               }
             }

@@ -97,9 +97,6 @@ import PageLayout from '@/layouts/PageLayout'
 import { hostList, hostExport, hostGraph } from '@/services/admin'
 import moment from 'moment'
 import { parseTimeFun } from '@/utils/formatter'
-import echarts from 'echarts'
-import FileSaver from 'file-saver'
-import XLSX from 'xlsx'
 require('echarts-liquidfill')
 export default {
   i18n: require('./i18n'),
@@ -326,7 +323,7 @@ export default {
           // 其他错误
           this.$message.error(res.message || this.$t('msg_get_graph_failed'))
         }
-      }).catch((error) => {
+      }).catch(() => {
         // 处理请求异常
         this.$message.error(this.$t('msg_request_failed'))
       })
@@ -353,7 +350,7 @@ export default {
           this.pngData = []
           this.sortPngData()
         }
-      }).catch((error) => {
+      }).catch(() => {
         // 处理请求异常
         this.$message.error(this.$t('msg_request_failed'))
         this.pngData = []
@@ -374,25 +371,6 @@ export default {
         this.interfaces = ''
         this.available = ''
         this.init()
-      }
-    },
-    restDate() {
-      let ntime = new Date(),
-        qtime = new Date(new Date().getTime() - 2 * 60 * 60 * 1000)
-      this.beginTime = parseTimeFun(qtime)
-      this.endTime = parseTimeFun(ntime)
-      this.timeValue = [
-        moment(qtime, 'YYYY-MM-DD HH:mm:ss'),
-        moment(ntime, 'YYYY-MM-DD HH:mm:ss')
-      ]
-    },
-    changeCreationTime(e) {
-      if (e.length) {
-        this.beginTime = parseTimeFun(new Date(e[0]))
-        this.endTime = parseTimeFun(new Date(e[1]))
-      } else {
-        this.beginTime = ''
-        this.endTime = ''
       }
     }
   }

@@ -84,7 +84,7 @@ export default {
   },
   watch: {
     mock: {
-      handler(val) {
+      handler() {
         this.init();
       },
       deep: true
