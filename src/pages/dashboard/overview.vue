@@ -32,134 +32,23 @@
       <!-- 主机详情卡片 -->
       <a-card :bodyStyle="{padding: '24px'}" :loading="loading" class="main-card">
         <a-row :gutter="[24, 24]">
-          <!-- Windows 主机 -->
-          <a-col :xl="12" :lg="12" :md="24" :sm="24" :xs="24">
+          <a-col
+            v-for="section in sections"
+            :key="section.type_code"
+            :xl="12" :lg="12" :md="24" :sm="24" :xs="24"
+          >
             <div class="host-section">
-              <div class="section-header windows-header">
+              <div class="section-header">
                 <div class="header-left">
-                  <a-icon type="windows" class="section-icon" />
-                  <span class="section-title">{{ winTitle }}</span>
+                  <a-icon :type="getSectionIcon(section.type_code)" class="section-icon" />
+                  <span class="section-title">{{ section.name }}</span>
                 </div>
-                <a-badge :count="getAlarmCount(win)" :number-style="{ backgroundColor: '#faad14' }" />
+                <a-badge :count="getAlarmCount(section.hosts)" :number-style="{ backgroundColor: '#faad14' }" />
               </div>
               <div class="host-grid">
-                <div 
-                  v-for="(item, index) in win" 
-                  :key="index" 
-                  class="host-item"
-                  :class="getHostClass(item)"
-                >
-                  <a-popover :title="$t('title_device_info')" placement="top">
-                    <template slot="content">
-                      <div class="popover-content">
-                        <p><strong>{{ $t('label_hostname') }}:</strong> {{ item.name }}</p>
-                        <p v-if="item.instance_name"><strong>{{ $t('label_instance_name') }}:</strong> {{ item.instance_name }}</p>
-                        <p><strong>{{ $t('label_IP') }}:</strong> {{ item.interfaces }}</p>
-                        <p><strong>{{ $t('label_cpu_usage') }}:</strong> {{ item.cpu_utilization }}</p>
-                        <p><strong>{{ $t('label_memory_usage') }}:</strong> {{ item.memory_utilization }}</p>
-                        <p><strong>{{ $t('label_num_errors') }}:</strong> {{ item.error }}</p>
-                        <p><strong>{{ $t('label_num_alarms') }}:</strong> {{ item.alarm }}</p>
-                      </div>
-                    </template>
-                    <div class="host-dot" :class="getStatusClass(item)">
-                      <div class="pulse-ring" v-if="item.alarm > 0"></div>
-                    </div>
-                  </a-popover>
-                </div>
-              </div>
-            </div>
-          </a-col>
-
-          <!-- Linux 主机 -->
-          <a-col :xl="12" :lg="12" :md="24" :sm="24" :xs="24">
-            <div class="host-section">
-              <div class="section-header linux-header">
-                <div class="header-left">
-                  <a-icon type="code" class="section-icon" />
-                  <span class="section-title">{{ linTitle }}</span>
-                </div>
-                <a-badge :count="getAlarmCount(lin)" :number-style="{ backgroundColor: '#faad14' }" />
-              </div>
-              <div class="host-grid">
-                <div 
-                  v-for="(item, index) in lin" 
-                  :key="index" 
-                  class="host-item"
-                  :class="getHostClass(item)"
-                >
-                  <a-popover :title="$t('title_device_info')" placement="top">
-                    <template slot="content">
-                      <div class="popover-content">
-                        <p><strong>{{ $t('label_hostname') }}:</strong> {{ item.name }}</p>
-                        <p v-if="item.instance_name"><strong>{{ $t('label_instance_name') }}:</strong> {{ item.instance_name }}</p>
-                        <p><strong>{{ $t('label_IP') }}:</strong> {{ item.interfaces }}</p>
-                        <p><strong>{{ $t('label_cpu_usage') }}:</strong> {{ item.cpu_utilization }}</p>
-                        <p><strong>{{ $t('label_memory_usage') }}:</strong> {{ item.memory_utilization }}</p>
-                        <p><strong>{{ $t('label_num_errors') }}:</strong> {{ item.error }}</p>
-                        <p><strong>{{ $t('label_num_alarms') }}:</strong> {{ item.alarm }}</p>
-                      </div>
-                    </template>
-                    <div class="host-dot" :class="getStatusClass(item)">
-                      <div class="pulse-ring" v-if="item.alarm > 0"></div>
-                    </div>
-                  </a-popover>
-                </div>
-              </div>
-            </div>
-          </a-col>
-
-          <!-- 网络设备 -->
-          <a-col :xl="12" :lg="12" :md="24" :sm="24" :xs="24">
-            <div class="host-section">
-              <div class="section-header network-header">
-                <div class="header-left">
-                  <a-icon type="global" class="section-icon" />
-                  <span class="section-title">{{ netTitle }}</span>
-                </div>
-                <a-badge :count="getAlarmCount(net)" :number-style="{ backgroundColor: '#faad14' }" />
-              </div>
-              <div class="host-grid">
-                <div 
-                  v-for="(item, index) in net" 
-                  :key="index" 
-                  class="host-item"
-                  :class="getHostClass(item)"
-                >
-                  <a-popover :title="$t('title_device_info')" placement="top">
-                    <template slot="content">
-                      <div class="popover-content">
-                        <p><strong>{{ $t('label_hostname') }}:</strong> {{ item.name }}</p>
-                        <p v-if="item.instance_name"><strong>{{ $t('label_instance_name') }}:</strong> {{ item.instance_name }}</p>
-                        <p><strong>{{ $t('label_IP') }}:</strong> {{ item.interfaces }}</p>
-                        <p><strong>{{ $t('label_cpu_usage') }}:</strong> {{ item.cpu_utilization }}</p>
-                        <p><strong>{{ $t('label_memory_usage') }}:</strong> {{ item.memory_utilization }}</p>
-                        <p><strong>{{ $t('label_num_errors') }}:</strong> {{ item.error }}</p>
-                        <p><strong>{{ $t('label_num_alarms') }}:</strong> {{ item.alarm }}</p>
-                      </div>
-                    </template>
-                    <div class="host-dot" :class="getStatusClass(item)">
-                      <div class="pulse-ring" v-if="item.alarm > 0"></div>
-                    </div>
-                  </a-popover>
-                </div>
-              </div>
-            </div>
-          </a-col>
-
-          <!-- 硬件服务器 -->
-          <a-col :xl="12" :lg="12" :md="24" :sm="24" :xs="24">
-            <div class="host-section">
-              <div class="section-header server-header">
-                <div class="header-left">
-                  <a-icon type="database" class="section-icon" />
-                  <span class="section-title">{{ srvTitle }}</span>
-                </div>
-                <a-badge :count="getAlarmCount(srv)" :number-style="{ backgroundColor: '#faad14' }" />
-              </div>
-              <div class="host-grid">
-                <div 
-                  v-for="(item, index) in srv" 
-                  :key="index" 
+                <div
+                  v-for="(item, index) in section.hosts"
+                  :key="index"
                   class="host-item"
                   :class="getHostClass(item)"
                 >
@@ -191,7 +80,7 @@
 
 <script>
 import PageLayout from "@/layouts/PageLayout";
-import { indexOverview } from "@/services/admin";
+import { indexOverview, getAssetTypes } from "@/services/admin";
 
 export default {
   i18n: require('./i18n'),
@@ -200,80 +89,61 @@ export default {
   data() {
     return {
       name: '测试',
-      win: [],
-      lin: [],
-      net: [],
-      srv: [],
+      sections: [],
+      assetTypes: [],
       loading: false,
-      winTitle: '',
-      linTitle: '',
-      netTitle: '',
-      srvTitle: '',
     };
   },
   computed: {
     statsCards() {
-      return [
-        {
-          title: this.$t('num_windows_hosts'),
-          value: this.win.length,
-          icon: 'windows',
-          type: 'windows',
-          healthy: this.getHealthyCount(this.win),
-          warning: this.getWarningCount(this.win),
-          error: this.getErrorCount(this.win)
-        },
-        {
-          title: this.$t('num_linux_hosts'),
-          value: this.lin.length,
-          icon: 'code',
-          type: 'linux',
-          healthy: this.getHealthyCount(this.lin),
-          warning: this.getWarningCount(this.lin),
-          error: this.getErrorCount(this.lin)
-        },
-        {
-          title: this.$t('num_networking_hosts'),
-          value: this.net.length,
-          icon: 'global',
-          type: 'network',
-          healthy: this.getHealthyCount(this.net),
-          warning: this.getWarningCount(this.net),
-          error: this.getErrorCount(this.net)
-        },
-        {
-          title: this.$t('num_hardware_hosts'),
-          value: this.srv.length,
-          icon: 'database',
-          type: 'server',
-          healthy: this.getHealthyCount(this.srv),
-          warning: this.getWarningCount(this.srv),
-          error: this.getErrorCount(this.srv)
-        }
-      ];
+      return this.sections.map(section => ({
+        title: section.name,
+        value: section.hosts.length,
+        icon: this.getSectionIcon(section.type_code),
+        type: section.type_code.toLowerCase(),
+        healthy: this.getHealthyCount(section.hosts),
+        warning: this.getWarningCount(section.hosts),
+        error: this.getErrorCount(section.hosts),
+      }));
     }
   },
   created() {
     this.init();
   },
   methods: {
-    init() {
+    getPrimaryName(name) {
+      if (!name) return ''
+      return String(name).replace(/\s*[（(][^（）()]*[）)]\s*$/u, '').trim()
+    },
+    async init() {
       this.loading = true;
-      indexOverview().then((resp) => {
-        let res = resp.data;
-        if (res.code == 200) {
-          this.win = res.data.vm_win || [];
-          this.winTitle = this.$t('num_windows_hosts');
-          this.lin = res.data.vm_lin || [];
-          this.linTitle = this.$t('num_linux_hosts');
-          this.net = res.data.hw_net || [];
-          this.netTitle = this.$t('num_networking_hosts');
-          this.srv = res.data.hw_srv || [];
-          this.srvTitle = this.$t('num_hardware_hosts');
+      try {
+        const [atRes, overviewRes] = await Promise.all([getAssetTypes(), indexOverview()]);
+        const atBiz = (atRes && atRes.data) ? atRes.data : atRes;
+        if (atBiz && atBiz.code === 200) {
+          this.assetTypes = atBiz.data || [];
         }
-      }).finally(() => { 
+        const biz = (overviewRes && overviewRes.data) ? overviewRes.data : overviewRes;
+        if (biz && biz.code === 200) {
+          const dataMap = biz.data || {};
+          this.sections = this.assetTypes.map(at => ({
+            name: this.getPrimaryName(at.name),
+            type_code: at.type_code,
+            icon: at.icon || '',
+            hosts: dataMap[at.type_code] || [],
+          }));
+        }
+      } finally {
         this.loading = false;
-      });
+      }
+    },
+    getSectionIcon(typeCode) {
+      const section = this.sections.find(s => s.type_code === typeCode);
+      if (section && section.icon) return section.icon;
+      const at = this.assetTypes.find(a => a.type_code === typeCode);
+      if (at && at.icon) return at.icon;
+      const fallback = { VM_LIN: 'desktop', VM_WIN: 'windows', HW_NET: 'global', HW_SRV: 'database' };
+      return fallback[typeCode] || 'folder';
     },
     getStatusClass(item) {
       if (item.available == 1 && item.alarm == 0) return 'status-healthy';

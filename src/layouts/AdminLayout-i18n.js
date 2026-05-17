@@ -1,6 +1,8 @@
 module.exports = {
   messages: {
     CN: {
+      header_search_placeholder: '搜索主机、IP、资产编号',
+      header_search_instance_unknown: '未知实例',
       setup_complete_success: '初始配置已完成！',
       setup_complete_mark_failed: '标记配置完成失败，但引导已关闭',
       setup_complete_action_failed: '标记完成状态失败，但引导已关闭',
@@ -10,6 +12,8 @@ module.exports = {
       setup_skip_mark_failed: '标记跳过状态失败'
     },
     HK: {
+      header_search_placeholder: '搜索主機、IP、資產編號',
+      header_search_instance_unknown: '未知實例',
       setup_complete_success: '初始配置已完成！',
       setup_complete_mark_failed: '標記配置完成失敗，但引導已關閉',
       setup_complete_action_failed: '標記完成狀態失敗，但引導已關閉',
@@ -19,6 +23,8 @@ module.exports = {
       setup_skip_mark_failed: '標記跳過狀態失敗'
     },
     US: {
+      header_search_placeholder: 'Search hosts, IPs, or asset IDs',
+      header_search_instance_unknown: 'Unknown instance',
       setup_complete_success: 'Initial setup completed!',
       setup_complete_mark_failed: 'Failed to mark setup as completed, but guide is closed',
       setup_complete_action_failed: 'Failed to mark completion status, but guide is closed',
@@ -29,4 +35,3 @@ module.exports = {
     }
   }
 }
-

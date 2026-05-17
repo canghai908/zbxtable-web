@@ -19,6 +19,7 @@ import {
 	INVENTORY_LIST,
 	SYSTEM_LIST,
 	HOST_GROUP,
+	HOST_FILTER_BY_TAG,
 	TEMPLATE_lIST,
 	ITEM_TRAFFIC,
 	TOPO_TRAFFIC,
@@ -34,6 +35,8 @@ import {
 	ZABBIX,
 	METRIC_MAPPING,
 	SYSTEM_UPDATE,
+	ASSET_TYPE,
+	SYSTEM_BINDING,
 } from '@/services/api'
 import { request, METHOD } from '@/utils/request'
 // import { INDEX_VERSION, INVENTORY_EXPORT, REPORT } from "./api";
@@ -181,6 +184,23 @@ export async function configUpdate(id, params) {
 }
 export async function hostgroupList(id) {
 	return request(HOST_GROUP, METHOD.GET, { zid: id })
+}
+export async function hostgroupHosts(groupId, zid) {
+	try {
+		return await request(HOST_GROUP + '/' + groupId + '/hosts', METHOD.GET, { zid })
+	} catch (error) {
+		const status = error && (error.status || (error.data && error.data.code))
+		if (status === 404) {
+			return hostgroupHostsLegacy(groupId, zid)
+		}
+		throw error
+	}
+}
+export async function hostgroupHostsLegacy(groupId, zid) {
+	return request(HOST_GROUP + '/list/' + groupId, METHOD.GET, { zid })
+}
+export async function hostFilterByTag(params) {
+	return request(HOST_FILTER_BY_TAG, METHOD.GET, params)
 }
 export async function templateList(id) {
 	return request(TEMPLATE_lIST, METHOD.GET, { zid: id })
@@ -353,6 +373,40 @@ export async function completeInitialSetup() {
 	return request('/v1/system/complete-setup', METHOD.POST)
 }
 
+// 资产类型管理
+export async function getAssetTypes() {
+	return request(ASSET_TYPE, METHOD.GET)
+}
+export async function createAssetType(params) {
+	return request(ASSET_TYPE, METHOD.POST, params)
+}
+export async function updateAssetType(id, params) {
+	return request(ASSET_TYPE + '/' + id, METHOD.PUT, params)
+}
+export async function deleteAssetType(id) {
+	return request(ASSET_TYPE + '/' + id, METHOD.DELETE)
+}
+
+// 资产绑定配置
+export async function getSystemBindings() {
+	return request(SYSTEM_BINDING, METHOD.GET)
+}
+export async function createSystemBinding(params) {
+	return request(SYSTEM_BINDING, METHOD.POST, params)
+}
+export async function updateSystemBinding(id, params) {
+	return request(SYSTEM_BINDING + '/' + id, METHOD.PUT, params)
+}
+export async function deleteSystemBinding(id) {
+	return request(SYSTEM_BINDING + '/' + id, METHOD.DELETE)
+}
+export async function initSystemBinding(id, zid) {
+	return request(SYSTEM_BINDING + '/init/' + id, METHOD.POST, { zid })
+}
+export async function getSystemBindingHistory(id, params) {
+	return request(SYSTEM_BINDING + '/' + id + '/history', METHOD.GET, params)
+}
+
 export default {
 	hostList,
 	hostDetail,
@@ -398,6 +452,8 @@ export default {
 	configGetOne,
 	configUpdate,
 	hostgroupList,
+	hostgroupHosts,
+	hostFilterByTag,
 	templateList,
 	templateGetItemList,
 	baseVersion,
@@ -441,4 +497,14 @@ export default {
 	systemCheckUpdate,
 	systemDoUpdate,
 	getPublicSystemInfo,
+	getAssetTypes,
+	createAssetType,
+	updateAssetType,
+	deleteAssetType,
+	getSystemBindings,
+	createSystemBinding,
+	updateSystemBinding,
+	deleteSystemBinding,
+	initSystemBinding,
+	getSystemBindingHistory,
 }

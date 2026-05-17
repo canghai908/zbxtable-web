@@ -4,7 +4,7 @@
       <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}">
         <a-row :gutter="16">
           <a-col :xl="{ span: 4 }" :lg="{ span: 24 }">
-	    <a-card :title="$t('overview')" :headStyle="$cardHeadStyle" size="small">
+            <a-card :title="$t('overview')" :headStyle="$cardHeadStyle" size="small">
               <div class="inventory-tree-wrapper">
                 <a-tree 
                   :showLine=false 
@@ -18,7 +18,7 @@
                 >
                   <template slot="title" slot-scope="node">
                     <span class="tree-node-title">
-                      <a-icon :type="getNodeIcon(node.id)" :style="{ fontSize: '16px', color: getNodeColor(node.id), marginRight: '8px' }" />
+                      <a-icon :type="getNodeIcon(node)" :style="{ fontSize: '16px', color: getNodeColorByCode(node.type_code), marginRight: '8px' }" />
                       <span>{{ node.name }}</span>
                     </span>
                   </template>
@@ -29,10 +29,10 @@
           <a-col :xl="{ span: 20 }" :lg="{ span: 24 }">
             <a-row>
               <a-col :lg="24" :md="24">
-		<a-card :title="$t('information')" :headStyle="$cardHeadStyle" :bodyStyle="{ height: '350px' }" size="small">
+                <a-card :title="$t('information')" :headStyle="$cardHeadStyle" :bodyStyle="{ height: '350px' }" size="small">
                   <template #extra>
                     <!-- <a-button type="primary" style="margin-left: 10px;" @click="inventoryexport">导入资产</a-button> -->
-		    <a-button type="info" style="margin-left: 10px;" @click="inventoryexport">{{ $t('export_btn') }}</a-button>
+                    <a-button type="info" style="margin-left: 10px;" @click="inventoryexport">{{ $t('export_btn') }}</a-button>
 
                   </template>
                   <a-table :loading="loading" :columns="columns" :data-source="list" @change="changePage" :pagination="pagination" :rowKey="(record) => { return `${record.zid || 0}-${record.hostid}`;}">
@@ -45,7 +45,7 @@
                     <span slot="uptime" slot-scope="record">{{record.uptime}}</span>
                     <div slot="location" slot-scope="record">
                       <p v-if="record.editable">
-			<a-input v-model.trim="form.location" :placeholder="$t('location_placeholder')" />
+                        <a-input v-model.trim="form.location" :placeholder="$t('location_placeholder')" />
                       </p>
                       <p v-else>{{record.location}}</p>
                     </div>
@@ -84,21 +84,21 @@
                         <template slot="title">
                           {{record.error}}
                         </template>
- 			<a-tag v-if="record.available == 1" color="#34af67">{{ $t('status_available') }}</a-tag>
-    			<a-tag v-else-if="record.available == 2" color="#DC143C">{{ $t('status_not_available') }}</a-tag>
-    			<a-tag v-else status="default" :text="$t('status_unknown')" />
+                        <a-tag v-if="record.available == 1" color="#34af67">{{ $t('status_available') }}</a-tag>
+                        <a-tag v-else-if="record.available == 2" color="#DC143C">{{ $t('status_not_available') }}</a-tag>
+                        <a-tag v-else status="default" :text="$t('status_unknown')" />
                       </a-tooltip>
                     </span>
                     <template slot="operation" slot-scope="text, record">
                       <div class="editable-row-operations">
                         <span v-if="record.editable">
-		          <a @click="save(record)" style="margin-right: 10px">{{ $t('save_btn') }}</a>
-		          <a-popconfirm :title="$t('discard_btn')" @confirm="cancel(record)">
-      			    <a>{{ $t('cancel_btn') }}</a>
+                          <a @click="save(record)" style="margin-right: 10px">{{ $t('save_btn') }}</a>
+                          <a-popconfirm :title="$t('discard_btn')" @confirm="cancel(record)">
+                            <a>{{ $t('cancel_btn') }}</a>
                           </a-popconfirm>
                         </span>
                         <span v-else>
-    			  <a @click="edit(record)">{{ $t('edit_btn') }}</a>
+                          <a @click="edit(record)">{{ $t('edit_btn') }}</a>
                         </span>
                       </div>
                     </template>
@@ -115,17 +115,17 @@
 
 <script>
 import PageLayout from "@/layouts/PageLayout";
-import { inventoryTree, inventoryExport, hostUpdate, hostList } from '@/services/admin'
-import DetailList from "@/components/tool/DetailList";
-const DetailListItem = DetailList.Item;
+import { inventoryTree, inventoryExport, hostUpdate, hostList, getAssetTypes } from '@/services/admin'
+import { parseTimeFun } from '@/utils/formatter'
 export default {
   i18n: require('./i18n'),
   name: "index",
-  components: { PageLayout, DetailListItem, DetailList },
+  components: { PageLayout },
   data() {
     return {
       loading: false,
       treeData: "",
+      assetTypes: [],
       replaceFields: {
         children: 'children',
         title: 'name',
@@ -175,11 +175,27 @@ export default {
       }
     };
   },
-  components: {
-    PageLayout,
+  computed: {
+    nodeTypeMap() {
+      const map = {};
+      if (!this.treeData || !Array.isArray(this.treeData)) return map;
+      const flatten = (nodes) => {
+        nodes.forEach(node => {
+          if (node.type_code) {
+            map[node.id] = node.type_code;
+          }
+          if (node.children && node.children.length > 0) {
+            flatten(node.children);
+          }
+        });
+      };
+      flatten(this.treeData);
+      return map;
+    },
   },
   created() {
     this.initree()
+    this.loadAssetTypes()
     // 默认选中Linux操作系统节点并加载数据
     this.$nextTick(() => {
       this.onSelect([10])
@@ -221,23 +237,30 @@ export default {
       
       return this.treeData.map(node => translateNode(node))
     },
-    getNodeIcon(nodeId) {
-      const iconMap = {
-        10: 'desktop',        // Linux操作系统
-        11: 'windows',        // Windows操作系统
-        12: 'cluster',        // 网络设备
-        13: 'database',       // 服务器硬件
+    async loadAssetTypes() {
+      try {
+        const res = await getAssetTypes()
+        const biz = (res && res.data) ? res.data : res
+        if (biz && biz.code === 200) {
+          this.assetTypes = biz.data || []
+        }
+      } catch (e) {
+        console.error('加载资产类型失败', e)
       }
-      return iconMap[nodeId] || 'folder'
     },
-    getNodeColor(nodeId) {
+    getNodeIcon(node) {
+      if (node.icon) return node.icon;
+      const map = { VM_LIN: 'desktop', VM_WIN: 'windows', HW_NET: 'cluster', HW_SRV: 'database' };
+      return map[node.type_code] || 'folder';
+    },
+    getNodeColorByCode(typeCode) {
       const colorMap = {
-        10: '#52c41a',        // Linux - 绿色
-        11: '#1890ff',        // Windows - 蓝色
-        12: '#faad14',        // 网络设备 - 橙色
-        13: '#722ed1',        // 服务器硬件 - 紫色
+        VM_LIN: '#52c41a',
+        VM_WIN: '#1890ff',
+        HW_NET: '#faad14',
+        HW_SRV: '#722ed1',
       }
-      return colorMap[nodeId] || '#666'
+      return colorMap[typeCode] || '#666'
     },
     initree() {
       inventoryTree().then((resp) => {
@@ -291,34 +314,13 @@ export default {
         if (res.code == 200) {
           item.editable = false;
           this.onSelect([this.hostid]);
-	  this.$message.success(this.$t('message_save_success'));
+          this.$message.success(this.$t('message_save_success'));
         }
       })
     },
     onSelect(selectedKeys) {
-      // this.hostid = selectedKeys[0]
-
-      // hostDetail(this.hostid).then((resp) => {
-      //   let res = resp.data;
-      //   this.detail = res;
-
-      // });
       this.hostid = selectedKeys[0]
-      this.hostType = "VM_LIN";
-      switch (selectedKeys[0]) {
-        case 10:
-          this.hostType = "VM_LIN";
-          break;
-        case 11:
-          this.hostType = "VM_WIN";
-          break;
-        case 12:
-          this.hostType = "HW_NET";
-          break;
-        case 13:
-          this.hostType = "HW_SRV";
-          break;
-      }
+      this.hostType = this.nodeTypeMap[selectedKeys[0]] || 'VM_LIN';
       this.loading = true;
       hostList({
         page: this.page,

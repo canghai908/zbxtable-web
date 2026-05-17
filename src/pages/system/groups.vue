@@ -5,9 +5,9 @@
       <a-input v-model.trim="name" :placeholder="$t('label_group_name')" />
       </a-form-model-item>
       <a-form-model-item>
-    	<a-button type="primary" @click="init">{{ $t('search_btn') }}</a-button>
-    	<a-button style="margin-left: 10px;" @click="resetData">{{ $t('reset_btn') }}</a-button>
-    	<a-button type="primary" style="margin-left: 10px;" @click="showModal" v-auth="`add`">{{ $t('add_group_btn') }}</a-button>
+        <a-button type="primary" @click="init">{{ $t('search_btn') }}</a-button>
+        <a-button style="margin-left: 10px;" @click="resetData">{{ $t('reset_btn') }}</a-button>
+        <a-button type="primary" style="margin-left: 10px;" @click="showModal" v-auth="`add`">{{ $t('add_group_btn') }}</a-button>
       </a-form-model-item>
     </a-form-model>
     <div class="linux-list">
@@ -56,7 +56,7 @@
             <span>{{group.name}}</span>
           </a-form-model-item>
           <a-form-model-item prop="email">
-    	    <a-transfer :data-source="transferDataSource" :render="item => item.title" show-search :list-style="{width: '250px',height: '300px',}" :titles="[$t('all_users'), $t('group_members')]" :target-keys="targetKeys" :selected-keys="selectedKeys" @change="handleChange" @selectChange="handleSelectChange" />
+            <a-transfer :data-source="transferDataSource" :render="item => item.title" show-search :list-style="{width: '250px',height: '300px',}" :titles="[$t('all_users'), $t('group_members')]" :target-keys="targetKeys" :selected-keys="selectedKeys" @change="handleChange" @selectChange="handleSelectChange" />
             <!-- <a-input v-model="group.members" :placeholder="$t('modalInputEmail')" /> -->
           </a-form-model-item>
         </a-form-model>
@@ -254,7 +254,7 @@ export default {
         this.init();
       }
     },
-    handleChange(nextTargetKeys, direction, moveKeys) {
+    handleChange(nextTargetKeys) {
       this.targetKeys = nextTargetKeys;
     },
     handleSelectChange(sourceSelectedKeys, targetSelectedKeys) {

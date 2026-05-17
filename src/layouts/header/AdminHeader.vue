@@ -11,6 +11,11 @@
         <i-menu class="head-menu" :theme="headerTheme" mode="horizontal" :options="menuData" @select="onSelect" />
       </div>
       <div :class="['admin-header-right', headerTheme]">
+        <header-search
+          v-if="!isMobile"
+          class="header-item header-search-item"
+          @active="searchActive = $event"
+        />
         <!-- 演示模式提示（悬浮说明） -->
         <a-tooltip v-if="demoMode" placement="bottom">
           <template slot="title">
@@ -31,6 +36,17 @@
           <a-icon type="github" />
         </a>
 
+        <a-button
+          v-if="showEnterScreen"
+          class="header-item enter-screen-btn"
+          type="primary"
+          ghost
+          icon="fullscreen"
+          size="small"
+          @click="goToScreen"
+        >
+          {{ $t('topology.enterScreen') }}
+        </a-button>
         <header-avatar class="header-item" />
         <a-dropdown class="lang header-item">
           <div>
@@ -46,7 +62,7 @@
 </template>
 
 <script>
-// import HeaderSearch from './HeaderSearch'
+import HeaderSearch from './HeaderSearch'
 // import HeaderNotice from './HeaderNotice'
 import HeaderAvatar from "./HeaderAvatar";
 import IMenu from "@/components/menu/menu";
@@ -54,7 +70,7 @@ import { mapState, mapMutations } from "vuex";
 
 export default {
   name: "AdminHeader",
-  components: { IMenu, HeaderAvatar },
+  components: { HeaderSearch, IMenu, HeaderAvatar },
   props: ["collapsed", "menuData"],
   data() {
     return {
@@ -91,6 +107,9 @@ export default {
       let lang = this.langList.find((item) => item.key == this.lang);
       return lang.alias;
     },
+    showEnterScreen() {
+      return this.$route.path !== '/screen/dashboard'
+    },
     menuWidth() {
       const { layout, searchActive } = this;
       const headWidth = layout === "head" ? "100% - 188px" : "100%";
@@ -105,6 +124,9 @@ export default {
     onSelect(obj) {
       this.$emit("menuSelect", obj);
     },
+    goToScreen() {
+      this.$router.push('/screen/dashboard')
+    },
     ...mapMutations("setting", ["setLang"]),
   },
 };
@@ -117,5 +139,16 @@ export default {
   margin-right: 8px;
   border-radius: 10px;
   font-weight: 500;
+}
+
+.header-search-item {
+  padding-right: 4px;
+  padding-left: 4px;
+}
+
+.enter-screen-btn {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
 }
 </style>

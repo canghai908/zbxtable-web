@@ -10,6 +10,11 @@ const routesConfig = [
     path: '/share/topology',
     name: '共享拓扑'
   },
+  {
+    router: 'screenDashboard',
+    path: '/screen/dashboard',
+    name: '运维大屏'
+  },
   'root',
   {
     router: 'exp404',

@@ -18,10 +18,10 @@
       <a-col style="padding: 0 12px" :xl="4" :lg="8" :md="24" :sm="24" :xs="24">
         <a-card title="设备统计" :headStyle="$cardHeadStyle" size="small">
           <div class="homeMain homeList">
-            <div class="homeItem"><div>Linux主机:</div><span>{{info.lin_count}}台</span></div>
-            <div class="homeItem"><div>Window主机:</div><span>{{info.win_count}}台</span></div>
-            <div class="homeItem"><div>物理机器:</div><span>{{info.srv_count}}台</span></div>
-            <div class="homeItem"><div>网络设备:</div><span>{{info.net_count}}台</span></div>
+            <div class="homeItem" v-for="item in deviceStats" :key="item.type_code">
+              <div>{{ item.name }}:</div>
+              <span>{{ item.count }}台</span>
+            </div>
           </div>
         </a-card>
       </a-col>
@@ -97,12 +97,38 @@ export default {
   data () {
     return {
       triggerList: [],
-      info: "",
+      info: {
+        net_count: 0,
+        srv_count: 0,
+        win_count: 0,
+        lin_count: 0,
+        total_count: 0,
+        asset_type_counts: []
+      },
       winC: [],
       winM: [],
       linC: [],
       linM: [],
       net: {val1: "--", val2: "--", val3: "--", val4: "--"}
+    }
+  },
+  computed: {
+    deviceStats() {
+      const counts = Array.isArray(this.info.asset_type_counts) ? this.info.asset_type_counts : []
+      if (counts.length) {
+        return counts.map(item => ({
+          type_code: item.type_code,
+          name: this.getPrimaryName(item.name || item.type_code),
+          count: item.count || 0
+        }))
+      }
+
+      return [
+        { type_code: 'VM_LIN', name: 'Linux主机', count: this.info.lin_count || 0 },
+        { type_code: 'VM_WIN', name: 'Window主机', count: this.info.win_count || 0 },
+        { type_code: 'HW_SRV', name: '物理机器', count: this.info.srv_count || 0 },
+        { type_code: 'HW_NET', name: '网络设备', count: this.info.net_count || 0 }
+      ]
     }
   },
   created() {
@@ -112,6 +138,10 @@ export default {
     this.initMock();
   },
   methods: {
+    getPrimaryName(name) {
+      if (!name) return ''
+      return String(name).replace(/\s*[（(][^（）()]*[）)]\s*$/u, '').trim()
+    },
     initTrigger () {
       indexTrigger().then(resp => {
         let res = resp.data;
@@ -121,7 +151,15 @@ export default {
     initInfo () {
       indexInfo().then(resp => {
         let res = resp.data;
-        this.info = res.data.items;
+        const data = (res && res.data) || {};
+        this.info = {
+          net_count: data.net_count || 0,
+          srv_count: data.srv_count || 0,
+          win_count: data.win_count || 0,
+          lin_count: data.lin_count || 0,
+          total_count: data.total_count || 0,
+          asset_type_counts: Array.isArray(data.asset_type_counts) ? data.asset_type_counts : []
+        };
       })
     },
     hostMock() {

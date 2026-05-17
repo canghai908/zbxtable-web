@@ -260,6 +260,7 @@ export default {
     editTopology: '編輯拓撲',
     topologyName: '拓撲名稱',
     share: '分享',
+    enterScreen: '進入大屏',
     fullscreen: '全屏',
     zoomIn: '放大',
     zoomOut: '縮小',

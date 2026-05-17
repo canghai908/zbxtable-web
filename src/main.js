@@ -16,6 +16,8 @@ import bootstrap from "@/bootstrap";
 import "moment/locale/zh-cn";
 import "moment/locale/zh-tw";
 import 'highlight.js/styles/github.css';  // 或其他主题样式
+import Cookie from 'js-cookie'
+import { startTokenRefresher, stopTokenRefresher } from '@/utils/tokenRefresher'
 const router = initRouter(store.state.setting.asyncRoutes);
 const i18n = initI18n("CN", "US");
 
@@ -48,7 +50,14 @@ Vue.mixin({
 });
 
 bootstrap({ router, store, i18n, message: Vue.prototype.$message });
+
+// 页面加载时，如果 Cookie 中已有 token（F5 刷新、新标签、浏览器重启），直接启动刷新器
+if (Cookie.get('X-Token')) {
+  startTokenRefresher()
+}
+
 window.loginNoAuth = function () {
+  stopTokenRefresher()
   Vue.prototype.$message.warning("登录已失效，请重新登录");
   router.push({ path: "/login" });
 };

@@ -24,7 +24,6 @@ module.exports = {
       unavailable: '不可用',
       
       // 认证方式
-      password: '密码',
       token: 'Token',
       
       // 通知方式
@@ -313,7 +312,6 @@ module.exports = {
       unavailable: '不可用',
       
       // 認證方式
-      password: '密碼',
       token: 'Token',
       
       // 通知方式
@@ -602,7 +600,6 @@ module.exports = {
       unavailable: 'Unavailable',
       
       // Auth Methods
-      password: 'Password',
       token: 'Token',
       
       // Notify Methods

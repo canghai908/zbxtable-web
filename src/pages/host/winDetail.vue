@@ -226,8 +226,6 @@
 
 <script>
 import PageLayout from "@/layouts/PageLayout";
-import DetailList from "@/components/tool/DetailList";
-const DetailListItem = DetailList.Item;
 import { hostDetail, winMonList, netInterfaceData } from "@/services/admin";
 import { parseTimeFun } from "@/utils/formatter";
 import moment from "moment";
@@ -241,7 +239,7 @@ export default {
   i18n: require('./i18n'),
   name: "WinDetail",
   mixins: [themeMixin],
-  components: { PageLayout, DetailListItem, DetailList, },
+  components: { PageLayout },
   data() {
     return {
       moment,
@@ -255,9 +253,6 @@ export default {
       historyType: "",
       cpu: "",
       memory: "",
-      loading1: false,
-      loading2: false,
-      loading3: false,
       mode1: "date",
       mode2: "date",
       disabledTime: { h: 0, m: 0, s: 0 },
@@ -813,17 +808,17 @@ export default {
                   tdHeads += '<td style="padding: 0 10px">' + nameData[i].name + '</ td >';
                 }
                 var table = '<table id="Mytable" border="1" class="table table-bordered table-striped table-hover" style="width:100%;text-align:center" ><tbody><tr>' + tdHeads + ' </tr>';
-                for (var i = 0, l = axisData.length; i < l; i++) {
+                for (let axisIndex = 0, l = axisData.length; axisIndex < l; axisIndex++) {
                   for (var j = 0; j < series.length; j++) {
-                    var temp = series[j].data[i];
+                    var temp = series[j].data[axisIndex];
                     if (temp != null && temp != undefined) {
-                      tdBodys += '<td>' + temp + '</td>';
+                      tdBodys += "<td>" + temp + "</td>";
                     } else {
-                      tdBodys += '<td></td>';
+                      tdBodys += "<td></td>";
                     }
                   }
-                  table += '<tr><td style="padding: 0 10px">' + axisData[i] + '</td>' + tdBodys + '</tr>';
-                  tdBodys = '';
+                  table += '<tr><td style="padding: 0 10px">' + axisData[axisIndex] + '</td>' + tdBodys + '</tr>';
+                  tdBodys = "";
                 }
                 table += '</tbody></table>';
                 return table;
@@ -846,6 +841,7 @@ export default {
                     opt.title[0].text + "-" + new Date().toLocaleString() + ".xlsx"
                   );
                 } catch (e) {
+                  void e;
                 }
                 return etout;
               },
@@ -964,17 +960,17 @@ export default {
                   tdHeads += '<td style="padding: 0 10px">' + nameData[i].name + '</ td >';
                 }
                 var table = '<table id="Mytable" border="1" class="table table-bordered table-striped table-hover" style="width:100%;text-align:center" ><tbody><tr>' + tdHeads + ' </tr>';
-                for (var i = 0, l = axisData.length; i < l; i++) {
+                for (let axisIndex = 0, l = axisData.length; axisIndex < l; axisIndex++) {
                   for (var j = 0; j < series.length; j++) {
-                    var temp = series[j].data[i];
+                    var temp = series[j].data[axisIndex];
                     if (temp != null && temp != undefined) {
-                      tdBodys += '<td>' + temp + '</td>';
+                      tdBodys += "<td>" + temp + "</td>";
                     } else {
-                      tdBodys += '<td></td>';
+                      tdBodys += "<td></td>";
                     }
                   }
-                  table += '<tr><td style="padding: 0 10px">' + axisData[i] + '</td>' + tdBodys + '</tr>';
-                  tdBodys = '';
+                  table += '<tr><td style="padding: 0 10px">' + axisData[axisIndex] + '</td>' + tdBodys + '</tr>';
+                  tdBodys = "";
                 }
                 table += '</tbody></table>';
                 return table;
@@ -997,6 +993,7 @@ export default {
                     opt.title[0].text + "-" + new Date().toLocaleString() + ".xlsx"
                   );
                 } catch (e) {
+                  void e;
                 }
                 return etout;
               },
@@ -1101,17 +1098,17 @@ export default {
                   tdHeads += '<td style="padding: 0 10px">' + nameData[i].name + '</ td >';
                 }
                 var table = '<table id="Mytable" border="1" class="table table-bordered table-striped table-hover" style="width:100%;text-align:center" ><tbody><tr>' + tdHeads + ' </tr>';
-                for (var i = 0, l = axisData.length; i < l; i++) {
+                for (let axisIndex = 0, l = axisData.length; axisIndex < l; axisIndex++) {
                   for (var j = 0; j < series.length; j++) {
-                    var temp = series[j].data[i];
+                    var temp = series[j].data[axisIndex];
                     if (temp != null && temp != undefined) {
-                      tdBodys += '<td>' + temp + '</td>';
+                      tdBodys += "<td>" + temp + "</td>";
                     } else {
-                      tdBodys += '<td></td>';
+                      tdBodys += "<td></td>";
                     }
                   }
-                  table += '<tr><td style="padding: 0 10px">' + axisData[i] + '</td>' + tdBodys + '</tr>';
-                  tdBodys = '';
+                  table += '<tr><td style="padding: 0 10px">' + axisData[axisIndex] + '</td>' + tdBodys + '</tr>';
+                  tdBodys = "";
                 }
                 table += '</tbody></table>';
                 return table;
@@ -1134,6 +1131,7 @@ export default {
                     opt.title[0].text + "-" + new Date().toLocaleString() + ".xlsx"
                   );
                 } catch (e) {
+                  void e;
                 }
                 return etout;
               },
@@ -1239,17 +1237,17 @@ export default {
                   tdHeads += '<td style="padding: 0 10px">' + nameData[i].name + '</ td >';
                 }
                 var table = '<table id="Mytable" border="1" class="table table-bordered table-striped table-hover" style="width:100%;text-align:center" ><tbody><tr>' + tdHeads + ' </tr>';
-                for (var i = 0, l = axisData.length; i < l; i++) {
+                for (let axisIndex = 0, l = axisData.length; axisIndex < l; axisIndex++) {
                   for (var j = 0; j < series.length; j++) {
-                    var temp = series[j].data[i];
+                    var temp = series[j].data[axisIndex];
                     if (temp != null && temp != undefined) {
-                      tdBodys += '<td>' + temp + '</td>';
+                      tdBodys += "<td>" + temp + "</td>";
                     } else {
-                      tdBodys += '<td></td>';
+                      tdBodys += "<td></td>";
                     }
                   }
-                  table += '<tr><td style="padding: 0 10px">' + axisData[i] + '</td>' + tdBodys + '</tr>';
-                  tdBodys = '';
+                  table += '<tr><td style="padding: 0 10px">' + axisData[axisIndex] + '</td>' + tdBodys + '</tr>';
+                  tdBodys = "";
                 }
                 table += '</tbody></table>';
                 return table;
@@ -1272,6 +1270,7 @@ export default {
                     opt.title[0].text + "-" + new Date().toLocaleString() + ".xlsx"
                   );
                 } catch (e) {
+                  void e;
                 }
                 return etout;
               },

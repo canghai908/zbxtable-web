@@ -59,21 +59,9 @@
             <a-col :lg="24" :md="24">
               <a-card :title="$t('title_hosttypecount')" :headStyle="cardHeadStyle" :bodyStyle="{height: '180px'}" size="small" :loading="!loading2">
                 <div class="homeHost beauty-scroll" :style="cssVars">
-                  <div class="homeHItem">
-                    <span class="device-name">{{ $t('device_network_devices') }}</span>
-                    <em class="device-count">{{ info.net_count }}</em>
-                  </div>
-                  <div class="homeHItem">
-                    <span class="device-name">{{ $t('device_server_devices') }}</span>
-                    <em class="device-count">{{ info.srv_count }}</em>
-                  </div>
-                  <div class="homeHItem">
-                    <span class="device-name">{{ $t('device_windows_hosts') }}</span>
-                    <em class="device-count">{{ info.win_count }}</em>
-                  </div>
-                  <div class="homeHItem">
-                    <span class="device-name">{{ $t('device_linux_hosts') }}</span>
-                    <em class="device-count">{{ info.lin_count }}</em>
+                  <div class="homeHItem" v-for="item in deviceStats" :key="item.type_code">
+                    <span class="device-name">{{ item.name }}</span>
+                    <em class="device-count">{{ item.count }}</em>
                   </div>
                 </div>
               </a-card>
@@ -94,77 +82,9 @@
       </a-row>
     </a-card>
     <div style="width: 100%;height: 12px;"></div>
-    <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="false">
-      <a-row :gutter="16">
-        <a-col :xl="{ span: 24 }" :lg="{ span: 24 }">
-          <a-card :headStyle="cardHeadStyle" :bodyStyle="{ padding: 0 }" size="small" :loading="!loading4">
-            <template slot="title">
-              <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                <span>{{ $t('windows_systems_title') }}</span>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <a-radio-group size="small" :value="winSortBy" @change="onWinSortChange">
-                    <a-radio-button value="CPU">{{ $t('sort_by_cpu') }}</a-radio-button>
-                    <a-radio-button value="MEM">{{ $t('sort_by_mem') }}</a-radio-button>
-                  </a-radio-group>
-                  <a-tooltip :title="$t('top_settings')">
-                    <a-button size="small" icon="setting" @click="openTopConfigModal('VM_WIN')" />
-                  </a-tooltip>
-                </div>
-              </div>
-            </template>
-            <div class="homeTopList" :style="cssVars">
-              <div class="topListHeader">
-                <span class="col-name">{{ $t('column_hostname') }}</span>
-                <template v-if="winSortBy === 'CPU'">
-                  <span class="col-metric">{{ $t('top_header_cpu') }}</span>
-                  <span class="col-metric">{{ $t('top_header_mem') }}</span>
-                </template>
-                <template v-else>
-                  <span class="col-metric">{{ $t('top_header_mem') }}</span>
-                  <span class="col-metric">{{ $t('top_header_cpu') }}</span>
-                </template>
-              </div>
-              <div class="beauty-scroll listBody">
-                <div class="topListItem" v-for="(v, i) in winTop" :key="'winTop-'+i">
-                  <div class="col-name" :title="hostTitle(v)">
-                    <div class="rank-icon"><img :src="require('../../assets/img/top'+(i+1)+'.png')" v-if="i < 3" /><span v-else>{{i+1}}</span></div>
-                    <div class="host-info">
-                      <a-tag v-if="v.instance_name" :color="theme.color" class="instance-tag-small">{{v.instance_name}}</a-tag>
-                      <span class="hostname">{{v.hostname}}</span>
-                    </div>
-                  </div>
-                  <template v-if="winSortBy === 'CPU'">
-                    <div class="col-metric">
-                      <legent :rate="v.cpu" :height="20"></legent>
-                      <span class="metric-value">{{fmtPercent(v.cpu)}}</span>
-                    </div>
-                    <div class="col-metric">
-                      <legent :rate="v.mem" :height="20"></legent>
-                      <span class="metric-value">{{fmtPercent(v.mem)}}</span>
-                    </div>
-                  </template>
-                  <template v-else>
-                    <div class="col-metric">
-                      <legent :rate="v.mem" :height="20"></legent>
-                      <span class="metric-value">{{fmtPercent(v.mem)}}</span>
-                    </div>
-                    <div class="col-metric">
-                      <legent :rate="v.cpu" :height="20"></legent>
-                      <span class="metric-value">{{fmtPercent(v.cpu)}}</span>
-                    </div>
-                  </template>
-                  </div>
-                  <div class="topListItem empty" v-for="i in winTopNum-winTop.length" :key="'winTop-empty-'+i"></div>
-                  </div>
-                  </div>
-          </a-card>
-        </a-col>
-      </a-row>
-    </a-card>
-    <div style="width: 100%;height: 12px;"></div>
-    <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="false">
-      <a-row :gutter="16">
-        <a-col :xl="{ span: 24 }" :lg="{ span: 24 }">
+    <a-row :gutter="16" class="top-panels-row">
+      <a-col :xl="{ span: 12 }" :lg="{ span: 12 }" :md="{ span: 24 }" :sm="{ span: 24 }">
+        <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="false">
           <a-card :headStyle="cardHeadStyle" :bodyStyle="{ padding: 0 }" size="small" :loading="!loading6">
             <template slot="title">
               <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
@@ -221,14 +141,79 @@
                       <span class="metric-value">{{fmtPercent(v.cpu)}}</span>
                     </div>
                   </template>
-                  </div>
-                  <div class="topListItem empty" v-for="i in linTopNum-linTop.length" :key="'linTop-empty-'+i"></div>
-                  </div>
-                  </div>
+                </div>
+                <div class="topListItem empty" v-for="i in linTopNum-linTop.length" :key="'linTop-empty-'+i"></div>
+              </div>
+            </div>
           </a-card>
-        </a-col>
-      </a-row>
-    </a-card>
+        </a-card>
+      </a-col>
+      <a-col :xl="{ span: 12 }" :lg="{ span: 12 }" :md="{ span: 24 }" :sm="{ span: 24 }">
+        <a-card :bodyStyle="{boxShadow: '0 1px 8px 0 #ddd'}" :loading="false">
+          <a-card :headStyle="cardHeadStyle" :bodyStyle="{ padding: 0 }" size="small" :loading="!loading4">
+            <template slot="title">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                <span>{{ $t('windows_systems_title') }}</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <a-radio-group size="small" :value="winSortBy" @change="onWinSortChange">
+                    <a-radio-button value="CPU">{{ $t('sort_by_cpu') }}</a-radio-button>
+                    <a-radio-button value="MEM">{{ $t('sort_by_mem') }}</a-radio-button>
+                  </a-radio-group>
+                  <a-tooltip :title="$t('top_settings')">
+                    <a-button size="small" icon="setting" @click="openTopConfigModal('VM_WIN')" />
+                  </a-tooltip>
+                </div>
+              </div>
+            </template>
+            <div class="homeTopList" :style="cssVars">
+              <div class="topListHeader">
+                <span class="col-name">{{ $t('column_hostname') }}</span>
+                <template v-if="winSortBy === 'CPU'">
+                  <span class="col-metric">{{ $t('top_header_cpu') }}</span>
+                  <span class="col-metric">{{ $t('top_header_mem') }}</span>
+                </template>
+                <template v-else>
+                  <span class="col-metric">{{ $t('top_header_mem') }}</span>
+                  <span class="col-metric">{{ $t('top_header_cpu') }}</span>
+                </template>
+              </div>
+              <div class="beauty-scroll listBody">
+                <div class="topListItem" v-for="(v, i) in winTop" :key="'winTop-'+i">
+                  <div class="col-name" :title="hostTitle(v)">
+                    <div class="rank-icon"><img :src="require('../../assets/img/top'+(i+1)+'.png')" v-if="i < 3" /><span v-else>{{i+1}}</span></div>
+                    <div class="host-info">
+                      <a-tag v-if="v.instance_name" :color="theme.color" class="instance-tag-small">{{v.instance_name}}</a-tag>
+                      <span class="hostname">{{v.hostname}}</span>
+                    </div>
+                  </div>
+                  <template v-if="winSortBy === 'CPU'">
+                    <div class="col-metric">
+                      <legent :rate="v.cpu" :height="20"></legent>
+                      <span class="metric-value">{{fmtPercent(v.cpu)}}</span>
+                    </div>
+                    <div class="col-metric">
+                      <legent :rate="v.mem" :height="20"></legent>
+                      <span class="metric-value">{{fmtPercent(v.mem)}}</span>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div class="col-metric">
+                      <legent :rate="v.mem" :height="20"></legent>
+                      <span class="metric-value">{{fmtPercent(v.mem)}}</span>
+                    </div>
+                    <div class="col-metric">
+                      <legent :rate="v.cpu" :height="20"></legent>
+                      <span class="metric-value">{{fmtPercent(v.cpu)}}</span>
+                    </div>
+                  </template>
+                </div>
+                <div class="topListItem empty" v-for="i in winTopNum-winTop.length" :key="'winTop-empty-'+i"></div>
+              </div>
+            </div>
+          </a-card>
+        </a-card>
+      </a-col>
+    </a-row>
     <div style="width: 100%;height: 20px;"></div>
   </page-layout>
 </template>
@@ -245,7 +230,6 @@ import {
 } from '@/services/admin'
 import { message } from 'ant-design-vue'
 import { parseTimeFun } from '@/utils/formatter'
-import pie from '@/components/gcharts/pie'
 import legent from '@/components/gcharts/legent'
 import EgressBandwidth from '@/components/egress/EgressBandwidth'
 import { mapState } from 'vuex'
@@ -272,7 +256,9 @@ export default {
         net_count: 0,
         srv_count: 0,
         win_count: 0,
-        lin_count: 0
+        lin_count: 0,
+        total_count: 0,
+        asset_type_counts: []
       },
       egressData: [], // 改为数组，支持多个出口
       egressUpdateTime: '', // 出口带宽采集时间
@@ -305,11 +291,27 @@ export default {
     },
     topConfigTitle() {
       return this.topConfigType === 'VM_WIN' ? this.$t('top_settings_title_win') : this.$t('top_settings_title_lin')
+    },
+    deviceStats() {
+      const counts = Array.isArray(this.info.asset_type_counts) ? this.info.asset_type_counts : []
+      if (counts.length) {
+        return counts.map(item => ({
+          type_code: item.type_code,
+          name: this.getPrimaryName(item.name || item.type_code),
+          count: item.count || 0
+        }))
+      }
+
+      return [
+        { type_code: 'HW_NET', name: this.$t('device_network_devices'), count: this.info.net_count || 0 },
+        { type_code: 'HW_SRV', name: this.$t('device_server_devices'), count: this.info.srv_count || 0 },
+        { type_code: 'VM_WIN', name: this.$t('device_windows_hosts'), count: this.info.win_count || 0 },
+        { type_code: 'VM_LIN', name: this.$t('device_linux_hosts'), count: this.info.lin_count || 0 }
+      ]
     }
   },
   components: {
     PageLayout,
-    pie,
     legent,
     EgressBandwidth
   },
@@ -332,6 +334,10 @@ export default {
     }
   },
   methods: {
+    getPrimaryName(name) {
+      if (!name) return ''
+      return String(name).replace(/\s*[（(][^（）()]*[）)]\s*$/u, '').trim()
+    },
     goToZabbixConfig() {
       this.$router.push('/system/zabbix')
     },
@@ -477,12 +483,15 @@ export default {
       indexInfo()
         .then((resp) => {
           let res = resp.data
+          const data = (res && res.data) || {}
           // 确保数据有默认值
           this.info = {
-            net_count: res.data?.net_count || 0,
-            srv_count: res.data?.srv_count || 0,
-            win_count: res.data?.win_count || 0,
-            lin_count: res.data?.lin_count || 0
+            net_count: data.net_count || 0,
+            srv_count: data.srv_count || 0,
+            win_count: data.win_count || 0,
+            lin_count: data.lin_count || 0,
+            total_count: data.total_count || 0,
+            asset_type_counts: Array.isArray(data.asset_type_counts) ? data.asset_type_counts : []
           }
           // 如果有数据或者明确返回成功，认为实例已配置
           if (res && (res.code === 200 || res.code === 0)) {
@@ -500,7 +509,9 @@ export default {
             net_count: 0,
             srv_count: 0,
             win_count: 0,
-            lin_count: 0
+            lin_count: 0,
+            total_count: 0,
+            asset_type_counts: []
           }
         })
         .finally(() => {
@@ -608,7 +619,12 @@ export default {
 </script>
 
 <style lang="less">
+.top-panels-row {
+  margin-bottom: 20px;
+}
+
 .homeTopList {
+  --top-row-height: 49px;
   width: 100%;
   padding: 10px 20px;
   .topListHeader {
@@ -630,12 +646,15 @@ export default {
     }
   }
   .listBody {
-    max-height: 400px;
+    height: calc(var(--top-row-height) * 10);
+    max-height: calc(var(--top-row-height) * 10);
     overflow-y: auto;
   }
   .topListItem {
     display: flex;
     align-items: center;
+    min-height: var(--top-row-height);
+    box-sizing: border-box;
     padding: 8px 0;
     border-bottom: 1px solid #f0f0f0;
     transition: all 0.3s;
@@ -643,7 +662,8 @@ export default {
       background: var(--primary-bg);
     }
     &.empty {
-      height: 50px;
+      height: var(--top-row-height);
+      min-height: var(--top-row-height);
       border-bottom: none;
     }
     .col-name {
