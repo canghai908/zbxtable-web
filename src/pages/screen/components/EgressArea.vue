@@ -81,7 +81,13 @@ export default {
           textStyle: { color: 'rgba(207,232,255,0.75)', fontSize: 12 },
           data: [this.$t('egress_in'), this.$t('egress_out')]
         },
-        grid: { left: 60, right: 18, top: 30, bottom: 30 },
+        grid: {
+          left: 12,
+          right: 18,
+          top: 30,
+          bottom: 30,
+          containLabel: true
+        },
         xAxis: {
           type: 'category',
           data: xs,
@@ -96,6 +102,7 @@ export default {
           axisLabel: {
             color: 'rgba(207,232,255,0.6)',
             fontSize: 11,
+            margin: 12,
             formatter: v => this.fmt(v)
           }
         },
