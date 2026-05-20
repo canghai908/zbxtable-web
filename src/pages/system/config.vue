@@ -164,6 +164,7 @@
                 <a-select v-model="aiForm.ai_type" :placeholder="getConfigComment('ai_type')" style="width: 100%" @change="onAiTypeChange">
                   <a-select-option value="ollama">Ollama</a-select-option>
                   <a-select-option value="deepseek">Deepseek</a-select-option>
+                  <a-select-option value="custom">Custom</a-select-option>
                 </a-select>
                 <div class="config-hint">{{ getConfigComment('ai_type') }}</div>
               </a-form-model-item>
@@ -180,6 +181,15 @@
               <template v-if="aiForm.ai_type === 'deepseek'">
                 <a-form-model-item v-for="item in deepseekConfigs" :key="item.id" :label="item.name">
                   <a-input-password v-if="item.config_key === 'deepseek_api_key'" v-model="aiForm[item.config_key]" :placeholder="item.comment" />
+                  <a-input v-else v-model="aiForm[item.config_key]" :placeholder="item.comment" />
+                  <div class="config-hint">{{ item.comment }}</div>
+                </a-form-model-item>
+              </template>
+
+              <!-- Custom(OpenAI-compatible) 配置项 -->
+              <template v-if="aiForm.ai_type === 'custom'">
+                <a-form-model-item v-for="item in customConfigs" :key="item.id" :label="item.name">
+                  <a-input-password v-if="item.config_key === 'custom_api_key'" v-model="aiForm[item.config_key]" :placeholder="item.comment" />
                   <a-input v-else v-model="aiForm[item.config_key]" :placeholder="item.comment" />
                   <div class="config-hint">{{ item.comment }}</div>
                 </a-form-model-item>
@@ -338,6 +348,7 @@ export default {
         item.config_key && (
           item.config_key.startsWith('ollama_') ||
           item.config_key.startsWith('deepseek_') ||
+          item.config_key.startsWith('custom_') ||
           item.config_key === 'ai_type' ||
           item.config_key === 'alarm_analysis_prompt'
         )
@@ -351,6 +362,11 @@ export default {
     deepseekConfigs() {
       return this.list.filter(item => 
         item.config_key && item.config_key.startsWith('deepseek_')
+      )
+    },
+    customConfigs() {
+      return this.list.filter(item =>
+        item.config_key && item.config_key.startsWith('custom_')
       )
     },
     securityConfigs() {

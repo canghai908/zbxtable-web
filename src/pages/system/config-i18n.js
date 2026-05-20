@@ -132,7 +132,7 @@ module.exports = {
       },
       ai_type: {
         name: 'AI 类型',
-        comment: '选择使用的 AI 服务类型：ollama 或 deepseek'
+        comment: '选择使用的 AI 服务类型：ollama、deepseek 或 custom'
       },
       alarm_analysis_prompt: {
         name: '告警分析提示词',
@@ -157,6 +157,18 @@ module.exports = {
       deepseek_base_url: {
         name: 'Deepseek Base URL',
         comment: 'Deepseek API 地址，默认为 https://api.deepseek.com'
+      },
+      custom_api_key: {
+        name: 'Custom API Key',
+        comment: 'OpenAI 兼容接口的 API Key'
+      },
+      custom_model: {
+        name: 'Custom Model',
+        comment: 'OpenAI 兼容接口的模型名称'
+      },
+      custom_base_url: {
+        name: 'Custom Base URL',
+        comment: 'OpenAI 兼容接口地址，如 https://api.example.com/v1'
       },
       dash_top_lin_num: {
         name: 'Linux Top 数量',
@@ -298,7 +310,7 @@ module.exports = {
       },
       ai_type: {
         name: 'AI 類型',
-        comment: '選擇使用的 AI 服務類型：ollama 或 deepseek'
+        comment: '選擇使用的 AI 服務類型：ollama、deepseek 或 custom'
       },
       alarm_analysis_prompt: {
         name: '告警分析提示詞',
@@ -323,6 +335,18 @@ module.exports = {
       deepseek_base_url: {
         name: 'Deepseek Base URL',
         comment: 'Deepseek API 地址，默認為 https://api.deepseek.com'
+      },
+      custom_api_key: {
+        name: 'Custom API Key',
+        comment: 'OpenAI 相容接口的 API Key'
+      },
+      custom_model: {
+        name: 'Custom Model',
+        comment: 'OpenAI 相容接口的模型名稱'
+      },
+      custom_base_url: {
+        name: 'Custom Base URL',
+        comment: 'OpenAI 相容接口地址，如 https://api.example.com/v1'
       },
       dash_top_lin_num: {
         name: 'Linux Top 數量',
@@ -464,7 +488,7 @@ module.exports = {
       },
       ai_type: {
         name: 'AI Type',
-        comment: 'Select AI service type: ollama or deepseek'
+        comment: 'Select AI service type: ollama, deepseek, or custom'
       },
       alarm_analysis_prompt: {
         name: 'Alarm Analysis Prompt',
@@ -489,6 +513,18 @@ module.exports = {
       deepseek_base_url: {
         name: 'Deepseek Base URL',
         comment: 'Deepseek API base URL, default is https://api.deepseek.com'
+      },
+      custom_api_key: {
+        name: 'Custom API Key',
+        comment: 'API key for an OpenAI-compatible endpoint'
+      },
+      custom_model: {
+        name: 'Custom Model',
+        comment: 'Model name for an OpenAI-compatible endpoint'
+      },
+      custom_base_url: {
+        name: 'Custom Base URL',
+        comment: 'OpenAI-compatible API base URL, e.g. https://api.example.com/v1'
       },
       dash_top_lin_num: {
         name: 'Linux Top Number',
