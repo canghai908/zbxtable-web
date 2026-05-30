@@ -154,6 +154,7 @@
 import PageLayout from "@/layouts/PageLayout";
 import config from "../../../package.json";
 import { baseVersion, systemCheckUpdate, systemDoUpdate } from "@/services/admin";
+import { removeAuthorization } from "@/utils/request";
 
 export default {
   name: "version",
@@ -317,9 +318,15 @@ export default {
       document.body.removeChild(textArea)
     },
     
-    // 刷新页面
+    // 刷新页面：清除登录态并跳转登录页，确保新版本路由生效
     refreshPage() {
-      window.location.reload()
+      removeAuthorization()
+      ;[
+        process.env.VUE_APP_ROUTES_KEY,
+        process.env.VUE_APP_PERMISSIONS_KEY,
+        process.env.VUE_APP_ROLES_KEY,
+      ].forEach(key => key && localStorage.removeItem(key))
+      this.$router.push('/login')
     }
   },
 };

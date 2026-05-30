@@ -1,5 +1,6 @@
 <template>
-  <page-layout :title="detail.name">
+  <page-layout :title="detail.name" :custom-breadcrumb="breadcrumbItems">
+    <a-button slot="action" icon="arrow-left" @click="goBack">返回</a-button>
     <div slot="headerContent" class="linux-detail">
       <!-- 主机基本信息 -->
       <a-card :headStyle="{...$cardHeadStyle, marginBottom: '12px'}" :bodyStyle="{padding: '12px'}" :title="$t('ser_card_basic_info')">
@@ -120,6 +121,14 @@ export default {
       detail: "",
     };
   },
+  computed: {
+    breadcrumbItems() {
+      if (this.$route.query.from === 'assets') {
+        return ['资产管理', '资产树', '设备详情']
+      }
+      return null
+    },
+  },
   created() {
     this.dates = new Date().getTime();
     this.dater = parseTimeFun(this.dates);
@@ -128,6 +137,15 @@ export default {
     this.init();
   },
   methods: {
+    // 返回：从资产管理进入则回到对应设备类型列表，否则返回上一页
+    goBack() {
+      if (this.$route.query.from === 'assets') {
+        const t = this.$route.query.fromType
+        this.$router.push(t ? `/assets/tree?type=${t}` : '/assets/tree')
+      } else {
+        this.$router.back()
+      }
+    },
     init() {
       hostDetail(this.id, this.zid).then((resp) => {
         let res = resp.data;

@@ -49,12 +49,6 @@ const options = {
               component: () => import("@/pages/dashboard/index"),
             },
             {
-              path: "inventory",
-              name: "资产管理",
-              meta: { page: { closable: false } },
-              component: () => import("@/pages/dashboard/inventory"),
-            },
-            {
               path: "overview",
               name: "状态总览",
               meta: { page: { closable: false } },
@@ -63,21 +57,12 @@ const options = {
           ],
         },
         {
+          // 主机/网络/硬件列表已并入“资产管理”，父容器保留仅用于挂载详情路由
           path: "host",
           name: "主机应用",
-          meta: { icon: "hdd", page: { cacheAble: false } },
+          meta: { icon: "hdd", page: { cacheAble: false }, invisible: true },
           component: BlankView,
           children: [
-            {
-              path: "linux",
-              name: "Linux系统",
-              component: () => import("@/pages/host/linuxList"),
-            },
-            {
-              path: "windows",
-              name: "Windows系统",
-              component: () => import("@/pages/host/winList"),
-            },
             {
               path: "windetail",
               name: "Windows详情",
@@ -95,14 +80,9 @@ const options = {
         {
           path: "net",
           name: "网络管理",
-          meta: { icon: "ie", page: { cacheAble: false } },
+          meta: { icon: "ie", page: { cacheAble: false }, invisible: true },
           component: BlankView,
           children: [
-            {
-              path: "list",
-              name: "网络设备",
-              component: () => import("@/pages/host/netList"),
-            },
             {
               path: "detail",
               name: "设备详情",
@@ -114,14 +94,9 @@ const options = {
         {
           path: "server",
           name: "硬件管理",
-          meta: { icon: "folder", page: { cacheAble: false } },
+          meta: { icon: "folder", page: { cacheAble: false }, invisible: true },
           component: BlankView,
           children: [
-            {
-              path: "list",
-              name: "物理服务器",
-              component: () => import("@/pages/host/serList"),
-            },
             {
               path: "detail",
               name: "详细信息",
@@ -229,7 +204,7 @@ const options = {
             },
             {
               path: "asset-management",
-              name: "资产管理",
+              name: "资产设置",
               component: () => import("@/pages/system/asset-management"),
             },
             {

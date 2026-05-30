@@ -42,5 +42,6 @@ module.exports = {
 	SYSTEM_UPDATE: '/v1/system',
 	SYSTEM_PUBLIC_INFO: '/v1/info',
 	ASSET_TYPE: '/v1/asset-type',
+	ASSET_GROUP: '/v1/asset-group',
 	SYSTEM_BINDING: '/v1/system',
 }

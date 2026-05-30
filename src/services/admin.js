@@ -36,6 +36,7 @@ import {
 	METRIC_MAPPING,
 	SYSTEM_UPDATE,
 	ASSET_TYPE,
+	ASSET_GROUP,
 	SYSTEM_BINDING,
 } from '@/services/api'
 import { request, METHOD } from '@/utils/request'
@@ -386,6 +387,26 @@ export async function updateAssetType(id, params) {
 export async function deleteAssetType(id) {
 	return request(ASSET_TYPE + '/' + id, METHOD.DELETE)
 }
+export async function getAssetTypeFields(id) {
+	return request(ASSET_TYPE + '/' + id + '/fields', METHOD.GET)
+}
+export async function updateAssetTypeFields(id, fields) {
+	return request(ASSET_TYPE + '/' + id + '/fields', METHOD.PUT, fields)
+}
+
+// 设备分组管理
+export async function getAssetGroups() {
+	return request(ASSET_GROUP, METHOD.GET)
+}
+export async function createAssetGroup(params) {
+	return request(ASSET_GROUP, METHOD.POST, params)
+}
+export async function updateAssetGroup(id, params) {
+	return request(ASSET_GROUP + '/' + id, METHOD.PUT, params)
+}
+export async function deleteAssetGroup(id) {
+	return request(ASSET_GROUP + '/' + id, METHOD.DELETE)
+}
 
 // 资产绑定配置
 export async function getSystemBindings() {
@@ -501,6 +522,12 @@ export default {
 	createAssetType,
 	updateAssetType,
 	deleteAssetType,
+	getAssetTypeFields,
+	updateAssetTypeFields,
+	getAssetGroups,
+	createAssetGroup,
+	updateAssetGroup,
+	deleteAssetGroup,
 	getSystemBindings,
 	createSystemBinding,
 	updateSystemBinding,

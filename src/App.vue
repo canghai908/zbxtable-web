@@ -105,7 +105,8 @@ export default {
     },
     setHtmlTitle() {
       const route = this.$route
-      const key = route.path === '/' ? 'home.name' : getI18nKey(route.matched[route.matched.length - 1].path)
+      const lastMatched = route && route.matched && route.matched.length > 0 ? route.matched[route.matched.length - 1] : null
+      const key = route.path === '/' ? 'home.name' : lastMatched ? getI18nKey(lastMatched.path) : 'home.name'
       document.title = process.env.VUE_APP_NAME + ' | ' + this.$t(key)
     },
     popContainer() {

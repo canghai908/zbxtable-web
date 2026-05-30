@@ -53,7 +53,10 @@ function hasAnyRole(required, roles) {
  * @returns {boolean}
  */
 function hasAuthority(route, permissions, roles) {
-  const authorities = [...route.meta.pAuthorities, route.meta.authority]
+  if (!route.meta) return true
+  const pAuthorities = Array.isArray(route.meta.pAuthorities) ? route.meta.pAuthorities : []
+  const authorities = [...pAuthorities, route.meta.authority].filter(Boolean)
+  if (authorities.length === 0) return true
   for (let authority of authorities) {
     if (!hasPermission(authority, permissions) && !hasRole(authority, roles)) {
       return false

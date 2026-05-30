@@ -41,7 +41,12 @@ function parseRoutes(routesConfig, routerMap) {
     }
     if (!router) {
       console.warn(`can't find register for router ${routeCfg.router}, please register it in advance.`)
-      router = typeof item === 'string' ? {path: item, name: item} : item
+      // 动态资产分组作为父菜单容器，没有注册时用 blank 视图兜底
+      const fallback = typeof item === 'string' ? {path: item, name: item} : item
+      router = {
+        ...fallback,
+        component: fallback.component || (() => import('@/layouts/BlankView')),
+      }
     }
     // 从 router 和 routeCfg 解析路由
     const meta = {

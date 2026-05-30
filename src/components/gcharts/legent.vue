@@ -23,7 +23,8 @@ export default {
       return this.theme.color || '#1890ff'
     },
     lightColor() {
-      return this.adjustColor(this.themeColor, 80)
+      // 与白色混合生成柔和浅色（混合 78% 白），避免对高亮度主题色（如青色）提亮后过曝刺眼
+      return this.mixWithWhite(this.themeColor, 0.78)
     },
     clampedRate() {
       const n = Number(this.rate)
@@ -32,11 +33,15 @@ export default {
     }
   },
   methods: {
-    adjustColor(hex, amount) {
+    // 将颜色与白色按比例混合：ratio 越大越接近白色（越浅、越柔和）
+    mixWithWhite(hex, ratio) {
       const num = parseInt(hex.slice(1), 16)
-      const r = Math.min(255, Math.max(0, (num >> 16) + amount))
-      const g = Math.min(255, Math.max(0, ((num >> 8) & 0x00ff) + amount))
-      const b = Math.min(255, Math.max(0, (num & 0x0000ff) + amount))
+      const r0 = num >> 16
+      const g0 = (num >> 8) & 0x00ff
+      const b0 = num & 0x0000ff
+      const r = Math.round(r0 + (255 - r0) * ratio)
+      const g = Math.round(g0 + (255 - g0) * ratio)
+      const b = Math.round(b0 + (255 - b0) * ratio)
       return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`
     },
     isActive(index) {

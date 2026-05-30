@@ -27,7 +27,7 @@ import {getI18nKey} from '@/utils/routerUtil'
 export default {
   name: 'PageLayout',
   components: {PageHeader},
-  props: ['desc', 'logo', 'title', 'avatar', 'linkList', 'extraImage', "noTitle"],
+  props: ['desc', 'logo', 'title', 'avatar', 'linkList', 'extraImage', "noTitle", "customBreadcrumb"],
   data () {
     return {
       page: {},
@@ -70,6 +70,10 @@ export default {
       return this.$t(getI18nKey(route.matched[route.matched.length - 1].path))
     },
     breadcrumb() {
+      // 优先使用外部传入的自定义面包屑（直接作为展示文本，缺失的 i18n key 原样返回）
+      if (this.customBreadcrumb && this.customBreadcrumb.length) {
+        return this.customBreadcrumb.map(item => this.$t(item))
+      }
       let page = this.page
       let breadcrumb = page && page.breadcrumb
       if (breadcrumb) {
