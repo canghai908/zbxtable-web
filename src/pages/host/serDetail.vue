@@ -52,7 +52,15 @@
           <a-col :xl="6" :lg="8" :md="12" :sm="24">
             <div class="info-item">
               <span class="info-label" :style="{color: themeColor, opacity: 0.85}">{{ $t('ser_label_expiry_date') }}:</span>
-              <span class="info-value">{{detail.date_hw_expiry || "--"}}</span>
+              <span class="info-value">
+                <a-tooltip v-if="detail.date_hw_expiry" :title="expiryStatus(detail.date_hw_expiry).tip">
+                  <a-tag :color="expiryStatus(detail.date_hw_expiry).color">
+                    {{ detail.date_hw_expiry }}
+                    <span style="margin-left: 4px;">{{ expiryStatus(detail.date_hw_expiry).text }}</span>
+                  </a-tag>
+                </a-tooltip>
+                <template v-else>--</template>
+              </span>
             </div>
           </a-col>
         </a-row>
@@ -106,7 +114,7 @@
 <script>
 import PageLayout from "@/layouts/PageLayout";
 import { hostDetail } from "@/services/admin";
-import { parseTimeFun } from "@/utils/formatter";
+import { parseTimeFun, expiryStatus } from "@/utils/formatter";
 import themeMixin from '@/mixins/themeMixin';
 
 export default {
@@ -124,7 +132,7 @@ export default {
   computed: {
     breadcrumbItems() {
       if (this.$route.query.from === 'assets') {
-        return ['资产管理', '资产树', '设备详情']
+        return ['设备管理', '设备树', '设备详情']
       }
       return null
     },
@@ -137,6 +145,10 @@ export default {
     this.init();
   },
   methods: {
+    // 维保到期状态（共享工具，详见 @/utils/formatter）
+    expiryStatus(dateStr) {
+      return expiryStatus(dateStr)
+    },
     // 返回：从资产管理进入则回到对应设备类型列表，否则返回上一页
     goBack() {
       if (this.$route.query.from === 'assets') {

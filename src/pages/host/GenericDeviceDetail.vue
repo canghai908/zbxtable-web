@@ -61,6 +61,15 @@
                     />
                     <a-input v-else v-model.trim="editForm[field.key]" size="small" style="width: 200px;" />
                   </template>
+                  <!-- 维保到期：按距当前时间远近显示不同风格的 Tag -->
+                  <template v-else-if="field.key === 'date_hw_expiry' && detail[field.key]">
+                    <a-tooltip :title="expiryStatus(detail[field.key]).tip">
+                      <a-tag :color="expiryStatus(detail[field.key]).color">
+                        {{ detail[field.key] }}
+                        <span style="margin-left: 4px;">{{ expiryStatus(detail[field.key]).text }}</span>
+                      </a-tag>
+                    </a-tooltip>
+                  </template>
                   <span v-else>{{ detail[field.key] || '--' }}</span>
                 </template>
               </a-descriptions-item>
@@ -116,7 +125,7 @@
 import PageLayout from '@/layouts/PageLayout'
 import moment from 'moment'
 import { hostDetail, hostGraph, hostUpdate, getAssetTypes, getAssetTypeFields } from '@/services/admin'
-import { parseTimeFun } from '@/utils/formatter'
+import { parseTimeFun, expiryStatus } from '@/utils/formatter'
 import themeMixin from '@/mixins/themeMixin'
 
 const EDITABLE_FIELDS = new Set(['location', 'department', 'resource_id', 'mac', 'date_hw_install', 'date_hw_expiry'])
@@ -150,7 +159,7 @@ export default {
   },
   computed: {
     breadcrumbItems() {
-      return ['资产管理', '资产树', this.typeName || '设备详情']
+      return ['设备管理', '设备树', this.typeName || '设备详情']
     },
     visibleFields() {
       return this.fieldConfigs
@@ -235,6 +244,10 @@ export default {
     fmtPercent(val) {
       const n = parseFloat(String(val).split(' ')[0])
       return isNaN(n) ? '--' : n.toFixed(1) + '%'
+    },
+    // 维保到期状态（共享工具，详见 @/utils/formatter）
+    expiryStatus(dateStr) {
+      return expiryStatus(dateStr)
     },
 
     goBack() {

@@ -70,6 +70,24 @@
           </span>
         </template>
 
+        <!-- 维保到期：按距当前时间远近显示不同风格的 Tag（已过期 / 紧急 / 临近 / 提醒 / 正常） -->
+        <span slot="date_hw_expiry" slot-scope="record">
+          <a-date-picker
+            v-if="isEditing(record)"
+            v-model="editForm.date_hw_expiry"
+            value-format="YYYY-MM-DD"
+            size="small"
+            style="width: 100%;"
+          />
+          <a-tooltip v-else-if="record.date_hw_expiry" :title="expiryStatus(record.date_hw_expiry).tip">
+            <a-tag :color="expiryStatus(record.date_hw_expiry).color">
+              {{ record.date_hw_expiry }}
+              <span style="margin-left: 4px;">{{ expiryStatus(record.date_hw_expiry).text }}</span>
+            </a-tag>
+          </a-tooltip>
+          <template v-else>--</template>
+        </span>
+
         <div slot="instance_name" slot-scope="record">
           <a-tag :color="$themeColor">{{ record.instance_name || '未知' }}</a-tag>
         </div>
@@ -189,7 +207,15 @@
           <a-descriptions-item label="资产编号">{{ detailRecord.resource_id || '--' }}</a-descriptions-item>
           <a-descriptions-item label="MAC地址">{{ detailRecord.mac || '--' }}</a-descriptions-item>
           <a-descriptions-item label="安装时间">{{ detailRecord.date_hw_install || '--' }}</a-descriptions-item>
-          <a-descriptions-item label="维保到期">{{ detailRecord.date_hw_expiry || '--' }}</a-descriptions-item>
+          <a-descriptions-item label="维保到期">
+            <a-tooltip v-if="detailRecord.date_hw_expiry" :title="expiryStatus(detailRecord.date_hw_expiry).tip">
+              <a-tag :color="expiryStatus(detailRecord.date_hw_expiry).color">
+                {{ detailRecord.date_hw_expiry }}
+                <span style="margin-left: 4px;">{{ expiryStatus(detailRecord.date_hw_expiry).text }}</span>
+              </a-tag>
+            </a-tooltip>
+            <template v-else>--</template>
+          </a-descriptions-item>
         </a-descriptions>
       </a-modal>
     </div>
@@ -200,12 +226,13 @@
 import PageLayout from '@/layouts/PageLayout'
 import moment from 'moment'
 import { hostList, hostExport, hostUpdate, hostGraph, getAssetTypes, getAssetTypeFields } from '@/services/admin'
-import { parseTimeFun } from '@/utils/formatter'
+import { parseTimeFun, expiryStatus } from '@/utils/formatter'
 import AssetTypeFieldDrawer from '@/pages/system/asset-type-fields.vue'
 
 // 专用 slot key（有单独的 template slot，不走通用文本 slot）
 const DEDICATED_SLOTS = new Set([
   'instance_name', 'cpu_utilization', 'memory_utilization', 'ping', 'available', 'operation',
+  'date_hw_expiry',
 ])
 
 // 可内联编辑的资产字段（与原 inventory 页面一致）
@@ -476,6 +503,10 @@ export default {
     fmtPercent(v) {
       const n = parseFloat(v)
       return isNaN(n) ? '--' : n.toFixed(1) + '%'
+    },
+    // 维保到期状态（共享工具，详见 @/utils/formatter）
+    expiryStatus(dateStr) {
+      return expiryStatus(dateStr)
     },
     // ── 详情弹窗内的图表 ──────────────────────────────────────
     resetGraphRange() {
