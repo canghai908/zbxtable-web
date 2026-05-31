@@ -31,58 +31,33 @@ const routerMap = {
 	workplace: {
 		component: () => import('@/pages/dashboard/index'),
 	},
-	inventory: {
-		component: () => import('@/pages/dashboard/inventory'),
-	},
 	overview: {
 		component: () => import('@/pages/dashboard/overview'),
 	},
 	dash: {
 		component: () => import('@/pages/dashboard/dash'),
 	},
-	//host
+	// host/net/server 父容器保留：仅用于挂载各设备详情路由（列表已并入“资产管理”）
 	host: {
 		component: view.blank,
-	},
-	linux: {
-		component: () => import('@/pages/host/linuxList'),
 	},
 	linDetail: {
 		component: () => import('@/pages/host/linuxDetail'),
 	},
-	windows: {
-		component: () => import('@/pages/host/winList'),
-	},
 	winDetail: {
 		component: () => import('@/pages/host/winDetail'),
 	},
-	//net
 	net: {
 		component: view.blank,
-	},
-	netList: {
-		component: () => import('@/pages/host/netList'),
 	},
 	netDetail: {
 		component: () => import('@/pages/host/netDetail'),
 	},
-	//server
 	server: {
 		component: view.blank,
 	},
-	srvList: {
-		component: () => import('@/pages/host/serList'),
-	},
 	srvDetail: {
 		component: () => import('@/pages/host/serDetail'),
-	},
-	//光纤交换机
-	sanList: {
-		component: () => import('@/pages/host/sanList'),
-	},
-	//存储设备
-	stoList: {
-		component: () => import('@/pages/host/stoList'),
 	},
 	//alarm
 	alarm: {
@@ -166,6 +141,27 @@ const routerMap = {
 	},
 	assetBinding: {
 		component: () => import('@/pages/system/asset-binding'),
+	},
+	// 自定义设备类型通用列表（动态菜单路由使用）
+	deviceList: {
+		component: () => import('@/pages/host/GenericDeviceList'),
+	},
+	// 自定义设备类型通用详情页
+	deviceDetail: {
+		component: () => import('@/pages/host/GenericDeviceDetail'),
+	},
+	// 资产管理 一级父容器，默认进入“资产树”子页面
+	assets: {
+		component: view.blank,
+		redirect: '/assets/tree',
+	},
+	// 资产树（统一资产管理浏览器，三级树形视图）
+	assetBrowser: {
+		component: () => import('@/pages/host/AssetBrowser'),
+	},
+	// 自定义设备分组 父菜单占位（group_key 作为 router name）
+	custom: {
+		component: view.blank,
 	},
 
 	form: {

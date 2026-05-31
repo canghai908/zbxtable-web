@@ -112,7 +112,8 @@ export default {
     navigateToHost(host) {
       const route = this.resolveRoute(host)
       if (!route) {
-        this.$router.push('/dashboard/inventory')
+        // 资产管理已合并到顶级"资产管理"页面
+        this.$router.push('/assets/tree')
         return
       }
       this.$router.push(route)
@@ -135,7 +136,8 @@ export default {
         case 'HW_SRV':
           return `/server/detail?${params.join('&')}`
         default:
-          return '/dashboard/inventory'
+          // 自定义/未知类型：回退到统一资产管理页面
+          return '/assets/tree'
       }
     }
   }

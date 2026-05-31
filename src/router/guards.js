@@ -139,7 +139,9 @@ const authorityGuard = (to, from, next, options) => {
 const redirectGuard = (to, from, next, options) => {
   const {store} = options
   const getFirstChild = (routes) => {
+    if (!routes || routes.length === 0) return undefined
     const route = routes[0]
+    if (!route) return undefined
     if (!route.children || route.children.length === 0) {
       return route
     }
@@ -147,12 +149,14 @@ const redirectGuard = (to, from, next, options) => {
   }
   if (store.state.setting.layout === 'mix') {
     const firstMenu = store.getters['setting/firstMenu']
-    if (firstMenu.find(item => item.fullPath === to.fullPath)) {
+    if (firstMenu && firstMenu.find(item => item.fullPath === to.fullPath)) {
       store.commit('setting/setActivatedFirst', to.fullPath)
       const subMenu = store.getters['setting/subMenu']
-      if (subMenu.length > 0) {
+      if (subMenu && subMenu.length > 0) {
         const redirect = getFirstChild(subMenu)
-        return next({path: redirect.fullPath})
+        if (redirect && redirect.fullPath) {
+          return next({path: redirect.fullPath})
+        }
       }
     }
   }

@@ -107,12 +107,13 @@ export default {
       this.toggleCollapse()
     },
     setActivated(route) {
+      if (!route || !route.matched) return
       if (this.layout === 'mix') {
-        let matched = route.matched
+        let matched = route.matched.filter(Boolean)
         matched = matched.slice(0, matched.length - 1)
         const {firstMenu} = this
-        for (let menu of firstMenu) {
-          if (matched.findIndex(item => item.path === menu.fullPath) !== -1) {
+        for (let menu of (firstMenu || [])) {
+          if (matched.findIndex(item => item && item.path === menu.fullPath) !== -1) {
             this.setActivatedFirst(menu.fullPath)
             break
           }

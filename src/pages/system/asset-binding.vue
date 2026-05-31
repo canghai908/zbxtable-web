@@ -4,7 +4,7 @@
       <a-card :bordered="false" class="table-card">
         <template #title>
           <div class="table-card__title-wrap">
-            <div class="table-card__title">资产绑定配置</div>
+            <div class="table-card__title">设备绑定配置</div>
           </div>
         </template>
         <template #extra>
@@ -21,6 +21,7 @@
           :pagination="false"
           rowKey="id"
           :rowClassName="getRowClassName"
+          :scroll="{ x: 1770 }"
         >
           <span slot="name" slot-scope="text, record">
             <div class="binding-name-cell">
@@ -48,7 +49,9 @@
             </div>
           </span>
           <span slot="group_id" slot-scope="text, record">
-            <div class="group-cell">{{ formatGroupNames(record) }}</div>
+            <a-tooltip :title="formatGroupNames(record)">
+              <div class="group-cell">{{ formatGroupNames(record) }}</div>
+            </a-tooltip>
           </span>
           <span slot="status" slot-scope="text, record">
             <div class="status-cell">
@@ -260,7 +263,7 @@
       <a-card :bordered="false" class="table-card">
         <template #title>
           <div class="table-card__title-wrap">
-            <div class="table-card__title">资产绑定配置</div>
+            <div class="table-card__title">设备绑定配置</div>
           </div>
         </template>
         <template #extra>
@@ -277,6 +280,7 @@
           :pagination="false"
           rowKey="id"
           :rowClassName="getRowClassName"
+          :scroll="{ x: 1770 }"
         >
           <span slot="name" slot-scope="text, record">
             <div class="binding-name-cell">
@@ -304,7 +308,9 @@
             </div>
           </span>
           <span slot="group_id" slot-scope="text, record">
-            <div class="group-cell">{{ formatGroupNames(record) }}</div>
+            <a-tooltip :title="formatGroupNames(record)">
+              <div class="group-cell">{{ formatGroupNames(record) }}</div>
+            </a-tooltip>
           </span>
           <span slot="status" slot-scope="text, record">
             <div class="status-cell">
@@ -561,8 +567,8 @@ export default {
       itemLists: emptyLists(),
       itemsLoading: emptyLoading(),
       metricDefs: METRIC_DEFS,
-      autoInitSwitch: false,
-      initOnNewHostSwitch: false,
+      autoInitSwitch: true,
+      initOnNewHostSwitch: true,
       modalVisible: false,
       modalLoading: false,
       isEdit: false,
@@ -617,8 +623,8 @@ export default {
         name: '', zid: undefined, type_code: undefined, group_id: '',
         cpu_core: '', cpu_utilization_id: '', memory_utilization_id: '',
         memory_used_id: '', memory_total_id: '', uptime_id: '', model: '',
-        ping_template_id: '', auto_init: 0, init_cron: '0 0 2 * * *',
-        init_on_new_host: 0, max_retry: 3,
+        ping_template_id: '', auto_init: 1, init_cron: '0 0 2 * * *',
+        init_on_new_host: 1, max_retry: 3,
       };
     },
     async loadAssetTypes() {
@@ -777,8 +783,9 @@ export default {
       this.selectedItems = emptyItems();
       this.itemLists = emptyLists();
       this.itemsLoading = emptyLoading();
-      this.autoInitSwitch = false;
-      this.initOnNewHostSwitch = false;
+      // 新建时默认开启自动初始化（编辑时由 handleEdit 按记录覆盖）
+      this.autoInitSwitch = true;
+      this.initOnNewHostSwitch = true;
     },
     async handleAdd() {
       this.isEdit = false;
@@ -823,7 +830,11 @@ export default {
       this.$nextTick(() => { this.$refs.form && this.$refs.form.clearValidate(); });
       if (initialZid) {
         await this.handleInstanceChange(initialZid);
-        if (record.group_id) this.selectedGroups = record.group_id.split(',').filter(Boolean).map(String);
+        // handleInstanceChange 会清空 selectedGroups 和 form.group_id，这里恢复并同步回填 group_id
+        if (record.group_id) {
+          this.selectedGroups = record.group_id.split(',').filter(Boolean).map(String);
+          this.updateGroupId();
+        }
         if (record.ping_template_id) this.form.ping_template_id = record.ping_template_id;
       }
     },
@@ -857,7 +868,11 @@ export default {
       this.$nextTick(() => { this.$refs.form && this.$refs.form.clearValidate(); });
       if (initialZid) {
         await this.handleInstanceChange(initialZid);
-        if (record.group_id) this.selectedGroups = record.group_id.split(',').filter(Boolean).map(String);
+        // handleInstanceChange 会清空 selectedGroups 和 form.group_id，这里恢复并同步回填 group_id
+        if (record.group_id) {
+          this.selectedGroups = record.group_id.split(',').filter(Boolean).map(String);
+          this.updateGroupId();
+        }
         if (record.ping_template_id) this.form.ping_template_id = String(record.ping_template_id);
       }
     },
@@ -1019,6 +1034,9 @@ export default {
 .group-cell {
   color: #344054;
   line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .status-error-icon {
@@ -1027,15 +1045,17 @@ export default {
 }
 
 .auto-init-cell {
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
 }
 
 .auto-init-cron {
   font-size: 12px;
   color: #667085;
-  word-break: break-all;
+  white-space: nowrap;
 }
 
 .action-cell {

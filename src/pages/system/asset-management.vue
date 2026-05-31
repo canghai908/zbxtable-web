@@ -4,14 +4,17 @@
       <a-card :bordered="false">
         <div slot="title" class="asset-management-page__title">
           <a-icon type="appstore" />
-          <span>资产管理</span>
+          <span>设备配置</span>
         </div>
 
         <a-tabs :activeKey="activeTab" @change="handleTabChange">
-          <a-tab-pane key="type" tab="资产类型">
+          <a-tab-pane key="group" tab="设备分组">
+            <asset-group />
+          </a-tab-pane>
+          <a-tab-pane key="type" tab="设备类型">
             <asset-type embedded />
           </a-tab-pane>
-          <a-tab-pane key="binding" tab="资产绑定">
+          <a-tab-pane key="binding" tab="设备绑定">
             <asset-binding embedded />
           </a-tab-pane>
         </a-tabs>
@@ -24,18 +27,17 @@
 import PageLayout from "@/layouts/PageLayout";
 import AssetType from "./asset-type.vue";
 import AssetBinding from "./asset-binding.vue";
+import AssetGroup from "./asset-group.vue";
+
+const VALID_TABS = ['group', 'type', 'binding'];
 
 export default {
   name: 'AssetManagement',
-  components: {
-    PageLayout,
-    AssetType,
-    AssetBinding,
-  },
+  components: { PageLayout, AssetType, AssetBinding, AssetGroup },
   computed: {
     activeTab() {
       const tab = this.$route.query.tab;
-      return tab === 'binding' ? 'binding' : 'type';
+      return VALID_TABS.includes(tab) ? tab : 'group';
     },
   },
   methods: {
@@ -43,7 +45,7 @@ export default {
       if (tab === this.activeTab) return;
       this.$router.replace({
         path: this.$route.path,
-        query: tab === 'type' ? {} : { tab },
+        query: tab === 'group' ? {} : { tab },
       });
     },
   },

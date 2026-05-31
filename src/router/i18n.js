@@ -22,26 +22,16 @@ module.exports = {
       },
       host: {
         name: '主机应用',
-        linux: {name: 'Linux'},
-        windows: {name: 'Windows'},
         lindetail: {name: 'Linux详情'},
         windetail: {name: 'Windows详情'}
       },
       net: {
         name: '网络管理',
-        list: {name: '网络设备'},
         detail: {name: '设备详情'}
       },
       server: {
         name: '硬件管理',
-        list: {name: '物理服务器'},
-        srvList: {name: '物理服务器'},
-        detail: {name: '详细信息'},
-        srvDetail: {name: '详细信息'},
-        fiber: {name: '光纤交换机'},
-        sanList: {name: '光纤交换机'},
-        storage: {name: '存储设备'},
-        stoList: {name: '存储设备'}
+        detail: {name: '详细信息'}
       },
       topology: {
         name: '拓扑管理',
@@ -66,9 +56,9 @@ module.exports = {
         sysConfig: {name: '参数配置'},
         version: {name: '版本信息'},
         menu: {name: '菜单管理'},
-        'asset-management': {name: '资产管理'},
+        'asset-management': {name: '设备配置'},
         'asset-type': {name: '资产类型'},
-        'asset-binding': {name: '资产绑定'},
+        'asset-binding': {name: '设备绑定'},
       },
       form: {
         name: '表单页',
@@ -132,26 +122,16 @@ module.exports = {
       },
       host: {
         name: 'Host',
-        linux: {name: 'Linux'},
-        windows: {name: 'Windows'},
         lindetail: {name: 'Linux Details'},
         windetail: {name: 'Windows Details'}
       },
       net: {
         name: 'Network',
-        list: {name: 'Network'},
         detail: {name: 'Device Details'}
       },
       server: {
         name: 'Hardware',
-        list: {name: 'Physical Servers'},
-        srvList: {name: 'Physical Servers'},
-        detail: {name: 'Detailed Info'},
-        srvDetail: {name: 'Detailed Info'},
-        fiber: {name: 'Fiber Channel Switch'},
-        sanList: {name: 'Fiber Channel Switch'},
-        storage: {name: 'Storage Devices'},
-        stoList: {name: 'Storage Devices'}
+        detail: {name: 'Detailed Info'}
       },
       topology: {
         name: 'Topology',
@@ -176,9 +156,9 @@ module.exports = {
         sysConfig: {name: 'Parameter'},
         version: {name: 'Version'},
         menu: {name: 'Menu'},
-        'asset-management': {name: 'Asset Management'},
+        'asset-management': {name: 'Device Configuration'},
         'asset-type': {name: 'Asset Types'},
-        'asset-binding': {name: 'Asset Bindings'},
+        'asset-binding': {name: 'Device Bindings'},
       },
       form: {
         name: 'Form',
@@ -242,26 +222,16 @@ module.exports = {
       },
       host: {
         name: '主機應用',
-        linux: {name: 'Linux系統'},
-        windows: {name: 'Windows系統'},
         lindetail: {name: 'Linux詳情'},
         windetail: {name: 'Windows詳情'}
       },
       net: {
         name: '網絡管理',
-        list: {name: '網絡設備'},
         detail: {name: '設備詳情'}
       },
       server: {
         name: '硬件管理',
-        list: {name: '物理服務器'},
-        srvList: {name: '物理服務器'},
-        detail: {name: '詳細信息'},
-        srvDetail: {name: '詳細信息'},
-        fiber: {name: '光纖交換機'},
-        sanList: {name: '光纖交換機'},
-        storage: {name: '存儲設備'},
-        stoList: {name: '存儲設備'}
+        detail: {name: '詳細信息'}
       },
       topology: {
         name: '拓撲管理',
@@ -286,9 +256,9 @@ module.exports = {
         sysConfig: {name: '參數配置'},
         version: {name: '版本信息'},
         menu: {name: '菜單'},
-        'asset-management': {name: '資產管理'},
+        'asset-management': {name: '設備配置'},
         'asset-type': {name: '資產類型'},
-        'asset-binding': {name: '資產綁定'},
+        'asset-binding': {name: '設備綁定'},
       },
       form: {
         name: '表單頁',

@@ -330,7 +330,7 @@ export default {
             const routesConfig =
               routesRes && routesRes.data && routesRes.data ? routesRes.data : []
             loadRoutes(routesConfig)
-            
+
             // 加载系统配置（名称和Logo）
             this.loadSystemConfig()
             

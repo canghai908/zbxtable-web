@@ -1,5 +1,6 @@
 <template>
-  <page-layout :title="detail.name">
+  <page-layout :title="detail.name" :custom-breadcrumb="breadcrumbItems">
+    <a-button slot="action" icon="arrow-left" @click="goBack">返回</a-button>
     <div slot="headerContent" class="linux-detail">
       <!-- 主机基本信息 -->
       <a-card :headStyle="{...$cardHeadStyle, marginBottom: '12px'}" :bodyStyle="{padding: '12px'}" :title="$t('net_card_basic_info')">
@@ -39,7 +40,15 @@
           <a-col :xl="6" :lg="8" :md="12" :sm="24">
             <div class="info-item">
               <span class="info-label" :style="{color: themeColor, opacity: 0.85}">{{ $t('net_label_expiry_date') }}:</span>
-              <span class="info-value">{{detail.date_hw_expiry || "--"}}</span>
+              <span class="info-value">
+                <a-tooltip v-if="detail.date_hw_expiry" :title="expiryStatus(detail.date_hw_expiry).tip">
+                  <a-tag :color="expiryStatus(detail.date_hw_expiry).color">
+                    {{ detail.date_hw_expiry }}
+                    <span style="margin-left: 4px;">{{ expiryStatus(detail.date_hw_expiry).text }}</span>
+                  </a-tag>
+                </a-tooltip>
+                <template v-else>--</template>
+              </span>
             </div>
           </a-col>
           <a-col :xl="6" :lg="8" :md="12" :sm="24">
@@ -251,7 +260,7 @@ import {
   netInterfaceList,
   netInterfaceData
 } from '@/services/admin'
-import { parseTimeFun } from '@/utils/formatter'
+import { parseTimeFun, expiryStatus } from '@/utils/formatter'
 import moment from 'moment'
 import echarts from 'echarts'
 require('echarts-liquidfill')
@@ -365,6 +374,14 @@ export default {
       pingLossChart: null,
     }
   },
+  computed: {
+    breadcrumbItems() {
+      if (this.$route.query.from === 'assets') {
+        return ['设备管理', '设备树', '设备详情']
+      }
+      return null
+    },
+  },
   watch: {
     themeColor() {
       // 当主题颜色变化时，重新渲染图表
@@ -470,6 +487,19 @@ export default {
     }
   },
   methods: {
+    // 维保到期状态（共享工具，详见 @/utils/formatter）
+    expiryStatus(dateStr) {
+      return expiryStatus(dateStr)
+    },
+    // 返回：从资产管理进入则回到对应设备类型列表，否则返回上一页
+    goBack() {
+      if (this.$route.query.from === 'assets') {
+        const t = this.$route.query.fromType
+        this.$router.push(t ? `/assets/tree?type=${t}` : '/assets/tree')
+      } else {
+        this.$router.back()
+      }
+    },
     // 转换后端返回的中文字段名为 i18n
     translateChartData(data) {
       const nameMap = {

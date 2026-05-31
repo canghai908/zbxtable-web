@@ -188,4 +188,62 @@ function trafficeFormat(value) {
   return value;
 }
 
-module.exports = { formatConfig, parseTimeFun, trafficeFormat };
+/**
+ * 维保到期状态：根据到期日距今天的天数差，返回不同风格的 Tag 配置。
+ * 已过期(红) / 紧急≤7天(橙红) / 临近≤30天(橙) / 提醒≤90天(蓝) / 正常>90天(绿)
+ * @param  {String} dateStr  维保到期日期字符串（如 2026-08-01）
+ * @returns {Object} { color, text, tip }
+ */
+function expiryStatus(dateStr) {
+  const moment = require("moment");
+  if (!dateStr) {
+    return { color: "#808080", text: "", tip: "" };
+  }
+  const d = moment(dateStr, [
+    "YYYY-MM-DD",
+    "YYYY/MM/DD",
+    "YYYY-MM-DD HH:mm:ss",
+    moment.ISO_8601,
+  ]);
+  if (!d || !d.isValid()) {
+    return { color: "#808080", text: "", tip: dateStr };
+  }
+  const target = d.clone().startOf("day");
+  const diff = target.diff(moment().startOf("day"), "days");
+  const dateText = target.format("YYYY-MM-DD");
+  if (diff < 0) {
+    return {
+      color: "#DC143C",
+      text: `已过期${-diff}天`,
+      tip: `维保已于 ${dateText} 到期，已过期 ${-diff} 天`,
+    };
+  }
+  if (diff <= 7) {
+    return {
+      color: "#fa541c",
+      text: `剩${diff}天`,
+      tip: `维保将于 ${dateText} 到期，仅剩 ${diff} 天，请尽快续保`,
+    };
+  }
+  if (diff <= 30) {
+    return {
+      color: "#fa8c16",
+      text: `剩${diff}天`,
+      tip: `维保将于 ${dateText} 到期，剩余 ${diff} 天`,
+    };
+  }
+  if (diff <= 90) {
+    return {
+      color: "#1890ff",
+      text: `剩${diff}天`,
+      tip: `维保将于 ${dateText} 到期，剩余 ${diff} 天`,
+    };
+  }
+  return {
+    color: "#34af67",
+    text: "正常",
+    tip: `维保到期日 ${dateText}，剩余 ${diff} 天`,
+  };
+}
+
+module.exports = { formatConfig, parseTimeFun, trafficeFormat, expiryStatus };

@@ -13,6 +13,7 @@
       <a-form-model-item>
         <a-button type="primary" @click="init">{{ $t('search_btn') }}</a-button>
         <a-button style="margin-left: 10px;" @click="resetData">{{ $t('clear_filter_btn') }}</a-button>
+        <a-button style="margin-left: 10px;" icon="reload" @click="init">{{ $t('refresh_btn') }}</a-button>
         <a-button type="primary" style="margin-left: 10px;" @click="showFormModal">{{ $t('add_report_btn') }}</a-button>
       </a-form-model-item>
     </a-form-model>

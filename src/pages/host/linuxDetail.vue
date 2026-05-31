@@ -1,5 +1,6 @@
 <template>
-  <page-layout :title="detail.name">
+  <page-layout :title="detail.name" :custom-breadcrumb="breadcrumbItems">
+    <a-button slot="action" icon="arrow-left" @click="goBack">返回</a-button>
     <div slot="headerContent" class="linux-detail">
       <a-card :bodyStyle="{padding: '12px 20px'}" style="margin-bottom: 12px;">
         <!-- 第一行 -->
@@ -362,6 +363,15 @@ export default {
       pingLossChart: null,
     };
   },
+  computed: {
+    // 从设备管理进入时，面包屑显示“设备管理 / 设备树 / Linux详情”
+    breadcrumbItems() {
+      if (this.$route.query.from === 'assets') {
+        return ['设备管理', '设备树', 'Linux详情']
+      }
+      return null
+    },
+  },
   watch: {
     themeColor() {
       // 当主题颜色变化时，重新渲染图表
@@ -446,6 +456,15 @@ export default {
     }
   },
   methods: {
+    // 返回：从资产管理进入则回到对应设备类型列表，否则返回上一页
+    goBack() {
+      if (this.$route.query.from === 'assets') {
+        const t = this.$route.query.fromType
+        this.$router.push(t ? `/assets/tree?type=${t}` : '/assets/tree')
+      } else {
+        this.$router.back()
+      }
+    },
     // 转换后端返回的中文字段名为 i18n
     translateChartData(data) {
       const nameMap = {

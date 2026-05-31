@@ -397,7 +397,10 @@ export default {
     },
     async loadHostList(record) {
       try {
-        const res = await hostSearch({ zid: record.zid })
+        const res = await hostSearch({
+          zid: record.zid,
+          limit: 10000,
+        })
         const biz = (res && res.data) ? res.data : res
         if (biz && biz.code === 200) {
           record.hostList = biz.data.items || []
