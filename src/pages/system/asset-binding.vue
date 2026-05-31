@@ -4,7 +4,7 @@
       <a-card :bordered="false" class="table-card">
         <template #title>
           <div class="table-card__title-wrap">
-            <div class="table-card__title">资产绑定配置</div>
+            <div class="table-card__title">设备绑定配置</div>
           </div>
         </template>
         <template #extra>
@@ -263,7 +263,7 @@
       <a-card :bordered="false" class="table-card">
         <template #title>
           <div class="table-card__title-wrap">
-            <div class="table-card__title">资产绑定配置</div>
+            <div class="table-card__title">设备绑定配置</div>
           </div>
         </template>
         <template #extra>

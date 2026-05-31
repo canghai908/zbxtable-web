@@ -332,7 +332,7 @@ export default {
   computed: {
     breadcrumbItems() {
       if (this.$route.query.from === 'assets') {
-        return ['资产管理', '资产树', 'Windows详情']
+        return ['设备管理', '设备树', 'Windows详情']
       }
       return null
     },

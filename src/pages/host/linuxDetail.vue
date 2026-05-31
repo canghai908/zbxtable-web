@@ -364,10 +364,10 @@ export default {
     };
   },
   computed: {
-    // 从资产管理进入时，面包屑显示“资产管理 / 资产树 / Linux详情”
+    // 从设备管理进入时，面包屑显示“设备管理 / 设备树 / Linux详情”
     breadcrumbItems() {
       if (this.$route.query.from === 'assets') {
-        return ['资产管理', '资产树', 'Linux详情']
+        return ['设备管理', '设备树', 'Linux详情']
       }
       return null
     },

@@ -80,7 +80,7 @@
           </a-select-option>
         </a-select>
         <div style="font-size: 12px; color: #aaa; margin-top: 2px;">
-          可在"资产管理 → 设备分组"中新建自定义分组
+          可在"设备配置 → 设备分组"中新建自定义分组
         </div>
       </a-form-model-item>
 

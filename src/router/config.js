@@ -204,7 +204,7 @@ const options = {
             },
             {
               path: "asset-management",
-              name: "资产设置",
+              name: "设备配置",
               component: () => import("@/pages/system/asset-management"),
             },
             {
@@ -220,7 +220,7 @@ const options = {
             },
             {
               path: "asset-binding",
-              name: "资产绑定",
+              name: "设备绑定",
               meta: { invisible: true, highlight: "/system/asset-management" },
               component: () => import("@/pages/system/asset-binding"),
             },

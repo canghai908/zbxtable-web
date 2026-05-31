@@ -4,7 +4,7 @@
       <a-card :bordered="false">
         <div slot="title" class="asset-management-page__title">
           <a-icon type="appstore" />
-          <span>资产管理</span>
+          <span>设备配置</span>
         </div>
 
         <a-tabs :activeKey="activeTab" @change="handleTabChange">
@@ -14,7 +14,7 @@
           <a-tab-pane key="type" tab="设备类型">
             <asset-type embedded />
           </a-tab-pane>
-          <a-tab-pane key="binding" tab="资产绑定">
+          <a-tab-pane key="binding" tab="设备绑定">
             <asset-binding embedded />
           </a-tab-pane>
         </a-tabs>

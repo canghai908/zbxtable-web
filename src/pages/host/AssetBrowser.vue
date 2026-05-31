@@ -129,7 +129,7 @@
             <div class="content-header">
               <a-breadcrumb>
                 <a-breadcrumb-item>
-                  <a @click="selectedType = null" style="cursor:pointer;">资产管理</a>
+                  <a @click="selectedType = null" style="cursor:pointer;">设备管理</a>
                 </a-breadcrumb-item>
                 <a-breadcrumb-item>{{ selectedGroupName }}</a-breadcrumb-item>
                 <a-breadcrumb-item>
@@ -248,7 +248,7 @@ export default {
         // 若从详情页返回并带 ?type=，自动选中对应设备类型
         this.applyTypeFromQuery()
       } catch (e) {
-        this.$message.error('加载资产树失败')
+        this.$message.error('加载设备树失败')
       } finally {
         this.treeLoading = false
       }
