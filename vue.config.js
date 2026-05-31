@@ -12,15 +12,32 @@ const assetsCDN = {
   css: [],
 };
 
-const version = new Date();
-module.exports = {
-  chainWebpack(config) {
-    config.plugin("define").tap((args) => {
-      args[0]["process.env"].version = JSON.stringify(version);
-      return args;
-    });
-  },
-};
+// 解析前端版本号：与后端一致，发布时只需打 git tag 即可生效。
+// 优先级：环境变量 VERSION > 当前提交精确匹配的 tag > 最近 tag+短hash > package.json
+function resolveAppVersion() {
+  if (process.env.VERSION) {
+    return process.env.VERSION;
+  }
+  const { execSync } = require("child_process");
+  const run = (cmd) =>
+    execSync(cmd, { stdio: ["ignore", "pipe", "ignore"] }).toString().trim();
+  try {
+    // 精确匹配当前提交的 tag（如 v3.0.5），与后端 `git describe --tags --exact-match` 对齐
+    return run("git describe --tags --exact-match");
+  } catch (e) {
+    try {
+      // 非 tag 提交：回退到最近 tag + 提交数 + 短 hash（如 v3.0.4-3-gabc1234）
+      return run("git describe --tags --always");
+    } catch (e2) {
+      // 无 git 环境时兜底 package.json
+      return require("./package.json").version;
+    }
+  }
+}
+
+// Vue CLI 会自动把以 VUE_APP_ 开头的环境变量注入到前端代码（process.env.VUE_APP_VERSION）
+process.env.VUE_APP_VERSION = resolveAppVersion();
+
 module.exports = {
   devServer: {
     proxy: {

@@ -186,7 +186,8 @@ export default {
   },
 
   created() {
-    this.UIVersion = config.version
+    // 版本号由构建时从 git tag 注入（见 vue.config.js），package.json 作为兜底
+    this.UIVersion = process.env.VUE_APP_VERSION || config.version
     this.getversion()
   },
   
