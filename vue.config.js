@@ -90,60 +90,6 @@ module.exports = {
     // if prod, add externals
     if (isProd) {
       config.externals = assetsCDN.externals;
-      config.resolve = config.resolve || {};
-      config.resolve.alias = {
-        ...(config.resolve.alias || {}),
-        "@antv/g2$": path.resolve(__dirname, "node_modules/@antv/g2/dist/g2.min.js"),
-        "@ant-design/icons/lib/dist$": path.resolve(__dirname, "src/icons/antd.js"),
-      };
-      config.optimization = {
-        ...(config.optimization || {}),
-        splitChunks: {
-          chunks: "all",
-          minSize: 20000,
-          maxSize: 380 * 1024,
-          maxAsyncRequests: 50,
-          maxInitialRequests: 50,
-          automaticNameDelimiter: "-",
-          cacheGroups: {
-            core: {
-              name: "vendor-core",
-              test: /[\\/]node_modules[\\/](vue|vue-router|vuex|vue-i18n|core-js|babel-polyfill|whatwg-fetch|regenerator-runtime|axios|moment)[\\/]/,
-              priority: 60,
-            },
-            antd: {
-              name: "vendor-antd",
-              test: /[\\/]node_modules[\\/](@ant-design|ant-design-vue|async-validator|dom-scroll-into-view|resize-observer-polyfill|tinycolor2)[\\/]/,
-              priority: 50,
-            },
-            charts: {
-              name: "vendor-charts",
-              test: /[\\/]node_modules[\\/](@antv[\\/]g2|@antv[\\/]g2-brush|@antv[\\/]g2-plugin-slider|viser|viser-vue|d3-format)[\\/]/,
-              priority: 45,
-            },
-            echarts: {
-              name: "vendor-echarts",
-              test: /[\\/]node_modules[\\/](echarts|zrender|echarts-liquidfill)[\\/]/,
-              priority: 40,
-            },
-            topology: {
-              name: "vendor-topology",
-              test: /[\\/]node_modules[\\/](@antv[\\/]x6|@antv[\\/]x6-vue-shape|jquery|jquery-mousewheel|mousetrap|insert-css)[\\/]/,
-              priority: 35,
-            },
-            markdown: {
-              name: "vendor-markdown",
-              test: /[\\/]node_modules[\\/](highlight\.js|marked|dompurify)[\\/]/,
-              priority: 30,
-            },
-            misc: {
-              name: "vendor-misc",
-              test: /[\\/]node_modules[\\/]/,
-              priority: 10,
-            },
-          },
-        },
-      };
     }
   },
   chainWebpack: (config) => {
