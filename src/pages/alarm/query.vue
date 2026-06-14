@@ -31,7 +31,7 @@
       </a-form-model-item>
       <a-form-model-item :label="$t('label_creation_time')">
         <a-range-picker format="YYYY-MM-DD HH:mm:ss" :show-time="{ format: 'HH:mm', defaultValue:[moment('00:00:00', 'HH:mm:ss'),moment('23:59:59', 'HH:mm:ss')]}" v-model="timeValue"
-          @change="changeCreationTime" :getCalendarContainer="triggerNode=>{return triggerNode.parentNode || document.body}" />
+          :ranges="timeRanges" @change="changeCreationTime" :getCalendarContainer="triggerNode=>{return triggerNode.parentNode || document.body}" />
       </a-form-model-item>
       <a-form-model-item>
         <a-button type="primary" @click="init">{{ $t('btn_query') }}</a-button>
@@ -182,6 +182,7 @@ import PageLayout from "@/layouts/PageLayout";
 import { alarm, alarmExport, eventLogGet, alarmDeepseekAnalysis, configGetList } from "@/services/admin";
 import { listZabbixInstance } from '@/services/zabbix'
 import { parseTimeFun } from "@/utils/formatter";
+import { buildAlarmTimeRanges, getDefaultAlarmTimeRange } from "./timeRange";
 import moment from "moment";
 import "moment/locale/zh-cn";
 import { marked } from 'marked';
@@ -277,6 +278,7 @@ export default {
         "show-total": (total) => this.$t('pagination_total', { total }),
       },
       moment,
+      timeRanges: {},
       // 兼容旧字段（不再参与请求）
       tenantid: "",
       hosts: "",
@@ -306,14 +308,8 @@ export default {
     }
   },
   created() {
-    let ntime = new Date(),
-      qtime = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000);
-    this.beginTime = parseTimeFun(qtime);
-    this.endTime = parseTimeFun(ntime);
-    this.timeValue = [
-      moment(qtime, "YYYY-MM-DD HH:mm:ss"),
-      moment(ntime, "YYYY-MM-DD HH:mm:ss"),
-    ];
+    this.timeRanges = buildAlarmTimeRanges(this.$t.bind(this));
+    this.applyTimeRange(getDefaultAlarmTimeRange());
     this.initOptions();
     this.initColumns();
     this.loadInstances();
@@ -321,6 +317,17 @@ export default {
     this.init();
   },
   methods: {
+    applyTimeRange(range = []) {
+      if (!range.length) {
+        this.timeValue = null
+        this.beginTime = ""
+        this.endTime = ""
+        return
+      }
+      this.timeValue = range
+      this.beginTime = parseTimeFun(range[0].toDate())
+      this.endTime = parseTimeFun(range[1].toDate())
+    },
     initOptions() {
       this.statuslist = [
         { id: 1, value: this.$t('alarm_type_alarm') },
@@ -517,13 +524,7 @@ export default {
       this.init();
     },
     changeCreationTime(e) {
-      if (e.length) {
-        this.beginTime = parseTimeFun(new Date(e[0]));
-        this.endTime = parseTimeFun(new Date(e[1]));
-      } else {
-        this.beginTime = "";
-        this.endTime = "";
-      }
+      this.applyTimeRange(e || [])
     },
     resetData() {
       this.hosts = "";
@@ -531,6 +532,7 @@ export default {
       this.level = "";
       this.hostIp = "";
       this.selectedInstance = "";
+      this.applyTimeRange(getDefaultAlarmTimeRange());
       this.init();
     },
     getEvent(exp, record) {

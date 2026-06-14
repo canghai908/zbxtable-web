@@ -12,7 +12,7 @@
         </a-form-model-item>
         <a-form-model-item :label="$t('analysis_alarm_time')">
           <a-range-picker format="YYYY-MM-DD HH:mm:ss" :show-time="{ format: 'HH:mm', defaultValue:[moment('00:00:00', 'HH:mm:ss'),moment('23:59:59', 'HH:mm:ss')]}" v-model="timeValue"
-            @change="changeCreationTime" :getCalendarContainer="triggerNode=>{return triggerNode.parentNode || document.body}" />
+            :ranges="timeRanges" @change="changeCreationTime" :getCalendarContainer="triggerNode=>{return triggerNode.parentNode || document.body}" />
         </a-form-model-item>
         <a-form-model-item>
           <a-button type="primary" @click="init">{{ $t('btn_query') }}</a-button>
@@ -44,6 +44,7 @@ import eLine from "./eLine";
 import { alarmAnalysis, alarmExport } from "@/services/admin";
 import { listZabbixInstance } from '@/services/zabbix'
 import { parseTimeFun } from "@/utils/formatter";
+import { buildAlarmTimeRanges, getDefaultAlarmTimeRange } from "./timeRange";
 import moment from "moment";
 import "moment/locale/zh-cn";
 export default {
@@ -62,6 +63,7 @@ export default {
       nameList: [],
       numList: [],
       moment,
+      timeRanges: {},
       timeValue: null,
       beginTime: "",
       endTime: "",
@@ -70,18 +72,23 @@ export default {
     };
   },
   created() {
-    let ntime = new Date(),
-      qtime = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000);
-    this.beginTime = parseTimeFun(qtime);
-    this.endTime = parseTimeFun(ntime);
-    this.timeValue = [
-      moment(qtime, "YYYY-MM-DD HH:mm:ss"),
-      moment(ntime, "YYYY-MM-DD HH:mm:ss"),
-    ];
+    this.timeRanges = buildAlarmTimeRanges(this.$t.bind(this));
+    this.applyTimeRange(getDefaultAlarmTimeRange());
     this.loadInstances();
     this.init();
   },
   methods: {
+    applyTimeRange(range = []) {
+      if (!range.length) {
+        this.timeValue = null;
+        this.beginTime = "";
+        this.endTime = "";
+        return;
+      }
+      this.timeValue = range;
+      this.beginTime = parseTimeFun(range[0].toDate());
+      this.endTime = parseTimeFun(range[1].toDate());
+    },
     loadInstances() {
       listZabbixInstance().then((resp) => {
         let res = resp.data
@@ -143,13 +150,7 @@ export default {
       });
     },
     changeCreationTime(e) {
-      if (e.length) {
-        this.beginTime = parseTimeFun(new Date(e[0]));
-        this.endTime = parseTimeFun(new Date(e[1]));
-      } else {
-        this.beginTime = "";
-        this.endTime = "";
-      }
+      this.applyTimeRange(e || []);
     },
   },
 };

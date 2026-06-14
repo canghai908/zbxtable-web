@@ -152,6 +152,10 @@ module.exports = {
       analysis_select_instance: '选择实例',
       analysis_all_instances: '全部实例',
       analysis_alarm_time: '告警时间',
+      time_range_last_1d: '最近1天',
+      time_range_last_3d: '最近3天',
+      time_range_last_7d: '最近7天',
+      time_range_last_30d: '最近30天',
       analysis_historical_alarm_top10: '历史告警TOP10',
       analysis_alarm_classification_top: '告警分类TOP',
       
@@ -480,6 +484,10 @@ module.exports = {
       analysis_select_instance: 'Select Instance',
       analysis_all_instances: 'All Instances',
       analysis_alarm_time: 'Alarm Time',
+      time_range_last_1d: 'Last 1 Day',
+      time_range_last_3d: 'Last 3 Days',
+      time_range_last_7d: 'Last 7 Days',
+      time_range_last_30d: 'Last 30 Days',
       analysis_historical_alarm_top10: 'Historical Alarm TOP10',
       analysis_alarm_classification_top: 'Alarm Classification TOP',
       
@@ -808,6 +816,10 @@ module.exports = {
       analysis_select_instance: '選擇實例',
       analysis_all_instances: '全部實例',
       analysis_alarm_time: '告警時間',
+      time_range_last_1d: '最近1天',
+      time_range_last_3d: '最近3天',
+      time_range_last_7d: '最近7天',
+      time_range_last_30d: '最近30天',
       analysis_historical_alarm_top10: '歷史告警TOP10',
       analysis_alarm_classification_top: '告警分類TOP',
       
