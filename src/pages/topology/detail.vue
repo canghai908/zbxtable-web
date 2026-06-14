@@ -353,6 +353,8 @@ export default {
         name: 'path',
         size: 12,
       },
+      isGraphReady: false,
+      pendingTopologyData: null,
       X6Data: {},
       grid: {
         size: 10,
@@ -387,21 +389,60 @@ export default {
     }
   },
   created() {
-    this.id = this.$route.query.id || ""
-    // 如果有ID，则为查看模式；否则为编辑模式
-    if (this.$route.query.id) {
-      this.isReading = true
-    this.tuopuDetail()
-    } else {
-      this.isReading = false
-    }
+    this.syncRouteState()
   },
   mounted() {
     this.$nextTick(() => {
       this.initX6()
+      this.isGraphReady = true
+      this.applyPendingTopologyData()
     })
   },
+  watch: {
+    '$route.query.id': {
+      immediate: false,
+      handler() {
+        this.syncRouteState()
+      }
+    }
+  },
   methods: {
+    syncRouteState() {
+      this.id = this.$route.query.id || ""
+      this.isReading = !!this.id
+      this.pendingTopologyData = null
+
+      if (!this.id) {
+        this.resetTopologyState()
+        return
+      }
+
+      this.tuopuDetail()
+    },
+
+    resetTopologyState() {
+      this.form.name = ''
+      this.form.status = ''
+      this.form.backgroundImage = ''
+      this.form.canvasWidth = 1920
+      this.form.canvasHeight = 1080
+      this.backgroundImage = ''
+      this.backgroundSize = 'cover'
+      this.backgroundPosition = 'center'
+      this.backgroundRepeat = 'no-repeat'
+      this.backgroundOpacity = 100
+      this.imageNaturalSize = { width: 0, height: 0 }
+      this.canvasSizePreset = '1920x1080'
+      this.X6Data = {}
+
+      if (!this.isGraphReady || !this.graph) {
+        return
+      }
+
+      this.graph.clearCells()
+      this.updateCanvasSize()
+    },
+
     initX6() {
       var _that = this
       this.graph = new Graph({
@@ -588,6 +629,142 @@ export default {
           _that.type = 'grid'
         }
       })
+    },
+
+    applyPendingTopologyData() {
+      if (!this.isGraphReady || !this.graph || !this.pendingTopologyData) {
+        return
+      }
+
+      const topologyData = this.pendingTopologyData
+      this.pendingTopologyData = null
+
+      let edges = []
+      let nodes = []
+
+      try {
+        edges = topologyData.edges ? JSON.parse(topologyData.edges) : []
+        nodes = topologyData.nodes ? JSON.parse(topologyData.nodes) : []
+      } catch (error) {
+        console.error('解析拓扑数据失败:', error)
+        this.$message.error(this.$t('msg_load_topology_failed'))
+        return
+      }
+
+      edges = Array.isArray(edges) ? edges : []
+      nodes = Array.isArray(nodes) ? nodes : []
+
+      nodes = nodes.map(node => {
+        if (!node.shape) {
+          if (node.attrs && node.attrs.image) {
+            node.shape = 'custom-image'
+          } else if (node.attrs && node.attrs.label && !node.attrs.image) {
+            node.shape = 'text-node'
+          } else {
+            node.shape = 'custom-image'
+          }
+        }
+        return node
+      })
+
+      edges = edges.map(edge => {
+        if (!edge.shape) {
+          edge.shape = 'edge'
+        }
+        return edge
+      })
+
+      this.X6Data = {
+        cells: [],
+        edges,
+        nodes
+      }
+      this.form.name = topologyData.topology || ''
+      this.form.status = topologyData.status || ''
+
+      if (topologyData.canvas_width && topologyData.canvas_height) {
+        this.form.canvasWidth = topologyData.canvas_width
+        this.form.canvasHeight = topologyData.canvas_height
+      } else {
+        this.form.canvasWidth = 1920
+        this.form.canvasHeight = 1080
+      }
+
+      const sizeKey = `${this.form.canvasWidth}x${this.form.canvasHeight}`
+      const presets = ['1920x1080', '2560x1440', '3000x2000', '3840x2160', '4096x2160']
+      this.canvasSizePreset = presets.includes(sizeKey) ? sizeKey : 'custom'
+
+      try {
+        this.graph.clearCells()
+        this.updateCanvasSize()
+        this.graph.fromJSON(this.X6Data)
+      } catch (error) {
+        console.error('渲染拓扑数据失败:', error)
+        this.$message.error(this.$t('msg_load_topology_failed'))
+        return
+      }
+
+      if (topologyData.background_image) {
+        try {
+          if (topologyData.background_image.startsWith('{')) {
+            const bgConfig = JSON.parse(topologyData.background_image)
+            this.backgroundImage = bgConfig.image
+            this.backgroundSize = bgConfig.size || 'cover'
+            this.backgroundPosition = bgConfig.position || 'center'
+            this.backgroundRepeat = bgConfig.repeat || 'no-repeat'
+            this.backgroundOpacity = bgConfig.opacity || 100
+            this.imageNaturalSize = {
+              width: bgConfig.naturalWidth || 0,
+              height: bgConfig.naturalHeight || 0
+            }
+            this.form.backgroundImage = topologyData.background_image
+            this.applyBackground()
+          } else {
+            this.backgroundImage = topologyData.background_image
+            this.backgroundSize = 'cover'
+            this.backgroundPosition = 'center'
+            this.backgroundRepeat = 'no-repeat'
+            this.backgroundOpacity = 100
+            this.form.backgroundImage = topologyData.background_image
+
+            const img = new Image()
+            img.onload = () => {
+              this.imageNaturalSize = {
+                width: img.naturalWidth,
+                height: img.naturalHeight
+              }
+              this.applyBackground()
+            }
+            img.onerror = () => {
+              console.error('背景图加载失败:', topologyData.background_image)
+              this.$message.error('背景图加载失败')
+            }
+            img.src = topologyData.background_image
+          }
+        } catch (error) {
+          console.error('解析背景图配置失败', error)
+        }
+      }
+
+      this.$nextTick(() => {
+        this.graph.getNodes().forEach(node => {
+          node.attr('label/text', node.attr('label/text'))
+        })
+        this.graph.centerContent()
+        this.graph.zoomToFit({ padding: 100, maxScale: 1 })
+      })
+    },
+
+    normalizeTopologyData(data) {
+      if (data && data.items) {
+        return data.items
+      }
+
+      if (data && data.data && data.data.items) {
+        return data.data.items
+      }
+
+      return data
     },
     
     showPorts(ports, show) {
@@ -1053,116 +1230,14 @@ export default {
       if (this.id) {
         topologyDetail(this.id).then((resp) => {
           let res = resp.data
-          let X6Data = {}
           if (res.code == 200) {
-            // 适配新的响应格式：res.data 直接是拓扑对象
-            const topologyData = res.data
-            let edges = JSON.parse(topologyData.edges)
-            let nodes = JSON.parse(topologyData.nodes)
-            
-            // 确保所有节点都有 shape 属性
-            nodes = nodes.map(node => {
-              if (!node.shape) {
-                // 根据节点属性判断类型
-                if (node.attrs && node.attrs.image) {
-                  node.shape = 'custom-image'
-                } else if (node.attrs && node.attrs.label && !node.attrs.image) {
-                  node.shape = 'text-node'
-                } else {
-                  node.shape = 'custom-image'
-                }
-              }
-              return node
-            })
-            
-            // 确保所有边都有 shape 属性
-            edges = edges.map(edge => {
-              if (!edge.shape) {
-                edge.shape = 'edge'
-              }
-              return edge
-            })
-            
-            X6Data.cells = []
-            X6Data.edges = edges
-            X6Data.nodes = nodes
-            this.X6Data = X6Data
-            this.form.name = topologyData.topology
-            this.form.status = topologyData.status
-            
-            // 加载画布尺寸
-            if (topologyData.canvas_width && topologyData.canvas_height) {
-              this.form.canvasWidth = topologyData.canvas_width
-              this.form.canvasHeight = topologyData.canvas_height
-              // 设置预设值
-              const sizeKey = `${this.form.canvasWidth}x${this.form.canvasHeight}`
-              const presets = ['1920x1080', '2560x1440', '3000x2000', '3840x2160', '4096x2160']
-              this.canvasSizePreset = presets.includes(sizeKey) ? sizeKey : 'custom'
-              // 更新画布尺寸
-              this.updateCanvasSize()
+            const topologyData = this.normalizeTopologyData(res.data)
+            if (!topologyData || !topologyData.id) {
+              this.$message.error(this.$t('msg_load_topology_failed'))
+              return
             }
-            
-            // 先加载节点和边
-            this.graph.fromJSON(this.X6Data)
-            
-            // 然后加载背景图（在 fromJSON 之后，避免被清除）
-            if (topologyData.background_image) {
-              try {
-                // 兼容新旧两种格式
-                if (topologyData.background_image.startsWith('{')) {
-                  // 旧格式：JSON（包含 base64）
-                  const bgConfig = JSON.parse(topologyData.background_image)
-                  this.backgroundImage = bgConfig.image
-                  this.backgroundSize = bgConfig.size || 'cover'
-                  this.backgroundPosition = bgConfig.position || 'center'
-                  this.backgroundRepeat = bgConfig.repeat || 'no-repeat'
-                  this.backgroundOpacity = bgConfig.opacity || 100
-                  this.imageNaturalSize = {
-                    width: bgConfig.naturalWidth || 0,
-                    height: bgConfig.naturalHeight || 0
-                  }
-                  this.form.backgroundImage = topologyData.background_image
-                  // 应用背景图
-                  this.applyBackground()
-                } else {
-                  // 新格式：直接是图片路径
-                  this.backgroundImage = topologyData.background_image
-                  this.backgroundSize = 'cover'
-                  this.backgroundPosition = 'center'
-                  this.backgroundRepeat = 'no-repeat'
-                  this.backgroundOpacity = 100
-                  this.form.backgroundImage = topologyData.background_image
-                  
-                  // 加载图片获取尺寸后再应用背景
-                  const img = new Image()
-                  img.onload = () => {
-                    this.imageNaturalSize = {
-                      width: img.naturalWidth,
-                      height: img.naturalHeight
-                    }
-                    // 在图片加载完成后应用背景图
-                    this.applyBackground()
-                  }
-                  img.onerror = () => {
-                    console.error('背景图加载失败:', topologyData.background_image)
-                    this.$message.error('背景图加载失败')
-                  }
-                  img.src = topologyData.background_image
-                }
-              } catch (e) {
-                console.error('解析背景图配置失败', e)
-              }
-            }
-            
-            // 强制重绘以确保文本正确渲染，并重新居中和缩放
-            this.$nextTick(() => {
-              this.graph.getNodes().forEach(node => {
-                node.attr('label/text', node.attr('label/text'))
-              })
-              // 居中并自动缩放以适应画布，使用较大的padding确保文本不被裁剪
-              this.graph.centerContent()
-              this.graph.zoomToFit({ padding: 100, maxScale: 1 })
-            })
+            this.pendingTopologyData = topologyData
+            this.applyPendingTopologyData()
           } else {
             this.$message.error(res.message || this.$t('msg_load_topology_failed'))
           }
