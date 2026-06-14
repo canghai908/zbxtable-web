@@ -107,6 +107,7 @@
               @change="handleChange"
             >
               <a-select-option v-for="(item, index) in HostTypeList" :key="index" :value="item.value">
+                <a-icon v-if="item.icon" :type="item.icon" style="margin-right: 6px;" />
                 {{ item.label }}
               </a-select-option>
             </a-select>
@@ -170,6 +171,7 @@
               @change="handleChange"
             >
               <a-select-option v-for="(item, index) in HostTypeList" :key="index" :value="item.value">
+                <a-icon v-if="item.icon" :type="item.icon" style="margin-right: 6px;" />
                 {{ item.label }}
               </a-select-option>
             </a-select>
@@ -256,10 +258,16 @@
 </template>
 
 <script>
-import { hostList, triggerList, itemTopoTraffic } from "@/services/admin"
+import { hostList, triggerList, itemTopoTraffic, getAssetTypes } from "@/services/admin"
 import { listZabbixInstance } from "@/services/zabbix"
 
 const selectSize = 30
+const defaultHostTypeList = [
+  { value: 'VM_WIN', label: 'Windows', icon: 'desktop' },
+  { value: 'VM_LIN', label: 'Linux', icon: 'laptop' },
+  { value: 'HW_SRV', label: '物理机器', icon: 'database' },
+  { value: 'HW_NET', label: '网络设备', icon: 'cluster' }
+]
 const debounce = (func, delay = 60) => {
   let timer = null;
   return function (...args) {
@@ -301,12 +309,7 @@ export default {
       labelCol: { span: 8 },
       wrapperCol: { span: 16 },
       hosttype: 'VM_WIN',
-      HostTypeList: [
-        { value: 'VM_WIN', label: 'Windows' },
-        { value: 'VM_LIN', label: 'Linux' },
-        { value: 'HW_SRV', label: '物理机器' },
-        { value: 'HW_NET', label: '网络设备' }
-      ],
+      HostTypeList: defaultHostTypeList,
       HostsList: [],
       curHostsList: [],
       hostsFilterList: [],
@@ -385,8 +388,25 @@ export default {
   },
   created() {
     this.loadZabbixInstances()
+    this.loadAssetTypes()
   },
   methods: {
+    async loadAssetTypes() {
+      try {
+        const resp = await getAssetTypes()
+        const biz = resp && resp.data ? resp.data : resp
+        if (biz && biz.code === 200 && Array.isArray(biz.data) && biz.data.length) {
+          this.HostTypeList = biz.data.map(item => ({
+            value: item.type_code,
+            label: item.name || item.type_code,
+            icon: item.icon || ''
+          })).filter(item => item.value)
+        }
+      } catch (err) {
+        this.HostTypeList = defaultHostTypeList
+      }
+    },
+
     // 加载Zabbix实例列表
     async loadZabbixInstances() {
       try {

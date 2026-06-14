@@ -34,7 +34,7 @@
           <img :src="logoUrl" alt="Logo" class="logo-image" />
         </div>
         <h1 class="system-title">{{ systemName }}</h1>
-        <p class="system-subtitle">{{$t('systemSubtitle')}}</p>
+        <p class="system-subtitle">{{ systemSubtitle }}</p>
       </div>
 
       <!-- 登录表单 -->
@@ -114,6 +114,7 @@ export default {
       error: '',
       form: this.$form.createForm(this),
       systemName: 'ZbxTable',
+      systemSubtitle: this.$t('systemSubtitle'),
       logoUrl: require('@/assets/img/logo.png'),
       demoMode: false
     }
@@ -158,7 +159,12 @@ export default {
             this.systemName = infoRes.data.system_name
             this.$store.commit('setting/setSystemName', infoRes.data.system_name)
           }
+          if (infoRes.data.system_subtitle) {
+            this.systemSubtitle = infoRes.data.system_subtitle
+            this.$store.commit('setting/setSystemSubtitle', infoRes.data.system_subtitle)
+          }
           if (infoRes.data.system_logo) {
+            this.logoUrl = infoRes.data.system_logo
             this.$store.commit('setting/setSystemLogo', infoRes.data.system_logo)
           }
           // 识别演示模式并自动填充账号密码
@@ -248,13 +254,20 @@ export default {
         if (configRes && configRes.code === 200 && configRes.data && configRes.data.items) {
           const configs = configRes.data.items
           const systemNameConfig = configs.find(item => item.config_key === 'system_name')
+          const systemSubtitleConfig = configs.find(item => item.config_key === 'system_subtitle')
           const systemLogoConfig = configs.find(item => item.config_key === 'system_logo')
           
           if (systemNameConfig && systemNameConfig.config_value) {
+            this.systemName = systemNameConfig.config_value
             this.$store.commit('setting/setSystemName', systemNameConfig.config_value)
+          }
+          if (systemSubtitleConfig && systemSubtitleConfig.config_value) {
+            this.systemSubtitle = systemSubtitleConfig.config_value
+            this.$store.commit('setting/setSystemSubtitle', systemSubtitleConfig.config_value)
           }
           
           if (systemLogoConfig && systemLogoConfig.config_value) {
+            this.logoUrl = systemLogoConfig.config_value
             this.$store.commit('setting/setSystemLogo', systemLogoConfig.config_value)
           }
         }

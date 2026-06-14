@@ -524,35 +524,48 @@ export default {
       this.$message.error(this.$t('msg_websocket_error'))
     },
     
-    async websocketonmessage(e) {
-      const redata = JSON.parse(e.data)
-      let X6Data = {}
-      // 注意：这里的 nodes 和 edges 字段名称与后端返回的对应
-      let nodes = JSON.parse(redata.nodes)
-      let edges = JSON.parse(redata.edges)
-      
-      // 确保所有节点都有 shape 属性
+    parseTopologyCells(nodesJSON, edgesJSON) {
+      let nodes = []
+      let edges = []
+
+      try {
+        nodes = nodesJSON ? JSON.parse(nodesJSON) : []
+        edges = edgesJSON ? JSON.parse(edgesJSON) : []
+      } catch (error) {
+        console.error('解析拓扑数据失败:', error)
+        return { nodes: [], edges: [] }
+      }
+
+      nodes = Array.isArray(nodes) ? nodes : []
+      edges = Array.isArray(edges) ? edges : []
+
       nodes = nodes.map(node => {
         if (!node.shape) {
-          // 根据节点属性判断类型
           if (node.attrs && node.attrs.image) {
             node.shape = 'custom-image'
           } else if (node.attrs && node.attrs.label && !node.attrs.image) {
             node.shape = 'text-node'
           } else {
-          node.shape = 'custom-image'
+            node.shape = 'custom-image'
           }
         }
         return node
       })
-      
-      // 确保所有边都有 shape 属性
+
       edges = edges.map(edge => {
         if (!edge.shape) {
           edge.shape = 'edge'
         }
         return edge
       })
+
+      return { nodes, edges }
+    },
+    
+    async websocketonmessage(e) {
+      const redata = JSON.parse(e.data)
+      let X6Data = {}
+      const { nodes, edges } = this.parseTopologyCells(redata.nodes, redata.edges)
       
       X6Data.cells = []
       X6Data.nodes = nodes
@@ -626,32 +639,7 @@ export default {
         .then((resp) => {
           let res = resp.data
           if (res.code == 200) {
-            // 注意：这里的 nodes 和 edges 字段名称与后端返回的对应
-            let nodes = JSON.parse(res.data.nodes)
-            let edges = JSON.parse(res.data.edges)
-            
-            // 确保所有节点都有 shape 属性
-            nodes = nodes.map(node => {
-              if (!node.shape) {
-                // 根据节点属性判断类型
-                if (node.attrs && node.attrs.image) {
-                  node.shape = 'custom-image'
-                } else if (node.attrs && node.attrs.label && !node.attrs.image) {
-                  node.shape = 'text-node'
-                } else {
-                node.shape = 'custom-image'
-                }
-              }
-              return node
-            })
-            
-            // 确保所有边都有 shape 属性
-            edges = edges.map(edge => {
-              if (!edge.shape) {
-                edge.shape = 'edge'
-              }
-              return edge
-            })
+            const { nodes, edges } = this.parseTopologyCells(res.data.nodes, res.data.edges)
             
             let X6Data = {}
             X6Data.cells = []

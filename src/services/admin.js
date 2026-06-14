@@ -82,7 +82,7 @@ export async function alarm(params) {
 	return request(ALARM, METHOD.GET, { ...params })
 }
 export async function alarmAnalysis(params) {
-	return request(ALARM_ANALYSIS, METHOD.POST, params)
+	return request(ALARM_ANALYSIS, METHOD.GET, { ...params })
 }
 export async function alarmExport(params, config) {
 	return request(ALARM_EXPORT, METHOD.POST, params, config)

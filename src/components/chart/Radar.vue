@@ -11,7 +11,7 @@
 </template>
 
 <script>
-const DataSet = require('@antv/data-set')
+import { foldRows } from '@/utils/chartData'
 
 const sourceData = [
   {item: '引用', a: 70, b: 30, c: 40},
@@ -22,21 +22,13 @@ const sourceData = [
   {item: '引用', a: 70, b: 50, c: 40}
 ]
 
-const dv = new DataSet.View().source(sourceData)
-dv.transform({
-  type: 'fold',
-  fields: ['a', 'b', 'c'],
-  key: 'user',
-  value: 'score'
-})
-
 const scale = [{
   dataKey: 'score',
   min: 0,
   max: 80
 }]
 
-const data = dv.rows
+const data = foldRows(sourceData, ['a', 'b', 'c'], 'user', 'score')
 
 const axis1Opts = {
   dataKey: 'item',

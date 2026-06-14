@@ -10,7 +10,7 @@
 
 <script>
 import { mapState } from 'vuex'
-const DataSet = require('@antv/data-set');
+import { toPercentRows } from '@/utils/chartData'
 export default {
   props: {
     name: { type: String, default: "" },
@@ -56,10 +56,7 @@ export default {
   created () {
     if((this.rate && this.rate > 0) || this.rate == 0) {
       let source = [{ item: this.name, count: this.rate }, {item: "其他", count: 100 - this.rate}];
-      const dv = new DataSet.View().source(source);
-      dv.transform({ type: 'percent', field: 'count', dimension: 'item', as: 'percent' });
-      const data = dv.rows;
-      this.mock = data;
+      this.mock = toPercentRows(source);
       const count = 12;
       this.named = this.name.length > count ? (this.name.substring(0, count)+"...") : this.name;
       this.showPage = true;
@@ -67,4 +64,3 @@ export default {
   }
 };
 </script>
-

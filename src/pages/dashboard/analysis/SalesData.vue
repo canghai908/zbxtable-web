@@ -11,7 +11,7 @@
 </template>
 
 <script>
-const DataSet = require('@antv/data-set')
+import { toPercentRows } from '@/utils/chartData'
 
 const sourceData = [
   { item: '事例一', count: 40 },
@@ -27,14 +27,7 @@ const scale = [{
   formatter: '.0%'
 }]
 
-const dv = new DataSet.View().source(sourceData)
-dv.transform({
-  type: 'percent',
-  field: 'count',
-  dimension: 'item',
-  as: 'percent'
-})
-const data = dv.rows
+const data = toPercentRows(sourceData)
 export default {
   name: 'SalesData',
   data () {

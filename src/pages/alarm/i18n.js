@@ -152,6 +152,10 @@ module.exports = {
       analysis_select_instance: '选择实例',
       analysis_all_instances: '全部实例',
       analysis_alarm_time: '告警时间',
+      time_range_last_1d: '最近1天',
+      time_range_last_3d: '最近3天',
+      time_range_last_7d: '最近7天',
+      time_range_last_30d: '最近30天',
       analysis_historical_alarm_top10: '历史告警TOP10',
       analysis_alarm_classification_top: '告警分类TOP',
       
@@ -202,7 +206,7 @@ module.exports = {
       condition_placeholder_value: '匹配值',
       
       // 字段选项
-      field_host: '主机',
+      field_host: '主机名称',
       field_group: '主机组',
       field_item: '指标名称',
       field_key: '指标Key',
@@ -480,6 +484,10 @@ module.exports = {
       analysis_select_instance: 'Select Instance',
       analysis_all_instances: 'All Instances',
       analysis_alarm_time: 'Alarm Time',
+      time_range_last_1d: 'Last 1 Day',
+      time_range_last_3d: 'Last 3 Days',
+      time_range_last_7d: 'Last 7 Days',
+      time_range_last_30d: 'Last 30 Days',
       analysis_historical_alarm_top10: 'Historical Alarm TOP10',
       analysis_alarm_classification_top: 'Alarm Classification TOP',
       
@@ -530,7 +538,7 @@ module.exports = {
       condition_placeholder_value: 'Match Value',
       
       // Field options
-      field_host: 'Host',
+      field_host: 'Host Name',
       field_group: 'Host Group',
       field_item: 'Item Name',
       field_key: 'Item Key',
@@ -808,6 +816,10 @@ module.exports = {
       analysis_select_instance: '選擇實例',
       analysis_all_instances: '全部實例',
       analysis_alarm_time: '告警時間',
+      time_range_last_1d: '最近1天',
+      time_range_last_3d: '最近3天',
+      time_range_last_7d: '最近7天',
+      time_range_last_30d: '最近30天',
       analysis_historical_alarm_top10: '歷史告警TOP10',
       analysis_alarm_classification_top: '告警分類TOP',
       
@@ -858,7 +870,7 @@ module.exports = {
       condition_placeholder_value: '匹配值',
       
       // 字段選項
-      field_host: '主機',
+      field_host: '主機名稱',
       field_group: '主機組',
       field_item: '指標名稱',
       field_key: '指標Key',

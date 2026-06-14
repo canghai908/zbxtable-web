@@ -110,12 +110,12 @@
         </div>
 
         <span slot="available" slot-scope="record">
-          <a-tooltip>
+          <a-tooltip v-if="record.available == 2">
             <template slot="title">{{ record.error }}</template>
-            <a-tag v-if="record.available == 1" color="#34af67">正常</a-tag>
-            <a-tag v-else-if="record.available == 2" color="#DC143C">异常</a-tag>
-            <a-tag v-else color="#808080">未知</a-tag>
+            <a-tag color="#DC143C">异常</a-tag>
           </a-tooltip>
+          <a-tag v-else-if="record.available == 1" color="#34af67">正常</a-tag>
+          <a-tag v-else color="#808080">未知</a-tag>
         </span>
 
         <span slot="operation" slot-scope="record">

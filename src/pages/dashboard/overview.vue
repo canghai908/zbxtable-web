@@ -3,8 +3,8 @@
     <div slot="headerContent" class="overview-container">
       <!-- 统计概览卡片 -->
       <div class="stats-overview">
-        <a-row :gutter="[24, 24]">
-          <a-col :xl="6" :lg="12" :md="12" :sm="24" :xs="24" v-for="(stat, index) in statsCards" :key="index" class="stat-col">
+        <div class="stats-grid">
+          <div v-for="(stat, index) in statsCards" :key="index" class="stat-col">
             <div class="stat-card" :class="`stat-card-${stat.type}`">
               <div class="stat-icon" :class="`stat-icon-${stat.type}`">
                 <a-icon :type="stat.icon" />
@@ -25,8 +25,8 @@
                 </div>
               </div>
             </div>
-          </a-col>
-        </a-row>
+          </div>
+        </div>
       </div>
 
       <!-- 主机详情卡片 -->
@@ -184,8 +184,14 @@ export default {
 
 // 统计卡片样式
 .stats-overview {
-  margin-bottom: 24px;
+  margin-bottom: 12px;
   animation: fadeInDown 0.6s ease-out;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
 }
 
 .stat-col {
@@ -201,7 +207,8 @@ export default {
 .stat-card {
   background: @component-background;
   border-radius: 12px;
-  padding: 24px;
+  min-height: 94px;
+  padding: 14px 16px;
   display: flex;
   align-items: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
@@ -247,19 +254,19 @@ export default {
 }
 
 .stat-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 12px;
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
-  margin-right: 20px;
+  font-size: 20px;
+  margin-right: 12px;
   transition: all 0.3s ease;
   position: relative;
   
   .anticon {
-    font-size: 32px;
+    font-size: 22px;
     position: relative;
     z-index: 1;
   }
@@ -291,33 +298,35 @@ export default {
 }
 
 .stat-title {
-  font-size: 14px;
+  font-size: 12px;
   color: @text-color-secondary;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   font-weight: 500;
+  line-height: 1.4;
 }
 
 .stat-value {
-  font-size: 32px;
+  font-size: 22px;
   font-weight: 700;
   color: @heading-color;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   line-height: 1;
 }
 
 .stat-detail {
   display: flex;
-  gap: 12px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
 .stat-status {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 13px;
-  padding: 2px 8px;
-  border-radius: 10px;
+  gap: 2px;
+  font-size: 11px;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 999px;
   font-weight: 500;
   
   &.healthy {
@@ -552,24 +561,30 @@ export default {
   .overview-container {
     padding: 16px;
   }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
   
   .stat-card {
-    padding: 16px;
+    min-height: 84px;
+    padding: 12px 14px;
   }
   
   .stat-icon {
-    width: 48px;
-    height: 48px;
-    font-size: 24px;
-    margin-right: 12px;
+    width: 38px;
+    height: 38px;
+    font-size: 18px;
+    margin-right: 10px;
     
     .anticon {
-      font-size: 24px;
+      font-size: 19px;
     }
   }
   
   .stat-value {
-    font-size: 24px;
+    font-size: 20px;
   }
   
   .host-grid {
@@ -581,6 +596,12 @@ export default {
     width: 24px;
     height: 24px;
     border-radius: 5px;
+  }
+}
+
+@media (max-width: 1200px) and (min-width: 769px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 </style>

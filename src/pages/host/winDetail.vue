@@ -232,8 +232,7 @@ import { parseTimeFun } from "@/utils/formatter";
 import moment from "moment";
 import echarts from 'echarts';
 require('echarts-liquidfill');
-import FileSaver from "file-saver";
-import XLSX from "xlsx";
+import { exportTableToXlsx } from '@/utils/exportXlsx';
 import themeMixin from '@/mixins/themeMixin';
 
 export default {
@@ -843,25 +842,11 @@ export default {
               },
               //contentToOption为重写“刷新”按钮的语句
               contentToOption: function (HTMLDomElement, opt) {
-                let et = XLSX.utils.table_to_book(
-                  document.getElementById("Mytable")
+                exportTableToXlsx(
+                  document.getElementById("Mytable"),
+                  opt.title[0].text + "-" + new Date().toLocaleString() + ".xlsx"
                 );
-                let etout = XLSX.write(et, {
-                  bookType: "xlsx",
-                  bookSST: true,
-                  type: "array",
-                });
-                try {
-                  FileSaver.saveAs(
-                    new Blob([etout], {
-                      type: "application/octet-stream",
-                    }),
-                    opt.title[0].text + "-" + new Date().toLocaleString() + ".xlsx"
-                  );
-                } catch (e) {
-                  void e;
-                }
-                return etout;
+                return opt;
               },
             },
           },
@@ -995,25 +980,11 @@ export default {
               },
               //contentToOption为重写“刷新”按钮的语句
               contentToOption: function (HTMLDomElement, opt) {
-                let et = XLSX.utils.table_to_book(
-                  document.getElementById("Mytable")
+                exportTableToXlsx(
+                  document.getElementById("Mytable"),
+                  opt.title[0].text + "-" + new Date().toLocaleString() + ".xlsx"
                 );
-                let etout = XLSX.write(et, {
-                  bookType: "xlsx",
-                  bookSST: true,
-                  type: "array",
-                });
-                try {
-                  FileSaver.saveAs(
-                    new Blob([etout], {
-                      type: "application/octet-stream",
-                    }),
-                    opt.title[0].text + "-" + new Date().toLocaleString() + ".xlsx"
-                  );
-                } catch (e) {
-                  void e;
-                }
-                return etout;
+                return opt;
               },
             },
           },
@@ -1133,25 +1104,11 @@ export default {
               },
               //contentToOption为重写“刷新”按钮的语句
               contentToOption: function (HTMLDomElement, opt) {
-                let et = XLSX.utils.table_to_book(
-                  document.getElementById("Mytable")
+                exportTableToXlsx(
+                  document.getElementById("Mytable"),
+                  opt.title[0].text + "-" + new Date().toLocaleString() + ".xlsx"
                 );
-                let etout = XLSX.write(et, {
-                  bookType: "xlsx",
-                  bookSST: true,
-                  type: "array",
-                });
-                try {
-                  FileSaver.saveAs(
-                    new Blob([etout], {
-                      type: "application/octet-stream",
-                    }),
-                    opt.title[0].text + "-" + new Date().toLocaleString() + ".xlsx"
-                  );
-                } catch (e) {
-                  void e;
-                }
-                return etout;
+                return opt;
               },
             },
           },
@@ -1272,25 +1229,11 @@ export default {
               },
               //contentToOption为重写“刷新”按钮的语句
               contentToOption: function (HTMLDomElement, opt) {
-                let et = XLSX.utils.table_to_book(
-                  document.getElementById("Mytable")
+                exportTableToXlsx(
+                  document.getElementById("Mytable"),
+                  opt.title[0].text + "-" + new Date().toLocaleString() + ".xlsx"
                 );
-                let etout = XLSX.write(et, {
-                  bookType: "xlsx",
-                  bookSST: true,
-                  type: "array",
-                });
-                try {
-                  FileSaver.saveAs(
-                    new Blob([etout], {
-                      type: "application/octet-stream",
-                    }),
-                    opt.title[0].text + "-" + new Date().toLocaleString() + ".xlsx"
-                  );
-                } catch (e) {
-                  void e;
-                }
-                return etout;
+                return opt;
               },
             },
           },

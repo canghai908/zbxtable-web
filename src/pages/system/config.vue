@@ -13,6 +13,11 @@
                 <a-input v-model="systemForm.system_name" :placeholder="$t('systemNamePlaceholder')" />
                 <div class="config-hint">{{$t('systemNameHint')}}</div>
               </a-form-model-item>
+
+              <a-form-model-item :label="$t('systemSubtitle')">
+                <a-input v-model="systemForm.system_subtitle" :placeholder="$t('systemSubtitlePlaceholder')" />
+                <div class="config-hint">{{$t('systemSubtitleHint')}}</div>
+              </a-form-model-item>
               
               <a-form-model-item :label="$t('systemLogo')">
                 <div class="logo-upload-container">
@@ -289,6 +294,7 @@ export default {
     allSystemConfigs() {
       return this.list.filter(item => 
         item.config_key === 'system_name' || 
+        item.config_key === 'system_subtitle' ||
         item.config_key === 'system_logo' ||
         item.config_key === 'zbx_dash' || 
         item.config_key === 'dash_id' || 
@@ -541,7 +547,8 @@ export default {
         // 如果是系统配置，更新 Vuex 中的系统名称和Logo
         if (category === 'system') {
           this.$store.commit('setting/setSystemName', form.system_name || 'ZbxTable')
-          this.$store.commit('setting/setSystemLogo', form.system_logo || '/static/img/logo.png')
+          this.$store.commit('setting/setSystemSubtitle', form.system_subtitle || this.$t('systemSubtitleDefault'))
+          this.$store.commit('setting/setSystemLogo', form.system_logo || '/logo.png')
         }
         
         this.init()

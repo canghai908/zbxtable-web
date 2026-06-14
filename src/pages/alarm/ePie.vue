@@ -17,8 +17,8 @@
 </template>
 
 <script>
-const DataSet = require('@antv/data-set')
 import { mapState } from 'vuex'
+import { toPercentRows } from '@/utils/chartData'
 
 export default {
   name: 'LinuxPie',
@@ -66,9 +66,7 @@ export default {
           this.mock.forEach((v) => {
             list.push({count: v.value, item: this.levelFilter(v.name), name: v.name});
           })
-          const dv = new DataSet.View().source(list);
-          dv.transform({ type: 'percent', field: 'count', dimension: 'item', as: 'percent'});
-          this.mockData = dv.rows;  
+          this.mockData = toPercentRows(list);  
         })
       } else {
         this.show = 2;

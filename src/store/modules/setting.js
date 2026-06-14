@@ -131,6 +131,12 @@ export default {
       localSetting.systemName = systemName
       localStorage.setItem(process.env.VUE_APP_SETTING_KEY, JSON.stringify(localSetting))
     },
+    setSystemSubtitle(state, systemSubtitle) {
+      state.systemSubtitle = systemSubtitle
+      const localSetting = JSON.parse(localStorage.getItem(process.env.VUE_APP_SETTING_KEY) || '{}')
+      localSetting.systemSubtitle = systemSubtitle
+      localStorage.setItem(process.env.VUE_APP_SETTING_KEY, JSON.stringify(localSetting))
+    },
     setSystemLogo(state, systemLogo) {
       state.systemLogo = systemLogo
       // 保存到 localStorage
