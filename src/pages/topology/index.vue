@@ -74,7 +74,7 @@ export default {
     initColumns() {
       this.columns = [
         { title: this.$t('col_id'), key: 'id', align: 'center', scopedSlots: { customRender: 'id' } },
-        { title: this.$t('label_topology_name'), key: 'topology', align: 'center', scopedSlots: { customRender: 'topology' } },
+        { title: this.$t('label_topology_name'), key: 'topology', align: 'left', scopedSlots: { customRender: 'topology' } },
         { title: this.$t('col_status'), key: 'status', align: 'center', scopedSlots: { customRender: 'status' } },
         { title: this.$t('col_created_at'), key: 'created_at', align: 'center', scopedSlots: { customRender: 'created_at' } },
         { title: this.$t('col_updated_at'), key: 'updated_at', align: 'center', scopedSlots: { customRender: 'updated_at' } },

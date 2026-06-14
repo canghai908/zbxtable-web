@@ -274,16 +274,32 @@ export default {
       },
       connection: null,
       isWebSocket: false,//判断是否链接成功！
+      wsManualClose: false, // 是否为主动关闭（主动关闭不重连）
+      wsReconnectTimer: null, // 重连定时器
+      wsReconnectAttempts: 0, // 已重连次数（用于退避）
     }
   },
   created() {
     this.id = this.$route.query.id || ""
-    this.initWebSocket(this.id)
   },
   mounted() {
     this.$nextTick(() => {
+      // 先初始化画布，再建立 WebSocket，避免消息早于 this.graph 到达导致渲染异常
       this.initX6()
+      this.initWebSocket(this.id)
     })
+  },
+  beforeDestroy() {
+    this.wsManualClose = true
+    if (this.wsReconnectTimer) {
+      clearTimeout(this.wsReconnectTimer)
+      this.wsReconnectTimer = null
+    }
+    if (this.websock) {
+      this.websock.onclose = null // 避免主动关闭触发重连
+      this.websock.close()
+      this.websock = null
+    }
   },
   methods: {
     adjustColor(color, amount) {
@@ -395,6 +411,10 @@ export default {
           to {
               stroke-dashoffset: -1000
           }
+        }
+
+        .topology-animated-line {
+          animation: ant-line 30s infinite linear;
         }
       `)
       // this.graph.fromJSON(this.X6Data)
@@ -535,34 +555,52 @@ export default {
     initWebSocket() { //初始化websocket
       //init topo
       this.tuopuDetail(this.id)
-      
+
+      // 已存在连接时先清理，避免重复连接
+      if (this.websock) {
+        this.websock.onclose = null
+        this.websock.close()
+        this.websock = null
+      }
+
       // 构建 WebSocket URL - 使用统一的 /wsapi/auth 路径
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
       const wsUrl = `${protocol}//${window.location.host}${API_WS}/${this.id}`
-      
+
       console.log('=== WebSocket Connection (Auth) ===')
       console.log('WebSocket URL:', wsUrl)
-      
+
       //init websocket
       this.websock = new WebSocket(wsUrl);
       this.websock.onmessage = this.websocketonmessage;
       this.websock.onopen = this.websocketonopen;
       this.websock.onerror = this.websocketonerror;
-      // this.websock.onclose = this.websocketonclose;
+      this.websock.onclose = this.websocketonclose;
     },
     websocketonopen() { //连接建立之后执行send方法发送数据
       this.isWebSocket = true;
+      this.wsReconnectAttempts = 0 // 连接成功后重置退避计数
       this.websock.send("success")
       this.$message.success(this.$t('msg_websocket_connected'))
-
+    },
+    scheduleReconnect() { // 断线重连（指数退避，封顶 30s）
+      if (this.wsManualClose) return
+      if (this.wsReconnectTimer) return
+      const delay = Math.min(3000 * Math.pow(2, this.wsReconnectAttempts), 30000)
+      this.wsReconnectAttempts++
+      console.log(`WebSocket 将在 ${delay}ms 后重连（第 ${this.wsReconnectAttempts} 次）`)
+      this.wsReconnectTimer = setTimeout(() => {
+        this.wsReconnectTimer = null
+        this.initWebSocket(this.id)
+      }, delay)
     },
     websocketonclose() {//断开
-      // setTimeout(this.$message.info("重新建立Websocket连接中11"), 5000);
-      // setTimeout(this.initWebSocket(), 5000); //重连
+      this.isWebSocket = false
+      this.scheduleReconnect()
     },
-    websocketonerror() {//连接建立失败重连
-      // setTimeout(this.$message.info("重新建立Websocket连接中22"), 5000);
-      // this.initWebSocket()
+    websocketonerror() {//连接建立失败
+      this.isWebSocket = false
+      // onerror 之后浏览器通常会触发 onclose，由 onclose 统一重连
     },
     parseTopologyCells(nodesJSON, edgesJSON) {
       let nodes = []
@@ -596,12 +634,57 @@ export default {
         if (!edge.shape) {
           edge.shape = 'edge'
         }
+        const line = edge.attrs && edge.attrs.line ? edge.attrs.line : null
+        if (line) {
+          const dash = line.strokeDasharray
+          if (typeof dash === 'number' && dash > 0) {
+            line.strokeDasharray = `${dash} ${dash}`
+          } else if (typeof dash === 'string' && /^\d+$/.test(dash)) {
+            line.strokeDasharray = `${dash} ${dash}`
+          }
+        }
         return edge
       })
 
       return { nodes, edges }
     },
+    applyAnimatedEdgeStyles() {
+      if (!this.graph) {
+        return
+      }
+      this.graph.getEdges().forEach((edge) => {
+        const attrs = edge.getAttrs() || {}
+        const line = attrs.line || {}
+        const style = line.style || {}
+        const animation = style.animation || line.animation || ''
+        const dash = line.strokeDasharray
+        if (animation) {
+          if (typeof dash === 'number' && dash > 0) {
+            edge.attr('line/strokeDasharray', `${dash} ${dash}`)
+          } else if (typeof dash === 'string' && /^\d+$/.test(dash)) {
+            edge.attr('line/strokeDasharray', `${dash} ${dash}`)
+          }
+          edge.attr('line/class', 'topology-animated-line')
+          edge.attr('line/style/animation', animation)
+          edge.attr('line/style/strokeDashoffset', 0)
+        } else {
+          edge.attr('line/class', '')
+        }
+      })
+    },
     async websocketonmessage(e) { //数据接收
+      try {
+        await this.renderTopologyMessage(e)
+      } catch (err) {
+        console.error('渲染拓扑消息失败:', err)
+      } finally {
+        // 无论渲染是否成功，都要回发 success，维持服务端的刷新循环
+        if (this.websock && this.websock.readyState === WebSocket.OPEN) {
+          this.websock.send("success")
+        }
+      }
+    },
+    async renderTopologyMessage(e) {
       const redata = JSON.parse(e.data);
       let X6Data = {}
       const { nodes, edges } = this.parseTopologyCells(redata.nodes, redata.edges)
@@ -615,6 +698,7 @@ export default {
       
       // 先加载节点和边
       this.graph.fromJSON(this.X6Data)
+      this.applyAnimatedEdgeStyles()
       
       // 然后加载背景图（在 fromJSON 之后）
       if (redata.background_image) {
@@ -670,8 +754,6 @@ export default {
         this.graph.centerContent()
         this.graph.zoomToFit({ padding: 100, maxScale: 1 })
       })
-      
-      this.websock.send("success");
     },
     tuopuDetail() {
       if (this.id) {
@@ -699,6 +781,7 @@ export default {
             
             // 先加载节点和边
             this.graph.fromJSON(this.X6Data)
+            this.applyAnimatedEdgeStyles()
             
             // 然后加载背景图（在 fromJSON 之后）
             if (topologyData.background_image) {
