@@ -38,6 +38,9 @@ export default {
       this.setLanguage(val)
       this.setHtmlTitle()
     },
+    systemName() {
+      this.setHtmlTitle()
+    },
     $route() {
       this.setHtmlTitle()
       // 从安装页面跳转到其他页面时，加载系统配置
@@ -58,10 +61,10 @@ export default {
     }
   },
   computed: {
-    ...mapState('setting', ['layout', 'theme', 'weekMode', 'lang'])
+    ...mapState('setting', ['layout', 'theme', 'weekMode', 'lang', 'systemName'])
   },
   methods: {
-    ...mapMutations('setting', ['setDevice', 'setSystemName', 'setSystemLogo', 'setDemoMode']),
+    ...mapMutations('setting', ['setDevice', 'setSystemName', 'setSystemSubtitle', 'setSystemLogo', 'setDemoMode']),
     async loadSystemConfig() {
       try {
         const res = await getPublicSystemInfo()
@@ -70,6 +73,9 @@ export default {
         if (infoRes && infoRes.code === 200 && infoRes.data) {
           if (infoRes.data.system_name) {
             this.setSystemName(infoRes.data.system_name)
+          }
+          if (infoRes.data.system_subtitle) {
+            this.setSystemSubtitle(infoRes.data.system_subtitle)
           }
           if (infoRes.data.system_logo) {
             this.setSystemLogo(infoRes.data.system_logo)
@@ -107,7 +113,8 @@ export default {
       const route = this.$route
       const lastMatched = route && route.matched && route.matched.length > 0 ? route.matched[route.matched.length - 1] : null
       const key = route.path === '/' ? 'home.name' : lastMatched ? getI18nKey(lastMatched.path) : 'home.name'
-      document.title = process.env.VUE_APP_NAME + ' | ' + this.$t(key)
+      const appName = this.systemName || process.env.VUE_APP_NAME
+      document.title = appName + ' | ' + this.$t(key)
     },
     popContainer() {
       return document.getElementById("popContainer")

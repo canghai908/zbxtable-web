@@ -10,6 +10,10 @@ module.exports = {
         name: '系统名称',
         comment: '系统显示的名称'
       },
+      system_subtitle: {
+        name: '系统副标题',
+        comment: '登录页显示的系统副标题'
+      },
       system_logo: {
         name: '系统Logo',
         comment: '系统Logo的base64编码数据'
@@ -188,6 +192,10 @@ module.exports = {
         name: '系統名稱',
         comment: '系統顯示的名稱'
       },
+      system_subtitle: {
+        name: '系統副標題',
+        comment: '登入頁顯示的系統副標題'
+      },
       system_logo: {
         name: '系統Logo',
         comment: '系統Logo的base64編碼數據'
@@ -365,6 +373,10 @@ module.exports = {
       system_name: {
         name: 'System Name',
         comment: 'The name displayed in the system'
+      },
+      system_subtitle: {
+        name: 'System Subtitle',
+        comment: 'The system subtitle displayed on the login page'
       },
       system_logo: {
         name: 'System Logo',
@@ -551,6 +563,10 @@ module.exports = {
       systemName: '系统名称',
       systemNamePlaceholder: '请输入系统名称',
       systemNameHint: '系统显示的名称，将在页面标题和导航栏中显示',
+      systemSubtitle: '系统副标题',
+      systemSubtitlePlaceholder: '请输入系统副标题',
+      systemSubtitleHint: '登录页标题下方显示的说明文案',
+      systemSubtitleDefault: 'Zabbix 监控数据可视化平台',
       systemLogo: '系统Logo',
       uploadLogo: '上传Logo',
       logoUploading: '上传中...',
@@ -639,6 +655,10 @@ module.exports = {
       systemName: '系統名稱',
       systemNamePlaceholder: '請輸入系統名稱',
       systemNameHint: '系統顯示的名稱，將在頁面標題和導航欄中顯示',
+      systemSubtitle: '系統副標題',
+      systemSubtitlePlaceholder: '請輸入系統副標題',
+      systemSubtitleHint: '登入頁標題下方顯示的說明文案',
+      systemSubtitleDefault: 'Zabbix 監控數據可視化平台',
       systemLogo: '系統Logo',
       uploadLogo: '上傳Logo',
       logoUploading: '上傳中...',
@@ -727,6 +747,10 @@ module.exports = {
       systemName: 'Name',
       systemNamePlaceholder: 'Please input system name',
       systemNameHint: 'The name displayed in the system, shown in page title and navigation bar',
+      systemSubtitle: 'Subtitle',
+      systemSubtitlePlaceholder: 'Please input system subtitle',
+      systemSubtitleHint: 'Description displayed below the title on the login page',
+      systemSubtitleDefault: 'Zabbix Monitoring Data Visualization Platform',
       systemLogo: 'Logo',
       uploadLogo: 'Upload Logo',
       logoUploading: 'Uploading...',
