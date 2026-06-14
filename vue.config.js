@@ -93,7 +93,7 @@ module.exports = {
       config.resolve = config.resolve || {};
       config.resolve.alias = {
         ...(config.resolve.alias || {}),
-        "@antv/g2$": path.resolve(__dirname, "node_modules/@antv/g2/lib/index.js"),
+        "@antv/g2$": path.resolve(__dirname, "node_modules/@antv/g2/dist/g2.min.js"),
         "@ant-design/icons/lib/dist$": path.resolve(__dirname, "src/icons/antd.js"),
       };
       config.optimization = {
