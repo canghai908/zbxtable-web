@@ -206,7 +206,7 @@ module.exports = {
       condition_placeholder_value: '匹配值',
       
       // 字段选项
-      field_host: '主机',
+      field_host: '主机名称',
       field_group: '主机组',
       field_item: '指标名称',
       field_key: '指标Key',
@@ -538,7 +538,7 @@ module.exports = {
       condition_placeholder_value: 'Match Value',
       
       // Field options
-      field_host: 'Host',
+      field_host: 'Host Name',
       field_group: 'Host Group',
       field_item: 'Item Name',
       field_key: 'Item Key',
@@ -870,7 +870,7 @@ module.exports = {
       condition_placeholder_value: '匹配值',
       
       // 字段選項
-      field_host: '主機',
+      field_host: '主機名稱',
       field_group: '主機組',
       field_item: '指標名稱',
       field_key: '指標Key',
