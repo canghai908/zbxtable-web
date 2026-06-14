@@ -535,6 +535,10 @@ export default {
               stroke-dashoffset: -1000
           }
         }
+
+        .topology-animated-line {
+          animation: ant-line 30s infinite linear;
+        }
       `)
       
       this.graph.history.redo()
@@ -698,6 +702,7 @@ export default {
         this.graph.clearCells()
         this.updateCanvasSize()
         this.graph.fromJSON(this.X6Data)
+        this.applyAnimatedEdgeStyles()
       } catch (error) {
         console.error('渲染拓扑数据失败:', error)
         this.$message.error(this.$t('msg_load_topology_failed'))
@@ -1176,8 +1181,9 @@ export default {
         
         if (item.attrs.line) {
           edges.push(item)
-        }
-        if (item.attrs.image || item.shape === 'text-node') {
+        } else {
+          // Keep every non-edge node type, including rect/card nodes created
+          // outside the built-in drag palette.
           nodes.push(item)
         }
       })
@@ -1224,6 +1230,30 @@ export default {
           console.error(err)
         })
       }
+    },
+    applyAnimatedEdgeStyles() {
+      if (!this.graph) {
+        return
+      }
+      this.graph.getEdges().forEach((edge) => {
+        const attrs = edge.getAttrs() || {}
+        const line = attrs.line || {}
+        const style = line.style || {}
+        const animation = style.animation || line.animation || ''
+        const dash = line.strokeDasharray
+        if (animation) {
+          if (typeof dash === 'number' && dash > 0) {
+            edge.attr('line/strokeDasharray', `${dash} ${dash}`)
+          } else if (typeof dash === 'string' && /^\d+$/.test(dash)) {
+            edge.attr('line/strokeDasharray', `${dash} ${dash}`)
+          }
+          edge.attr('line/class', 'topology-animated-line')
+          edge.attr('line/style/animation', animation)
+          edge.attr('line/style/strokeDashoffset', 0)
+        } else {
+          edge.attr('line/class', '')
+        }
+      })
     },
     
     tuopuDetail() {

@@ -236,6 +236,9 @@ export default {
       isWebSocket: false,
       websock: null,
       wsInitialized: false, // 防止重复初始化
+      wsManualClose: false, // 是否为主动关闭（主动关闭不重连）
+      wsReconnectTimer: null, // 重连定时器
+      wsReconnectAttempts: 0, // 已重连次数（用于退避）
     }
   },
   created() {
@@ -253,8 +256,14 @@ export default {
   },
   beforeDestroy() {
     console.log('Component beforeDestroy - closing WebSocket')
+    this.wsManualClose = true
     this.wsInitialized = false
+    if (this.wsReconnectTimer) {
+      clearTimeout(this.wsReconnectTimer)
+      this.wsReconnectTimer = null
+    }
     if (this.websock) {
+      this.websock.onclose = null // 避免主动关闭触发重连
       this.websock.close()
       this.websock = null
     }
@@ -314,6 +323,10 @@ export default {
           to {
               stroke-dashoffset: -1000
           }
+        }
+
+        .topology-animated-line {
+          animation: ant-line 30s infinite linear;
         }
       `)
       
@@ -465,7 +478,8 @@ export default {
       }
       
       this.wsInitialized = true
-      
+      this.wsManualClose = false
+
       // 构建 WebSocket URL - 使用统一的 /ws/public 路径（共享）
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
       const wsUrl = `${protocol}//${window.location.host}/ws/pub/${this.id}`
@@ -508,20 +522,35 @@ export default {
     websocketonopen() {
       console.log('WebSocket connection opened successfully')
       this.isWebSocket = true
+      this.wsReconnectAttempts = 0 // 连接成功后重置退避计数
       console.log('Sending initial "success" message')
       this.websock.send("success")
       this.$message.success(this.$t('msg_websocket_connected'))
     },
-    
+
+    scheduleReconnect() { // 断线重连（指数退避，封顶 30s）
+      if (this.wsManualClose) return
+      if (this.wsReconnectTimer) return
+      const delay = Math.min(3000 * Math.pow(2, this.wsReconnectAttempts), 30000)
+      this.wsReconnectAttempts++
+      console.log(`WebSocket 将在 ${delay}ms 后重连（第 ${this.wsReconnectAttempts} 次）`)
+      this.wsReconnectTimer = setTimeout(() => {
+        this.wsReconnectTimer = null
+        this.wsInitialized = false // 允许重新初始化
+        this.initWebSocket()
+      }, delay)
+    },
+
     websocketonclose() {
       this.isWebSocket = false
+      this.scheduleReconnect()
     },
-    
+
     websocketonerror(error) {
       this.isWebSocket = false
       console.error('WebSocket error occurred:', error)
       console.error('WebSocket readyState:', this.websock?.readyState)
-      this.$message.error(this.$t('msg_websocket_error'))
+      // onerror 之后浏览器通常会触发 onclose，由 onclose 统一重连
     },
     
     parseTopologyCells(nodesJSON, edgesJSON) {
@@ -556,13 +585,59 @@ export default {
         if (!edge.shape) {
           edge.shape = 'edge'
         }
+        const line = edge.attrs && edge.attrs.line ? edge.attrs.line : null
+        if (line) {
+          const dash = line.strokeDasharray
+          if (typeof dash === 'number' && dash > 0) {
+            line.strokeDasharray = `${dash} ${dash}`
+          } else if (typeof dash === 'string' && /^\d+$/.test(dash)) {
+            line.strokeDasharray = `${dash} ${dash}`
+          }
+        }
         return edge
       })
 
       return { nodes, edges }
     },
+    applyAnimatedEdgeStyles() {
+      if (!this.graph) {
+        return
+      }
+      this.graph.getEdges().forEach((edge) => {
+        const attrs = edge.getAttrs() || {}
+        const line = attrs.line || {}
+        const style = line.style || {}
+        const animation = style.animation || line.animation || ''
+        const dash = line.strokeDasharray
+        if (animation) {
+          if (typeof dash === 'number' && dash > 0) {
+            edge.attr('line/strokeDasharray', `${dash} ${dash}`)
+          } else if (typeof dash === 'string' && /^\d+$/.test(dash)) {
+            edge.attr('line/strokeDasharray', `${dash} ${dash}`)
+          }
+          edge.attr('line/class', 'topology-animated-line')
+          edge.attr('line/style/animation', animation)
+          edge.attr('line/style/strokeDashoffset', 0)
+        } else {
+          edge.attr('line/class', '')
+        }
+      })
+    },
     
     async websocketonmessage(e) {
+      try {
+        await this.renderTopologyMessage(e)
+      } catch (err) {
+        console.error('渲染拓扑消息失败:', err)
+      } finally {
+        // 无论渲染是否成功，都要回发 success，维持服务端的刷新循环
+        if (this.websock && this.websock.readyState === WebSocket.OPEN) {
+          this.websock.send("success")
+        }
+      }
+    },
+
+    async renderTopologyMessage(e) {
       const redata = JSON.parse(e.data)
       let X6Data = {}
       const { nodes, edges } = this.parseTopologyCells(redata.nodes, redata.edges)
@@ -576,6 +651,7 @@ export default {
       
       // 先加载节点和边
       this.graph.fromJSON(this.X6Data)
+      this.applyAnimatedEdgeStyles()
       
       // 然后加载背景图（在 fromJSON 之后）
       if (redata.background_image) {
@@ -629,10 +705,8 @@ export default {
         this.graph.centerContent()
         this.graph.zoomToFit({ padding: 100, maxScale: 1 })
       })
-      
-      this.websock.send("success")
     },
-    
+
     loadTopologyData() {
       // 使用独立的 axios 实例，避免全局拦截器干扰
       publicAxios.get(`/public/topology/${this.id}`)
@@ -657,6 +731,7 @@ export default {
             
             // 先加载节点和边
             this.graph.fromJSON(this.X6Data)
+            this.applyAnimatedEdgeStyles()
             
             // 然后加载背景图（在 fromJSON 之后）
             if (res.data.background_image) {
