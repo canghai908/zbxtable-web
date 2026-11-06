@@ -16,6 +16,7 @@ import {
 	ALARM_EXPORT,
 	TOPOLOGY_LIST,
 	ITEM_LIST,
+	ITEM_BY_IDS,
 	INVENTORY_LIST,
 	SYSTEM_LIST,
 	HOST_GROUP,
@@ -113,6 +114,10 @@ export async function deployTopology(params) {
 }
 export async function itemList(params) {
 	return request(ITEM_LIST, METHOD.GET, params)
+}
+// itemGetByIds 根据 itemids（逗号分隔）批量获取监控项，用于编辑绑定配置时回填名称
+export async function itemGetByIds(itemids, zid) {
+	return request(ITEM_BY_IDS, METHOD.GET, { itemids, zid })
 }
 export async function inventoryTree() {
 	return request(INVENTORY_LIST, METHOD.GET)
@@ -448,6 +453,7 @@ export default {
 	updateTopology,
 	deleteTopology,
 	itemList,
+	itemGetByIds,
 	triggerList,
 	deployTopology,
 	inventoryTree,
