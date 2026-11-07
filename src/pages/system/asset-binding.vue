@@ -178,7 +178,7 @@
             <a-col :span="12">
               <a-form-model-item :label="m.label + ' / 模板'" :label-col="{ span: 10 }" :wrapper-col="{ span: 14 }">
                 <a-select show-search option-label-prop="label" option-filter-prop="label" placeholder="选择模板" :loading="templatesLoading"
-                  @change="val => handleTemplateChange(val, m.key)">
+                  v-model="selectedTemplates[m.key]" @change="val => handleTemplateChange(val, m.key)">
                   <a-select-option v-for="tpl in templateList" :key="tpl.templateid" :value="tpl.templateid" :label="tpl.name">
                     {{ tpl.name }}
                   </a-select-option>
@@ -437,7 +437,7 @@
             <a-col :span="12">
               <a-form-model-item :label="m.label + ' / 模板'" :label-col="{ span: 10 }" :wrapper-col="{ span: 14 }">
                 <a-select show-search option-label-prop="label" option-filter-prop="label" placeholder="选择模板" :loading="templatesLoading"
-                  @change="val => handleTemplateChange(val, m.key)">
+                  v-model="selectedTemplates[m.key]" @change="val => handleTemplateChange(val, m.key)">
                   <a-select-option v-for="tpl in templateList" :key="tpl.templateid" :value="tpl.templateid" :label="tpl.name">
                     {{ tpl.name }}
                   </a-select-option>
@@ -524,23 +524,25 @@ import PageLayout from "@/layouts/PageLayout";
 import {
   getAssetTypes, getSystemBindings, createSystemBinding, updateSystemBinding,
   deleteSystemBinding, initSystemBinding, getSystemBindingHistory,
-  hostgroupList, templateList, templateGetItemList,
+  hostgroupList, templateList, templateGetItemList, itemGetByIds,
 } from "@/services/admin";
 import { listZabbixInstance } from "@/services/zabbix";
 
 const METRIC_DEFS = [
-  { key: 'uptime',             field: 'uptime_id',             label: '在线时长' },
-  { key: 'cpu_core',           field: 'cpu_core',              label: 'CPU核心数' },
-  { key: 'cpu_utilization',    field: 'cpu_utilization_id',    label: 'CPU使用率' },
-  { key: 'memory_utilization', field: 'memory_utilization_id', label: '内存使用率' },
-  { key: 'memory_used',        field: 'memory_used_id',        label: '已用内存' },
-  { key: 'memory_total',       field: 'memory_total_id',       label: '总内存' },
-  { key: 'model',              field: 'model',                 label: '型号' },
+  { key: 'uptime',             field: 'uptime_id',             tplField: 'uptime_template_id',             label: '在线时长' },
+  { key: 'cpu_core',           field: 'cpu_core',              tplField: 'cpu_core_template_id',           label: 'CPU核心数' },
+  { key: 'cpu_utilization',    field: 'cpu_utilization_id',    tplField: 'cpu_utilization_template_id',    label: 'CPU使用率' },
+  { key: 'memory_utilization', field: 'memory_utilization_id', tplField: 'memory_utilization_template_id', label: '内存使用率' },
+  { key: 'memory_used',        field: 'memory_used_id',        tplField: 'memory_used_template_id',        label: '已用内存' },
+  { key: 'memory_total',       field: 'memory_total_id',       tplField: 'memory_total_template_id',       label: '总内存' },
+  { key: 'model',              field: 'model',                 tplField: 'model_template_id',              label: '型号' },
 ];
 
 function emptyItems() { return METRIC_DEFS.reduce((a, m) => { a[m.key] = undefined; return a; }, {}); }
+function emptyTemplates() { return METRIC_DEFS.reduce((a, m) => { a[m.key] = undefined; return a; }, {}); }
 function emptyLists() { return METRIC_DEFS.reduce((a, m) => { a[m.key] = []; return a; }, {}); }
 function emptyLoading() { return METRIC_DEFS.reduce((a, m) => { a[m.key] = false; return a; }, {}); }
+function emptyTemplateFields() { return METRIC_DEFS.reduce((a, m) => { a[m.tplField] = ''; return a; }, {}); }
 
 export default {
   name: 'AssetBinding',
@@ -564,6 +566,7 @@ export default {
       templatesLoading: false,
       selectedGroups: [],
       selectedItems: emptyItems(),
+      selectedTemplates: emptyTemplates(),
       itemLists: emptyLists(),
       itemsLoading: emptyLoading(),
       metricDefs: METRIC_DEFS,
@@ -625,6 +628,7 @@ export default {
         memory_used_id: '', memory_total_id: '', uptime_id: '', model: '',
         ping_template_id: '', auto_init: 1, init_cron: '0 0 2 * * *',
         init_on_new_host: 1, max_retry: 3,
+        ...emptyTemplateFields(),
       };
     },
     async loadAssetTypes() {
@@ -721,6 +725,13 @@ export default {
     },
     updateGroupId() { this.form.group_id = this.selectedGroups.join(','); },
     async handleTemplateChange(templateId, metricKey) {
+      const def = this.metricDefs.find(m => m.key === metricKey);
+      if (def) {
+        this.form[def.tplField] = templateId ? String(templateId) : '';
+        // 换模板时清掉旧选中的监控项，避免把新模板与旧监控项一起提交
+        this.$set(this.selectedItems, metricKey, undefined);
+        this.form[def.field] = '';
+      }
       if (!this.form.zid) { this.$message.warning('请先选择 Zabbix 实例'); return; }
       this.$set(this.itemsLoading, metricKey, true);
       try {
@@ -738,6 +749,46 @@ export default {
       finally { this.$set(this.itemsLoading, metricKey, false); }
     },
     handleItemChange(itemId, formField) { this.form[formField] = itemId ? String(itemId) : ''; },
+    // backfillMetrics 编辑/复制时回填各指标的模板与监控项下拉。
+    // 有保存模板 id 的：回填模板并加载该模板监控项，再选中已保存监控项；
+    // 旧数据无模板 id 的：退回按 item id 批量查名称，至少显示已选监控项。
+    async backfillMetrics(record) {
+      const zid = this.form.zid;
+      if (!zid) return;
+      const legacyIds = [];
+      const legacyByKey = {};
+      for (const m of this.metricDefs) {
+        const tplId = record[m.tplField] ? String(record[m.tplField]) : '';
+        const itemId = this.form[m.field] ? String(this.form[m.field]) : '';
+        if (tplId) {
+          this.$set(this.selectedTemplates, m.key, tplId);
+          this.form[m.tplField] = tplId;
+          // handleTemplateChange 会清空该指标的已选监控项，加载完列表后再恢复
+          await this.handleTemplateChange(tplId, m.key);
+          if (itemId && /^\d+$/.test(itemId)) {
+            this.$set(this.selectedItems, m.key, itemId);
+            this.form[m.field] = itemId;
+          }
+        } else if (itemId && /^\d+$/.test(itemId)) {
+          legacyByKey[m.key] = itemId;
+          legacyIds.push(itemId);
+        }
+      }
+      if (legacyIds.length === 0) return;
+      try {
+        const res = await itemGetByIds(legacyIds.join(','), zid);
+        const biz = (res && res.data) ? res.data : res;
+        // 接口返回分页结构 data.items（SuccessWithPage），需取 items 数组
+        const list = (biz && biz.code === 200 && biz.data && Array.isArray(biz.data.items)) ? biz.data.items : [];
+        const nameById = {};
+        list.forEach(it => { nameById[String(it.itemid)] = it.name || it.key_ || String(it.itemid); });
+        Object.keys(legacyByKey).forEach(key => {
+          const id = legacyByKey[key];
+          this.$set(this.itemLists, key, [{ itemid: id, name: nameById[id] || id }]);
+          this.$set(this.selectedItems, key, id);
+        });
+      } catch (e) { /* 回填失败不阻断编辑 */ }
+    },
     getDefaultInstanceId() {
       return this.instanceList.length > 0 ? String(this.instanceList[0].instance) : undefined;
     },
@@ -781,6 +832,7 @@ export default {
       this.hostGroups = [];
       this.templateList = [];
       this.selectedItems = emptyItems();
+      this.selectedTemplates = emptyTemplates();
       this.itemLists = emptyLists();
       this.itemsLoading = emptyLoading();
       // 新建时默认开启自动初始化（编辑时由 handleEdit 按记录覆盖）
@@ -823,6 +875,7 @@ export default {
         init_cron:           record.init_cron || '0 0 2 * * *',
         init_on_new_host:    record.init_on_new_host || 0,
         max_retry:           record.max_retry !== undefined ? record.max_retry : 3,
+        ...emptyTemplateFields(),
       };
       this.autoInitSwitch = record.auto_init === 1;
       this.initOnNewHostSwitch = record.init_on_new_host === 1;
@@ -836,6 +889,7 @@ export default {
           this.updateGroupId();
         }
         if (record.ping_template_id) this.form.ping_template_id = record.ping_template_id;
+        await this.backfillMetrics(record);
       }
     },
     async handleCopy(record) {
@@ -861,6 +915,7 @@ export default {
         init_cron:           record.init_cron || '0 0 2 * * *',
         init_on_new_host:    record.init_on_new_host || 0,
         max_retry:           record.max_retry !== undefined ? record.max_retry : 3,
+        ...emptyTemplateFields(),
       };
       this.autoInitSwitch = record.auto_init === 1;
       this.initOnNewHostSwitch = record.init_on_new_host === 1;
@@ -874,6 +929,7 @@ export default {
           this.updateGroupId();
         }
         if (record.ping_template_id) this.form.ping_template_id = String(record.ping_template_id);
+        await this.backfillMetrics(record);
       }
     },
     handleCancel() { this.modalVisible = false; },

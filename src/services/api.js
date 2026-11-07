@@ -20,6 +20,7 @@ module.exports = {
 	ALARM_EXPORT: '/v1/alarm/export',
 	TOPOLOGY_LIST: '/v1/topology',
 	ITEM_LIST: '/v1/item/list',
+	ITEM_BY_IDS: '/v1/item/by_ids',
 	INVENTORY_LIST: '/v1/index/inventory',
 	SYSTEM_LIST: '/v1/system',
 	HOST_GROUP: '/v1/host_group',

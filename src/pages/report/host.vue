@@ -205,7 +205,7 @@
               </a-row>
               <a-row :gutter="16">
                 <a-col :span="10">
-                  <a-select v-model="config.reference_host_id" show-search :placeholder="$t('select_reference_host')" style="width: 100%"
+                  <a-select v-model="config.reference_host_id" show-search option-filter-prop="children" :placeholder="$t('select_reference_host')" style="width: 100%"
                     :disabled="!(config.matched_hosts && config.matched_hosts.length)" @change="() => handleReferenceHostChange(config, index)">
                     <a-select-option v-for="host in config.matched_hosts || []" :key="host.hostid" :value="host.hostid">
                       {{ host.name }}
