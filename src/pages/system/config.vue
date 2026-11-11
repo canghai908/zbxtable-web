@@ -161,6 +161,29 @@
             </a-form-model>
           </a-tab-pane>
 
+          <!-- APM / OpenTelemetry 配置 -->
+          <a-tab-pane key="apm" :tab="$t('apmTab')">
+            <a-form-model ref="apmForm" :model="apmForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
+              <a-alert :message="$t('apmRestartHint')" type="warning" show-icon style="margin-bottom: 16px;" />
+              <a-form-model-item v-for="item in apmConfigs" :key="item.id" :label="item.name">
+                <a-select v-if="isBooleanConfig(item.config_key)" v-model="apmForm[item.config_key]" :placeholder="item.comment" style="width: 100%">
+                  <a-select-option v-for="opt in getBooleanOptions(item.config_key)" :key="opt.value" :value="opt.value">
+                    {{ opt.label }}
+                  </a-select-option>
+                </a-select>
+                <a-select v-else-if="item.config_key === 'otel_protocol'" v-model="apmForm[item.config_key]" :placeholder="item.comment" style="width: 100%">
+                  <a-select-option value="grpc">grpc</a-select-option>
+                  <a-select-option value="http">http</a-select-option>
+                </a-select>
+                <a-input v-else v-model="apmForm[item.config_key]" :placeholder="item.comment" />
+                <div class="config-hint">{{ item.comment }}</div>
+              </a-form-model-item>
+              <a-form-model-item :wrapper-col="{ span: 14, offset: 6 }">
+                <a-button type="primary" @click="saveCategory('apm')" :loading="saveLoading">{{$t('save')}}</a-button>
+              </a-form-model-item>
+            </a-form-model>
+          </a-tab-pane>
+
           <!-- AI 配置 -->
           <a-tab-pane key="ai" :tab="$t('aiTab')">
             <a-form-model ref="aiForm" :model="aiForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
@@ -268,6 +291,7 @@ export default {
       emailForm: {},
       wechatForm: {},
       aiForm: {},
+      apmForm: {},
       securityForm: {},
       saveLoading: false,
       logoUploading: false,
@@ -375,8 +399,13 @@ export default {
         item.config_key && item.config_key.startsWith('custom_')
       )
     },
+    apmConfigs() {
+      return this.list.filter(item =>
+        item.config_key && item.config_key.startsWith('otel_')
+      )
+    },
     securityConfigs() {
-      return this.list.filter(item => 
+      return this.list.filter(item =>
         item.config_key === 'encryption_key'
       )
     }
@@ -419,7 +448,8 @@ export default {
     },
     isBooleanConfig(key) {
       // 判断是否为布尔类型的配置项（开启/关闭）
-      const booleanKeys = ['zbx_dash', 'sync_inventory', 'wechat_enabled', 'email_isSSl']
+      const booleanKeys = ['zbx_dash', 'sync_inventory', 'wechat_enabled', 'email_isSSl',
+        'otel_enable', 'otel_insecure', 'otel_logs_enable', 'otel_metrics_enable']
       return booleanKeys.includes(key) || key.endsWith('_enabled')
     },
     isTaskConfig(key) {
@@ -451,7 +481,8 @@ export default {
       const enabledText = this.$t('enabled')
       const disabledText = this.$t('disabled')
       
-      if (key === 'email_isSSl') {
+      const trueFalseKeys = ['email_isSSl', 'otel_enable', 'otel_insecure', 'otel_logs_enable', 'otel_metrics_enable']
+      if (trueFalseKeys.includes(key)) {
         return [
           { label: enabledText, value: 'true' },
           { label: disabledText, value: 'false' }
@@ -503,6 +534,9 @@ export default {
       if (!this.aiForm.alarm_analysis_prompt) {
         this.$set(this.aiForm, 'alarm_analysis_prompt', this.$t('defaultAlarmAnalysisPrompt'))
       }
+      this.apmConfigs.forEach(item => {
+        this.$set(this.apmForm, item.config_key, item.config_value)
+      })
       this.securityConfigs.forEach(item => {
         this.$set(this.securityForm, item.config_key, item.config_value)
       })
@@ -533,6 +567,10 @@ export default {
           case 'ai':
             configs = this.aiConfigs
             form = this.aiForm
+            break
+          case 'apm':
+            configs = this.apmConfigs
+            form = this.apmForm
             break
         }
         
