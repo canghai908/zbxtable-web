@@ -40,6 +40,7 @@ import insertCss from 'insert-css'
 import '@antv/x6-vue-shape'
 import { Graph, DataUri } from '@antv/x6'
 import axios from 'axios'
+import { fitGraphContent, getContainerSize } from './Graph/zoom'
 
 // 创建独立的 axios 实例，用于公开接口（不带 token，不使用全局拦截器）
 const publicAxios = axios.create({
@@ -285,10 +286,15 @@ export default {
         newB.toString(16).padStart(2, '0')
     },
     initX6() {
+      const container = document.getElementById('containerChart')
+      const { width, height } = getContainerSize(container, {
+        width: Math.max(window.innerWidth - 40, 800),
+        height: this.canvasHeight || 600,
+      })
       this.graph = new Graph({
-        container: document.getElementById('containerChart'),
-        width: '100%',
-        height: '100%',
+        container,
+        width,
+        height,
         resizing: {
           enabled: true,
           orthogonal: true,
@@ -702,8 +708,7 @@ export default {
         const container = document.getElementById('containerChart')
         const ports = container.querySelectorAll('.x6-port-body')
         this.showPorts(ports, false)
-        this.graph.centerContent()
-        this.graph.zoomToFit({ padding: 100, maxScale: 1 })
+        fitGraphContent(this.graph, { padding: 100, maxScale: 1 })
       })
     },
 
@@ -779,8 +784,7 @@ export default {
               this.graph.getNodes().forEach(node => {
                 node.attr('label/text', node.attr('label/text'))
               })
-              this.graph.centerContent()
-              this.graph.zoomToFit({ padding: 100, maxScale: 1 })
+              fitGraphContent(this.graph, { padding: 100, maxScale: 1 })
             })
             
             // 数据加载成功后再初始化 WebSocket

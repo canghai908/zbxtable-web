@@ -51,6 +51,7 @@ import { Graph, Shape, DataUri } from '@antv/x6'
 import { topologyDetail } from '@/services/admin'
 import { API_WS } from "@/services/api"
 import Cookie from 'js-cookie'
+import { fitGraphContent, getContainerSize } from './Graph/zoom'
 
 // 注册文字节点类型
 Graph.registerNode(
@@ -320,10 +321,15 @@ export default {
     },
     initX6() {
       var _that = this
+      const container = document.getElementById('containerChart')
+      const { width, height } = getContainerSize(container, {
+        width: this.canvasHeight ? Math.max(window.innerWidth - 40, 800) : 800,
+        height: this.canvasHeight || 600,
+      })
       this.graph = new Graph({
-        container: document.getElementById('containerChart'),
-        width: '100%',
-        height: '100%',
+        container,
+        width,
+        height,
         background: _that.backgroundOptions,
         grid: _that.grid,
         resizing: { // 调整节点宽高
@@ -754,8 +760,7 @@ export default {
         const ports = container.querySelectorAll('.x6-port-body')
       this.showPorts(ports, false)
         // 保持居中和缩放，使用较大的padding确保文本不被裁剪
-        this.graph.centerContent()
-        this.graph.zoomToFit({ padding: 100, maxScale: 1 })
+        fitGraphContent(this.graph, { padding: 100, maxScale: 1 })
       })
     },
     tuopuDetail() {
@@ -834,8 +839,7 @@ export default {
                 node.attr('label/text', node.attr('label/text'))
               })
               // 居中并自动缩放以适应画布，使用较大的padding确保文本不被裁剪
-              this.graph.centerContent()
-              this.graph.zoomToFit({ padding: 100, maxScale: 1 })
+              fitGraphContent(this.graph, { padding: 100, maxScale: 1 })
             })
           } else {
             this.$message.error(res.message || this.$t('msg_load_topology_failed'))

@@ -280,6 +280,7 @@ import insertCss from 'insert-css'
 import '@antv/x6-vue-shape'
 import { Graph, Shape, FunctionExt } from '@antv/x6'
 import { startDragToGraph } from './Graph/methods.js'
+import { fitGraphContent, getContainerSize } from './Graph/zoom'
 import { createTopology, topologyDetail, updateTopology } from '@/services/admin'
 
 // 注册文字节点类型
@@ -445,10 +446,15 @@ export default {
 
     initX6() {
       var _that = this
+      const container = document.getElementById('containerChart')
+      const { width, height } = getContainerSize(container, {
+        width: this.form.canvasWidth || 1920,
+        height: this.minHeight || this.form.canvasHeight || 1080,
+      })
       this.graph = new Graph({
-        container: document.getElementById('containerChart'),
-        width: '100%',
-        height: '100%',
+        container,
+        width,
+        height,
         background: _that.backgroundOptions,
         grid: _that.grid,
         resizing: {
@@ -755,8 +761,7 @@ export default {
         this.graph.getNodes().forEach(node => {
           node.attr('label/text', node.attr('label/text'))
         })
-        this.graph.centerContent()
-        this.graph.zoomToFit({ padding: 100, maxScale: 1 })
+        fitGraphContent(this.graph, { padding: 100, maxScale: 1 })
       })
     },
 
