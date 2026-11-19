@@ -709,7 +709,7 @@ export default {
                   this.chatMessages[aiMessageIndex].formattedContent = DOMPurify.sanitize(htmlContent);
                 } catch (parseError) {
                   console.error('Markdown parse error:', parseError);
-                  this.chatMessages[aiMessageIndex].formattedContent = text;
+                  this.chatMessages[aiMessageIndex].formattedContent = DOMPurify.sanitize(text);
                 }
                 
                 // 滚动到底部
@@ -730,7 +730,7 @@ export default {
         if (this.isTyping) {
           this.isTyping = false;
           this.chatMessages[aiMessageIndex].content = this.$t('msg_analysis_timeout');
-          this.chatMessages[aiMessageIndex].formattedContent = this.$t('msg_analysis_timeout');
+          this.chatMessages[aiMessageIndex].formattedContent = DOMPurify.sanitize(this.$t('msg_analysis_timeout'));
           this.$message.warning(this.$t('msg_analysis_timeout'));
         }
       }, 360000); // 6分钟总体超时
@@ -760,7 +760,9 @@ export default {
           }
           
           this.chatMessages[aiMessageIndex].content = this.$t('msg_analysis_failed') + ': ' + errorMsg;
-          this.chatMessages[aiMessageIndex].formattedContent = this.$t('msg_analysis_failed') + ': ' + errorMsg;
+          this.chatMessages[aiMessageIndex].formattedContent = DOMPurify.sanitize(
+            this.$t('msg_analysis_failed') + ': ' + errorMsg
+          );
           this.$message.error(this.$t('msg_analysis_failed'));
         });
     },
