@@ -286,6 +286,9 @@ export async function userDelete(id) {
 export async function userPut(id, params) {
 	return request(USER + '/' + id, METHOD.PUT, params)
 }
+export async function updateUserTheme(params) {
+	return request(USER + '/theme', METHOD.PUT, params)
+}
 export async function userStatusPut(id, params) {
 	return request(USER + '/status/' + id, METHOD.PUT, params)
 }
@@ -506,6 +509,7 @@ export default {
 	userCreate,
 	userDelete,
 	userPut,
+	updateUserTheme,
 	userStatusPut,
 	groupList,
 	groupCreate,

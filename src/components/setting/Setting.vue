@@ -101,7 +101,7 @@ import { setting } from '@/config/default'
 import sysConfig from '@/config/config'
 import fastEqual from 'fast-deep-equal'
 import deepMerge from 'deepmerge'
-import { userPut } from '@/services/admin'
+import { updateUserTheme } from '@/services/admin'
 import theme_dark from '@/assets/img/theme_dark.svg'
 import theme_light from '@/assets/img/theme_light.svg'
 import theme_night from '@/assets/img/theme_night.svg'
@@ -232,7 +232,7 @@ export default {
     async saveToServer() {
       this.saving = true
       try {
-        // 获取当前用户信息
+        // 获取当前用户信息（主题接口按登录用户名更新，不依赖管理员权限）
         const user = this.$store.getters['account/user']
         if (!user || !user.id) {
           throw new Error(this.$t('user_missing'))
@@ -240,8 +240,8 @@ export default {
         
         const config = this.extractConfig(true)
         
-        // 调用用户更新接口，只更新 theme 字段
-        const response = await userPut(user.id, {
+        // 走专用主题接口，避免 PUT /v1/user/:id 的管理员限制
+        const response = await updateUserTheme({
           theme: JSON.stringify(config)
         })
         
