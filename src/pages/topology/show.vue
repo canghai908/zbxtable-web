@@ -50,6 +50,7 @@ import '@antv/x6-vue-shape'
 import { Graph, Shape, DataUri } from '@antv/x6'
 import { topologyDetail } from '@/services/admin'
 import { API_WS } from "@/services/api"
+import Cookie from 'js-cookie'
 
 // 注册文字节点类型
 Graph.registerNode(
@@ -563,12 +564,14 @@ export default {
         this.websock = null
       }
 
-      // 构建 WebSocket URL - 使用统一的 /wsapi/auth 路径
+      // 构建 WebSocket URL，通过 query 携带令牌（浏览器 WS 无法自定义 Authorization header）
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-      const wsUrl = `${protocol}//${window.location.host}${API_WS}/${this.id}`
+      const token = Cookie.get('X-Token') || ''
+      const qs = token ? `?token=${encodeURIComponent(token)}` : ''
+      const wsUrl = `${protocol}//${window.location.host}${API_WS}/${this.id}${qs}`
 
       console.log('=== WebSocket Connection (Auth) ===')
-      console.log('WebSocket URL:', wsUrl)
+      console.log('WebSocket URL:', wsUrl.replace(/token=[^&]+/, 'token=***'))
 
       //init websocket
       this.websock = new WebSocket(wsUrl);
