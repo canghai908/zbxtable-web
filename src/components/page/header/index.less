@@ -1,13 +1,14 @@
 .page-header{
   background: @base-bg-color;
-  padding: 16px 24px;
+  padding: 12px 16px;
+  @media (max-width: 767px) { padding: 8px; }
   &.head.fixed{
     margin: auto;
     max-width: 1400px;
   }
   .page-header-wide{
     .breadcrumb{
-      margin-bottom: 20px;
+      margin-bottom: 12px;
     }
     .detail{
       display: flex;
@@ -24,7 +25,7 @@
         .title{
           font-size: 20px;
           color: @title-color;
-          margin-bottom: 16px;
+          margin-bottom: 12px;
         }
         .content{
           flex: 1;

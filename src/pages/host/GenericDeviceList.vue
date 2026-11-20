@@ -528,20 +528,27 @@ export default {
     fetchGraph() {
       if (!this.detailRecord || !this.detailRecord.hostid) return
       this.graphLoading = true
-      hostGraph(this.detailRecord.hostid, { start: this.beginTime, end: this.endTime })
+      hostGraph(this.detailRecord.hostid, {
+        start: this.beginTime,
+        end: this.endTime,
+        zid: Number(this.detailRecord.zid) || 0,
+      })
         .then((resp) => {
           const res = resp.data
           if (res.code == 200) {
             this.pngData = (res.data && res.data.items) || []
-          } else if (res.code == 403) {
-            this.$message.error(res.message || '该实例未配置密码，无法获取图表')
-            this.pngData = []
           } else {
             this.pngData = []
+            this.$message.error(res.message || '获取图表数据失败')
           }
           this.sortPngData()
         })
-        .catch(() => { this.pngData = []; this.sortPngData() })
+        .catch((error) => {
+          this.pngData = []
+          this.sortPngData()
+          const response = error.response && error.response.data
+          this.$message.error((response && response.message) || error.message || '获取图表数据失败')
+        })
         .finally(() => { this.graphLoading = false })
     },
     sortPngData() {

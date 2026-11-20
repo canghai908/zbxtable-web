@@ -63,9 +63,11 @@
           <a-badge v-if="record.notify_status==0" status="success"></a-badge>
           <a-badge v-else-if="record.notify_status==1" status="default"></a-badge>
           <a-badge v-else-if="record.notify_status==2" status="processing"></a-badge>
+          <a-badge v-else-if="record.notify_status==3" status="warning"></a-badge>
           <template v-if="record.notify_status==0">{{ $t('notify_status_notified') }}</template>
           <template v-else-if="record.notify_status==1">{{ $t('notify_status_muted') }}</template>
           <template v-else-if="record.notify_status==2">{{ $t('notify_status_default_rule') }}</template>
+          <template v-else-if="record.notify_status==3">{{ $t('notify_status_no_recipient') }}</template>
         </span>
         <span slot="operation" slot-scope="record">
           <a-button v-if="record.notify_status!=1" class="pd20 paddingleft0" type="link" size="small" @click="addMutes(record)">{{ $t('btn_mute') }}</a-button>
@@ -895,6 +897,9 @@ export default {
           break;
         case "2":
           res = this.$t('notify_status_default_rule');
+          break;
+        case "3":
+          res = this.$t('notify_status_no_recipient');
           break;
       }
       return res;

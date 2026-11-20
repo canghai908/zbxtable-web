@@ -657,7 +657,7 @@ export default {
     box-sizing: border-box;
     padding: 8px 0;
     border-bottom: 1px solid #f0f0f0;
-    transition: all 0.3s;
+    transition: background-color 160ms ease;
     &:hover {
       background: var(--primary-bg);
     }
@@ -924,18 +924,12 @@ export default {
   gap: 16px;
   padding: 16px 12px;
   background: var(--primary-bg);
-  transition: all 0.3s ease;
+  transition: background-color 160ms ease, border-color 160ms ease;
   position: relative;
   overflow: hidden;
   
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
     background: var(--primary-bg-hover);
-    
-    .device-count {
-      transform: scale(1.15);
-  }
   }
   
   .device-name {
@@ -954,7 +948,6 @@ export default {
     color: var(--primary-color);
     font-style: normal;
     font-weight: 700;
-    transition: transform 0.3s ease;
   }
 }
 </style>

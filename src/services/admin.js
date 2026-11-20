@@ -256,6 +256,19 @@ export async function taskLogDelete(id) {
 export async function managerChpwd(params) {
 	return request(MANAGER + '/chpwd', METHOD.POST, params)
 }
+export async function onCallList(params) { return request('/v1/oncall/schedules', METHOD.GET, params) }
+export async function onCallGet(id) { return request('/v1/oncall/schedules/' + id, METHOD.GET) }
+export async function onCallCreate(params) { return request('/v1/oncall/schedules', METHOD.POST, params) }
+export async function onCallUpdate(id, params) { return request('/v1/oncall/schedules/' + id, METHOD.PUT, params) }
+export async function onCallDelete(id) { return request('/v1/oncall/schedules/' + id, METHOD.DELETE) }
+export async function onCallPreview(id, params) { return request('/v1/oncall/schedules/' + id + '/preview', METHOD.POST, params) }
+export async function onCallOverrideCreate(id, params) { return request('/v1/oncall/schedules/' + id + '/overrides', METHOD.POST, params) }
+export async function onCallOverrideDelete(id, overrideId) { return request('/v1/oncall/schedules/' + id + '/overrides/' + overrideId, METHOD.DELETE) }
+export async function onCallAudit(id, params) { return request('/v1/oncall/schedules/' + id + '/audit', METHOD.GET, params) }
+export async function rulePreview(params) { return request(RULE + '/preview', METHOD.POST, params) }
+export async function ruleTest(params) {
+	return request(RULE + '/test', METHOD.POST, params)
+}
 export async function ruleList(params) {
 	return request(RULE, METHOD.GET, { ...params })
 }

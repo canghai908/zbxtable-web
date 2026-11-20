@@ -278,7 +278,11 @@ export default {
     fetchGraph() {
       if (!this.id) return
       this.graphLoading = true
-      hostGraph(this.id, { start: this.beginTime, end: this.endTime })
+      hostGraph(this.id, {
+        start: this.beginTime,
+        end: this.endTime,
+        zid: Number(this.zid) || 0,
+      })
         .then((resp) => {
           const res = resp.data
           if (res.code === 200) {
@@ -286,9 +290,14 @@ export default {
             this.sortedPngData = [...items].sort((a, b) => a.name.localeCompare(b.name))
           } else {
             this.sortedPngData = []
+            this.$message.error(res.message || '获取图表数据失败')
           }
         })
-        .catch(() => { this.sortedPngData = [] })
+        .catch((error) => {
+          this.sortedPngData = []
+          const response = error.response && error.response.data
+          this.$message.error((response && response.message) || error.message || '获取图表数据失败')
+        })
         .finally(() => { this.graphLoading = false })
     },
   },

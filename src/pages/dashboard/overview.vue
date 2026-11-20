@@ -185,23 +185,12 @@ export default {
 // 统计卡片样式
 .stats-overview {
   margin-bottom: 12px;
-  animation: fadeInDown 0.6s ease-out;
 }
 
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 12px;
-}
-
-.stat-col {
-  animation: fadeInUp 0.6s ease-out;
-  animation-fill-mode: both;
-  
-  &:nth-child(1) { animation-delay: 0.1s; }
-  &:nth-child(2) { animation-delay: 0.2s; }
-  &:nth-child(3) { animation-delay: 0.3s; }
-  &:nth-child(4) { animation-delay: 0.4s; }
 }
 
 .stat-card {
@@ -212,45 +201,14 @@ export default {
   display: flex;
   align-items: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background-color 160ms ease, border-color 160ms ease;
   position: relative;
   overflow: hidden;
   border: 1px solid @border-color-base;
   
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.3s ease;
-  }
-  
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-    border-color: transparent;
-    
-    &::before {
-      transform: scaleX(1);
-    }
-    
-    .stat-icon {
-      transform: scale(1.05);
-    }
+    border-color: @primary-color;
   }
-}
-
-// 统一使用主题色
-.stat-card-windows,
-.stat-card-linux,
-.stat-card-network,
-.stat-card-server {
-  &::before { background: @primary-color; }
-  &:hover { box-shadow: 0 8px 24px fade(@primary-color, 20%); }
 }
 
 .stat-icon {
@@ -262,7 +220,6 @@ export default {
   justify-content: center;
   font-size: 20px;
   margin-right: 12px;
-  transition: all 0.3s ease;
   position: relative;
   
   .anticon {
@@ -277,7 +234,7 @@ export default {
     inset: 0;
     border-radius: 12px;
     opacity: 0.12;
-    transition: opacity 0.3s ease;
+    transition: opacity 160ms ease;
   }
 }
 
@@ -349,7 +306,6 @@ export default {
 .main-card {
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  animation: fadeIn 0.8s ease-out 0.3s both;
   border: 1px solid @border-color-base;
   background: @component-background;
 }
@@ -360,12 +316,12 @@ export default {
   border-radius: 8px;
   padding: 20px;
   min-height: 280px;
-  transition: all 0.3s ease;
   border: 1px solid @border-color-split;
   
+  transition: border-color 160ms ease;
+
   &:hover {
     border-color: @border-color-base;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   }
 }
 
@@ -376,7 +332,6 @@ export default {
   margin-bottom: 20px;
   padding-bottom: 16px;
   border-bottom: 2px solid fade(@primary-color, 30%);
-  transition: all 0.3s ease;
 }
 
 .header-left {
@@ -388,11 +343,6 @@ export default {
 .section-icon {
   font-size: 22px;
   color: @primary-color;
-  transition: all 0.3s ease;
-  
-  .host-section:hover & {
-    transform: scale(1.1);
-  }
 }
 
 .section-title {
@@ -414,29 +364,14 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  animation: scaleIn 0.4s ease-out;
-  animation-fill-mode: both;
 }
-
-// 生成动画延迟
-.host-item:nth-child(1) { animation-delay: 0.02s; }
-.host-item:nth-child(2) { animation-delay: 0.04s; }
-.host-item:nth-child(3) { animation-delay: 0.06s; }
-.host-item:nth-child(4) { animation-delay: 0.08s; }
-.host-item:nth-child(5) { animation-delay: 0.10s; }
-.host-item:nth-child(6) { animation-delay: 0.12s; }
-.host-item:nth-child(7) { animation-delay: 0.14s; }
-.host-item:nth-child(8) { animation-delay: 0.16s; }
-.host-item:nth-child(9) { animation-delay: 0.18s; }
-.host-item:nth-child(10) { animation-delay: 0.20s; }
-.host-item:nth-child(n+11) { animation-delay: 0.22s; }
 
 .host-dot {
   width: 28px;
   height: 28px;
   border-radius: 6px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background-color 160ms ease, box-shadow 160ms ease;
   position: relative;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   
@@ -453,8 +388,7 @@ export default {
   }
   
   &:hover {
-    transform: scale(1.25);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 0 0 2px @text-color-secondary;
   }
   
   &.status-healthy {
@@ -502,49 +436,7 @@ export default {
   }
 }
 
-// 动画定义
-@keyframes fadeInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
+// 告警状态反馈
 @keyframes pulse {
   0% {
     transform: translate(-50%, -50%) scale(1);

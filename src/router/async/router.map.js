@@ -72,6 +72,7 @@ const routerMap = {
 	alarmRule: {
 		component: () => import('@/pages/alarm/rule'),
 	},
+	alarmOnCall: { component: () => import('@/pages/alarm/OnCallSchedules') },
 	alarmMutes: {
 		component: () => import('@/pages/alarm/mutes'),
 	},

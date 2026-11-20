@@ -68,7 +68,7 @@ export default {
 <style lang="less">
   .header-notice{
     display: inline-block;
-    transition: all 0.3s;
+    transition: color 160ms ease, background-color 160ms ease;
     span {
       vertical-align: initial;
     }

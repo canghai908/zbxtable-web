@@ -37,8 +37,8 @@ export default {
       }
       a{
         color: @text-color-second;
-        -webkit-transition: all .3s;
-        transition: all .3s;
+        -webkit-transition: color 160ms ease;
+        transition: color 160ms ease;
       }
     }
   }

@@ -67,6 +67,7 @@ module.exports = {
       notify_status_notified: '已通知',
       notify_status_muted: '已屏蔽',
       notify_status_default_rule: '默认规则',
+      notify_status_no_recipient: '无可用接收人',
       
       // 通知结果
       notify_result_delivered: '已送达',
@@ -253,7 +254,14 @@ module.exports = {
       mutes_col_start_time: '开始时间',
       mutes_col_end_time: '结束时间',
       mutes_col_add_time: '添加时间',
-      mutes_col_policy_status: '策略状态',
+      mutes_col_policy_status: '启用开关',
+      mutes_col_effective_status: '生效状态',
+      mutes_state_pending: '待生效',
+      mutes_state_active: '当前生效',
+      mutes_state_expired: '已过期',
+      mutes_state_disabled: '已禁用',
+      mutes_state_invalid: '时间异常',
+      mutes_effective_help: '按当前时间、启用状态和屏蔽时间判断（Asia/Shanghai）。实际屏蔽以告警时间及条件、实例和渠道匹配为准。',
       mutes_col_operation: '操作',
       
       // 时长单位
@@ -399,6 +407,7 @@ module.exports = {
       notify_status_notified: 'Notified',
       notify_status_muted: 'Muted',
       notify_status_default_rule: 'Default Rule',
+      notify_status_no_recipient: 'No available recipients',
       
       // Notification result
       notify_result_delivered: 'Delivered',
@@ -585,7 +594,14 @@ module.exports = {
       mutes_col_start_time: 'Start',
       mutes_col_end_time: 'End',
       mutes_col_add_time: 'Created',
-      mutes_col_policy_status: 'Status',
+      mutes_col_policy_status: 'Enabled',
+      mutes_col_effective_status: 'Effective Status',
+      mutes_state_pending: 'Scheduled',
+      mutes_state_active: 'Active',
+      mutes_state_expired: 'Expired',
+      mutes_state_disabled: 'Disabled',
+      mutes_state_invalid: 'Invalid Time',
+      mutes_effective_help: 'Based on the current time, switch and mute window (Asia/Shanghai). Actual suppression uses the alert time and matching conditions, instance and channel.',
       mutes_col_operation: 'Operation',
       
       // Duration units
@@ -731,6 +747,7 @@ module.exports = {
       notify_status_notified: '已通知',
       notify_status_muted: '已屏蔽',
       notify_status_default_rule: '默認規則',
+      notify_status_no_recipient: '無可用接收人',
       
       // 通知結果
       notify_result_delivered: '已送達',
@@ -917,7 +934,14 @@ module.exports = {
       mutes_col_start_time: '開始時間',
       mutes_col_end_time: '結束時間',
       mutes_col_add_time: '添加時間',
-      mutes_col_policy_status: '策略狀態',
+      mutes_col_policy_status: '啟用開關',
+      mutes_col_effective_status: '生效狀態',
+      mutes_state_pending: '待生效',
+      mutes_state_active: '目前生效',
+      mutes_state_expired: '已過期',
+      mutes_state_disabled: '已停用',
+      mutes_state_invalid: '時間異常',
+      mutes_effective_help: '依目前時間、啟用狀態及屏蔽時間判斷（Asia/Shanghai）。實際屏蔽依告警時間及條件、實例和渠道匹配為準。',
       mutes_col_operation: '操作',
       
       // 時長單位

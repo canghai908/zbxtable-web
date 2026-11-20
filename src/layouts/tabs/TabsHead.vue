@@ -109,7 +109,7 @@
     padding: 0 16px;
     font-size: 14px;
     user-select: none;
-    transition: all 0.2s;
+    transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease;
     .title{
       display: inline-block;
       height: 100%;
@@ -126,7 +126,7 @@
     .icon-sync{
       margin-left: -4px;
       color: @primary-4;
-      transition: all 0.3s ease-in-out;
+      transition: color 160ms ease;
       &:hover{
         color: @primary-color;
       }
@@ -144,7 +144,6 @@
   }
   .tabs-container{
     margin: -16px auto 8px;
-    transition: top,left 0.2s;
     .header-lock{
       font-size: 18px;
       cursor: pointer;

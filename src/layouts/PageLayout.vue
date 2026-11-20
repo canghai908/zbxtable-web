@@ -121,7 +121,8 @@ export default {
 
 <style lang="less">
   .page-header{
-    margin: 0 -24px 0;
+    margin: 0 -16px 0;
+    @media (max-width: 767px) { margin: 0 -8px 0; }
   }
   .link{
     /*margin-top: 16px;*/

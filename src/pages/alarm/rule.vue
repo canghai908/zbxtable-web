@@ -18,6 +18,7 @@
     </a-form-model>
     <div class="linux-list">
       <a-table :loading="loading" :columns="columns" :data-source="list" @change="changePage" :pagination="pagination" :rowKey="(record) => { return record.id;}">
+        <condition-summary slot="conditions" slot-scope="text, record" :value="text" :empty-label="record.m_type === '2' ? '默认回退规则' : '未配置条件'" />
         <div slot="instance_tag" slot-scope="text">
           <a-tag :color="themeColor">{{ getInstanceNames(text) || $t('status_not_selected') }}</a-tag>
         </div>
@@ -35,55 +36,23 @@
       </a-table>
     </div>
     <!-- 新增/编辑规则弹窗 -->
-    <a-modal :title="editingId ? $t('modal_title_edit_rule') : $t('modal_title_add_rule')" :visible="modalVisible" :confirmLoading="modalLoading" @ok="saveRule" @cancel="closeModal" width="900px">
-      <a-form-model :model="editRule" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
-        <a-form-model-item :label="$t('form_label_name')" required>
-          <a-input v-model.trim="editRule.name" :placeholder="$t('form_placeholder_name')" />
-        </a-form-model-item>
-        <a-form-model-item :label="$t('form_label_instance')" required>
-          <a-select v-model="editRule.z_ids" mode="multiple" style="width: 100%" :placeholder="$t('form_placeholder_instance')">
-            <a-select-option v-for="(item, index) in instanceList" :key="index" :value="item.id.toString()" :label="item.name" :title="item.name">
-              {{ item.name }}
-            </a-select-option>
-          </a-select>
-        </a-form-model-item>
+    <a-modal wrapClassName="rule-editor-modal" :title="editingId ? $t('modal_title_edit_rule') : $t('modal_title_add_rule')" :visible="modalVisible" :confirmLoading="modalLoading" @ok="saveRule" @cancel="closeModal" width="900px">
+      <a-form-model class="rule-editor-form" :model="editRule" :label-col="{ xs: 24, sm: 4 }" :wrapper-col="{ xs: 24, sm: 20 }">
+        <div class="rule-basic-fields">
+          <a-form-model-item :label="$t('form_label_name')" required :label-col="{xs:24,sm:8}" :wrapper-col="{xs:24,sm:16}">
+            <a-input v-model.trim="editRule.name" :placeholder="$t('form_placeholder_name')" />
+          </a-form-model-item>
+          <a-form-model-item :label="$t('form_label_instance')" required :label-col="{xs:24,sm:8}" :wrapper-col="{xs:24,sm:16}">
+            <a-select v-model="editRule.z_ids" mode="multiple" style="width: 100%" :placeholder="$t('form_placeholder_instance')">
+              <a-select-option v-for="(item, index) in instanceList" :key="index" :value="item.id.toString()" :label="item.name" :title="item.name">
+                {{ item.name }}
+              </a-select-option>
+            </a-select>
+          </a-form-model-item>
+        </div>
 
         <a-card :title="$t('card_title_match_conditions')" :bordered="false" size="small">
-          <div v-for="(itv, its) in editRule.conditions" :key="its" class="condition-row">
-            <a-row :gutter="8" type="flex" align="middle">
-              <a-col :span="6">
-                <a-form-item :label="$t('condition_field')" :label-col="{ span: 24 }" :wrapper-col="{ span: 24 }">
-                  <a-select v-model="itv.r_type">
-                    <a-select-option v-for="(item, index) in rTypeOptions" :key="index" :value="item.value">
-                      {{ item.label }}
-                    </a-select-option>
-                  </a-select>
-                </a-form-item>
-              </a-col>
-              <a-col :span="5">
-                <a-form-item :label="$t('condition_operator')" :label-col="{ span: 24 }" :wrapper-col="{ span: 24 }">
-                  <a-select v-model="itv.r_func">
-                    <a-select-option v-for="(item, index) in rFuncOptions" :key="index" :value="item.value">
-                      {{ item.label }}
-                    </a-select-option>
-                  </a-select>
-                </a-form-item>
-              </a-col>
-              <a-col :span="8">
-                <a-form-item :label="$t('condition_value')" :label-col="{ span: 24 }" :wrapper-col="{ span: 24 }">
-                  <a-input v-model="itv.r_value" :placeholder="$t('condition_placeholder_value')" />
-                </a-form-item>
-              </a-col>
-              <a-col :span="5" class="condition-actions">
-                <a-button type="danger" v-if="editRule.conditions && editRule.conditions.length > 1" icon="delete" size="small" @click="editRule.conditions.splice(its, 1)">
-                  {{ $t('btn_delete_condition') }}
-                </a-button>
-                <a-button type="primary" v-if="its === 0" icon="plus" size="small" @click="editRule.conditions.push({ r_type: '', r_func: '', r_value: '' })" style="margin-left: 8px;">
-                  {{ $t('btn_add_condition') }}
-                </a-button>
-              </a-col>
-            </a-row>
-          </div>
+          <condition-editor v-model="editRule.conditions" :allow-empty="editRule.m_type === '2'" />
         </a-card>
 
         <a-card :title="$t('card_title_time_channel')" :bordered="false" size="small" style="margin-top: 12px;">
@@ -94,13 +63,15 @@
               </a-select-option>
             </a-select>
           </a-form-model-item>
-          <a-form-model-item :label="$t('form_label_time_range')">
-            <a-time-picker v-model="editRule.s_time" format="HH:mm" style="margin-right: 8px;" />
-            <a-time-picker v-model="editRule.e_time" format="HH:mm" />
-          </a-form-model-item>
-          <a-form-model-item :label="$t('form_label_channel')">
-            <a-checkbox-group v-model="editRule.channel" :options="rChannelOptions" />
-          </a-form-model-item>
+          <div class="rule-time-fields">
+            <a-form-model-item class="rule-time-window" :label="$t('form_label_time_range')" :label-col="{xs:24,sm:8}" :wrapper-col="{xs:24,sm:16}">
+              <a-time-picker v-model="editRule.s_time" format="HH:mm" style="margin-right: 8px;" />
+              <a-time-picker v-model="editRule.e_time" format="HH:mm" />
+            </a-form-model-item>
+            <a-form-model-item :label="$t('form_label_channel')" :label-col="{xs:24,sm:8}" :wrapper-col="{xs:24,sm:16}">
+              <a-checkbox-group v-model="editRule.channel" :options="rChannelOptions" />
+            </a-form-model-item>
+          </div>
         </a-card>
 
         <a-card :title="$t('card_title_receiver_object')" :bordered="false" size="small" style="margin-top: 12px;">
@@ -118,7 +89,14 @@
               </a-select-option>
             </a-select>
           </a-form-model-item>
+          <a-form-model-item label="值班排班">
+            <a-select v-model="editRule.schedule_ids" mode="multiple" option-filter-prop="children" placeholder="可与固定用户、用户组同时选择，按用户和渠道去重">
+              <a-select-option v-for="schedule in scheduleList" :key="schedule.id" :value="schedule.id">{{ schedule.name }}{{ schedule.enabled ? '' : '（已禁用）' }}</a-select-option>
+            </a-select>
+            <small class="rule-receiver-help">按分发时刻选取值班人，不可达时使用排班兜底</small>
+          </a-form-model-item>
         </a-card>
+        <rule-dispatch-preview :rule="editRule" :users="userlist" :schedules="scheduleList" :instances="instanceList" style="margin-top:12px" />
 
         <a-form-model-item :label="$t('form_label_note')" style="margin-top: 12px;">
           <a-input v-model.trim="editRule.note" :placeholder="$t('form_placeholder_note')" />
@@ -133,18 +111,23 @@
 
 <script>
 import PageLayout from "@/layouts/PageLayout";
-import { ruleList, userList, groupList, ruleStatusPut, ruleDelete, ruleAdd, rulePut, ruleGet } from "@/services/admin";
+import { ruleList, userList, groupList, ruleStatusPut, ruleDelete, ruleAdd, rulePut, ruleGet, onCallList } from "@/services/admin";
 import { listZabbixInstance } from "@/services/zabbix";
 import { parseTimeFun } from "@/utils/formatter";
 import moment from "moment";
 import "moment/locale/zh-cn";
 import themeMixin from '@/mixins/themeMixin'
+import ConditionEditor from '@/components/RuleConditions/ConditionEditor.vue'
+import ConditionSummary from '@/components/RuleConditions/ConditionSummary.vue'
+import { newGroup } from '@/components/RuleConditions/model'
+import RuleDispatchPreview from '@/components/OnCall/RuleDispatchPreview.vue'
+import { ids, rulePayload } from '@/components/OnCall/model'
 export default {
   i18n: require('./i18n'),
   name: "LinuxList",
   mixins: [themeMixin],
   components: {
-    PageLayout,
+    PageLayout, ConditionEditor, ConditionSummary, RuleDispatchPreview,
   },
   authorize: {              //权限校验注入设置
     deleteRecord: {        //需要 注入权限校验 的方法名：deleteRecord
@@ -179,18 +162,20 @@ export default {
         name: "",
         z_ids: [],
         m_type: "1",
-        conditions: [{ r_type: "", r_func: "", r_value: "" }],
+        conditions: { version: 2, ...newGroup() },
         s_week: ["0", "1", "2", "3", "4", "5", "6"],
         s_time: moment("00:00", "HH:mm"),
         e_time: moment("23:59", "HH:mm"),
         channel: [],
         user_ids: [],
         group_ids: [],
+        schedule_ids: [],
         note: "",
         status: true,
       },
       columns: [],
       instanceList: [],
+      scheduleList: [],
       grouplist: [],
       userlist: [],
       list: [],
@@ -270,7 +255,7 @@ export default {
         { title: this.$t('col_id'), dataIndex: "id", align: "left" },
         { title: this.$t('col_name'), dataIndex: "name", align: "left" },
         { title: this.$t('col_instances'), dataIndex: "z_ids", key: "instance_tag", align: "left", scopedSlots: { customRender: "instance_tag" } },
-        { title: this.$t('col_distribution_conditions'), dataIndex: "conditions", align: "left" },
+        { title: this.$t('col_distribution_conditions'), dataIndex: "conditions", align: "left", scopedSlots: { customRender: "conditions" } },
         {
           title: this.$t('col_distribution_channel'), dataIndex: "channel", align: "left", customRender: (value) => {
             let allist = []
@@ -326,6 +311,7 @@ export default {
             return obj;
           },
         },
+        { title: '值班排班', dataIndex: 'schedule_ids', customRender: value => ids(value).map(id => { const schedule = this.scheduleList.find(s => s.id === id); return schedule ? schedule.name : `排班 #${id}` }).join('、') },
         { title: this.$t('col_note'), dataIndex: "note", align: "left" },
         { title: this.$t('col_add_time'), key: "created", align: "left", scopedSlots: { customRender: "created" }, },
         { title: this.$t('col_status'), key: "status", align: "left", scopedSlots: { customRender: "status" } },
@@ -337,13 +323,14 @@ export default {
         name: "",
         z_ids: [],
         m_type: "1",
-        conditions: [{ r_type: "", r_func: "", r_value: "" }],
+        conditions: { version: 2, ...newGroup() },
         s_week: ["0", "1", "2", "3", "4", "5", "6"],
         s_time: moment("00:00", "HH:mm"),
         e_time: moment("23:59", "HH:mm"),
         channel: [],
         user_ids: [],
         group_ids: [],
+        schedule_ids: [],
         note: "",
         status: true,
       }
@@ -370,6 +357,7 @@ export default {
       }).finally(() => {
         this.loading = false;
       });
+      this.loadScheduleOptions()
       // 使用 listZabbixInstance 从实例表获取实例列表
       listZabbixInstance().then((resp) => {
         let res = resp.data
@@ -399,6 +387,20 @@ export default {
         }
       })
     },
+    async loadScheduleOptions() {
+      try {
+        const schedules = []
+        for (let page = 1; ; page++) {
+          const response = await onCallList({page, limit:200})
+          if (response.data.code !== 200) throw new Error(response.data.message || '加载排班失败')
+          const data = response.data.data
+          const items = data.items || []
+          schedules.push(...items)
+          if (!items.length || schedules.length >= data.total) break
+        }
+        this.scheduleList = schedules
+      } catch (e) { this.$message.error(e.message || '加载排班失败') }
+    },
     addRecord() {
       this.editingId = null
       this.resetEditRule()
@@ -416,13 +418,14 @@ export default {
           this.editRule.name = item.name || ""
           this.editRule.m_type = item.m_type || "1"
           this.editRule.z_ids = item.z_ids ? item.z_ids.split(",") : []
-          this.editRule.conditions = item.conditions ? JSON.parse(item.conditions) : [{ r_type: "", r_func: "", r_value: "" }]
+          this.editRule.conditions = item.conditions || []
           this.editRule.s_time = moment(item.s_time || "00:00", "HH:mm")
           this.editRule.e_time = moment(item.e_time || "23:59", "HH:mm")
           this.editRule.s_week = item.s_week ? item.s_week.split(",") : []
           this.editRule.channel = item.channel ? item.channel.split(",") : []
           this.editRule.user_ids = item.user_ids ? item.user_ids.split(",") : []
           this.editRule.group_ids = item.group_ids ? item.group_ids.split(",") : []
+          this.editRule.schedule_ids = ids(item.schedule_ids)
           this.editRule.note = item.note || ""
           this.editRule.status = item.status === "0"
         }
@@ -508,22 +511,7 @@ export default {
       }
       this.modalLoading = true
       try {
-        const payload = JSON.parse(JSON.stringify(this.editRule))
-        // 将实例ID数组转换为逗号分隔的字符串
-        payload.z_ids = Array.isArray(payload.z_ids) ? payload.z_ids.join(",") : payload.z_ids
-        // 将其他数组字段也转换为逗号分隔的字符串
-        payload.s_week = Array.isArray(payload.s_week) ? payload.s_week.join(",") : payload.s_week
-        payload.channel = Array.isArray(payload.channel) ? payload.channel.join(",") : payload.channel
-        payload.user_ids = Array.isArray(payload.user_ids) ? payload.user_ids.join(",") : payload.user_ids
-        payload.group_ids = Array.isArray(payload.group_ids) ? payload.group_ids.join(",") : payload.group_ids
-        // 转换条件为JSON字符串
-        payload.conditions = JSON.stringify(payload.conditions)
-        // 转换时间格式
-        payload.status = payload.status ? "0" : "1"
-        payload.s_time = this.editRule.s_time ? this.editRule.s_time.format("HH:mm") : "00:00"
-        payload.e_time = this.editRule.e_time ? this.editRule.e_time.format("HH:mm") : "23:59"
-        // 保持原有的 m_type
-        payload.m_type = this.editRule.m_type || "1"
+        const payload = rulePayload(this.editRule)
 
         let resp
         if (this.editingId) {
@@ -539,6 +527,8 @@ export default {
         } else {
           this.$message.error(res.message || this.$t('msg_save_failed'))
         }
+      } catch (e) {
+        this.$message.error(e.message || this.$t('msg_save_failed'))
       } finally {
         this.modalLoading = false
       }
@@ -589,6 +579,15 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.rule-basic-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.rule-time-fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:12px}
+.rule-time-window /deep/ .ant-time-picker{width:calc(50% - 4px)}
+.rule-editor-form /deep/ .ant-card-head{min-height:32px}
+.rule-editor-form /deep/ .ant-card-head-title{padding:6px 0;font-weight:500}
+.rule-editor-form /deep/ .ant-card-body{padding:8px 12px}
+.rule-receiver-help{display:block;line-height:20px;color:var(--ops-muted,rgba(0,0,0,.65))}
+@media(max-width:767px){.rule-basic-fields,.rule-time-fields{grid-template-columns:minmax(0,1fr);gap:0}}
+
 .card-avatar {
   width: 48px;
   height: 48px;

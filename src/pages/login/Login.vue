@@ -18,14 +18,6 @@
       </div>
     </a>
 
-    <!-- 背景装饰 -->
-    <div class="background-decoration">
-      <div class="circle circle-1"></div>
-      <div class="circle circle-2"></div>
-      <div class="circle circle-3"></div>
-      <div class="grid-pattern"></div>
-    </div>
-
     <!-- 登录卡片 -->
     <div class="login-card">
       <!-- Logo和标题区域 -->
@@ -139,13 +131,6 @@ export default {
       })
     }
 
-    // 添加入场动画
-    this.$nextTick(() => {
-      const card = document.querySelector('.login-card')
-      if (card) {
-        card.style.animation = 'slideInUp 0.6s ease-out'
-      }
-    })
   },
   methods: {
     ...mapMutations('account', ['setUser', 'setPermissions', 'setRoles']),
@@ -374,12 +359,11 @@ export default {
   align-items: center;
   justify-content: center;
   position: relative;
-  overflow: hidden;
-  background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+  padding: 24px 16px;
+  background: @layout-body-background;
   font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
-// GitHub 右上角标识
 .github-corner {
   position: fixed;
   top: 0;
@@ -387,44 +371,21 @@ export default {
   width: 80px;
   height: 80px;
   z-index: 1000;
-  color: rgba(255, 255, 255, 0.9);
+  color: @text-color-inverse;
   text-decoration: none;
-  transition: all 0.3s ease;
-
-  &:hover {
-    color: #ffffff;
-
-    .octo-background {
-      fill: rgba(255, 255, 255, 0.15);
-    }
-
-    .octo-arm {
-      animation: octocat-wave 560ms ease-in-out;
-    }
-
-    .github-tooltip {
-      opacity: 1;
-      transform: translateX(-10px);
-    }
-  }
 
   .github-corner-svg {
     width: 80px;
     height: 80px;
     display: block;
-    fill: rgba(255, 255, 255, 0.9);
   }
 
   .octo-background {
-    fill: rgba(255, 255, 255, 0.08);
-    transition: fill 0.3s ease;
+    fill: @primary-color;
+    transition: fill 160ms ease-out;
   }
 
-  .octo-arm {
-    transform-origin: 130px 106px;
-  }
-
-  .octo-body {
+  .octo-arm, .octo-body {
     fill: currentColor;
   }
 
@@ -432,395 +393,169 @@ export default {
     position: absolute;
     top: 50%;
     right: 90px;
-    transform: translateY(-50%) translateX(0);
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    padding: 10px 18px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    transform: translateY(-50%);
+    padding: 8px 16px;
+    border: 1px solid @border-color-split;
+    border-radius: 8px;
+    background: @component-background;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, .08);
     opacity: 0;
     pointer-events: none;
-    transition: all 0.3s ease;
+    transition: opacity 160ms ease-out;
     white-space: nowrap;
+  }
 
-    &::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      right: -6px;
-      transform: translateY(-50%) rotate(45deg);
-      width: 12px;
-      height: 12px;
-      background: rgba(255, 255, 255, 0.95);
-    }
+  .tooltip-text {
+    display: block;
+    font-size: 14px;
+    color: @text-color;
+  }
 
-    .tooltip-text {
-      display: block;
-      font-size: 14px;
-      font-weight: 600;
-      color: #374151;
-    }
+  &:hover, &:focus-visible {
+    color: @text-color-inverse;
+
+    .octo-background { fill: @primary-7; }
+    .github-tooltip { opacity: 1; }
+  }
+
+  &:focus-visible {
+    outline: 2px solid @primary-color;
+    outline-offset: -2px;
   }
 }
 
-@keyframes octocat-wave {
-  0%, 100% {
-    transform: rotate(0);
-  }
-  20%, 60% {
-    transform: rotate(-25deg);
-  }
-  40%, 80% {
-    transform: rotate(10deg);
-  }
-}
-
-@media screen and (max-width: 768px) {
-  .github-corner {
-    width: 60px;
-    height: 60px;
-
-    .github-corner-svg {
-      width: 60px;
-      height: 60px;
-    }
-
-    .github-tooltip {
-      display: none;
-    }
-  }
-}
-
-// 背景装饰
-.background-decoration {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  z-index: 0;
-
-  .circle {
-    position: absolute;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.03);
-    animation: float 20s infinite ease-in-out;
-
-    &.circle-1 {
-      width: 500px;
-      height: 500px;
-      top: -250px;
-      right: -100px;
-      animation-delay: 0s;
-      background: radial-gradient(circle, rgba(100, 200, 255, 0.1) 0%, transparent 70%);
-    }
-
-    &.circle-2 {
-      width: 350px;
-      height: 350px;
-      bottom: -150px;
-      left: -100px;
-      animation-delay: 5s;
-      background: radial-gradient(circle, rgba(150, 100, 255, 0.08) 0%, transparent 70%);
-    }
-
-    &.circle-3 {
-      width: 250px;
-      height: 250px;
-      top: 50%;
-      left: 10%;
-      animation-delay: 10s;
-      background: radial-gradient(circle, rgba(255, 150, 100, 0.06) 0%, transparent 70%);
-    }
-  }
-
-  .grid-pattern {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: 
-      linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-    background-size: 50px 50px;
-    animation: gridMove 30s linear infinite;
-  }
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-  }
-  33% {
-    transform: translate(30px, -30px) scale(1.1);
-  }
-  66% {
-    transform: translate(-20px, 20px) scale(0.9);
-  }
-}
-
-@keyframes gridMove {
-  0% {
-    transform: translate(0, 0);
-  }
-  100% {
-    transform: translate(50px, 50px);
-  }
-}
-
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-// 登录卡片
 .login-card {
-  position: relative;
-  z-index: 1;
   width: 440px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  border-radius: 24px;
-  padding: 48px 40px;
-  box-shadow: 
-    0 20px 60px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-  animation: slideInUp 0.6s ease-out;
-
-  @media screen and (max-width: 576px) {
-    width: 90%;
-    padding: 36px 24px;
-    border-radius: 20px;
-  }
+  max-width: 100%;
+  border: 1px solid @border-color-split;
+  border-radius: 16px;
+  padding: 32px;
+  background: @component-background;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .06);
 }
 
-// Logo区域
 .logo-section {
   text-align: center;
-  margin-bottom: 40px;
-  animation: fadeIn 0.8s ease-out 0.2s both;
+  margin-bottom: 32px;
 
   .logo-wrapper {
     display: inline-block;
-    margin-bottom: 24px;
-    position: relative;
+    margin-bottom: 16px;
+  }
 
-    &::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 120px;
-      height: 120px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-radius: 50%;
-      opacity: 0.1;
-      animation: pulse 2s ease-in-out infinite;
-    }
-
-    .logo-image {
-      width: 80px;
-      height: 80px;
-      object-fit: contain;
-      position: relative;
-      z-index: 1;
-      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));
-      transition: transform 0.3s ease;
-
-      &:hover {
-        transform: scale(1.05) rotate(5deg);
-      }
-    }
+  .logo-image {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
   }
 
   .system-title {
     font-size: 32px;
-    font-weight: 700;
-    color: #1a1a2e;
-    margin: 0 0 8px 0;
-    letter-spacing: -0.5px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-weight: 600;
+    color: @heading-color;
+    margin: 0 0 8px;
   }
 
   .system-subtitle {
     font-size: 14px;
-    color: #6b7280;
+    color: @text-color;
     margin: 0;
     font-weight: 400;
-    letter-spacing: 0.3px;
   }
 }
 
-@keyframes pulse {
-  0%, 100% {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 0.1;
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.1);
-    opacity: 0.15;
-  }
-}
-
-// 表单区域
 .form-section {
-  animation: fadeIn 0.8s ease-out 0.4s both;
-
   .error-alert {
-    margin-bottom: 24px;
-    border-radius: 12px;
-    animation: shake 0.5s ease;
+    margin-bottom: 16px;
+    border-radius: 8px;
   }
 
   .form-item {
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 
-    /deep/ .ant-form-item-control {
-      line-height: 1;
-    }
+    /deep/ .ant-form-item-control { line-height: 1; }
   }
 
   .custom-input {
-    border-radius: 12px;
-    border: 2px solid #e5e7eb;
-    transition: all 0.3s ease;
-    font-size: 15px;
+    font-size: 14px;
 
-    &:hover {
-      border-color: #9ca3af;
-    }
-
-    &:focus,
-    &.ant-input-focused {
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-
-    /deep/ input {
-      font-size: 15px;
-      
-      &::placeholder {
-        color: #9ca3af;
-      }
+    /deep/ .ant-input {
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 160ms ease-out, box-shadow 160ms ease-out;
     }
 
     .input-icon {
-      color: #9ca3af;
+      color: @text-color;
       font-size: 16px;
     }
   }
 
   .submit-item {
     margin-bottom: 0;
-    margin-top: 32px;
+    margin-top: 24px;
   }
 
   .submit-button {
     height: 48px;
-    border-radius: 12px;
+    border-radius: 8px;
     font-size: 16px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-    transition: all 0.3s ease;
+    font-weight: 500;
+    background: @primary-color;
+    border-color: @primary-color;
+    box-shadow: none;
+    transition: background-color 160ms ease-out, border-color 160ms ease-out;
 
-    &:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
-      background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+    &:hover:not(:disabled), &:focus-visible:not(:disabled) {
+      background: @primary-5;
+      border-color: @primary-5;
+    }
+
+    &:focus-visible {
+      outline: 2px solid @primary-color;
+      outline-offset: 3px;
     }
 
     &:active:not(:disabled) {
-      transform: translateY(0);
+      background: @primary-7;
+      border-color: @primary-7;
     }
 
     &:disabled {
-      background: #d1d5db;
-      box-shadow: none;
+      color: @disabled-color;
+      background: @disabled-bg;
+      border-color: @border-color-base;
     }
   }
 }
 
-@keyframes shake {
-  0%, 100% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-10px);
-  }
-  75% {
-    transform: translateX(10px);
-  }
-}
-
-// 页脚
 .footer-section {
-  margin-top: 32px;
+  margin-top: 24px;
   text-align: center;
-  animation: fadeIn 0.8s ease-out 0.6s both;
 
   .footer-text {
     font-size: 13px;
-    color: #9ca3af;
+    color: @text-color;
     margin: 0;
   }
 }
 
-// 响应式调整
+@media screen and (max-width: 768px) {
+  .github-corner, .github-corner .github-corner-svg {
+    width: 60px;
+    height: 60px;
+  }
+  .github-corner .github-tooltip { display: none; }
+}
+
 @media screen and (max-width: 576px) {
+  .login-card { padding: 24px; }
   .logo-section {
-    margin-bottom: 32px;
-
-    .logo-wrapper .logo-image {
-      width: 64px;
-      height: 64px;
-    }
-
-    .system-title {
-      font-size: 28px;
-    }
-
-    .system-subtitle {
-      font-size: 13px;
-    }
+    margin-bottom: 24px;
+    .logo-image { width: 64px; height: 64px; }
+    .system-title { font-size: 28px; }
+    .system-subtitle { font-size: 13px; }
   }
-
-  .form-section {
-    .submit-item {
-      margin-top: 24px;
-    }
-
-    .submit-button {
-      height: 44px;
-      font-size: 15px;
-    }
-  }
-
-  .footer-section {
-    margin-top: 24px;
-  }
+  .form-section .submit-button { height: 44px; font-size: 15px; }
 }
 </style>

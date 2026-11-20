@@ -1,0 +1,156 @@
+// Shared operational UI roles follow the existing theme and its color replacer.
+:root {
+  --ops-text: @heading-color;
+  --ops-muted: @text-color;
+  --ops-accent: @primary-color;
+}
+// Shared density rules for forms, dialogs and data pages. Controls retain the
+// framework's normal font size and height; density comes from surrounding space.
+.ant-form-item {
+  margin-bottom: 12px;
+}
+.ant-form-item-label,
+.ant-form-item-control {
+  line-height: 32px;
+}
+.ant-form-vertical .ant-form-item-label {
+  padding-bottom: 4px;
+}
+.ant-form-inline .ant-form-item {
+  margin-bottom: 8px;
+}
+.ant-card-head {
+  min-height: 40px;
+  padding: 0 16px;
+}
+.ant-card-head-title,
+.ant-card-extra {
+  padding: 10px 0;
+}
+.ant-card-body {
+  padding: 16px;
+}
+.ant-card-small > .ant-card-body {
+  padding: 12px;
+}
+.ant-table-thead > tr > th,
+.ant-table-tbody > tr > td {
+  padding: 10px 12px;
+}
+.ant-table-pagination.ant-pagination {
+  margin: 12px 0;
+}
+.ant-tabs-bar {
+  margin-bottom: 12px;
+}
+.ant-collapse > .ant-collapse-item > .ant-collapse-header {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+.ant-collapse-content > .ant-collapse-content-box {
+  padding: 12px;
+}
+.ant-modal {
+  top: 24px;
+  max-width: calc(100vw - 32px);
+  padding-bottom: 0;
+}
+.ant-modal-content {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 48px);
+  max-height: calc(100dvh - 48px);
+}
+.ant-modal-header {
+  flex-shrink: 0;
+  padding: 14px 20px;
+}
+.ant-modal-close-x {
+  width: 48px;
+  height: 48px;
+  line-height: 48px;
+}
+.ant-modal-body {
+  min-height: 0;
+  padding: 16px 20px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.ant-modal-footer {
+  flex-shrink: 0;
+  padding: 10px 20px;
+}
+// Section cards inside edit dialogs should not multiply their outer whitespace.
+.ant-modal-body .ant-card + .ant-card {
+  margin-top: 12px;
+}
+.ant-modal-body .ant-card-head {
+  padding: 0 12px;
+}
+.ant-modal-body .ant-card-body {
+  padding: 12px;
+}
+.ant-drawer-body {
+  padding: 16px;
+}
+@media (max-width: 767px), (max-height: 640px) {
+  .ant-modal {
+    top: 8px;
+    max-width: calc(100vw - 16px);
+    margin: 0 auto;
+  }
+  .ant-modal-content {
+    max-height: calc(100vh - 16px);
+    max-height: calc(100dvh - 16px);
+  }
+  .ant-modal-header { padding: 12px 16px; }
+  .ant-modal-body { padding: 12px; }
+  .ant-modal-footer { padding: 8px 12px; }
+}
+@media (max-width: 575px) {
+  .ant-modal-body .ant-form-item-label {
+    white-space: normal;
+    text-align: left;
+    line-height: 24px;
+    padding-bottom: 2px;
+  }
+  .ant-modal-body .ant-form-item-label,
+  .ant-modal-body .ant-form-item-control-wrapper {
+    float: none;
+    width: 100%;
+  }
+}
+@media (pointer: coarse) {
+  .ant-btn:not(.ant-btn-sm),
+  .ant-input:not(.ant-input-sm),
+  .ant-select:not(.ant-select-sm) .ant-select-selection--single {
+    min-height: 40px;
+  }
+  .ant-select:not(.ant-select-sm) .ant-select-selection--single .ant-select-selection__rendered {
+    line-height: 38px;
+  }
+  .ant-checkbox-wrapper,
+  .ant-radio-wrapper {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
+@media (pointer: coarse) {
+  .touch-action.ant-btn-sm {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+// Honor motion preferences for drawers, tabs and meaningful live indicators too.
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

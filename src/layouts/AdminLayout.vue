@@ -222,11 +222,8 @@ export default {
         top: 0;
       }
     }
-    .virtual-side{
-      transition: all 0.2s;
-    }
     .virtual-header{
-      transition: all 0.2s;
+      transition: opacity 160ms ease;
       opacity: 0;
       &.fixed-tabs.multi-page:not(.fixed-header){
         height: 0;
@@ -237,14 +234,15 @@ export default {
         top: 0;
         right: 0;
         overflow: hidden;
-        transition: all 0.2s;
+        transition: background-color 160ms ease;
         &.fixed-tabs.multi-page:not(.fixed-header){
           height: 0;
         }
       }
     }
     .admin-layout-content{
-      padding: 24px 24px 0;
+      padding: 16px 16px 0;
+      @media (max-width: 767px) { padding: 8px 8px 0; }
       background: @base-bg-color;
       /*overflow-x: hidden;*/
       /*min-height: calc(100vh - 64px - 122px);*/
