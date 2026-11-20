@@ -545,6 +545,42 @@ module.exports = {
       dash_top_win_num: {
         name: 'Windows Top Number',
         comment: 'The number of Top items to display for Windows CPU and memory'
+      },
+      otel_enable: {
+        name: 'APM Tracing',
+        comment: 'Enable OpenTelemetry reporting to Zabbix 8 APM: true/false (restart required)'
+      },
+      otel_endpoint: {
+        name: 'OTLP Endpoint',
+        comment: 'OTLP receiver address without scheme, e.g. 127.0.0.1:4317 (grpc) / 127.0.0.1:4318 (http)'
+      },
+      otel_protocol: {
+        name: 'OTLP Protocol',
+        comment: 'Transport protocol: grpc or http'
+      },
+      otel_insecure: {
+        name: 'Insecure Connection',
+        comment: 'Use plaintext connection without TLS: true/false'
+      },
+      otel_service_name: {
+        name: 'Service Name',
+        comment: 'Service name used to identify this service in Zabbix APM'
+      },
+      otel_sample_ratio: {
+        name: 'Sample Ratio',
+        comment: 'Trace sampling ratio [0,1]; 1 means sample all'
+      },
+      otel_logs_enable: {
+        name: 'Logs Reporting',
+        comment: 'Also report application logs to Zabbix APM Logs: true/false (requires APM tracing enabled)'
+      },
+      otel_metrics_enable: {
+        name: 'Metrics Reporting',
+        comment: 'Also report metrics to Zabbix APM Metrics: true/false (requires APM tracing enabled)'
+      },
+      otel_metrics_interval: {
+        name: 'Metrics Interval',
+        comment: 'Metrics export interval in seconds, default 15'
       }
     }
   },
@@ -556,6 +592,8 @@ module.exports = {
       emailTab: '邮件配置',
       wechatTab: '企业微信配置',
       aiTab: 'AI 配置',
+      apmTab: 'APM 监控',
+      apmRestartHint: '以下配置用于对接 Zabbix 8 APM（OpenTelemetry），保存后需重启服务才能生效。',
       securityTab: '安全配置',
       
       // 外观配置
@@ -648,6 +686,8 @@ module.exports = {
       emailTab: '郵件配置',
       wechatTab: '企業微信配置',
       aiTab: 'AI 配置',
+      apmTab: 'APM 監控',
+      apmRestartHint: '以下配置用於對接 Zabbix 8 APM（OpenTelemetry），儲存後需重啟服務才能生效。',
       securityTab: '安全配置',
       
       // 外觀配置
@@ -740,6 +780,8 @@ module.exports = {
       emailTab: 'Email',
       wechatTab: 'WeChat',
       aiTab: 'AI',
+      apmTab: 'APM',
+      apmRestartHint: 'These settings integrate with Zabbix 8 APM (OpenTelemetry). A service restart is required after saving.',
       securityTab: 'Security',
       
       // Appearance Config
