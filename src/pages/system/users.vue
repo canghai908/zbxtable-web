@@ -296,6 +296,7 @@ export default {
           this.loading = false;
           this.confirmLoading = false;
           this.visible = false;
+          this.resetCreateUser();
           this.init()
         } else {
           this.visible = true;
@@ -311,10 +312,25 @@ export default {
       this.init();
     },
     showModal() {
+      this.resetCreateUser();
       this.visible = true;
     },
     handleCancel() {
       this.visible = false;
+      this.resetCreateUser();
+    },
+    resetCreateUser() {
+      this.user = {
+        username: "",
+        password: "",
+        role: "user",
+        email: "",
+        phone: "",
+        wechat: "",
+        wechat_robot_key: "",
+        status: "1",
+        ding_talk: "",
+      };
     },
     seeDetail(v) {
       this.$router.push("/system/user?id=" + v.hostid + "&type=1");
