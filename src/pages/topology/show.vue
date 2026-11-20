@@ -1,7 +1,7 @@
 <template>
   <page-layout :noTitle="true">
     <!-- 顶部标题栏 -->
-    <div class="topology-header" :style="{ background: `linear-gradient(135deg, ${$themeColor} 0%, ${adjustColor($themeColor, -30)} 100%)` }">
+    <div class="topology-header">
       <div class="header-content">
         <div class="topology-title">
           <a-icon type="apartment" class="title-icon" />
@@ -304,21 +304,6 @@ export default {
     }
   },
   methods: {
-    adjustColor(color, amount) {
-      const hex = color.replace('#', '')
-      const r = parseInt(hex.substring(0, 2), 16)
-      const g = parseInt(hex.substring(2, 4), 16)
-      const b = parseInt(hex.substring(4, 6), 16)
-      
-      const newR = Math.max(0, Math.min(255, r + amount))
-      const newG = Math.max(0, Math.min(255, g + amount))
-      const newB = Math.max(0, Math.min(255, b + amount))
-      
-      return '#' + 
-        newR.toString(16).padStart(2, '0') + 
-        newG.toString(16).padStart(2, '0') + 
-        newB.toString(16).padStart(2, '0')
-    },
     initX6() {
       var _that = this
       const container = document.getElementById('containerChart')
@@ -857,51 +842,49 @@ export default {
 <style lang="less" scoped>
 // 顶部标题栏
 .topology-header {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  background: #f4f5f6;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: none;
   position: relative;
   z-index: 100;
-  transition: background 0.3s ease;
 }
 
 .header-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 32px;
+  padding: 16px 24px;
   max-width: 100%;
 }
 
 .topology-title {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   
   .title-icon {
     font-size: 32px;
-    color: #fff;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    color: #5d646e;
   }
   
   h1 {
     margin: 0;
     font-size: 24px;
-    font-weight: 600;
-    color: #fff;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    letter-spacing: 0.5px;
+    font-weight: 500;
+    color: #30343b;
   }
   
   .update-time {
     display: flex;
     align-items: center;
     gap: 6px;
-    color: rgba(255, 255, 255, 0.85);
+    color: #5d646e;
     font-size: 13px;
     font-weight: 400;
-    padding: 4px 12px;
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 12px;
-    backdrop-filter: blur(10px);
+    padding: 4px 8px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
     
     .anticon {
       font-size: 12px;
@@ -910,7 +893,7 @@ export default {
   
   .status-badge {
     ::v-deep .ant-badge-status-text {
-      color: rgba(255, 255, 255, 0.9);
+      color: #5d646e;
       font-size: 13px;
       font-weight: 500;
     }
@@ -931,11 +914,10 @@ export default {
     height: 36px;
     border-radius: 6px;
     font-weight: 500;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease;
     
     &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      border-color: #bfc5cc;
     }
   }
 }
@@ -962,9 +944,9 @@ export default {
   z-index: 999;
   bottom: 24px;
   right: 24px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px rgba(31, 35, 41, 0.12);
   border-radius: 8px;
   overflow: hidden;
-  border: 2px solid rgba(255, 255, 255, 0.8);
+  border: 1px solid #e5e7eb;
 }
 </style>

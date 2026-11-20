@@ -198,15 +198,15 @@
                 >
                   <template slot="description">
                     <div style="line-height: 1.8;">
-                      <p style="margin-bottom: 8px;">✅ {{ t('complete.configGenerated') }}</p>
-                      <p style="margin-bottom: 8px;">✅ {{ t('complete.databaseInitialized') }}</p>
-                      <p v-if="portChanged" style="margin-bottom: 8px;">🔄 {{ t('complete.portChanged') }}: {{ oldPort }} → {{ newPort }}</p>
-                      <p v-else style="margin-bottom: 8px;">🔄 {{ t('complete.portChanged') }}: {{ newPort || '8088' }}</p>
+                      <p class="setup-status"><a-icon type="check-circle" /> {{ t('complete.configGenerated') }}</p>
+                      <p class="setup-status"><a-icon type="check-circle" /> {{ t('complete.databaseInitialized') }}</p>
+                      <p v-if="portChanged" class="setup-status"><a-icon type="sync" /> {{ t('complete.portChanged') }}: {{ oldPort }} → {{ newPort }}</p>
+                      <p v-else class="setup-status"><a-icon type="sync" /> {{ t('complete.portChanged') }}: {{ newPort || '8088' }}</p>
                       
                       <!-- systemd 重启命令 -->
-                      <p style="margin-bottom: 12px; font-weight: bold; color: #d63031; font-size: 15px;">⚠️ {{ t('complete.restartCommand') }}</p>
-                      <div style="background: #f5f5f5; padding: 12px; border-radius: 4px; margin-bottom: 12px; text-align: center;">
-                        <code style="font-size: 16px; color: #d63031; font-weight: bold;">
+                      <p class="restart-label"><a-icon type="warning" /> {{ t('complete.restartCommand') }}</p>
+                      <div class="restart-command">
+                        <code>
                           systemctl restart zbxtable
                         </code>
                       </div>
@@ -214,8 +214,8 @@
                       <p style="margin-bottom: 12px; color: #666; font-size: 13px;">
                         {{ t('complete.restartHint') }}
                       </p>
-                      <p style="margin: 0; color: #666; font-size: 13px;">
-                        💡 {{ t('complete.defaultAccount') }}
+                      <p class="default-account">
+                        <a-icon type="info-circle" /> {{ t('complete.defaultAccount') }}
                       </p>
                     </div>
                   </template>
@@ -574,7 +574,7 @@ export default {
 
 .install-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #f3f4f6;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -589,18 +589,19 @@ export default {
   z-index: 10;
   
   .ant-dropdown-link {
-    color: #fff;
+    color: #343943;
     font-size: 14px;
     padding: 8px 16px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 4px;
-    transition: all 0.3s;
+    background: #fff;
+    border: 1px solid #e4e7eb;
+    border-radius: 6px;
+    transition: background-color 160ms ease, border-color 160ms ease;
     display: inline-flex;
     align-items: center;
     gap: 8px;
     
     &:hover {
-      background: rgba(255, 255, 255, 0.3);
+      background: #f8f9fa;
     }
     
     .anticon {
@@ -612,7 +613,8 @@ export default {
 .install-card {
   width: 100%;
   max-width: 900px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(31, 35, 41, 0.06);
 }
 
 .install-header {
@@ -624,7 +626,7 @@ export default {
   }
   .subtitle {
     margin: 0;
-    color: #666;
+    color: #5d646e;
     font-size: 14px;
   }
 }
@@ -649,7 +651,7 @@ export default {
 }
 
 .install-steps {
-  margin: 40px 0;
+  margin: 32px 0;
   
   // 覆盖 Ant Design Steps 组件的主题色
   /deep/ .ant-steps-item-process .ant-steps-item-icon {
@@ -693,8 +695,8 @@ export default {
 
 .form-help-text {
   font-size: 12px;
-  color: #999;
-  margin-top: 4px;
+  color: #737780;
+  margin-top: 8px;
 }
 
 .success-text {
@@ -712,15 +714,15 @@ export default {
 }
 
 .config-section {
-  margin-bottom: 32px;
+  margin-bottom: 24px;
   
   .section-title {
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 500;
     color: #262626;
     margin-bottom: 16px;
     padding-bottom: 8px;
-    border-bottom: 2px solid var(--install-theme-color, #722ed1);
+    border-bottom: 1px solid #e4e7eb;
     
     .anticon {
       margin-right: 8px;
@@ -749,10 +751,45 @@ export default {
   }
 }
 
+.setup-status {
+  margin-bottom: 8px;
+  color: #434a54;
+}
+
+.setup-status .anticon {
+  color: #4a8a68;
+}
+
+.restart-label {
+  margin-bottom: 12px;
+  color: #a9474f;
+  font-size: 14px;
+}
+
+.restart-command {
+  margin-bottom: 12px;
+  padding: 12px 16px;
+  border: 1px solid #e4e7eb;
+  border-radius: 6px;
+  background: #f5f6f7;
+  text-align: left;
+}
+
+.restart-command code {
+  color: #343943;
+  font-size: 14px;
+}
+
+.default-account {
+  margin: 0;
+  color: #5d646e;
+  font-size: 13px;
+}
+
 // 主题 Alert 样式
 /deep/ .theme-alert-info {
-  background: linear-gradient(135deg, rgba(114, 46, 209, 0.08) 0%, rgba(102, 126, 234, 0.08) 100%) !important;
-  border: 1px solid rgba(114, 46, 209, 0.25) !important;
+  background: #f7f8f9 !important;
+  border: 1px solid #e4e7eb !important;
   
   .ant-alert-icon {
     color: var(--install-theme-color, #722ed1);
@@ -764,13 +801,13 @@ export default {
   }
   
   .ant-alert-description {
-    color: rgba(114, 46, 209, 0.85);
+    color: #5d646e;
   }
 }
 
 /deep/ .theme-alert-warning {
-  background: linear-gradient(135deg, rgba(114, 46, 209, 0.06) 0%, rgba(118, 75, 162, 0.06) 100%) !important;
-  border: 1px solid rgba(114, 46, 209, 0.2) !important;
+  background: #fbf8f2 !important;
+  border: 1px solid #e8dfcf !important;
   
   .ant-alert-icon {
     color: #d4380d;
@@ -782,7 +819,42 @@ export default {
   }
   
   .ant-alert-description {
-    color: rgba(0, 0, 0, 0.75);
+    color: #5d646e;
   }
+}
+
+@media (max-width: 767px) {
+  .install-container {
+    align-items: flex-start;
+    padding: 64px 12px 12px;
+  }
+
+  .language-switcher {
+    top: 12px;
+    right: 12px;
+  }
+
+  .install-steps { margin: 20px 0; }
+  .install-content { min-height: 0; padding: 8px 0; }
+  .step-content { padding: 8px 0; }
+  .install-header h1 { font-size: 24px; }
+
+  /deep/ .step-content .ant-form-item-label,
+  /deep/ .step-content .ant-form-item-control-wrapper {
+    float: none;
+    width: 100%;
+  }
+
+  /deep/ .step-content .ant-form-item-label {
+    padding-bottom: 4px;
+    line-height: 24px;
+    text-align: left;
+  }
+
+  /deep/ .step-content .ant-form-item-control {
+    line-height: 32px;
+  }
+
+  .install-footer { margin-top: 24px; }
 }
 </style>

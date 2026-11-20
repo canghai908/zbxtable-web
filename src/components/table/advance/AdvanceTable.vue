@@ -209,7 +209,6 @@
     display: flex;
     align-items: center;
     border-radius: 4px;
-    transition: all 0.3s;
     &.middle{
       padding: 12px 16px;
     }
@@ -222,10 +221,9 @@
       }
     }
     .title{
-      transition: all 0.3s;
       font-size: 18px;
       color: @title-color;
-      font-weight: 700;
+      font-weight: 500;
     }
     .search{
       flex: 1;

@@ -65,7 +65,6 @@ export default {
     bottom: 0;
     top: 0;
     background-color: @shadow-color;
-    transition: all 0.5s;
     z-index: 100;
     &.open{
       display: inline-block;
@@ -76,7 +75,7 @@ export default {
   }
   .drawer{
     position: fixed;
-    transition: all 0.5s;
+    transition: transform 180ms ease-out;
     height: 100vh;
     z-index: 100;
     &.left{
@@ -114,7 +113,6 @@ export default {
     position: absolute;
     display: inline-block;
     text-align: center;
-    transition: all 0.5s;
     cursor: pointer;
     top: 200px;
     z-index: 100;

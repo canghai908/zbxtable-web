@@ -164,43 +164,42 @@ export default {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 24px;
-  padding: 28px 28px 22px;
-  border-radius: 16px;
-  background:
-    radial-gradient(circle at top left, rgba(110, 75, 255, 0.16), transparent 34%),
-    linear-gradient(135deg, #f8fbff 0%, #f5f2ff 100%);
+  padding: 24px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #f7f8f9;
 }
 
 .hero-title {
   font-size: 24px;
   line-height: 1.3;
-  font-weight: 600;
-  color: #1f2a44;
+  font-weight: 500;
+  color: #30343b;
 }
 
 .hero-desc {
   margin-top: 8px;
   font-size: 14px;
   line-height: 1.7;
-  color: rgba(31, 42, 68, 0.68);
+  color: #5d646e;
 }
 
 .hero-badge {
   width: 64px;
   height: 64px;
-  border-radius: 18px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 30px;
-  color: #6b45ff;
-  background: rgba(255, 255, 255, 0.85);
-  box-shadow: inset 0 0 0 1px rgba(107, 69, 255, 0.08);
+  color: #5d646e;
+  background: #fff;
+  border: 1px solid #e5e7eb;
 }
 
 .logout-alert {
   margin-bottom: 24px;
-  border-radius: 12px;
+  border-radius: 8px;
 }
 
 .password-form {
@@ -208,7 +207,7 @@ export default {
 }
 
 .actions {
-  margin-top: 30px;
+  margin-top: 24px;
 }
 
 .is-modal {

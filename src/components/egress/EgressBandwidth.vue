@@ -162,12 +162,6 @@ export default {
   border-radius: 8px;
   padding: 12px;
   box-sizing: border-box;
-  transition: all 0.3s ease;
-
-  &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    transform: translateY(-2px);
-  }
 }
 
 .egress-name-single {

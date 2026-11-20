@@ -1322,7 +1322,7 @@ export default {
   display: flex;
   align-items: center;
   padding: 16px 24px;
-  background: linear-gradient(to bottom, #fafafa 0%, #f5f5f5 100%);
+    background: #f5f6f7;
   border-top: 1px solid #e8e8e8;
   gap: 24px;
 }
@@ -1367,40 +1367,22 @@ export default {
   height: 64px;
   cursor: pointer;
   border-radius: 8px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease;
   background: #fff;
-  border: 2px solid #e8e8e8;
+  border: 1px solid #e3e6e9;
   position: relative;
   overflow: hidden;
   
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(24, 144, 255, 0.1) 0%, rgba(24, 144, 255, 0) 100%);
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-  
   &:hover {
     border-color: #1890ff;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
-    
-    &::before {
-      opacity: 1;
-    }
-    
+    background: #f5f7f8;
     span {
       color: #1890ff;
     }
   }
   
   &:active {
-    transform: translateY(0);
+    background: #eef1f3;
   }
   
   img {
@@ -1435,9 +1417,9 @@ export default {
   }
   
   &.active {
-    background: linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%);
+    background: #edf4f6;
     border-color: #1890ff;
-    box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
+    box-shadow: none;
     
     span {
       color: #1890ff;
@@ -1449,7 +1431,7 @@ export default {
 .toolbar-divider {
   width: 1px;
   height: 48px;
-  background: linear-gradient(to bottom, transparent 0%, #d9d9d9 20%, #d9d9d9 80%, transparent 100%);
+  background: #d9dce0;
 }
 
 .tuopu {
@@ -1469,7 +1451,7 @@ export default {
   z-index: 999;
   bottom: 20px;
   right: 20px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 2px 8px rgba(31, 35, 41, 0.12);
 }
 
 .right_drawer {

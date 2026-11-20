@@ -219,7 +219,7 @@ export default {
     margin-bottom: 8px;
     border-radius: 4px;
     box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-    transition: all 0.3s ease;
+    transition: background-color 160ms ease, box-shadow 160ms ease;
     
     &:last-child {
       margin-bottom: 0;

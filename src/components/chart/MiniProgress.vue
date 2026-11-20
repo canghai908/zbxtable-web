@@ -7,7 +7,7 @@
       </div>
     </a-tooltip>
     <div class="wrap">
-      <div class="progress" :style="{backgroundColor: color, width: percent + '%', height: height}" />
+      <div class="progress" :style="{backgroundColor: color, transform: `scaleX(${Math.max(0, Math.min(100, Number(percent) || 0)) / 100})`, height: height}" />
     </div>
   </div>
 </template>
@@ -29,11 +29,12 @@ export default {
       position: relative;
     }
     .progress {
-      transition: all 0.4s cubic-bezier(0.08, 0.82, 0.17, 1) 0s;
+      transition: transform 240ms ease-out, background-color 160ms ease;
       border-radius: 1px 0 0 1px;
       background-color: #13C2C2;
-      width: 0;
+      width: 100%;
       height: 100%;
+      transform-origin: left center;
     }
     .target {
       position: absolute;

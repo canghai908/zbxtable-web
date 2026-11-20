@@ -863,7 +863,7 @@ export default {
                 this.addLog('info', this.$t('msagent_quick_install_cmd_desc'))
               }
             } catch (err) {
-              this.addLog('warning', '⚠ ' + this.$t('msg_operation_failed'))
+              this.addLog('warning', this.$t('msg_operation_failed'))
             }
           } else {
             throw new Error((biz && biz.message) || this.$t('install_failed_title'))
