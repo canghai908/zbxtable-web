@@ -1,9 +1,5 @@
 <template>
   <div class="screen-panel">
-    <div class="corner corner-tl" />
-    <div class="corner corner-tr" />
-    <div class="corner corner-bl" />
-    <div class="corner corner-br" />
     <div class="panel-title">
       <span class="title-text">{{ title }}</span>
       <span class="title-extra" v-if="extra">{{ extra }}</span>

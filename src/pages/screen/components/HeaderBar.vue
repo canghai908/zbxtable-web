@@ -1,11 +1,10 @@
 <template>
   <div class="screen-header">
     <div class="header-left">
-      <span class="header-btn" @click="goBack"><a-icon type="arrow-left" />{{ $t('screen_back') }}</span>
+      <button type="button" class="header-btn" @click="goBack"><a-icon type="arrow-left" />{{ $t('screen_back') }}</button>
     </div>
     <div class="header-title">
       <div class="title-main">{{ $t('screen_title') }}</div>
-      <div class="title-sub">{{ $t('screen_subtitle') }}</div>
     </div>
     <div class="header-right">
       <span class="clock-date">{{ dateText }}</span>
@@ -19,10 +18,10 @@
         </select>
       </div>
 
-      <span class="header-btn" @click="toggleFullscreen">
+      <button type="button" class="header-btn" @click="toggleFullscreen">
         <a-icon :type="isFs ? 'fullscreen-exit' : 'fullscreen'" />
         {{ isFs ? $t('screen_exit_fullscreen') : $t('screen_fullscreen') }}
-      </span>
+      </button>
     </div>
   </div>
 </template>

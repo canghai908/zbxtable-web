@@ -1,7 +1,6 @@
 <template>
   <div class="kpi-row">
     <div class="kpi-card">
-      <a-icon class="kpi-icon" type="cluster" />
       <div class="kpi-label">{{ $t('kpi_host_total') }}</div>
       <div>
         <span class="kpi-value">{{ animated.total }}</span>
@@ -9,7 +8,6 @@
       </div>
     </div>
     <div class="kpi-card">
-      <a-icon class="kpi-icon" type="check-circle" />
       <div class="kpi-label">{{ $t('kpi_host_online') }}</div>
       <div>
         <span class="kpi-value">{{ animated.online }}</span>
@@ -17,14 +15,12 @@
       </div>
     </div>
     <div class="kpi-card">
-      <a-icon class="kpi-icon" type="alert" />
       <div class="kpi-label">{{ $t('kpi_alarm_total') }}</div>
       <div>
         <span class="kpi-value">{{ animated.alarms }}</span>
       </div>
     </div>
     <div class="kpi-card kpi-warn">
-      <a-icon class="kpi-icon" type="fire" />
       <div class="kpi-label">{{ $t('kpi_alarm_critical') }}</div>
       <div>
         <span class="kpi-value">{{ animated.critical }}</span>

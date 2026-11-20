@@ -36,44 +36,41 @@ export default {
         if (buckets[s] !== undefined) buckets[s] += 1
       })
       const items = [
-        { name: this.$t('severity_disaster'), value: buckets[5], itemStyle: { color: '#ff4d6d' } },
-        { name: this.$t('severity_high'),     value: buckets[4], itemStyle: { color: '#ff6347' } },
-        { name: this.$t('severity_average'),  value: buckets[3], itemStyle: { color: '#ff9248' } },
-        { name: this.$t('severity_warning'),  value: buckets[2], itemStyle: { color: '#ffc859' } },
-        { name: this.$t('severity_info'),     value: buckets[1], itemStyle: { color: '#7499ff' } }
+        { name: this.$t('severity_disaster'), value: buckets[5], itemStyle: { color: '#d9777d' } },
+        { name: this.$t('severity_high'),     value: buckets[4], itemStyle: { color: '#de8065' } },
+        { name: this.$t('severity_average'),  value: buckets[3], itemStyle: { color: '#d69a65' } },
+        { name: this.$t('severity_warning'),  value: buckets[2], itemStyle: { color: '#d1b568' } },
+        { name: this.$t('severity_info'),     value: buckets[1], itemStyle: { color: '#91a6d8' } }
       ]
       const total = items.reduce((a, b) => a + b.value, 0)
       this.chart.setOption({
-        tooltip: { trigger: 'item', backgroundColor: 'rgba(2,6,13,0.85)', borderColor: 'rgba(0,230,255,0.4)', textStyle: { color: '#cfe8ff' } },
+        tooltip: { trigger: 'item', backgroundColor: '#1a222b', borderColor: 'rgba(215,221,228,0.18)', textStyle: { color: '#d7dde4' } },
         legend: {
           bottom: 4, left: 'center', itemWidth: 10, itemHeight: 10,
-          textStyle: { color: 'rgba(207,232,255,0.75)', fontSize: 12 }
+          textStyle: { color: '#b3bdc8', fontSize: 12 }
         },
         title: {
           text: String(total),
-          subtext: 'TOTAL',
+          subtext: 'Total',
           left: 'center',
           top: '38%',
-          textStyle: { color: '#00e6ff', fontSize: 26, fontWeight: 700 },
-          subtextStyle: { color: 'rgba(207,232,255,0.55)', fontSize: 11, letterSpacing: 2 }
+          textStyle: { color: '#d7dde4', fontSize: 26, fontWeight: 500 },
+          subtextStyle: { color: '#9ba5b1', fontSize: 11 }
         },
         series: [{
           type: 'pie',
           radius: ['52%', '70%'],
           center: ['50%', '46%'],
-          roseType: 'area',
           itemStyle: {
-            borderColor: 'rgba(2,6,13,0.85)',
-            borderWidth: 2,
-            shadowBlur: 14,
-            shadowColor: 'rgba(255,77,109,0.4)'
+            borderColor: '#151b22',
+            borderWidth: 2
           },
           label: {
-            color: '#cfe8ff',
+            color: '#d7dde4',
             fontSize: 11,
             formatter: '{b} {c}'
           },
-          labelLine: { lineStyle: { color: 'rgba(255,77,109,0.4)' } },
+          labelLine: { lineStyle: { color: 'rgba(215,221,228,0.32)' } },
           data: items
         }]
       }, true)
