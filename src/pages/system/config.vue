@@ -5,7 +5,7 @@
         <a-tabs v-model="activeTab" type="card">
           <!-- 系统配置 -->
           <a-tab-pane key="system" :tab="$t('systemTab')">
-            <a-form-model ref="systemForm" :model="systemForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
+            <a-form-model class="config-form" ref="systemForm" :model="systemForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
               <!-- 外观配置部分 -->
               <a-divider orientation="left">{{$t('appearanceConfig')}}</a-divider>
               
@@ -115,7 +115,7 @@
 
           <!-- 邮件配置 -->
           <a-tab-pane key="email" :tab="$t('emailTab')">
-            <a-form-model ref="emailForm" :model="emailForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
+            <a-form-model class="config-form" ref="emailForm" :model="emailForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
               <a-form-model-item v-for="item in emailConfigs" :key="item.id" :label="item.name">
                 <a-select v-if="isBooleanConfig(item.config_key)" v-model="emailForm[item.config_key]" :placeholder="item.comment" style="width: 100%">
                   <a-select-option v-for="opt in getBooleanOptions(item.config_key)" :key="opt.value" :value="opt.value">
@@ -139,7 +139,7 @@
 
           <!-- 企业微信配置 -->
           <a-tab-pane key="wechat" :tab="$t('wechatTab')">
-            <a-form-model ref="wechatForm" :model="wechatForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
+            <a-form-model class="config-form" ref="wechatForm" :model="wechatForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
               <a-form-model-item v-for="item in wechatConfigs" :key="item.id" :label="item.name">
                 <a-select v-if="isBooleanConfig(item.config_key)" v-model="wechatForm[item.config_key]" :placeholder="item.comment" style="width: 100%">
                   <a-select-option v-for="opt in getBooleanOptions(item.config_key)" :key="opt.value" :value="opt.value">
@@ -163,7 +163,7 @@
 
           <!-- APM / OpenTelemetry 配置 -->
           <a-tab-pane key="apm" :tab="$t('apmTab')">
-            <a-form-model ref="apmForm" :model="apmForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
+            <a-form-model class="config-form" ref="apmForm" :model="apmForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
               <a-alert :message="$t('apmRestartHint')" type="warning" show-icon style="margin-bottom: 16px;" />
               <a-form-model-item v-for="item in apmConfigs" :key="item.id" :label="item.name">
                 <a-select v-if="isBooleanConfig(item.config_key)" v-model="apmForm[item.config_key]" :placeholder="item.comment" style="width: 100%">
@@ -186,7 +186,7 @@
 
           <!-- AI 配置 -->
           <a-tab-pane key="ai" :tab="$t('aiTab')">
-            <a-form-model ref="aiForm" :model="aiForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
+            <a-form-model class="config-form" ref="aiForm" :model="aiForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
               <!-- AI 类型选择 -->
               <a-form-model-item :label="getConfigName('ai_type')">
                 <a-select v-model="aiForm.ai_type" :placeholder="getConfigComment('ai_type')" style="width: 100%" @change="onAiTypeChange">
@@ -805,20 +805,20 @@ export default {
 <style lang="less" scoped>
 .config-container {
   padding: 24px;
-  background: #f0f2f5;
+  background: #f4f5f6;
   min-height: calc(100vh - 200px);
 }
 
 .config-hint {
-  color: #999;
+  color: #737780;
   font-size: 12px;
-  margin-top: 4px;
+  margin-top: 8px;
   line-height: 1.5;
 }
 
 /deep/ .ant-card {
-  border-radius: 4px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  border-radius: 8px;
+  box-shadow: none;
 }
 
 /deep/ .ant-tabs-card > .ant-tabs-content {
@@ -827,11 +827,11 @@ export default {
 
 /deep/ .ant-tabs-card > .ant-tabs-content > .ant-tabs-tabpane {
   background: #fff;
-  padding: 24px;
+  padding: 24px 32px 32px;
 }
 
 /deep/ .ant-tabs-card > .ant-tabs-bar {
-  border-color: #fff;
+  border-color: #e8eaed;
   margin-bottom: 0;
 }
 
@@ -844,7 +844,45 @@ export default {
 /deep/ .ant-tabs-card > .ant-tabs-bar .ant-tabs-tab-active {
   border-color: #fff;
   background: #fff;
-  font-weight: 600;
+  font-weight: 500;
+}
+
+.config-form {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+/deep/ .config-form .ant-form-item {
+  display: flex;
+  align-items: flex-start;
+}
+
+/deep/ .config-form .ant-form-item-label {
+  flex: 0 0 176px;
+  width: 176px;
+  padding-right: 24px;
+  text-align: left;
+}
+
+/deep/ .config-form .ant-form-item-control-wrapper {
+  flex: 1;
+  min-width: 0;
+  width: auto;
+}
+
+/deep/ .config-form .ant-form-item-label > label {
+  color: #424750;
+  line-height: 32px;
+}
+
+/deep/ .config-form .ant-form-item:last-child {
+  margin-left: 176px;
+}
+
+/deep/ .config-form .ant-form-item:last-child .ant-form-item-control-wrapper {
+  flex: 1;
+  width: auto !important;
+  margin-left: 0 !important;
 }
 
 /deep/ .ant-form-item {
@@ -863,7 +901,7 @@ export default {
 
 /deep/ .ant-input,
 /deep/ .ant-input-password {
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 .logo-upload-container {
@@ -875,13 +913,13 @@ export default {
 .logo-preview {
   width: 80px;
   height: 80px;
-  border: 1px dashed #d9d9d9;
-  border-radius: 4px;
+  border: 1px solid #e3e6e9;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: #fafafa;
+  background: #f8f9fa;
 }
 
 .logo-preview img {
@@ -916,11 +954,11 @@ export default {
 }
 
 .task-config-card {
-  padding: 16px 16px 0;
-  margin-bottom: 16px;
-  border: 1px solid #f0f0f0;
+  padding: 20px 20px 0;
+  margin-bottom: 20px;
+  border: 1px solid #e8eaed;
   border-radius: 8px;
-  background: #fafafa;
+  background: #fff;
 }
 
 .task-config-card__header {
@@ -928,16 +966,16 @@ export default {
 }
 
 .task-config-card__title {
-  color: #262626;
+  color: #30343b;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.4;
   word-break: break-word;
 }
 
 /deep/ .task-config-card .ant-form-item-label > label {
   min-width: 44px;
-  color: #595959;
+  color: #555b64;
   font-weight: 500;
 }
 
@@ -961,8 +999,44 @@ export default {
 }
 
 @media (max-width: 1199px) {
+  /deep/ .ant-tabs-card > .ant-tabs-content > .ant-tabs-tabpane {
+    padding: 20px 24px 24px;
+  }
+
   .task-config-card {
-    padding: 14px 14px 0;
+    padding: 16px 16px 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .config-container {
+    padding: 12px;
+  }
+
+  /deep/ .ant-tabs-card > .ant-tabs-content > .ant-tabs-tabpane {
+    padding: 16px 12px 20px;
+  }
+
+  /deep/ .config-form .ant-form-item {
+    display: block;
+  }
+
+  /deep/ .config-form .ant-form-item-label {
+    width: 100%;
+    padding-right: 0;
+    line-height: 1.5;
+  }
+
+  /deep/ .config-form .ant-form-item-label > label {
+    line-height: 1.5;
+  }
+
+  /deep/ .config-form .ant-form-item:last-child {
+    margin-left: 0;
+  }
+
+  .logo-upload-container {
+    gap: 12px;
   }
 }
 </style>
