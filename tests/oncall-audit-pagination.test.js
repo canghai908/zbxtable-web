@@ -13,7 +13,7 @@ function auditMethods(api) {
   return mod.exports.default.methods
 }
 function context() {
-  return {selected:{id:41},auditSequence:0,audit:[],auditLoading:false,auditError:'',auditPagination:{current:1,pageSize:10,total:0}}
+  return {canManage:true,selected:{id:41},auditSequence:0,audit:[],auditLoading:false,auditError:'',auditPagination:{current:1,pageSize:10,total:0}}
 }
 const response = id => ({data:{code:200,data:{items:[{id}],total:250}}})
 test('actual audit loader passes page and limit to the server',async()=>{

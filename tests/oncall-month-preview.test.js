@@ -8,11 +8,14 @@ const babel = require('@babel/core')
 async function main() {
   const source=fs.readFileSync(path.join(__dirname,'../src/components/OnCall/calendar.js'),'utf8')
   const calendar=await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`)
+  const moduleURL = file => `data:text/javascript;base64,${Buffer.from(fs.readFileSync(path.join(__dirname,'../src/components/OnCall/',file),'utf8')).toString('base64')}`
+  const editorSource=fs.readFileSync(path.join(__dirname,'../src/components/OnCall/editor.js'),'utf8').replace("'./calendar'",JSON.stringify(moduleURL('calendar.js'))).replace("'./model'",JSON.stringify(moduleURL('model.js')))
+  const editor=await import(`data:text/javascript;base64,${Buffer.from(editorSource).toString('base64')}`)
   const script=parseComponent(fs.readFileSync(path.join(__dirname,'../src/pages/alarm/OnCallSchedules.vue'),'utf8')).script.content
   const code=babel.transformSync(script,{babelrc:false,configFile:false,plugins:[require.resolve('@babel/plugin-transform-modules-commonjs')]}).code
   const componentWith = api => {
     const mod={exports:{}}
-    new Function('require','module','exports',code)(name=>name==='moment'?require('moment'):name==='@/services/admin'?api:name==='@/components/OnCall/calendar'?calendar:{},mod,mod.exports)
+    new Function('require','module','exports',code)(name=>name==='moment'?require('moment'):name==='@/services/admin'?api:name==='@/components/OnCall/calendar'?calendar:name==='@/components/OnCall/editor'?editor:{},mod,mod.exports)
     return mod.exports.default
   }
   const methodsWith = api => componentWith(api).methods

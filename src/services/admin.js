@@ -257,6 +257,8 @@ export async function managerChpwd(params) {
 	return request(MANAGER + '/chpwd', METHOD.POST, params)
 }
 export async function onCallList(params) { return request('/v1/oncall/schedules', METHOD.GET, params) }
+export async function onCallDirectory() { return request('/v1/oncall/schedules/directory', METHOD.GET) }
+export async function onCallOverview(params) { return request('/v1/oncall/schedules/overview', METHOD.GET, params) }
 export async function onCallGet(id) { return request('/v1/oncall/schedules/' + id, METHOD.GET) }
 export async function onCallCreate(params) { return request('/v1/oncall/schedules', METHOD.POST, params) }
 export async function onCallUpdate(id, params) { return request('/v1/oncall/schedules/' + id, METHOD.PUT, params) }
