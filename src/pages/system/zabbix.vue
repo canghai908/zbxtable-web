@@ -35,7 +35,7 @@
         <template slot="conn" slot-scope="text, record">
           <a-tag v-if="record.enabled && record.last_test_ok" color="green">{{ $t('status_connected') }}</a-tag>
           <a-tag v-else-if="record.enabled && !record.last_test_ok" color="orange">{{ $t('status_not_verified') }}</a-tag>
-          <a-tag v-else color="default">{{ $t('status_unavailable') }}</a-tag>
+          <a-tag v-else color="red" class="connection-unavailable">{{ $t('status_unavailable') }}</a-tag>
         </template>
         <template slot="notify_method" slot-scope="text, record">
           <a-tag v-if="record.notify_method === 'webhook'" color="blue">
@@ -1037,6 +1037,13 @@ export default {
 </script>
 
 <style scoped>
+.connection-unavailable {
+  color: #a8071a;
+  background-color: #fff1f0;
+  border-color: #ff7875;
+  font-weight: 500;
+}
+
 code {
   background: #f0f0f0;
   padding: 2px 6px;
