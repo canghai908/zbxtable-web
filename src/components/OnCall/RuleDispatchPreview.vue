@@ -16,7 +16,7 @@ import { ids, rulePayload, sourceLabels } from './model'
 import { rulePreview } from '@/services/admin'
 export default {
   props: { rule:{type:Object,required:true}, users:{type:Array,default:()=>[]}, schedules:{type:Array,default:()=>[]}, instances:{type:Array,default:()=>[]} },
-  data:()=>({fields,sourceLabels,at:moment(),zid:undefined,sample:{host:'',group:'',item:'',key:'',trigger:'',severity:''},loading:false,error:'',result:null,sequence:0,channelNames:{mail:'邮件',wechat:'企业微信',wechat_robot:'企业微信群机器人'}}),
+  data:()=>({fields,sourceLabels,at:moment(),zid:undefined,sample:{host:'',group:'',item:'',key:'',trigger:'',severity:''},loading:false,error:'',result:null,sequence:0,channelNames:{mail:'邮件',wechat:'企业微信',wechat_robot:'企业微信群机器人',dingtalk_robot:'钉钉群机器人',feishu_robot:'飞书群机器人',webhook:'自定义Webhook'}}),
   watch:{rule:{deep:true,handler(){this.clear()}},sample:{deep:true,handler(){this.clear()}},at(){this.clear()},zid(){this.clear()}},
   methods:{
     clear(){this.sequence++;this.result=null;this.error=''},

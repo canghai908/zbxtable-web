@@ -88,6 +88,12 @@ export async function alarmAnalysis(params) {
 export async function alarmExport(params, config) {
 	return request(ALARM_EXPORT, METHOD.POST, params, config)
 }
+export async function alarmAck(id, params) {
+	return request(ALARM + '/' + id + '/ack', METHOD.POST, params)
+}
+export async function alarmBatchAck(params) {
+	return request(ALARM + '/ack', METHOD.POST, params)
+}
 export async function alarmTenantGet() {
 	return request(ALARM + '/tenant', METHOD.GET)
 }
@@ -463,6 +469,8 @@ export default {
 	indexEgress,
 	alarm,
 	alarmAnalysis,
+	alarmAck,
+	alarmBatchAck,
 	alarmTenantGet,
 	zabbixTenantList,
 	topologyList,

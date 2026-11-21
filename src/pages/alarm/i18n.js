@@ -68,6 +68,8 @@ module.exports = {
       notify_status_muted: '已屏蔽',
       notify_status_default_rule: '默认规则',
       notify_status_no_recipient: '无可用接收人',
+      notify_status_suppressed: '已聚合抑制',
+      notify_status_escalated: '已升级通知',
       
       // 通知结果
       notify_result_delivered: '已送达',
@@ -75,8 +77,21 @@ module.exports = {
       
       // 操作按钮
       btn_mute: '屏蔽',
+      btn_ack: '认领',
+      btn_batch_ack: '批量认领',
       btn_ai_analysis: 'AI助手分析',
       btn_view_detail: '详细信息',
+      col_ack_status: '认领状态',
+      ack_status_acked: '已认领',
+      ack_status_unacked: '未认领',
+      ack_status_escalated: '已升级',
+      modal_title_ack: '认领告警',
+      modal_title_batch_ack: '批量认领告警',
+      ack_note_label: '认领备注',
+      ack_note_placeholder: '请输入处理说明或认领备注（可选）',
+      ack_sync_zabbix_label: '同步认领到 Zabbix',
+      msg_select_alarms_to_ack: '请先选择需要认领的告警',
+      msg_ack_success: '认领成功',
       
       // AI分析模态框
       modal_title_ai_analysis: 'AI助手分析结果',
@@ -200,6 +215,17 @@ module.exports = {
       card_title_match_conditions: '匹配条件',
       card_title_time_channel: '时间与通道',
       card_title_receiver_object: '接收对象',
+      card_title_suppress_escalation: '风暴抑制与告警升级',
+      form_label_suppress_window: '聚合窗口(秒)',
+      form_help_suppress_window: '0 表示关闭风暴抑制；大于0时按实例+规则+渠道+主机聚合',
+      form_label_suppress_threshold: '立即放行阈值(条)',
+      form_label_escalation_minutes: '升级超时(分钟)',
+      form_help_escalation_minutes: '0 表示关闭超时升级；未认领且未恢复超时后自动升级',
+      form_label_escalation_channel: '升级通知渠道',
+      form_label_escalation_user: '升级接收人',
+      form_label_escalation_group: '升级接收组',
+      form_placeholder_escalation_receiver: '留空则回退至关联排班兜底人员',
+      col_policy_strategy: '降噪/升级',
       
       condition_field: '字段',
       condition_operator: '操作符',
@@ -227,6 +253,9 @@ module.exports = {
       channel_mail: '邮件',
       channel_wechat: '企业微信',
       channel_wechat_robot: '企业微信群机器人',
+      channel_dingtalk_robot: '钉钉群机器人',
+      channel_feishu_robot: '飞书群机器人',
+      channel_webhook: '自定义Webhook',
       channel_dingding: '钉钉',
       channel_sms: '短信',
       
@@ -408,6 +437,8 @@ module.exports = {
       notify_status_muted: 'Muted',
       notify_status_default_rule: 'Default Rule',
       notify_status_no_recipient: 'No available recipients',
+      notify_status_suppressed: 'Suppressed',
+      notify_status_escalated: 'Escalated',
       
       // Notification result
       notify_result_delivered: 'Delivered',
@@ -415,8 +446,21 @@ module.exports = {
       
       // Operation buttons
       btn_mute: 'Mute',
+      btn_ack: 'Acknowledge',
+      btn_batch_ack: 'Batch Acknowledge',
       btn_ai_analysis: 'AI Assistant',
       btn_view_detail: 'Detail',
+      col_ack_status: 'Ack Status',
+      ack_status_acked: 'Acknowledged',
+      ack_status_unacked: 'Unacknowledged',
+      ack_status_escalated: 'Escalated',
+      modal_title_ack: 'Acknowledge Alarm',
+      modal_title_batch_ack: 'Batch Acknowledge Alarms',
+      ack_note_label: 'Ack Note',
+      ack_note_placeholder: 'Enter handling note (optional)',
+      ack_sync_zabbix_label: 'Sync acknowledgement to Zabbix',
+      msg_select_alarms_to_ack: 'Please select alarms to acknowledge',
+      msg_ack_success: 'Acknowledged successfully',
       
       // AI analysis modal
       modal_title_ai_analysis: 'AI Assistant Analysis Result',
@@ -540,6 +584,17 @@ module.exports = {
       card_title_match_conditions: 'Conditions',
       card_title_time_channel: 'Duration & Channel',
       card_title_receiver_object: 'Receiver Object',
+      card_title_suppress_escalation: 'Storm Suppression & Escalation',
+      form_label_suppress_window: 'Aggregation Window (s)',
+      form_help_suppress_window: '0 disables storm suppression; >0 aggregates by instance, rule, channel & host',
+      form_label_suppress_threshold: 'Immediate Threshold',
+      form_label_escalation_minutes: 'Escalation Timeout (min)',
+      form_help_escalation_minutes: '0 disables escalation; unacknowledged & unresolved alarms escalate after timeout',
+      form_label_escalation_channel: 'Escalation Channels',
+      form_label_escalation_user: 'Escalation Users',
+      form_label_escalation_group: 'Escalation Groups',
+      form_placeholder_escalation_receiver: 'Leave empty to fallback to schedule fallback users',
+      col_policy_strategy: 'Suppression / Escalation',
       
       condition_field: 'Field',
       condition_operator: 'Operator',
@@ -567,6 +622,9 @@ module.exports = {
       channel_mail: 'Email',
       channel_wechat: 'WeChat',
       channel_wechat_robot: 'WeChat Work Group Robot',
+      channel_dingtalk_robot: 'DingTalk Group Robot',
+      channel_feishu_robot: 'Feishu Group Robot',
+      channel_webhook: 'Custom Webhook',
       channel_dingding: 'DingTalk',
       channel_sms: 'SMS',
       
@@ -748,6 +806,8 @@ module.exports = {
       notify_status_muted: '已屏蔽',
       notify_status_default_rule: '默認規則',
       notify_status_no_recipient: '無可用接收人',
+      notify_status_suppressed: '已聚合抑制',
+      notify_status_escalated: '已升級通知',
       
       // 通知結果
       notify_result_delivered: '已送達',
@@ -755,8 +815,21 @@ module.exports = {
       
       // 操作按鈕
       btn_mute: '屏蔽',
+      btn_ack: '認領',
+      btn_batch_ack: '批量認領',
       btn_ai_analysis: 'AI助手分析',
       btn_view_detail: '詳細信息',
+      col_ack_status: '認領狀態',
+      ack_status_acked: '已認領',
+      ack_status_unacked: '未認領',
+      ack_status_escalated: '已升級',
+      modal_title_ack: '認領告警',
+      modal_title_batch_ack: '批量認領告警',
+      ack_note_label: '認領備註',
+      ack_note_placeholder: '請輸入處理說明或認領備註（可選）',
+      ack_sync_zabbix_label: '同步認領到 Zabbix',
+      msg_select_alarms_to_ack: '請先選擇需要認領的告警',
+      msg_ack_success: '認領成功',
       
       // AI分析模態框
       modal_title_ai_analysis: 'AI助手分析結果',
@@ -880,6 +953,17 @@ module.exports = {
       card_title_match_conditions: '匹配條件',
       card_title_time_channel: '時間與通道',
       card_title_receiver_object: '接收對象',
+      card_title_suppress_escalation: '風暴抑制與告警升級',
+      form_label_suppress_window: '聚合窗口(秒)',
+      form_help_suppress_window: '0 表示關閉風暴抑制；大於0時按實例+規則+渠道+主機聚合',
+      form_label_suppress_threshold: '立即放行閾值(條)',
+      form_label_escalation_minutes: '升級超時(分鐘)',
+      form_help_escalation_minutes: '0 表示關閉超時升級；未認領且未恢復超時後自動升級',
+      form_label_escalation_channel: '升級通知渠道',
+      form_label_escalation_user: '升級接收人',
+      form_label_escalation_group: '升級接收組',
+      form_placeholder_escalation_receiver: '留空則回退至關聯排班兜底人員',
+      col_policy_strategy: '降噪/升級',
       
       condition_field: '字段',
       condition_operator: '操作符',
@@ -907,6 +991,9 @@ module.exports = {
       channel_mail: '郵件',
       channel_wechat: '企業微信',
       channel_wechat_robot: '企業微信群機器人',
+      channel_dingtalk_robot: '釘釘群機器人',
+      channel_feishu_robot: '飛書群機器人',
+      channel_webhook: '自定義Webhook',
       channel_dingding: '釘釘',
       channel_sms: '短信',
       

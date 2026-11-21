@@ -16,6 +16,11 @@
         <div slot="instance_tag" slot-scope="text">
           <a-tag :color="themeColor">{{ getInstanceNames(text) || $t('status_not_selected') }}</a-tag>
         </div>
+        <span slot="policy_strategy" slot-scope="record">
+          <a-tag v-if="record.suppress_window > 0" color="blue">抑制 {{ record.suppress_window }}s/{{ record.suppress_threshold || 1 }}条</a-tag>
+          <a-tag v-if="record.escalation_minutes > 0" color="volcano">升级 {{ record.escalation_minutes }}m</a-tag>
+          <span v-if="!record.suppress_window && !record.escalation_minutes">-</span>
+        </span>
         <span slot="created" slot-scope="record">{{record.created | parsetime }}</span>
         <span slot="status" slot-scope="record">
           <a-switch :checked="record.status == '0' ? true : false" :checked-children="$t('status_enabled')" :un-checked-children="$t('status_disabled')" @change="onStatusChange($event, record)" />
@@ -30,13 +35,22 @@
       </a-table>
     </div>
     <!-- 新增/编辑规则弹窗 -->
-    <a-modal wrapClassName="rule-editor-modal" :title="editingId ? $t('modal_title_edit_rule') : $t('modal_title_add_rule')" :visible="modalVisible" :confirmLoading="modalLoading" @ok="saveRule" @cancel="closeModal" width="900px">
-      <a-form-model class="rule-editor-form" :model="editRule" :label-col="{ xs: 24, sm: 4 }" :wrapper-col="{ xs: 24, sm: 20 }">
+    <a-modal
+      wrapClassName="rule-editor-modal"
+      :title="editingId ? $t('modal_title_edit_rule') : $t('modal_title_add_rule')"
+      :visible="modalVisible"
+      :confirmLoading="modalLoading"
+      :bodyStyle="{ padding: '12px 16px', maxHeight: '78vh', overflowY: 'auto' }"
+      @ok="saveRule"
+      @cancel="closeModal"
+      width="880px"
+    >
+      <a-form-model class="rule-editor-form" :model="editRule" :label-col="{ xs: 24, sm: 6 }" :wrapper-col="{ xs: 24, sm: 18 }">
         <div class="rule-basic-fields">
-          <a-form-model-item :label="$t('form_label_name')" required :label-col="{xs:24,sm:8}" :wrapper-col="{xs:24,sm:16}">
+          <a-form-model-item :label="$t('form_label_name')" required :label-col="{xs:24,sm:6}" :wrapper-col="{xs:24,sm:18}">
             <a-input v-model.trim="editRule.name" :placeholder="$t('form_placeholder_name')" />
           </a-form-model-item>
-          <a-form-model-item :label="$t('form_label_instance')" required :label-col="{xs:24,sm:8}" :wrapper-col="{xs:24,sm:16}">
+          <a-form-model-item :label="$t('form_label_instance')" required :label-col="{xs:24,sm:6}" :wrapper-col="{xs:24,sm:18}">
             <a-select v-model="editRule.z_ids" mode="multiple" style="width: 100%" :placeholder="$t('form_placeholder_instance')">
               <a-select-option v-for="(item, index) in instanceList" :key="index" :value="item.id.toString()" :label="item.name" :title="item.name">
                 {{ item.name }}
@@ -49,55 +63,106 @@
           <condition-editor v-model="editRule.conditions" :allow-empty="editRule.m_type === '2'" />
         </a-card>
 
-        <a-card :title="$t('card_title_time_channel')" :bordered="false" size="small" style="margin-top: 12px;">
-          <a-form-model-item :label="$t('form_label_week')">
-            <a-select v-model="editRule.s_week" mode="multiple" style="width: 100%">
-              <a-select-option v-for="(item, index) in rWeekOptions" :key="index" :value="item.value">
-                {{ item.label }}
-              </a-select-option>
-            </a-select>
-          </a-form-model-item>
-          <div class="rule-time-fields">
-            <a-form-model-item class="rule-time-window" :label="$t('form_label_time_range')" :label-col="{xs:24,sm:8}" :wrapper-col="{xs:24,sm:16}">
+        <a-card :title="$t('card_title_time_channel')" :bordered="false" size="small">
+          <div class="rule-time-row">
+            <a-form-model-item :label="$t('form_label_week')" :label-col="{xs:24,sm:5}" :wrapper-col="{xs:24,sm:19}">
+              <a-select v-model="editRule.s_week" mode="multiple" style="width: 100%" :maxTagCount="4">
+                <a-select-option v-for="(item, index) in rWeekOptions" :key="index" :value="item.value">
+                  {{ item.label }}
+                </a-select-option>
+              </a-select>
+            </a-form-model-item>
+            <a-form-model-item class="rule-time-window" :label="$t('form_label_time_range')" :label-col="{xs:24,sm:6}" :wrapper-col="{xs:24,sm:18}">
               <a-time-picker v-model="editRule.s_time" format="HH:mm" style="margin-right: 8px;" />
               <a-time-picker v-model="editRule.e_time" format="HH:mm" />
             </a-form-model-item>
-            <a-form-model-item :label="$t('form_label_channel')" :label-col="{xs:24,sm:8}" :wrapper-col="{xs:24,sm:16}">
-              <a-checkbox-group v-model="editRule.channel" :options="rChannelOptions" />
+          </div>
+          <a-form-model-item :label="$t('form_label_channel')" :label-col="{xs:24,sm:3}" :wrapper-col="{xs:24,sm:21}" style="margin-top: 6px;">
+            <a-checkbox-group v-model="editRule.channel" :options="rChannelOptions" />
+          </a-form-model-item>
+        </a-card>
+
+        <a-card :title="$t('card_title_receiver_object')" :bordered="false" size="small">
+          <div class="rule-two-col-grid">
+            <a-form-model-item :label="$t('form_label_receiver')" :label-col="{xs:24,sm:6}" :wrapper-col="{xs:24,sm:18}">
+              <a-select v-model="editRule.user_ids" mode="multiple" style="width: 100%" :placeholder="$t('form_placeholder_receiver')">
+                <a-select-option v-for="(item, index) in userlist" :key="index" :value="item.id.toString()" :label="item.username" :title="item.username">
+                  {{ item.username }}
+                </a-select-option>
+              </a-select>
+            </a-form-model-item>
+            <a-form-model-item :label="$t('form_label_receiver_group')" :label-col="{xs:24,sm:6}" :wrapper-col="{xs:24,sm:18}">
+              <a-select v-model="editRule.group_ids" mode="multiple" style="width: 100%" :placeholder="$t('form_placeholder_receiver_group')">
+                <a-select-option v-for="(item, index) in grouplist" :key="index" :value="item.id.toString()" :label="item.name" :title="item.name">
+                  {{ item.name }}
+                </a-select-option>
+              </a-select>
             </a-form-model-item>
           </div>
-        </a-card>
-
-        <a-card :title="$t('card_title_receiver_object')" :bordered="false" size="small" style="margin-top: 12px;">
-          <a-form-model-item :label="$t('form_label_receiver')">
-            <a-select v-model="editRule.user_ids" mode="multiple" style="width: 100%" :placeholder="$t('form_placeholder_receiver')">
-              <a-select-option v-for="(item, index) in userlist" :key="index" :value="item.id.toString()" :label="item.username" :title="item.username">
-                {{ item.username }}
-              </a-select-option>
-            </a-select>
-          </a-form-model-item>
-          <a-form-model-item :label="$t('form_label_receiver_group')">
-            <a-select v-model="editRule.group_ids" mode="multiple" style="width: 100%" :placeholder="$t('form_placeholder_receiver_group')">
-              <a-select-option v-for="(item, index) in grouplist" :key="index" :value="item.id.toString()" :label="item.name" :title="item.name">
-                {{ item.name }}
-              </a-select-option>
-            </a-select>
-          </a-form-model-item>
-          <a-form-model-item label="值班排班">
-            <a-select v-model="editRule.schedule_ids" mode="multiple" option-filter-prop="children" placeholder="可与固定用户、用户组同时选择，按用户和渠道去重">
+          <a-form-model-item label="值班排班" :label-col="{xs:24,sm:3}" :wrapper-col="{xs:24,sm:21}" style="margin-top: 6px;">
+            <a-select v-model="editRule.schedule_ids" mode="multiple" option-filter-prop="children" placeholder="可与固定用户/组同时选择，按分发时刻选取值班人（不可达时用排班兜底）">
               <a-select-option v-for="schedule in scheduleList" :key="schedule.id" :value="schedule.id">{{ schedule.name }}{{ schedule.enabled ? '' : '（已禁用）' }}</a-select-option>
             </a-select>
-            <small class="rule-receiver-help">按分发时刻选取值班人，不可达时使用排班兜底</small>
           </a-form-model-item>
         </a-card>
-        <rule-dispatch-preview :rule="editRule" :users="userlist" :schedules="scheduleList" :instances="instanceList" style="margin-top:12px" />
 
-        <a-form-model-item :label="$t('form_label_note')" style="margin-top: 12px;">
-          <a-input v-model.trim="editRule.note" :placeholder="$t('form_placeholder_note')" />
-        </a-form-model-item>
-        <a-form-model-item :label="$t('form_label_status')">
-          <a-switch v-model="editRule.status" :checked-children="$t('status_enabled')" :un-checked-children="$t('status_disabled')" />
-        </a-form-model-item>
+        <a-card :title="$t('card_title_suppress_escalation')" :bordered="false" size="small">
+          <div class="rule-three-col-grid">
+            <a-form-model-item :label-col="{xs:24,sm:11}" :wrapper-col="{xs:24,sm:13}">
+              <span slot="label">
+                {{ $t('form_label_suppress_window') }}
+                <a-tooltip :title="$t('form_help_suppress_window')">
+                  <a-icon type="question-circle-o" style="margin-left: 2px; color: rgba(0, 0, 0, .45);" />
+                </a-tooltip>
+              </span>
+              <a-input-number v-model="editRule.suppress_window" :min="0" :max="86400" style="width: 100%" />
+            </a-form-model-item>
+            <a-form-model-item :label="$t('form_label_suppress_threshold')" :label-col="{xs:24,sm:12}" :wrapper-col="{xs:24,sm:12}">
+              <a-input-number v-model="editRule.suppress_threshold" :min="1" :max="1000" :disabled="!editRule.suppress_window || editRule.suppress_window <= 0" style="width: 100%" />
+            </a-form-model-item>
+            <a-form-model-item :label-col="{xs:24,sm:11}" :wrapper-col="{xs:24,sm:13}">
+              <span slot="label">
+                {{ $t('form_label_escalation_minutes') }}
+                <a-tooltip :title="$t('form_help_escalation_minutes')">
+                  <a-icon type="question-circle-o" style="margin-left: 2px; color: rgba(0, 0, 0, .45);" />
+                </a-tooltip>
+              </span>
+              <a-input-number v-model="editRule.escalation_minutes" :min="0" :max="10080" style="width: 100%" />
+            </a-form-model-item>
+          </div>
+          <template v-if="editRule.escalation_minutes > 0">
+            <a-form-model-item :label="$t('form_label_escalation_channel')" :label-col="{xs:24,sm:3}" :wrapper-col="{xs:24,sm:21}" style="margin-top: 6px;">
+              <a-checkbox-group v-model="editRule.escalation_channel" :options="rChannelOptions" />
+            </a-form-model-item>
+            <div class="rule-two-col-grid" style="margin-top: 6px;">
+              <a-form-model-item :label="$t('form_label_escalation_user')" :label-col="{xs:24,sm:6}" :wrapper-col="{xs:24,sm:18}">
+                <a-select v-model="editRule.escalation_user_ids" mode="multiple" style="width: 100%" :placeholder="$t('form_placeholder_escalation_receiver')">
+                  <a-select-option v-for="(item, index) in userlist" :key="index" :value="item.id.toString()" :label="item.username" :title="item.username">
+                    {{ item.username }}
+                  </a-select-option>
+                </a-select>
+              </a-form-model-item>
+              <a-form-model-item :label="$t('form_label_escalation_group')" :label-col="{xs:24,sm:6}" :wrapper-col="{xs:24,sm:18}">
+                <a-select v-model="editRule.escalation_group_ids" mode="multiple" style="width: 100%" :placeholder="$t('form_placeholder_escalation_receiver')">
+                  <a-select-option v-for="(item, index) in grouplist" :key="index" :value="item.id.toString()" :label="item.name" :title="item.name">
+                    {{ item.name }}
+                  </a-select-option>
+                </a-select>
+              </a-form-model-item>
+            </div>
+          </template>
+        </a-card>
+
+        <rule-dispatch-preview :rule="editRule" :users="userlist" :schedules="scheduleList" :instances="instanceList" style="margin-top: 8px;" />
+
+        <div class="rule-footer-fields">
+          <a-form-model-item :label="$t('form_label_note')" :label-col="{xs:24,sm:4}" :wrapper-col="{xs:24,sm:20}">
+            <a-input v-model.trim="editRule.note" :placeholder="$t('form_placeholder_note')" />
+          </a-form-model-item>
+          <a-form-model-item :label="$t('form_label_status')" :label-col="{xs:24,sm:9}" :wrapper-col="{xs:24,sm:15}">
+            <a-switch v-model="editRule.status" :checked-children="$t('status_enabled')" :un-checked-children="$t('status_disabled')" />
+          </a-form-model-item>
+        </div>
       </a-form-model>
     </a-modal>
   </page-layout>
@@ -166,6 +231,12 @@ export default {
         schedule_ids: [],
         note: "",
         status: true,
+        suppress_window: 0,
+        suppress_threshold: 1,
+        escalation_minutes: 0,
+        escalation_channel: [],
+        escalation_user_ids: [],
+        escalation_group_ids: [],
       },
       columns: [],
       instanceList: [],
@@ -240,8 +311,9 @@ export default {
         { value: "mail", label: this.$t('channel_mail') },
         { value: "wechat", label: this.$t('channel_wechat') },
         { value: "wechat_robot", label: this.$t('channel_wechat_robot') },
-        // { value: "dingding", label: this.$t('channel_dingding') },
-        // { value: "sms", label: this.$t('channel_sms') },
+        { value: "dingtalk_robot", label: this.$t('channel_dingtalk_robot') },
+        { value: "feishu_robot", label: this.$t('channel_feishu_robot') },
+        { value: "webhook", label: this.$t('channel_webhook') },
       ];
       
       // 初始化表格列
@@ -256,6 +328,9 @@ export default {
             const channelMap = {
               "wechat": this.$t('channel_wechat'),
               "wechat_robot": this.$t('channel_wechat_robot'),
+              "dingtalk_robot": this.$t('channel_dingtalk_robot'),
+              "feishu_robot": this.$t('channel_feishu_robot'),
+              "webhook": this.$t('channel_webhook'),
               "sms": this.$t('channel_sms'),
               "dingding": this.$t('channel_dingding'),
               "mail": this.$t('channel_mail')
@@ -306,6 +381,7 @@ export default {
           },
         },
         { title: '值班排班', dataIndex: 'schedule_ids', customRender: value => ids(value).map(id => { const schedule = this.scheduleList.find(s => s.id === id); return schedule ? schedule.name : `排班 #${id}` }).join('、') },
+        { title: this.$t('col_policy_strategy'), key: "policy_strategy", align: "left", scopedSlots: { customRender: "policy_strategy" } },
         { title: this.$t('col_note'), dataIndex: "note", align: "left" },
         { title: this.$t('col_add_time'), key: "created", align: "left", scopedSlots: { customRender: "created" }, },
         { title: this.$t('col_status'), key: "status", align: "left", scopedSlots: { customRender: "status" } },
@@ -327,6 +403,12 @@ export default {
         schedule_ids: [],
         note: "",
         status: true,
+        suppress_window: 0,
+        suppress_threshold: 1,
+        escalation_minutes: 0,
+        escalation_channel: [],
+        escalation_user_ids: [],
+        escalation_group_ids: [],
       }
     },
     init() {
@@ -422,6 +504,12 @@ export default {
           this.editRule.schedule_ids = ids(item.schedule_ids)
           this.editRule.note = item.note || ""
           this.editRule.status = item.status === "0"
+          this.editRule.suppress_window = Number(item.suppress_window) || 0
+          this.editRule.suppress_threshold = Number(item.suppress_threshold) || 1
+          this.editRule.escalation_minutes = Number(item.escalation_minutes) || 0
+          this.editRule.escalation_channel = item.escalation_channel ? item.escalation_channel.split(",").filter(Boolean) : []
+          this.editRule.escalation_user_ids = item.escalation_user_ids ? item.escalation_user_ids.split(",").filter(Boolean) : []
+          this.editRule.escalation_group_ids = item.escalation_group_ids ? item.escalation_group_ids.split(",").filter(Boolean) : []
         }
       })
     },
@@ -573,14 +661,25 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.rule-basic-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.rule-time-fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:12px}
+.rule-basic-fields,.rule-two-col-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.rule-time-row{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:12px}
+.rule-three-col-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.rule-footer-fields{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,0.6fr);gap:12px;margin-top:8px}
 .rule-time-window /deep/ .ant-time-picker{width:calc(50% - 4px)}
-.rule-editor-form /deep/ .ant-card-head{min-height:32px}
-.rule-editor-form /deep/ .ant-card-head-title{padding:6px 0;font-weight:500}
-.rule-editor-form /deep/ .ant-card-body{padding:8px 12px}
-.rule-receiver-help{display:block;line-height:20px;color:var(--ops-muted,rgba(0,0,0,.65))}
-@media(max-width:767px){.rule-basic-fields,.rule-time-fields{grid-template-columns:minmax(0,1fr);gap:0}}
+.rule-editor-form /deep/ .ant-form-item{margin-bottom:6px}
+.rule-editor-form /deep/ .ant-card{margin-top:8px}
+.rule-editor-form /deep/ .ant-card-head{min-height:28px;padding:0 10px}
+.rule-editor-form /deep/ .ant-card-head-title{padding:4px 0;font-size:13px;font-weight:600}
+.rule-editor-form /deep/ .ant-card-body{padding:8px 10px}
+.rule-editor-form /deep/ .ant-card-body > .ant-form-item:last-child,
+.rule-editor-form /deep/ .rule-two-col-grid .ant-form-item,
+.rule-editor-form /deep/ .rule-three-col-grid .ant-form-item,
+.rule-editor-form /deep/ .rule-time-row .ant-form-item,
+.rule-editor-form /deep/ .rule-basic-fields .ant-form-item,
+.rule-editor-form /deep/ .rule-footer-fields .ant-form-item{margin-bottom:0}
+.rule-editor-form /deep/ .ant-checkbox-group{display:flex;flex-wrap:wrap;gap:4px 12px;line-height:32px}
+.rule-receiver-help{display:block;line-height:18px;color:var(--ops-muted,rgba(0,0,0,.65))}
+@media(max-width:767px){.rule-basic-fields,.rule-two-col-grid,.rule-time-row,.rule-three-col-grid,.rule-footer-fields{grid-template-columns:minmax(0,1fr);gap:6px}}
 
 .card-avatar {
   width: 48px;
