@@ -100,40 +100,53 @@ export default {
   position: fixed;
   inset: 0;
   z-index: 99999;
-  background: rgba(8, 12, 16, 0.78);
+  background: rgba(2, 6, 13, 0.82);
+  backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .session-box {
-  width: min(360px, calc(100vw - 32px));
-  background: #151b22;
-  border: 1px solid rgba(215, 221, 228, 0.18);
-  border-radius: 8px;
-  padding: 32px 24px 24px;
+  width: 360px;
+  background: linear-gradient(160deg, rgba(8, 22, 48, 0.98), rgba(4, 12, 28, 0.98));
+  border: 1px solid rgba(0, 230, 255, 0.4);
+  box-shadow: 0 0 40px rgba(0, 230, 255, 0.2), 0 0 80px rgba(0, 0, 0, 0.6);
+  padding: 36px 32px 28px;
   text-align: center;
   position: relative;
 
+  &::before, &::after {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-color: #00e6ff;
+    border-style: solid;
+    box-shadow: 0 0 8px rgba(0, 230, 255, 0.7);
+  }
+  &::before { top: -1px; left: -1px;  border-width: 2px 0 0 2px; }
+  &::after  { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
 }
 
 .session-icon {
   font-size: 36px;
   color: #ffc859;
   margin-bottom: 12px;
+  text-shadow: 0 0 16px rgba(255, 200, 89, 0.7);
 }
 
 .session-title {
   font-size: 18px;
-  font-weight: 500;
-  color: #d7dde4;
-  letter-spacing: 0;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 3px;
   margin-bottom: 8px;
 }
 
 .session-desc {
   font-size: 12px;
-  color: #9ba5b1;
+  color: rgba(207, 232, 255, 0.6);
   margin-bottom: 24px;
   line-height: 1.6;
 }
@@ -142,18 +155,18 @@ export default {
   text-align: left;
 
   /deep/ .ant-input {
-    background: #10151b;
-    border-color: rgba(215, 221, 228, 0.2);
-    color: #d7dde4;
+    background: rgba(0, 230, 255, 0.05);
+    border-color: rgba(0, 230, 255, 0.25);
+    color: #cfe8ff;
 
     &:focus {
-      border-color: #70bfd0;
-      box-shadow: 0 0 0 2px rgba(112, 191, 208, 0.22);
+      border-color: #00e6ff;
+      box-shadow: 0 0 8px rgba(0, 230, 255, 0.3);
     }
   }
 
   /deep/ .ant-input-prefix {
-    color: #9ba5b1;
+    color: rgba(0, 230, 255, 0.6);
   }
 
   /deep/ .ant-form-item {
@@ -169,18 +182,17 @@ export default {
 }
 
 .session-btn {
-  background: #70bfd0;
-  color: #10151b;
+  background: linear-gradient(90deg, #00c6e0, #1f7bff);
   border: none;
   height: 38px;
   font-size: 14px;
-  letter-spacing: 0;
-  font-weight: 500;
-  transition: background-color 160ms ease;
+  letter-spacing: 2px;
+  font-weight: 600;
+  box-shadow: 0 0 16px rgba(0, 230, 255, 0.4);
   margin-top: 4px;
 
   &:hover {
-    background: #8bc9d7;
+    box-shadow: 0 0 24px rgba(0, 230, 255, 0.6);
   }
 }
 </style>

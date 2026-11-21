@@ -29,11 +29,11 @@
       </screen-panel>
 
       <!-- 行 3 左：Linux TOP（CPU/内存切换） -->
-      <screen-panel class="area-cpu-top" :title="$t(linMetric === 'cpu' ? 'panel_cpu_top' : 'panel_mem_top')">
+      <screen-panel class="area-cpu-top" :title="'Linux ' + (linMetric === 'cpu' ? 'CPU' : '内存') + ' TOP'">
         <template slot="extra">
           <div class="top-toggle">
-            <button type="button" class="toggle-btn" :class="{ active: linMetric === 'cpu' }" @click="linMetric = 'cpu'">CPU</button>
-            <button type="button" class="toggle-btn" :class="{ active: linMetric === 'mem' }" @click="linMetric = 'mem'">内存</button>
+            <span class="toggle-btn" :class="{ active: linMetric === 'cpu' }" @click="linMetric = 'cpu'">CPU</span>
+            <span class="toggle-btn" :class="{ active: linMetric === 'mem' }" @click="linMetric = 'mem'">内存</span>
           </div>
         </template>
         <resource-top-bar :rows="linMetric === 'cpu' ? linCpuTop : linMemTop" :metric="linMetric" />
@@ -45,11 +45,11 @@
       </screen-panel>
 
       <!-- 行 3 右：Windows TOP（CPU/内存切换） -->
-      <screen-panel class="area-mem-top" :title="$t(winMetric === 'cpu' ? 'panel_win_cpu_top' : 'panel_win_mem_top')">
+      <screen-panel class="area-mem-top" :title="'Windows ' + (winMetric === 'cpu' ? 'CPU' : '内存') + ' TOP'">
         <template slot="extra">
           <div class="top-toggle">
-            <button type="button" class="toggle-btn" :class="{ active: winMetric === 'cpu' }" @click="winMetric = 'cpu'">CPU</button>
-            <button type="button" class="toggle-btn" :class="{ active: winMetric === 'mem' }" @click="winMetric = 'mem'">内存</button>
+            <span class="toggle-btn" :class="{ active: winMetric === 'cpu' }" @click="winMetric = 'cpu'">CPU</span>
+            <span class="toggle-btn" :class="{ active: winMetric === 'mem' }" @click="winMetric = 'mem'">内存</span>
           </div>
         </template>
         <resource-top-bar :rows="winMetric === 'cpu' ? winCpuTop : winMemTop" :metric="winMetric" />

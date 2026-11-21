@@ -9,8 +9,8 @@
     </div>
     <!-- 滚动区 -->
     <div class="alert-track" v-if="list.length">
-      <div class="alert-inner">
-        <div class="alert-row" v-for="(v, i) in list" :key="v.eventid || i">
+      <div class="alert-inner" :style="{ animationDuration: duration + 's' }">
+        <div class="alert-row" v-for="(v, i) in doubled" :key="i">
           <span class="sev-tag" :class="'sev-' + sevKey(v)">{{ sevLabel(v) }}</span>
           <span class="col-time">{{ fmtTime(v.lastchange) }}</span>
           <span class="col-host" :title="v.name || ''">{{ v.name || '--' }}</span>
@@ -30,6 +30,14 @@ export default {
   i18n: require('../i18n'),
   props: {
     list: { type: Array, default: () => [] }
+  },
+  computed: {
+    doubled() {
+      return this.list.length > 0 ? [...this.list, ...this.list] : []
+    },
+    duration() {
+      return Math.max(18, this.list.length * 2.5)
+    }
   },
   methods: {
     sevKey(v) {

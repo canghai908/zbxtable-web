@@ -68,9 +68,9 @@ export default {
       this.chart.setOption({
         tooltip: {
           trigger: 'axis',
-          backgroundColor: '#1a222b',
-          borderColor: 'rgba(215,221,228,0.18)',
-          textStyle: { color: '#d7dde4' },
+          backgroundColor: 'rgba(2,6,13,0.85)',
+          borderColor: 'rgba(0,230,255,0.4)',
+          textStyle: { color: '#cfe8ff' },
           formatter: params => {
             const lines = params.map(p => `${p.marker} ${p.seriesName}: ${this.fmt(p.value)}`)
             return `${params[0].axisValue}<br/>${lines.join('<br/>')}`
@@ -78,7 +78,7 @@ export default {
         },
         legend: {
           top: 0, right: 8,
-          textStyle: { color: '#b3bdc8', fontSize: 12 },
+          textStyle: { color: 'rgba(207,232,255,0.75)', fontSize: 12 },
           data: [this.$t('egress_in'), this.$t('egress_out')]
         },
         grid: {
@@ -92,15 +92,15 @@ export default {
           type: 'category',
           data: xs,
           boundaryGap: false,
-          axisLine: { lineStyle: { color: 'rgba(215,221,228,0.18)' } },
-          axisLabel: { color: '#9ba5b1', fontSize: 11 }
+          axisLine: { lineStyle: { color: 'rgba(0,230,255,0.3)' } },
+          axisLabel: { color: 'rgba(207,232,255,0.6)', fontSize: 11 }
         },
         yAxis: {
           type: 'value',
-          axisLine: { lineStyle: { color: 'rgba(215,221,228,0.18)' } },
-          splitLine: { lineStyle: { color: 'rgba(215,221,228,0.08)' } },
+          axisLine: { lineStyle: { color: 'rgba(0,230,255,0.3)' } },
+          splitLine: { lineStyle: { color: 'rgba(0,230,255,0.08)' } },
           axisLabel: {
-            color: '#9ba5b1',
+            color: 'rgba(207,232,255,0.6)',
             fontSize: 11,
             margin: 12,
             formatter: v => this.fmt(v)
@@ -112,12 +112,12 @@ export default {
             type: 'line',
             smooth: true,
             showSymbol: false,
-            lineStyle: { color: '#70bfd0', width: 2 },
-            itemStyle: { color: '#70bfd0' },
+            lineStyle: { color: '#00e6ff', width: 2 },
+            itemStyle: { color: '#00e6ff' },
             areaStyle: {
               color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                { offset: 0, color: 'rgba(112,191,208,0.28)' },
-                { offset: 1, color: 'rgba(112,191,208,0.02)' }
+                { offset: 0, color: 'rgba(0,230,255,0.55)' },
+                { offset: 1, color: 'rgba(0,230,255,0.02)' }
               ])
             },
             data: ins
@@ -127,12 +127,12 @@ export default {
             type: 'line',
             smooth: true,
             showSymbol: false,
-            lineStyle: { color: '#d69a65', width: 2 },
-            itemStyle: { color: '#d69a65' },
+            lineStyle: { color: '#ff9248', width: 2 },
+            itemStyle: { color: '#ff9248' },
             areaStyle: {
               color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                { offset: 0, color: 'rgba(214,154,101,0.24)' },
-                { offset: 1, color: 'rgba(214,154,101,0.02)' }
+                { offset: 0, color: 'rgba(255,146,72,0.5)' },
+                { offset: 1, color: 'rgba(255,146,72,0.02)' }
               ])
             },
             data: outs

@@ -38,7 +38,7 @@ export default {
     render() {
       if (!this.chart) return
       const d = this.data || {}
-      const palette = ['#70bfd0', '#8197c4', '#a391bd', '#c89a6d', '#82a889', '#c9b46c', '#c77f89', '#8b9aa8']
+      const palette = ['#00e6ff', '#1f7bff', '#7c3cff', '#ff9248', '#19d27c', '#ffd166', '#ef476f', '#8d99ae']
       const dynamicItems = Array.isArray(d.asset_type_counts) ? d.asset_type_counts : []
       const items = dynamicItems.length
         ? dynamicItems.map((item, index) => ({
@@ -53,26 +53,29 @@ export default {
           { name: this.$t('host_type_net'), value: d.net_count || 0, itemStyle: { color: palette[3] } }
         ]
       this.chart.setOption({
-        tooltip: { trigger: 'item', backgroundColor: '#1a222b', borderColor: 'rgba(215,221,228,0.18)', textStyle: { color: '#d7dde4' } },
+        tooltip: { trigger: 'item', backgroundColor: 'rgba(2,6,13,0.85)', borderColor: 'rgba(0,230,255,0.4)', textStyle: { color: '#cfe8ff' } },
         legend: {
           bottom: 4, left: 'center', itemWidth: 10, itemHeight: 10,
-          textStyle: { color: '#b3bdc8', fontSize: 12 }
+          textStyle: { color: 'rgba(207,232,255,0.75)', fontSize: 12 }
         },
         series: [{
           type: 'pie',
           radius: ['38%', '62%'],
           center: ['50%', '46%'],
+          roseType: 'radius',
           avoidLabelOverlap: true,
           itemStyle: {
-            borderColor: '#151b22',
-            borderWidth: 2
+            borderColor: 'rgba(2,6,13,0.85)',
+            borderWidth: 2,
+            shadowBlur: 14,
+            shadowColor: 'rgba(0,230,255,0.45)'
           },
           label: {
-            color: '#d7dde4',
+            color: '#cfe8ff',
             fontSize: 11,
             formatter: '{b}\n{c}'
           },
-          labelLine: { lineStyle: { color: 'rgba(215,221,228,0.32)' } },
+          labelLine: { lineStyle: { color: 'rgba(0,230,255,0.4)' } },
           data: items
         }]
       }, true)
