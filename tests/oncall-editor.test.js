@@ -29,6 +29,17 @@ async function main() {
     const form=createScheduleForm(undefined,new Date('2026-11-20T18:00:00Z'))
     assert.equal(form.start_date,'2026-11-21');assert.equal(form.handoff_time,'00:00:00');assert.equal(form.all_day,true)
   })
+  test('correcting a last-second anchor to midnight creates the exact beginning of the selected civil day',()=>{
+    const record={...stored,start:'2026-11-01T23:59:59.999999999+08:00'}
+    const form=createScheduleForm(record)
+    assert.equal(buildSchedulePayload(form).start,record.start)
+    form.handoff_time='00:00:00'
+    assert.equal(buildSchedulePayload(form).start,'2026-10-31T16:00:00.000Z')
+    assert.equal(form.start_date,'2026-11-01')
+    assert.deepEqual(buildSchedulePayload(form).members,[3,1,2])
+    form.timezone='UTC'
+    assert.equal(buildSchedulePayload(form).start,'2026-11-01T00:00:00.000Z')
+  })
   test('all-day toggle translates to compatible equal endpoints and restores custom coverage',()=>{
     const form=createScheduleForm({...stored,window_start:'22:00',window_end:'06:00'})
     assert.equal(form.all_day,false)

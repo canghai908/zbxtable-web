@@ -59,6 +59,16 @@ async function main(){
     await assert.rejects(ctx.loadDirectory(),/not authorized/)
     assert.equal(ctx.canManage,false)
   })
+  test('midnight handoff shortcut replaces 23:59:59 without changing the first date or member order',()=>{
+    const {ctx}=page()
+    ctx.form={start_date:'2026-11-01',handoff_time:'23:59:59',members:[3,1,2]}
+    ctx.setMidnightHandoff()
+    assert.equal(ctx.form.handoff_time,'00:00:00')
+    assert.equal(ctx.form.start_date,'2026-11-01')
+    assert.deepEqual(ctx.form.members,[3,1,2])
+    ctx.setHandoff(require('moment')('09:30:00','HH:mm:ss'))
+    assert.equal(ctx.form.handoff_time,'09:30:00')
+  })
   test('all-day switch retains a configured custom window and gives a useful first custom default',()=>{
     const {ctx}=page()
     ctx.setAllDay(false);assert.equal(ctx.form.window_start,'09:00');assert.equal(ctx.form.window_end,'18:00')

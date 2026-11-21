@@ -37,7 +37,7 @@
           </div>
           <div class="anchor-fields">
             <a-form-model-item label="首次值班日期（排班时区）" required><a-date-picker :value="dateValue(form.start_date)" format="YYYY-MM-DD" style="width:100%" @change="setStartDate" /></a-form-model-item>
-            <a-form-model-item :label="form.rotation === 'fixed' ? '开始钟点（排班时区）' : form.rotation === 'weekly' ? '每周交接时间（排班时区）' : '每日交接时间（排班时区）'" required><a-time-picker :value="handoffValue(form.handoff_time)" format="HH:mm:ss" :allow-clear="false" style="width:100%" @change="setHandoff" /></a-form-model-item>
+            <a-form-model-item :label="form.rotation === 'fixed' ? '开始钟点（排班时区）' : form.rotation === 'weekly' ? '每周交接时间（排班时区）' : '每日交接时间（排班时区）'" required><div class="handoff-control"><a-time-picker :value="handoffValue(form.handoff_time)" format="HH:mm:ss" :allow-clear="false" aria-label="交接时间" style="width:100%" @change="setHandoff" /><a-button size="small" @click="setMidnightHandoff">零点交接</a-button></div><small class="handoff-help">整天轮班请选择 00:00:00（零点），不是 23:59:59；时间列可上下滚动或直接输入。</small><small v-if="form.handoff_time === '23:59:59'" class="handoff-warning">当前在午夜前 1 秒换人。若要按完整自然日轮班，请点击“零点交接”后保存。</small></a-form-model-item>
           </div>
           <div class="anchor-summary"><strong>{{ zoneStart }} · {{ form.timezone }}</strong><small>{{ form.rotation === 'fixed' ? '首次日期与开始钟点之前视为空班' : '第一名成员从该日起接班，之后在相同钟点按自然日/周轮换；未覆盖的休息日仍推进顺序' }}</small><small>修改时区会按新时区解释当前日期和钟点</small></div>
         </section>
@@ -145,7 +145,7 @@ export default {
     previewSlotColumns() { return this.slotColumns.map(column => column.dataIndex === 'user_ids' ? {...column,title:this.previewChannel ? '实际接收人' : '值班人员'} : column) },
     previewMonth() { return this.previewAt ? calendarMonthWindow(this.previewAt.toISOString(),this.selected.timezone || 'Asia/Shanghai').month : '' },
     zoneOptions() { return timezoneOptions(this.form.timezone) },
-    zoneStart() { try { return formatInZone(buildSchedulePayload(this.form).start,this.form.timezone) } catch(e) { return '请选择有效的日期与交接时间' } },
+    zoneStart() { try { buildSchedulePayload(this.form); return `${this.form.start_date} ${this.form.handoff_time}` } catch(e) { return '请选择有效的日期与交接时间' } },
     coverageSummary() { return this.form.all_day ? '全天 24 小时覆盖' : `${this.form.window_start} 至 ${this.form.window_end}${this.form.window_end < this.form.window_start ? '（次日）' : ''}` },
   },
   created() { this.load() },
@@ -155,6 +155,7 @@ export default {
     requireManage() { if(this.canManage) return true;this.$message.error('仅管理员可修改排班');return false },
     dateValue(value) { return moment(value,'YYYY-MM-DD',true).isValid() ? moment(value,'YYYY-MM-DD') : null },
     handoffValue(value) { return moment(value,'HH:mm:ss',true).isValid() ? moment(value,'HH:mm:ss') : null },
+    setMidnightHandoff() { this.form.handoff_time='00:00:00' },
     setStartDate(value) { this.form.start_date=value ? value.format('YYYY-MM-DD') : '' },
     setHandoff(value) { this.form.handoff_time=value ? value.format('HH:mm:ss') : '' },
     setAllDay(value) { this.form.all_day=value;if(!value&&this.form.window_start===this.form.window_end){this.form.window_start='09:00';this.form.window_end='18:00'} },
@@ -261,6 +262,7 @@ export default {
 .scope-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px}.scope-toolbar .muted{font-size:12px}.overview-text{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere;max-height:42px;line-height:21px}.oncall-list-table small{display:block}.oncall-list-table /deep/ td{vertical-align:top}.oncall-list-table /deep/ .ant-btn-link{padding-left:0}
 .oncall-editor{display:flex;flex-direction:column;gap:12px}.editor-section{border:1px solid rgba(128,128,128,.2);border-radius:4px;padding:12px;min-width:0}
 .editor-heading{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px}.editor-heading h4{font-size:14px;font-weight:600;margin:0}.editor-heading .muted{font-size:12px}
+.handoff-control{display:flex;align-items:center;gap:8px}.handoff-control>.ant-time-picker{flex:1;min-width:0}.handoff-control>.ant-btn{flex-shrink:0}.handoff-help,.handoff-warning{display:block;font-size:12px;line-height:1.6;margin-top:4px;color:var(--ops-muted,rgba(0,0,0,.65))}.handoff-warning{color:var(--ops-text,rgba(0,0,0,.85));font-weight:500}
 .basic-fields{display:grid;grid-template-columns:1.1fr 1.4fr .9fr;gap:12px}.anchor-fields,.fallback-fields,.editor-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .basic-fields .ant-form-item,.anchor-fields .ant-form-item,.fallback-fields .ant-form-item{margin-bottom:0}.anchor-fields{margin-top:12px}
 .anchor-summary{display:flex;flex-direction:column;justify-content:center;gap:4px;padding:8px 12px;margin-bottom:0;background:rgba(128,128,128,.05);font-size:12px;overflow-wrap:anywhere}.anchor-summary strong{font-weight:500;font-variant-numeric:tabular-nums}.anchor-summary small{color:var(--ops-muted,rgba(0,0,0,.65))}

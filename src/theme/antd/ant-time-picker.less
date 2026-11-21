@@ -1,3 +1,10 @@
 .ant-time-picker-panel-input{
   background-color: @component-background;
 }
+
+// Do not require hover to reveal scrolling, especially on touch devices and
+// when the selected value is the final hour/minute/second in the column.
+.ant-time-picker-panel-select {
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+}
