@@ -1,11 +1,5 @@
 <template>
   <page-layout :noTitle="true">
-    <a-alert :message="$t('multi_instance_alert_title')" type="info" show-icon closable style="margin-bottom: 16px;">
-      <template slot="description">
-        {{ $t('multi_instance_alert_content') }}
-      </template>
-    </a-alert>
-    
     <a-form-model class="home-search" layout="inline" :colon='false'>
       <a-form-model-item :label="$t('task')">
         <a-input v-model.trim="name" :placeholder="$t('task')" />

@@ -5,13 +5,6 @@
         <a-button type="primary" icon="plus" @click="handleAdd">新建分组</a-button>
       </template>
 
-      <a-alert
-        type="info"
-        show-icon
-        style="margin-bottom: 16px;"
-        message="设备分组是导航菜单的一级分类。内置分组（主机管理/网络管理/硬件管理）不可删除，只能修改名称和图标。自定义类型会根据所属分组显示在对应的菜单下。"
-      />
-
       <a-table
         :data-source="dataSource"
         :loading="loading"

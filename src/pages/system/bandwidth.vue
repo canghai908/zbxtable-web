@@ -2,12 +2,6 @@
   <page-layout :title="$t('egress_config')">
     <div>
       <a-card :bordered="false">
-        <a-alert :message="$t('config_description_title')" type="info" show-icon closable style="margin-bottom: 16px;">
-          <template slot="description">
-            {{ $t('config_description_content') }}
-          </template>
-        </a-alert>
-
         <a-button type="primary" icon="plus" @click="handleAdd" style="margin-bottom: 16px;">
           {{ $t('add_egress') }}
         </a-button>

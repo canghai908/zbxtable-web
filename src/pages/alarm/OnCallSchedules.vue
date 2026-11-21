@@ -1,6 +1,6 @@
 <template>
   <page-layout :noTitle="true">
-    <div class="oncall-toolbar"><div><h3>值班排班</h3><span class="muted">今日按各排班时区显示；临时代班优先，通知不可达时按渠道使用兜底。</span></div><div><a-button @click="load">刷新</a-button><a-button v-if="canManage" type="primary" @click="edit()">新增排班</a-button></div></div>
+    <div class="oncall-toolbar"><div><h3>值班排班</h3></div><div><a-button @click="load">刷新</a-button><a-button v-if="canManage" type="primary" @click="edit()">新增排班</a-button></div></div>
     <div class="scope-toolbar"><a-radio-group v-model="scope" size="small" button-style="solid" @change="changeScope"><a-radio-button value="all">全部排班 · 今日当班</a-radio-button><a-radio-button value="mine">我的值班</a-radio-button></a-radio-group><span class="muted">{{ canManage ? '管理员可维护排班' : '只读查看排班与日历' }}<template v-if="overviewAt"> · 更新于 {{ formatInZone(overviewAt) }}</template></span></div>
     <a-alert v-if="error" type="error" :message="error" show-icon style="margin-bottom: 12px" />
     <div class="oncall-list-scroll" tabindex="0" aria-label="值班排班列表，窄屏可横向滚动"><a-table class="oncall-list-table" table-layout="fixed" :loading="loading" :data-source="list" :columns="overviewColumns" :pagination="pagination" @change="changePage" row-key="id" size="small">
