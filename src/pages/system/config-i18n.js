@@ -614,6 +614,10 @@ module.exports = {
       // 系统配置
       systemSettings: '系统配置',
       taskSettings: '计划任务',
+      taskPageDescription: '集中管理后台定时任务的启停状态和执行周期。',
+      taskCronHelpTitle: 'Cron 表达式格式',
+      taskCronHelpDescription: 'Cron 顺序：秒 分 时 日 月 周',
+      taskSaveHint: '保存后新的计划任务配置立即生效。',
       taskEnabledLabel: '开关',
       taskCronLabel: 'Cron',
       taskCronFormatShort: '秒 分 时 日 月 周',
@@ -708,6 +712,10 @@ module.exports = {
       // 系統配置
       systemSettings: '系統配置',
       taskSettings: '計劃任務',
+      taskPageDescription: '集中管理後台定時任務的啟停狀態和執行週期。',
+      taskCronHelpTitle: 'Cron 表達式格式',
+      taskCronHelpDescription: 'Cron 順序：秒 分 時 日 月 週',
+      taskSaveHint: '儲存後新的計劃任務配置立即生效。',
       taskEnabledLabel: '開關',
       taskCronLabel: 'Cron',
       taskCronFormatShort: '秒 分 時 日 月 周',
@@ -802,6 +810,10 @@ module.exports = {
       // System Settings
       systemSettings: 'System Settings',
       taskSettings: 'Scheduled Tasks',
+      taskPageDescription: 'Manage background task status and schedules in one place.',
+      taskCronHelpTitle: 'Cron expression format',
+      taskCronHelpDescription: 'Cron order: sec min hour day month weekday',
+      taskSaveHint: 'New scheduled task settings take effect after saving.',
       taskEnabledLabel: 'Switch',
       taskCronLabel: 'Cron',
       taskCronFormatShort: 'sec min hour day mon wk',

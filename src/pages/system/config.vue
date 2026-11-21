@@ -72,44 +72,48 @@
 
           <!-- 计划任务配置 -->
           <a-tab-pane key="task" :tab="$t('taskTab')">
-            <a-form-model ref="taskForm" :model="taskForm" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }">
-              <a-divider orientation="left">{{$t('taskSettings')}}</a-divider>
-
-              <div class="task-config-grid">
-                <a-row :gutter="24">
-                  <a-col :xs="24" :xl="12" v-for="(column, columnIndex) in taskConfigColumns" :key="`task-column-${columnIndex}`">
-                    <div
-                      v-for="(group, groupIndex) in column"
-                      :key="`task-group-${columnIndex}-${groupIndex}`"
-                      class="task-config-card"
-                    >
-                      <div class="task-config-card__header">
-                        <div class="task-config-card__title">{{ group.title }}</div>
-                      </div>
-                      <a-row :gutter="16">
-                        <a-col :xs="24" :md="12" v-for="item in group.items" :key="item.id">
-                          <a-form-model-item :label="getTaskFieldLabel(item.config_key)">
-                            <a-select v-if="isBooleanConfig(item.config_key)" v-model="taskForm[item.config_key]" :placeholder="item.comment" style="width: 100%">
-                              <a-select-option v-for="opt in getBooleanOptions(item.config_key)" :key="opt.value" :value="opt.value">
-                                {{ opt.label }}
-                              </a-select-option>
-                            </a-select>
-                            <a-input
-                              v-else
-                              v-model="taskForm[item.config_key]"
-                              :placeholder="`${item.comment}（${$t('taskCronFormatShort')}）`"
-                            />
-                          </a-form-model-item>
-                        </a-col>
-                      </a-row>
-                    </div>
-                  </a-col>
-                </a-row>
+            <a-form-model ref="taskForm" :model="taskForm" class="task-form">
+              <div class="task-page-heading">
+                <h2>{{$t('taskSettings')}}</h2>
+                <span class="task-cron-format">{{$t('taskCronFormatShort')}}</span>
               </div>
 
-              <a-form-model-item :wrapper-col="{ span: 14, offset: 6 }">
-                <a-button type="primary" @click="saveCategory('task')" :loading="saveLoading">{{$t('save')}}</a-button>
-              </a-form-model-item>
+              <div class="task-cron-help"><a-icon type="info-circle" /> {{$t('taskCronHelpDescription')}}</div>
+
+              <a-row :gutter="12" class="task-config-grid">
+                <a-col :xs="24" :md="12" :xl="6" v-for="group in taskConfigGroups" :key="group.key">
+                  <section class="task-config-card">
+                    <header class="task-config-card__header">
+                      <div class="task-config-card__title">{{ group.title }}</div>
+                      <div v-if="hasTaskEnable(group)" class="task-enabled-control">
+                        <span :class="['task-status-dot', isTaskGroupEnabled(group) ? 'is-enabled' : '']" />
+                        <a-select
+                          v-for="item in getTaskGroupItems(group, true)"
+                          :key="item.id"
+                          v-model="taskForm[item.config_key]"
+                          size="small"
+                          :aria-label="$t('taskEnabledLabel')"
+                        >
+                          <a-select-option v-for="opt in getBooleanOptions(item.config_key)" :key="opt.value" :value="opt.value">
+                            {{ opt.label }}
+                          </a-select-option>
+                        </a-select>
+                      </div>
+                    </header>
+                    <div v-for="item in getTaskGroupItems(group, false)" :key="`cron-${item.id}`" class="task-cron-control">
+                      <div class="task-field-label">{{$t('taskCronLabel')}}</div>
+                      <a-input v-model="taskForm[item.config_key]" class="task-cron-input" size="small" />
+                    </div>
+                  </section>
+                </a-col>
+              </a-row>
+
+              <div class="task-save-bar">
+                <span>{{$t('taskSaveHint')}}</span>
+                <a-button type="primary" @click="saveCategory('task')" :loading="saveLoading">
+                  <a-icon type="save" /> {{$t('save')}}
+                </a-button>
+              </div>
             </a-form-model>
           </a-tab-pane>
 
@@ -475,6 +479,18 @@ export default {
         return this.$t('taskEnabledLabel')
       }
       return this.$t('taskCronLabel')
+    },
+    isTaskGroupEnabled(group) {
+      const enabledConfig = group.items.find(item => this.isBooleanConfig(item.config_key))
+      if (!enabledConfig) return true
+      const value = this.taskForm[enabledConfig.config_key]
+      return value === '1' || value === 'true' || value === true
+    },
+    hasTaskEnable(group) {
+      return group.items.some(item => this.isBooleanConfig(item.config_key))
+    },
+    getTaskGroupItems(group, enabled) {
+      return group.items.filter(item => this.isBooleanConfig(item.config_key) === enabled)
     },
     getBooleanOptions(key) {
       // email_isSSl 使用 true/false，其他使用 1/0
@@ -950,19 +966,86 @@ export default {
 }
 
 .task-config-grid {
-  margin-bottom: 4px;
+  margin-bottom: 0;
+}
+
+.task-page-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.task-page-heading h2 {
+  margin: 0;
+  color: #252a31;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.task-cron-format {
+  color: #737780;
+  font-family: SFMono-Regular, Consolas, 'Liberation Mono', monospace;
+  font-size: 12px;
+}
+
+.task-cron-help {
+  margin-bottom: 12px;
+  color: #737780;
+  font-size: 12px;
 }
 
 .task-config-card {
-  padding: 20px 20px 0;
-  margin-bottom: 20px;
+  height: calc(100% - 12px);
+  padding: 12px;
+  margin-bottom: 12px;
   border: 1px solid #e8eaed;
   border-radius: 8px;
   background: #fff;
 }
 
 .task-config-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 24px;
   margin-bottom: 8px;
+}
+
+.task-status-dot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border-radius: 50%;
+  background: #b7bdc5;
+}
+
+.task-status-dot.is-enabled {
+  background: #52a675;
+}
+
+.task-enabled-control {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 6px;
+}
+
+.task-enabled-control /deep/ .ant-select {
+  width: 72px;
+}
+
+.task-cron-control {
+  min-width: 0;
+}
+
+.task-field-label {
+  margin-bottom: 4px;
+  color: #737780;
+  font-size: 12px;
+  line-height: 16px;
 }
 
 .task-config-card__title {
@@ -974,13 +1057,30 @@ export default {
 }
 
 /deep/ .task-config-card .ant-form-item-label > label {
-  min-width: 44px;
   color: #555b64;
   font-weight: 500;
 }
 
 /deep/ .task-config-card .ant-form-item {
-  margin-bottom: 14px;
+  margin-bottom: 8px;
+}
+
+/deep/ .task-cron-input input {
+  font-family: SFMono-Regular, Consolas, 'Liberation Mono', monospace;
+  letter-spacing: .2px;
+}
+
+.task-save-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0 0;
+  margin-top: 0;
+  border-top: 1px solid #edf0f2;
+  background: #fff;
+  color: #737780;
+  font-size: 13px;
 }
 
 /deep/ .ant-input-group {
@@ -1004,7 +1104,7 @@ export default {
   }
 
   .task-config-card {
-    padding: 16px 16px 0;
+    padding: 12px;
   }
 }
 
@@ -1037,6 +1137,11 @@ export default {
 
   .logo-upload-container {
     gap: 12px;
+  }
+
+  .task-save-bar {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
 </style>
