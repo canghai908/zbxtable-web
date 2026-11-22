@@ -40,6 +40,7 @@ module.exports = {
 	API_WS_PU: '/ws/pub',
 	ZABBIX: '/v1/zabbix',
 	METRIC_MAPPING: '/v1/metric_mapping',
+	INSPECTION: '/v1/inspection',
 	SYSTEM_UPDATE: '/v1/system',
 	SYSTEM_PUBLIC_INFO: '/v1/info',
 	ASSET_TYPE: '/v1/asset-type',

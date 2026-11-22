@@ -22,7 +22,7 @@ export function formatInZone(value, timezone = 'Asia/Shanghai') {
 }
 export function rulePayload(rule) {
   const result = { ...rule }
-  ;['z_ids', 's_week', 'channel', 'user_ids', 'group_ids'].forEach(key => {
+  ;['z_ids', 's_week', 'channel', 'user_ids', 'group_ids', 'escalation_channel', 'escalation_user_ids', 'escalation_group_ids'].forEach(key => {
     result[key] = Array.isArray(rule[key]) ? rule[key].join(',') : (rule[key] || '')
   })
   result.schedule_ids = ids(rule.schedule_ids)
@@ -30,5 +30,8 @@ export function rulePayload(rule) {
   result.s_time = rule.s_time && typeof rule.s_time.format === 'function' ? rule.s_time.format('HH:mm') : (rule.s_time || '00:00')
   result.e_time = rule.e_time && typeof rule.e_time.format === 'function' ? rule.e_time.format('HH:mm') : (rule.e_time || '23:59')
   result.status = typeof rule.status === 'boolean' ? (rule.status ? '0' : '1') : String(rule.status)
+  result.suppress_window = Math.max(0, Number(rule.suppress_window) || 0)
+  result.suppress_threshold = Math.max(1, Number(rule.suppress_threshold) || 1)
+  result.escalation_minutes = Math.max(0, Number(rule.escalation_minutes) || 0)
   return result
 }

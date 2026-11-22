@@ -105,6 +105,9 @@ const routerMap = {
 	hostReport: {
 		component: () => import('@/pages/report/host'),
 	},
+	inspectReport: {
+		component: () => import('@/pages/report/inspect'),
+	},
 	//system
 	system: {
 		component: view.blank,

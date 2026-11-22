@@ -277,8 +277,9 @@ export default {
         { value: "mail", label: this.$t('channel_mail') },
         { value: "wechat", label: this.$t('channel_wechat') },
         { value: "wechat_robot", label: this.$t('channel_wechat_robot') },
-        // { value: "dingding", label: this.$t('channel_dingding') },
-        // { value: "sms", label: this.$t('channel_sms') },
+        { value: "dingtalk_robot", label: this.$t('channel_dingtalk_robot') },
+        { value: "feishu_robot", label: this.$t('channel_feishu_robot') },
+        { value: "webhook", label: this.$t('channel_webhook') },
       ];
       
       // 初始化操作符选项

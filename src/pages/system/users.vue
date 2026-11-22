@@ -22,7 +22,9 @@
         <div slot="role" slot-scope="record">{{getRoleLabel(record.role)}}</div>
         <div slot="email" slot-scope="record">{{record.email}}</div>
         <div slot="phone" slot-scope="record">{{record.phone}}</div>
-        <span slot="ding_talk" slot-scope="record">{{record.ding_talk}}</span>
+        <span slot="ding_talk" slot-scope="record">{{record.ding_talk || '-'}}</span>
+        <span slot="feishu_robot_key" slot-scope="record">{{record.feishu_robot_key || '-'}}</span>
+        <span slot="webhook_url" slot-scope="record">{{record.webhook_url || '-'}}</span>
         <span slot="wechat" slot-scope="record">{{record.wechat}}</span>
         <span slot="wechat_robot_key" slot-scope="record">
           <template v-if="record.wechat_robot_key">
@@ -81,7 +83,22 @@
             <a-input-password v-model.trim="user.wechat_robot_key" :placeholder="$t('modalInputWechatRobotKey')" />
           </a-form-model-item>
           <a-form-model-item :label="$t('label_ding_talk')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="ding_talk">
-            <a-input v-model.trim="user.ding_talk" :placeholder="$t('modalInputDingTalk')" />
+            <a-input-password v-model.trim="user.ding_talk" :placeholder="$t('modalInputDingTalk')" />
+          </a-form-model-item>
+          <a-form-model-item :label="$t('label_ding_talk_secret')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="ding_talk_secret">
+            <a-input-password v-model.trim="user.ding_talk_secret" :placeholder="$t('modalInputDingTalkSecret')" />
+          </a-form-model-item>
+          <a-form-model-item :label="$t('label_feishu_robot_key')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="feishu_robot_key">
+            <a-input-password v-model.trim="user.feishu_robot_key" :placeholder="$t('modalInputFeishuRobotKey')" />
+          </a-form-model-item>
+          <a-form-model-item :label="$t('label_feishu_secret')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="feishu_secret">
+            <a-input-password v-model.trim="user.feishu_secret" :placeholder="$t('modalInputFeishuSecret')" />
+          </a-form-model-item>
+          <a-form-model-item :label="$t('label_webhook_url')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="webhook_url">
+            <a-input v-model.trim="user.webhook_url" :placeholder="$t('modalInputWebhookURL')" />
+          </a-form-model-item>
+          <a-form-model-item :label="$t('label_webhook_token')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="webhook_token">
+            <a-input-password v-model.trim="user.webhook_token" :placeholder="$t('modalInputWebhookToken')" />
           </a-form-model-item>
         </a-form-model>
       </template>
@@ -115,7 +132,22 @@
             <a-input-password v-model.trim="user.wechat_robot_key" :placeholder="$t('modalInputWechatRobotKey')" />
           </a-form-model-item>
           <a-form-model-item :label="$t('label_ding_talk')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="ding_talk">
-            <a-input v-model.trim="user.ding_talk" :placeholder="$t('modalInputDingTalk')" />
+            <a-input-password v-model.trim="user.ding_talk" :placeholder="$t('modalInputDingTalk')" />
+          </a-form-model-item>
+          <a-form-model-item :label="$t('label_ding_talk_secret')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="ding_talk_secret">
+            <a-input-password v-model.trim="user.ding_talk_secret" :placeholder="$t('modalInputDingTalkSecret')" />
+          </a-form-model-item>
+          <a-form-model-item :label="$t('label_feishu_robot_key')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="feishu_robot_key">
+            <a-input-password v-model.trim="user.feishu_robot_key" :placeholder="$t('modalInputFeishuRobotKey')" />
+          </a-form-model-item>
+          <a-form-model-item :label="$t('label_feishu_secret')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="feishu_secret">
+            <a-input-password v-model.trim="user.feishu_secret" :placeholder="$t('modalInputFeishuSecret')" />
+          </a-form-model-item>
+          <a-form-model-item :label="$t('label_webhook_url')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="webhook_url">
+            <a-input v-model.trim="user.webhook_url" :placeholder="$t('modalInputWebhookURL')" />
+          </a-form-model-item>
+          <a-form-model-item :label="$t('label_webhook_token')" :labelCol="{span: 7}" :wrapperCol="{span: 10}" prop="webhook_token">
+            <a-input-password v-model.trim="user.webhook_token" :placeholder="$t('modalInputWebhookToken')" />
           </a-form-model-item>
         </a-form-model>
       </template>
@@ -168,6 +200,11 @@ export default {
         wechat_robot_key: "",
         status: "1",
         ding_talk: "",
+        ding_talk_secret: "",
+        feishu_robot_key: "",
+        feishu_secret: "",
+        webhook_url: "",
+        webhook_token: "",
       },
       rules: {
 	username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
@@ -222,6 +259,8 @@ export default {
         { title: this.$t('table_headers_email'), key: 'email', align: 'left', scopedSlots: { customRender: 'email' } },
         { title: this.$t('table_headers_phone'), key: 'phone', align: 'left', scopedSlots: { customRender: 'phone' } },
         { title: this.$t('table_headers_ding_talk'), key: 'ding_talk', align: 'left', scopedSlots: { customRender: 'ding_talk' } },
+        { title: this.$t('table_headers_feishu_robot_key'), key: 'feishu_robot_key', align: 'left', scopedSlots: { customRender: 'feishu_robot_key' } },
+        { title: this.$t('table_headers_webhook_url'), key: 'webhook_url', align: 'left', scopedSlots: { customRender: 'webhook_url' } },
         { title: this.$t('table_headers_wechat'), key: 'wechat', align: 'left', scopedSlots: { customRender: 'wechat' } },
         { title: this.$t('table_headers_wechat_robot_key'), key: 'wechat_robot_key', align: 'left', scopedSlots: { customRender: 'wechat_robot_key' } },
         { title: this.$t('table_headers_creation_date'), key: 'created', align: 'left', scopedSlots: { customRender: 'created' } },
@@ -330,6 +369,11 @@ export default {
         wechat_robot_key: "",
         status: "1",
         ding_talk: "",
+        ding_talk_secret: "",
+        feishu_robot_key: "",
+        feishu_secret: "",
+        webhook_url: "",
+        webhook_token: "",
       };
     },
     seeDetail(v) {
@@ -364,6 +408,11 @@ export default {
         wechat: record.wechat,
         wechat_robot_key: record.wechat_robot_key,
         ding_talk: record.ding_talk,
+        ding_talk_secret: record.ding_talk_secret,
+        feishu_robot_key: record.feishu_robot_key,
+        feishu_secret: record.feishu_secret,
+        webhook_url: record.webhook_url,
+        webhook_token: record.webhook_token,
       }
     },
     updateUser() {

@@ -19,7 +19,7 @@ import { ids } from './model'
 export default {
   name:'MemberChannels',
   props:{users:{type:Array,default:()=>[]},members:{type:Array,default:()=>[]},fallbackUserIds:{type:Array,default:()=>[]}},
-  data:()=>({channels:[{key:'mail',label:'邮件'},{key:'wechat',label:'企业微信'},{key:'wechat_robot',label:'群机器人'}]}),
+  data:()=>({channels:[{key:'mail',label:'邮件'},{key:'wechat',label:'企业微信'},{key:'wechat_robot',label:'企微机器人'},{key:'dingtalk_robot',label:'钉钉机器人'},{key:'feishu_robot',label:'飞书机器人'},{key:'webhook',label:'Webhook'}]}),
   computed:{
     rows(){
       const members=ids(this.members),fallback=ids(this.fallbackUserIds)
@@ -33,5 +33,5 @@ export default {
 }
 </script>
 <style lang="less" scoped>
-.member-channels{min-width:0}.channel-summary{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px}.channel-summary strong{font-weight:500}.channel-help{font-size:12px;color:var(--ops-muted,rgba(0,0,0,.65));margin:4px 0 8px}.channel-scroll{max-height:176px;overflow:auto}.channel-scroll table{width:100%;min-width:440px;table-layout:fixed;font-size:12px}.channel-scroll th,.channel-scroll td{text-align:left;padding:6px 8px;border-bottom:1px solid @border-color-split;vertical-align:top}.channel-scroll th{position:sticky;top:0;background:@component-background;font-weight:500}.channel-scroll td:first-child,.channel-scroll th:first-child{width:28%}.channel-name{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.channel-scroll small{display:block;color:var(--ops-muted,rgba(0,0,0,.65))}.channel-missing{color:var(--ops-muted,rgba(0,0,0,.65))}
+.member-channels{min-width:0}.channel-summary{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px}.channel-summary strong{font-weight:500}.channel-help{font-size:12px;color:var(--ops-muted,rgba(0,0,0,.65));margin:4px 0 8px}.channel-scroll{max-height:176px;overflow:auto}.channel-scroll table{width:100%;min-width:640px;table-layout:fixed;font-size:12px}.channel-scroll th,.channel-scroll td{text-align:left;padding:6px 8px;border-bottom:1px solid @border-color-split;vertical-align:top}.channel-scroll th{position:sticky;top:0;background:@component-background;font-weight:500}.channel-scroll td:first-child,.channel-scroll th:first-child{width:28%}.channel-name{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.channel-scroll small{display:block;color:var(--ops-muted,rgba(0,0,0,.65))}.channel-missing{color:var(--ops-muted,rgba(0,0,0,.65))}
 </style>

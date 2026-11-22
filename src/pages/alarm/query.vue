@@ -37,11 +37,14 @@
         <a-button type="primary" @click="init">{{ $t('btn_query') }}</a-button>
         <a-button style="margin-left: 10px;" @click="resetData">{{ $t('btn_reset') }}</a-button>
         <a-button style="margin-left: 10px;" type="primary" @click="anayexport">{{ $t('btn_export') }}</a-button>
+        <a-button style="margin-left: 10px;" type="primary" ghost :disabled="!selectedRowKeys.length" @click="openBatchAckModal">
+          {{ $t('btn_batch_ack') }}<span v-if="selectedRowKeys.length"> ({{ selectedRowKeys.length }})</span>
+        </a-button>
       </a-form-model-item>
     </a-form-model>
 
     <div class="linux-list">
-      <a-table :loading="loading" :columns="columns" :data-source="list" @expand="getEvent" @change="changePage" :pagination="pagination" :rowKey="(record) => { return record.id;}">
+      <a-table :loading="loading" :columns="columns" :data-source="list" :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }" @expand="getEvent" @change="changePage" :pagination="pagination" :rowKey="(record) => { return record.id;}">
         <!-- 主表格的插槽 -->
         <div slot="instance_name" slot-scope="record">
           <a-tag :color="themeColor">{{getInstanceName(record.zid)}}</a-tag>
@@ -64,12 +67,30 @@
           <a-badge v-else-if="record.notify_status==1" status="default"></a-badge>
           <a-badge v-else-if="record.notify_status==2" status="processing"></a-badge>
           <a-badge v-else-if="record.notify_status==3" status="warning"></a-badge>
+          <a-badge v-else-if="record.notify_status==4" status="default"></a-badge>
+          <a-badge v-else-if="record.notify_status==5" status="error"></a-badge>
           <template v-if="record.notify_status==0">{{ $t('notify_status_notified') }}</template>
           <template v-else-if="record.notify_status==1">{{ $t('notify_status_muted') }}</template>
           <template v-else-if="record.notify_status==2">{{ $t('notify_status_default_rule') }}</template>
           <template v-else-if="record.notify_status==3">{{ $t('notify_status_no_recipient') }}</template>
+          <template v-else-if="record.notify_status==4">{{ $t('notify_status_suppressed') }}</template>
+          <template v-else-if="record.notify_status==5">{{ $t('notify_status_escalated') }}</template>
+        </span>
+        <span slot="ack_status" slot-scope="record">
+          <a-tooltip v-if="record.ack_status==1">
+            <template slot="title">
+              <div>{{ record.ack_user || '-' }} · {{ record.ack_time | parsetime }}</div>
+              <div v-if="record.ack_note">{{ record.ack_note }}</div>
+            </template>
+            <a-tag color="green">{{ $t('ack_status_acked') }}</a-tag>
+          </a-tooltip>
+          <template v-else>
+            <a-tag color="orange">{{ $t('ack_status_unacked') }}</a-tag>
+            <a-tag v-if="record.escalation_step > 0" color="red">{{ $t('ack_status_escalated') }}</a-tag>
+          </template>
         </span>
         <span slot="operation" slot-scope="record">
+          <a-button v-if="record.ack_status!=1" class="pd20 paddingleft0" type="link" size="small" @click="openAckModal(record)">{{ $t('btn_ack') }}</a-button>
           <a-button v-if="record.notify_status!=1" class="pd20 paddingleft0" type="link" size="small" @click="addMutes(record)">{{ $t('btn_mute') }}</a-button>
           <a-button class="pd20" type="link" size="small" @click="analyzeWithDeepseek(record)">{{ $t('btn_ai_analysis') }}</a-button>
         </span>
@@ -175,13 +196,30 @@
       </div>
     </a-drawer>
 
+    <!-- 告警认领弹窗 -->
+    <a-modal
+      :title="ackModalIsBatch ? $t('modal_title_batch_ack') : $t('modal_title_ack')"
+      :visible="ackModalVisible"
+      :confirm-loading="ackLoading"
+      @ok="submitAck"
+      @cancel="ackModalVisible = false"
+    >
+      <a-form-model :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
+        <a-form-model-item :label="$t('ack_note_label')">
+          <a-textarea v-model="ackNote" :rows="3" :placeholder="$t('ack_note_placeholder')" :max-length="500" />
+        </a-form-model-item>
+        <a-form-model-item :wrapper-col="{ span: 18, offset: 6 }">
+          <a-checkbox v-model="ackSyncZabbix">{{ $t('ack_sync_zabbix_label') }}</a-checkbox>
+        </a-form-model-item>
+      </a-form-model>
+    </a-modal>
 
   </page-layout>
 </template>
 
 <script>
 import PageLayout from "@/layouts/PageLayout";
-import { alarm, alarmExport, eventLogGet, alarmDeepseekAnalysis, configGetList } from "@/services/admin";
+import { alarm, alarmExport, alarmAck, alarmBatchAck, eventLogGet, alarmDeepseekAnalysis, configGetList } from "@/services/admin";
 import { listZabbixInstance } from '@/services/zabbix'
 import { parseTimeFun } from "@/utils/formatter";
 import { buildAlarmTimeRanges, getDefaultAlarmTimeRange } from "./timeRange";
@@ -322,6 +360,13 @@ export default {
       alarmAnalysisPrompt: '',
       contextExpanded: false,
       hostIp: "",
+      selectedRowKeys: [],
+      ackModalVisible: false,
+      ackLoading: false,
+      ackModalIsBatch: false,
+      ackTargetId: null,
+      ackNote: '',
+      ackSyncZabbix: true,
     };
   },
   computed: {
@@ -381,6 +426,7 @@ export default {
         { title: this.$t('col_alarm_detail'), dataIndex: "detail", align: "left" },
         { title: this.$t('col_occurrence_time'), key: "occur_time", align: "left", scopedSlots: { customRender: "occur_time" } },
         { title: this.$t('col_notification_status'), key: "notify_status", align: "left", scopedSlots: { customRender: "notify_status" } },
+        { title: this.$t('col_ack_status'), key: "ack_status", align: "left", scopedSlots: { customRender: "ack_status" } },
         { title: this.$t('col_operation'), key: "operation", align: "center", scopedSlots: { customRender: "operation" } },
       ];
       this.innerColumns = [
@@ -420,6 +466,9 @@ export default {
         mail: this.$t('channel_mail'),
         wechat: this.$t('channel_wechat'),
         wechat_robot: this.$t('channel_wechat_robot'),
+        dingtalk_robot: this.$t('channel_dingtalk_robot'),
+        feishu_robot: this.$t('channel_feishu_robot'),
+        webhook: this.$t('channel_webhook'),
         dingding: this.$t('channel_dingding'),
         sms: this.$t('channel_sms'),
       }
@@ -477,6 +526,7 @@ export default {
     },
     init() {
       this.loading = true;
+      this.selectedRowKeys = [];
       let req = {
         page: this.page, limit: this.pageSize,
         hosts: this.hosts,
@@ -511,6 +561,58 @@ export default {
     },
     handleLevelChange(value) {
       this.level = value
+    },
+    onSelectChange(selectedRowKeys) {
+      this.selectedRowKeys = selectedRowKeys;
+    },
+    openAckModal(record) {
+      this.ackModalIsBatch = false;
+      this.ackTargetId = record.id;
+      this.ackNote = '';
+      this.ackSyncZabbix = true;
+      this.ackModalVisible = true;
+    },
+    openBatchAckModal() {
+      if (!this.selectedRowKeys.length) {
+        this.$message.warning(this.$t('msg_select_alarms_to_ack'));
+        return;
+      }
+      this.ackModalIsBatch = true;
+      this.ackTargetId = null;
+      this.ackNote = '';
+      this.ackSyncZabbix = true;
+      this.ackModalVisible = true;
+    },
+    async submitAck() {
+      this.ackLoading = true;
+      try {
+        let resp;
+        if (this.ackModalIsBatch) {
+          resp = await alarmBatchAck({
+            ids: this.selectedRowKeys,
+            note: this.ackNote,
+            sync_zabbix: this.ackSyncZabbix,
+          });
+        } else {
+          resp = await alarmAck(this.ackTargetId, {
+            note: this.ackNote,
+            sync_zabbix: this.ackSyncZabbix,
+          });
+        }
+        const res = resp.data;
+        if (res.code === 200) {
+          this.$message.success(res.message || this.$t('msg_ack_success'));
+          this.ackModalVisible = false;
+          this.selectedRowKeys = [];
+          this.init();
+        } else {
+          this.$message.error(res.message || this.$t('msg_request_failed'));
+        }
+      } catch (e) {
+        this.$message.error(e.message || this.$t('msg_request_failed'));
+      } finally {
+        this.ackLoading = false;
+      }
     },
     addMutes(record) {
       console.log(record)
@@ -900,6 +1002,12 @@ export default {
           break;
         case "3":
           res = this.$t('notify_status_no_recipient');
+          break;
+        case "4":
+          res = this.$t('notify_status_suppressed');
+          break;
+        case "5":
+          res = this.$t('notify_status_escalated');
           break;
       }
       return res;
