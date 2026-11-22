@@ -129,16 +129,16 @@
             <a-row v-if="config.selection_mode === 'single'" :gutter="16">
               <a-col :span="10">
                 <a-select v-model="config.host_id" show-search :placeholder="config.zid ? $t('select_host') : $t('select_instance_first')" @popupScroll="handleHostPopupScrollForConfig(index)"
-                  @search="(value) => handleHostSearchForConfig(value, index)" option-filter-prop="label" @change="handleHostChange(config, index)" style="width: 100%" :disabled="!config.zid">
-                  <a-select-option v-for="(host, idx) in configHostsList[index]" :key="idx" :title="host.name" :label="host.name" :value="host.hostid">
+                  @search="(value) => handleHostSearchForConfig(value, index)" option-filter-prop="label" @change="handleHostChange(config, index, false)" style="width: 100%" :disabled="!config.zid">
+                  <a-select-option v-for="host in configHostsList[index]" :key="String(host.hostid)" :title="host.name" :label="host.name" :value="String(host.hostid)">
                     {{ host.name }}
                   </a-select-option>
                 </a-select>
               </a-col>
               <a-col :span="12">
                 <a-select mode="multiple" show-search v-model="config.item_ids" :placeholder="config.host_id ? $t('select_items') : $t('select_host_first')" @popupScroll="() => handleItemPopupScroll(index)"
-                  @search="(value) => handleItemSearch(value, index)" option-filter-prop="label" style="width: 100%" :disabled="!config.host_id">
-                  <a-select-option v-for="(item, idx) in curItemsList[index]" :key="idx" :label="item.name" :title="item.name" :value="item.itemid">
+                  @search="(value) => handleItemSearch(value, index)" @change="() => handleItemSelectionChange(index)" option-filter-prop="label" style="width: 100%" :disabled="!config.host_id">
+                  <a-select-option v-for="item in curItemsList[index]" :key="String(item.itemid)" :label="item.name" :title="item.name" :value="String(item.itemid)">
                     {{ item.name }}
                   </a-select-option>
                 </a-select>
@@ -208,7 +208,7 @@
                 </a-col>
                 <a-col :span="12">
                   <a-select mode="multiple" show-search v-model="config.reference_item_ids" :placeholder="$t('select_reference_items')" option-filter-prop="label" style="width: 100%" :disabled="!config.reference_host_id">
-                    <a-select-option v-for="(item, idx) in bulkReferenceItemsList[index] || []" :key="`ref-item-${index}-${idx}`" :label="item.name" :title="item.name" :value="item.itemid">
+                    <a-select-option v-for="item in bulkReferenceItemsList[index] || []" :key="`ref-item-${index}-${String(item.itemid)}`" :label="item.name" :title="item.name" :value="String(item.itemid)">
                       {{ item.name }}
                     </a-select-option>
                   </a-select>
@@ -332,6 +332,7 @@ export default {
         startTime: null,
         endTime: null
       },
+      configHostsAllList: {}, // key: index, value: all hosts list for this config
       configHostsList: {}, // key: index, value: hosts list for this config
       configHostsFilterList: {}, // key: index, value: filtered hosts list
       ItemsList: {}, // key: host_id, value: items list
@@ -623,6 +624,72 @@ export default {
       })
       return rebuilt
     },
+    mergeSelectedOptions(sliceList = [], allList = [], selectedIds = [], idKey) {
+      const merged = []
+      const seen = new Set()
+
+      const appendOption = (option) => {
+        if (!option || option[idKey] === undefined || option[idKey] === null) {
+          return
+        }
+        const id = String(option[idKey])
+        if (seen.has(id)) {
+          return
+        }
+        seen.add(id)
+        merged.push({
+          ...option,
+          [idKey]: id
+        })
+      }
+
+      ;(sliceList || []).forEach(appendOption)
+
+      if (selectedIds.length > 0 && allList.length > 0) {
+        const allById = new Map(allList.map(option => [String(option[idKey]), option]))
+        selectedIds.forEach((rawId) => {
+          const id = rawId === undefined || rawId === null ? '' : String(rawId)
+          if (id && !seen.has(id) && allById.has(id)) {
+            appendOption(allById.get(id))
+          }
+        })
+      }
+
+      return merged
+    },
+    mergeSelectedHosts(index, sliceHosts = []) {
+      const config = this.formData.hostConfigs[index]
+      const allHosts = this.configHostsAllList[index] || this.configHostsFilterList[index] || []
+      const selectedHostId = config && config.host_id ? String(config.host_id) : ''
+      return this.mergeSelectedOptions(sliceHosts, allHosts, selectedHostId ? [selectedHostId] : [], 'hostid')
+    },
+    mergeSelectedItems(index, sliceItems = []) {
+      const config = this.formData.hostConfigs[index]
+      const cacheKey = (config && config.zid && config.host_id)
+        ? this.getItemsCacheKey(config.zid, config.host_id)
+        : ''
+      const allItems = cacheKey ? (this.ItemsList[cacheKey] || []) : []
+      const selectedIds = (config && Array.isArray(config.item_ids)) ? config.item_ids : []
+      return this.mergeSelectedOptions(sliceItems, allItems, selectedIds, 'itemid')
+    },
+    getNextSelectPage(curList = [], filterList = [], idKey) {
+      const curIdSet = new Set(curList.map(item => String(item[idKey])))
+      const remaining = filterList.filter(item => !curIdSet.has(String(item[idKey])))
+      if (remaining.length === 0) {
+        return null
+      }
+      return [...curList, ...remaining.slice(0, selectSize)]
+    },
+    filterOptionsByKeyword(allOptions = [], value, nameKey = 'name') {
+      if (!value || value.trim() === '') {
+        return allOptions
+      }
+      const keyword = value.trim().toLowerCase()
+      return allOptions.filter(option => String(option[nameKey] || '').toLowerCase().includes(keyword))
+    },
+    handleItemSelectionChange(index) {
+      this.$set(this.curItemsList, index, this.mergeSelectedItems(index, this.curItemsList[index] || []))
+    },
     resetSingleConfigState(index) {
       this.$set(this.formData.hostConfigs[index], 'host_id', '')
       this.$set(this.formData.hostConfigs[index], 'item_ids', [])
@@ -663,7 +730,11 @@ export default {
       if (res.code !== 200) {
         throw new Error(res.message || 'load items failed')
       }
-      const items = (res.data && res.data.items) ? res.data.items : []
+      const rawItems = (res.data && res.data.items) ? res.data.items : []
+      const items = rawItems.map(item => ({
+        ...item,
+        itemid: String(item.itemid)
+      }))
       this.$set(this.ItemsList, cacheKey, items)
       return items
     },
@@ -675,6 +746,7 @@ export default {
       this.fetchHostGroupsForConfig(value, index)
 
       if (!value) {
+        this.$set(this.configHostsAllList, index, [])
         this.$set(this.configHostsList, index, [])
         this.$set(this.configHostsFilterList, index, [])
         return
@@ -687,9 +759,13 @@ export default {
       }).then((resp) => {
         const res = resp.data
         if (res.code == 200) {
-          const hosts = res.data.items || []
+          const hosts = (res.data.items || []).map(host => ({
+            ...host,
+            hostid: String(host.hostid)
+          }))
+          this.$set(this.configHostsAllList, index, hosts)
           this.$set(this.configHostsFilterList, index, hosts)
-          this.$set(this.configHostsList, index, hosts.slice(0, selectSize))
+          this.$set(this.configHostsList, index, this.mergeSelectedHosts(index, hosts.slice(0, selectSize)))
         }
       }).catch(err => {
         console.error(this.$t('load_hosts_failed'), err)
@@ -896,6 +972,7 @@ export default {
         startTime: null,
         endTime: null
       }
+      this.configHostsAllList = {}
       this.configHostsList = {}
       this.configHostsFilterList = {}
       this.ItemsList = {}
@@ -926,6 +1003,7 @@ export default {
         startTime: null,
         endTime: null
       }
+      this.configHostsAllList = {}
       this.configHostsList = {}
       this.configHostsFilterList = {}
       this.ItemsList = {}
@@ -995,16 +1073,20 @@ export default {
                       hostList(params).then((resp) => {
                         let res = resp.data
                         if (res.code == 200) {
-                          const hosts = res.data.items || []
+                          const hosts = (res.data.items || []).map(host => ({
+                            ...host,
+                            hostid: String(host.hostid)
+                          }))
+                          this.$set(this.configHostsAllList, index, hosts)
                           this.$set(this.configHostsFilterList, index, hosts)
-                          this.$set(this.configHostsList, index, hosts.slice(0, selectSize))
-                          
-                          // If host is already selected, load items
-                          if (config.host_id) {
-                            this.handleHostChange(config, index)
-                          }
+                          this.$set(this.configHostsList, index, this.mergeSelectedHosts(index, hosts.slice(0, selectSize)))
                         }
                       })
+
+                      // If host is already selected, load items and preserve configured item_ids in parallel
+                      if (config.host_id) {
+                        this.handleHostChange(config, index, true)
+                      }
 
                       if (this.isBulkSelectionMode(config.selection_mode)) {
                         if ((!config.matched_hosts || !config.matched_hosts.length) && config.reference_host_id) {
@@ -1366,8 +1448,12 @@ export default {
         this.$message.error(this.$t('load_bulk_hosts_failed'))
       }
     },
-    handleHostChange(config, index) {
+    handleHostChange(config, index, preserveItems = false) {
+      if (!preserveItems) {
+        this.$set(config, 'item_ids', [])
+      }
       if (!config.host_id) {
+        this.$set(this.itemsFilterList, index, [])
         this.$set(this.curItemsList, index, [])
         return
       }
@@ -1384,21 +1470,23 @@ export default {
       itemList(params).then((resp) => {
         let res = resp.data
         if (res.code == 200) {
+          const items = (res.data.items || []).map(item => ({
+            ...item,
+            itemid: String(item.itemid)
+          }))
           const cacheKey = this.getItemsCacheKey(config.zid, config.host_id)
-          this.$set(this.ItemsList, cacheKey, res.data.items)
-          this.$set(this.itemsFilterList, index, res.data.items)
-          this.$set(this.curItemsList, index, res.data.items.slice(0, selectSize))
+          this.$set(this.ItemsList, cacheKey, items)
+          this.$set(this.itemsFilterList, index, items)
           
           // Ensure item_ids type matches itemid type in items list (convert to string)
-          if (config.item_ids && Array.isArray(config.item_ids) && config.item_ids.length > 0) {
-            const items = res.data.items || []
-            // Convert item_ids to strings and filter valid item_ids
+          if (preserveItems && config.item_ids && Array.isArray(config.item_ids) && config.item_ids.length > 0) {
             const validItemIds = config.item_ids.map(id => String(id)).filter(id => {
-              return items.some(item => String(item.itemid) === id)
+              return items.some(item => item.itemid === id)
             })
-            // Update item_ids with valid item_ids (ensure type consistency)
             this.$set(config, 'item_ids', validItemIds)
           }
+
+          this.$set(this.curItemsList, index, this.mergeSelectedItems(index, items.slice(0, selectSize)))
         }
       })
     },
@@ -1432,9 +1520,11 @@ export default {
       const newIndex = this.formData.hostConfigs.length
       const newConfig = this.createDefaultHostConfig()
       this.formData.hostConfigs.push(newConfig)
+      this.$set(this.configHostsAllList, newIndex, [])
       this.$set(this.configHostsList, newIndex, [])
       this.$set(this.configHostsFilterList, newIndex, [])
       this.$set(this.curItemsList, newIndex, [])
+      this.$set(this.itemsFilterList, newIndex, [])
       this.$set(this.configHostGroupsList, newIndex, [])
       this.$set(this.bulkReferenceItemsList, newIndex, [])
 
@@ -1445,6 +1535,7 @@ export default {
     removeHostConfig(index) {
       this.formData.hostConfigs.splice(index, 1)
       this.curItemsList = this.rebuildIndexedStore(this.curItemsList, index)
+      this.configHostsAllList = this.rebuildIndexedStore(this.configHostsAllList, index)
       this.configHostsList = this.rebuildIndexedStore(this.configHostsList, index)
       this.configHostsFilterList = this.rebuildIndexedStore(this.configHostsFilterList, index)
       this.itemsFilterList = this.rebuildIndexedStore(this.itemsFilterList, index)
@@ -1452,38 +1543,21 @@ export default {
       this.bulkReferenceItemsList = this.rebuildIndexedStore(this.bulkReferenceItemsList, index)
     },
     handleHostPopupScrollForConfig: debounce(function (index) {
-      const curList = this.configHostsList[index] || []
-      const filterList = this.configHostsFilterList[index] || []
-      const curLen = curList.length
-      const allLen = filterList.length
-      if (curLen < allLen) {
-        const nextPage = filterList.slice(curLen, curLen + selectSize)
-        this.$set(this.configHostsList, index, [...curList, ...nextPage])
+      const nextList = this.getNextSelectPage(this.configHostsList[index], this.configHostsFilterList[index], 'hostid')
+      if (nextList) {
+        this.$set(this.configHostsList, index, this.mergeSelectedHosts(index, nextList))
       }
     }),
     handleHostSearchForConfig: debounce(function (value, index) {
-      // If no search value, restore full list
-      if (!value || value.trim() === '') {
-        const allHosts = this.configHostsFilterList[index] || []
-        this.$set(this.configHostsList, index, allHosts.slice(0, selectSize))
-        return
-      }
-      // Filter from full list
-      const allHosts = this.configHostsFilterList[index] || []
-      const filtered = allHosts.filter((item) => {
-        const reg = new RegExp(value, 'gi')
-        const match = item.name.toString().match(reg)
-        return match
-      })
-      // Update display list to first selectSize items after filtering
-      this.$set(this.configHostsList, index, filtered.slice(0, selectSize))
+      const allHosts = this.configHostsAllList[index] || this.configHostsFilterList[index] || []
+      const filtered = this.filterOptionsByKeyword(allHosts, value)
+      this.$set(this.configHostsFilterList, index, filtered)
+      this.$set(this.configHostsList, index, this.mergeSelectedHosts(index, filtered.slice(0, selectSize)))
     }),
     handleItemPopupScroll: debounce(function (index) {
-      const curLen = this.curItemsList[index] ? this.curItemsList[index].length : 0
-      const allLen = this.itemsFilterList[index] ? this.itemsFilterList[index].length : 0
-      if (curLen < allLen) {
-        const nextPage = this.itemsFilterList[index].slice(curLen, curLen + selectSize)
-        this.$set(this.curItemsList, index, [...(this.curItemsList[index] || []), ...nextPage])
+      const nextList = this.getNextSelectPage(this.curItemsList[index], this.itemsFilterList[index], 'itemid')
+      if (nextList) {
+        this.$set(this.curItemsList, index, this.mergeSelectedItems(index, nextList))
       }
     }),
     handleItemSearch: debounce(function (value, index) {
@@ -1492,12 +1566,9 @@ export default {
         return
       }
       const allItems = this.ItemsList[this.getItemsCacheKey(hostConfig.zid, hostConfig.host_id)] || []
-      this.$set(this.itemsFilterList, index, allItems.filter((item) => {
-        const reg = new RegExp(value, 'gi')
-        const match = item.name.toString().match(reg)
-        return match
-      }))
-      this.$set(this.curItemsList, index, this.itemsFilterList[index].slice(0, selectSize))
+      const filtered = this.filterOptionsByKeyword(allItems, value)
+      this.$set(this.itemsFilterList, index, filtered)
+      this.$set(this.curItemsList, index, this.mergeSelectedItems(index, filtered.slice(0, selectSize)))
     }),
     confirm(record) {
       this.loading = true
