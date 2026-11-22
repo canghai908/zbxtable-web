@@ -169,6 +169,11 @@ const options = {
               name: "主机报表",
               component: () => import("@/pages/report/host"),
             },
+            {
+              path: "inspect",
+              name: "自动巡检",
+              component: () => import("@/pages/report/inspect"),
+            },
           ],
         },
         {

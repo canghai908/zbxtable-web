@@ -43,7 +43,9 @@ module.exports = {
       },
       report: {
         name: '报表管理',
-        host: {name: '主机报表'}
+        host: {name: '主机报表'},
+        inspect: {name: '自动巡检'},
+        inspectReport: {name: '自动巡检'}
       },
       system: {
         name: '系统管理',
@@ -145,7 +147,9 @@ module.exports = {
       },
       report: {
         name: 'Report',
-        host: {name: 'Host Report'}
+        host: {name: 'Host Report'},
+        inspect: {name: 'Auto Inspection'},
+        inspectReport: {name: 'Auto Inspection'}
       },
       system: {
         name: 'System',
@@ -247,7 +251,9 @@ module.exports = {
       },
       report: {
         name: '報表管理',
-        host: {name: '主機報表'}
+        host: {name: '主機報表'},
+        inspect: {name: '自動巡檢'},
+        inspectReport: {name: '自動巡檢'}
       },
       system: {
         name: '系統管理',

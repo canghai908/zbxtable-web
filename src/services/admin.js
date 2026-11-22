@@ -35,6 +35,7 @@ import {
 	REPORT,
 	ZABBIX,
 	METRIC_MAPPING,
+	INSPECTION,
 	SYSTEM_UPDATE,
 	ASSET_TYPE,
 	ASSET_GROUP,
@@ -457,6 +458,41 @@ export async function getSystemBindingHistory(id, params) {
 	return request(SYSTEM_BINDING + '/' + id + '/history', METHOD.GET, params)
 }
 
+// 自动化巡检中心
+export async function inspectionOverview() {
+	return request(INSPECTION + '/overview', METHOD.GET)
+}
+export async function inspectionTaskList(params) {
+	return request(INSPECTION + '/tasks', METHOD.GET, { ...params })
+}
+export async function inspectionTaskGet(id) {
+	return request(INSPECTION + '/tasks/' + id, METHOD.GET)
+}
+export async function inspectionTaskCreate(params) {
+	return request(INSPECTION + '/tasks', METHOD.POST, params)
+}
+export async function inspectionTaskUpdate(id, params) {
+	return request(INSPECTION + '/tasks/' + id, METHOD.PUT, params)
+}
+export async function inspectionTaskStatusPut(id, params) {
+	return request(INSPECTION + '/tasks/' + id + '/status', METHOD.PUT, params)
+}
+export async function inspectionTaskDelete(id) {
+	return request(INSPECTION + '/tasks/' + id, METHOD.DELETE)
+}
+export async function inspectionTaskRun(id) {
+	return request(INSPECTION + '/tasks/' + id + '/run', METHOD.POST)
+}
+export async function inspectionReportList(params) {
+	return request(INSPECTION + '/reports', METHOD.GET, { ...params })
+}
+export async function inspectionReportDetail(id) {
+	return request(INSPECTION + '/reports/' + id, METHOD.GET)
+}
+export async function inspectionReportDelete(id) {
+	return request(INSPECTION + '/reports/' + id, METHOD.DELETE)
+}
+
 export default {
 	hostList,
 	hostDetail,
@@ -567,4 +603,15 @@ export default {
 	deleteSystemBinding,
 	initSystemBinding,
 	getSystemBindingHistory,
+	inspectionOverview,
+	inspectionTaskList,
+	inspectionTaskGet,
+	inspectionTaskCreate,
+	inspectionTaskUpdate,
+	inspectionTaskStatusPut,
+	inspectionTaskDelete,
+	inspectionTaskRun,
+	inspectionReportList,
+	inspectionReportDetail,
+	inspectionReportDelete,
 }
